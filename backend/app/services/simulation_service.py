@@ -82,7 +82,7 @@ class SimulationService:
             f"Outdoor work schedule shifted by {shift_outdoor_hours_by} hour(s) to avoid peak solar irradiance (12:00 - 15:00).",
         ]
 
-        disclaimer = "SIMULATION ESTIMATE: Microclimate perturbation outputs carry theoretical uncertainty bounds and do not represent validated physical field sensor recordings."
+        disclaimer = "SIMULATION ESTIMATE: Microclimate perturbation outputs are illustrative and carry theoretical uncertainty bounds; they do not represent validated physical field sensor recordings."
 
         return {
             "location_id": location.id,
@@ -93,6 +93,8 @@ class SimulationService:
             "risk_reduction_points": actual_reduction,
             "range_low": range_low,
             "range_high": range_high,
+            "range_basis": "heuristic ±25%, not a modelled uncertainty distribution",
+            "confidence": "low",
             "assumptions": assumptions,
             "baseline_wbgt_c": baseline_thermal["wbgt_c"],
             "simulated_wbgt_c": simulated_wbgt,

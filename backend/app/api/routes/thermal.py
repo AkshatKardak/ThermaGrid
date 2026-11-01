@@ -2,12 +2,13 @@
 Thermal Indices routes for WBGT, UTCI, and Heat Index.
 """
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.services.thermal_service import ThermalService
-from app.schemas.thermal import ThermalCurrentOut, ThermalHistoryOut
+from app.schemas.thermal import ThermalCurrentOut
+from src.historical.store import HistoricalDataUnavailable
 
 router = APIRouter(prefix="/thermal", tags=["Thermal Indices"])
 
@@ -21,11 +22,14 @@ def get_current_thermal(
     return ThermalService.get_current_thermal_indices(db, location_id)
 
 
-@router.get("/history", response_model=ThermalHistoryOut)
+@router.get("/history")
 def get_thermal_history(
     location_id: int = Query(1, description="Ward Location ID"),
     days: int = Query(2, ge=1, le=5),
     db: Session = Depends(get_db),
 ):
     """Retrieves hourly time-series of thermal indices over past & forecast hours."""
-    return ThermalService.get_thermal_history(db, location_id, days=days)
+    try:
+        return ThermalService.get_thermal_history(db, location_id, days=days)
+    except HistoricalDataUnavailable as e:
+        raise HTTPException(status_code=409, detail=str(e))

@@ -32,8 +32,8 @@ class RiskService:
             raise ValueError(f"Location ID {location_id} not found.")
 
         # Get current thermal metrics
-        thermal = ThermalService.get_current_thermal_indices(db, location_id)
-        weather = WeatherService.get_current_weather(db, location_id)
+        thermal = ThermalService.get_current_thermal_indices(db, location_id, for_risk=True)
+        weather = WeatherService.get_current_weather(db, location_id, for_risk=True)
 
         # Retrieve weights from DB config if present
         config = db.query(RiskConfig).filter(RiskConfig.config_name == "default").first()
@@ -78,19 +78,17 @@ class RiskService:
             "wbgt_c": thermal["wbgt_c"],
             "utci_c": thermal["utci_c"],
             "confidence": 0.94,
-            "sub_scores": {
+            "sub_scores": risk_calc.get("sub_scores", {
                 "thermal_hazard": risk_calc["hazard_score"],
                 "population_exposure": round(risk_calc["exposure_index"] * 100.0, 1),
                 "social_vulnerability": round(risk_calc["vulnerability_index"] * 100.0, 1),
-                "composite": risk_calc["risk_score"],
-            },
-            "diagnostics": {
-                "wbgt_c": thermal["wbgt_c"],
+                "adaptive_capacity": 60.0,
+            }),
+            "diagnostics": risk_calc.get("diagnostics", {
                 "utci_c": thermal["utci_c"],
                 "heat_index_c": thermal.get("heat_index_c", 0.0),
-                "temp_c": weather["temperature_c"],
-                "rel_humidity_pct": weather.get("rel_humidity_pct", 55.0),
-            },
+                "temperature_c": weather["temperature_c"],
+            }),
             "is_demo": risk_calc["is_demo"],
             "demo_label": weather["demo_label"],
             "provenance": create_provenance(

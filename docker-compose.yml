@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-heatsense}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-heatsense_secure_pass_demo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-heatsense}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"

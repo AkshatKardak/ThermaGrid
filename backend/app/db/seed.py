@@ -19,7 +19,6 @@ from app.models.data_source import DataSource
 from app.models.risk import RiskConfig
 from app.models.alert import Alert
 from app.models.user import User
-from app.core.security import get_password_hash
 
 logger = logging.getLogger(__name__)
 
@@ -410,21 +409,21 @@ def seed_database():
             users = [
                 User(
                     email="citizen@heatsense.in",
-                    hashed_password=get_password_hash("citizen123"),
+                    hashed_password="clerk_managed_user",
                     full_name="Pooja Sharma",
                     role="citizen",
                     city_preference="Mumbai",
                 ),
                 User(
                     email="worker@heatsense.in",
-                    hashed_password=get_password_hash("worker123"),
+                    hashed_password="clerk_managed_user",
                     full_name="Ramesh Patel (Construction Supervisor)",
                     role="worker",
                     city_preference="Mumbai",
                 ),
                 User(
                     email="authority@heatsense.in",
-                    hashed_password=get_password_hash("authority123"),
+                    hashed_password="clerk_managed_user",
                     full_name="Dr. Anil Deshmukh (Disaster Management Cell, BMC)",
                     role="authority",
                     city_preference="Mumbai",

@@ -55,7 +55,9 @@ async def lifespan(app: FastAPI):
     4. Halts scheduler gracefully on shutdown
     """
     logger.info(f"Starting {settings.app_name} in [{settings.app_env}] mode.")
-    Base.metadata.create_all(bind=engine)
+    # schema managed by Alembic — run: alembic upgrade head
+    if settings.app_env == "development" and settings.debug:
+        Base.metadata.create_all(bind=engine)
     should_run_scheduler = (
         settings.app_env != "testing"
         and os.getenv("TESTING") != "true"

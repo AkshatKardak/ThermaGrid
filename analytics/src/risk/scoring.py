@@ -14,31 +14,18 @@ Citations:
 from typing import Dict, Any, List, Optional
 
 
-def compute_thermal_hazard_score(
-    temp_c: float,
-    wbgt_c: float,
-    utci_c: float,
-    heat_index_c: float,
-) -> float:
+def compute_thermal_hazard_score(wbgt_c: float) -> float:
     """
-    Computes a normalized thermal hazard score (0 - 100) combining the three
-    thermal stress metrics with emphasis on WBGT and UTCI.
-    """
-    # Scale WBGT: 22°C (safe) -> 34°C (extreme)
-    wbgt_norm = max(0.0, min(100.0, (wbgt_c - 22.0) * (100.0 / 12.0)))
-    
-    # Scale UTCI: 24°C (comfortable) -> 44°C (extreme)
-    utci_norm = max(0.0, min(100.0, (utci_c - 24.0) * (100.0 / 20.0)))
-    
-    # Scale Heat Index: 26°C -> 48°C
-    hi_norm = max(0.0, min(100.0, (heat_index_c - 26.0) * (100.0 / 22.0)))
-    
-    # Scale dry-bulb temperature: 28°C -> 46°C
-    ta_norm = max(0.0, min(100.0, (temp_c - 28.0) * (100.0 / 18.0)))
+    Thermal hazard from WBGT ONLY.
 
-    # Weighted hazard: WBGT (40%) + UTCI (30%) + HI (20%) + Ta (10%)
-    hazard = (0.40 * wbgt_norm) + (0.30 * utci_norm) + (0.20 * hi_norm) + (0.10 * ta_norm)
-    return round(max(0.0, min(100.0, hazard)), 2)
+    WBGT is the single occupational heat-stress standard (ISO 7243) and is the
+    metric the rest of the pipeline is validated against. UTCI and Heat Index
+    share temperature/humidity inputs with WBGT; summing them into one hazard
+    score double-counts the same physical signal. They are returned as
+    diagnostics (see compute_composite_risk), never added to the composite.
+    """
+    wbgt_norm = max(0.0, min(100.0, (wbgt_c - 22.0) * (100.0 / 12.0)))
+    return round(wbgt_norm, 2)
 
 
 def compute_exposure_index(
@@ -109,7 +96,8 @@ def compute_composite_risk(
     computes factor contribution percentages, and constructs an evidence-based
     deterministic natural-language explanation.
     """
-    hazard = compute_thermal_hazard_score(temp_c, wbgt_c, utci_c, heat_index_c)
+    # utci_c, heat_index_c, temp_c retained for diagnostics only — not part of the composite.
+    hazard = compute_thermal_hazard_score(wbgt_c)      # WBGT only
     exposure = compute_exposure_index(population_density_per_km2, outdoor_worker_ratio)
     vulnerability = compute_vulnerability_index(
         elderly_ratio,
@@ -118,6 +106,7 @@ def compute_composite_risk(
         vegetation_deficit_ratio,
         cooling_access_deficit,
     )
+    adaptive_capacity = round(100.0 * (1.0 - cooling_access_deficit), 2)
 
     # Normalize exposure and vulnerability to 0-100 scale
     exp_100 = exposure * 100.0
@@ -219,5 +208,16 @@ def compute_composite_risk(
             "hazard": weight_hazard,
             "exposure": weight_exposure,
             "vulnerability": weight_vulnerability,
+        },
+        "sub_scores": {
+            "thermal_hazard": hazard,
+            "population_exposure": exp_100,
+            "social_vulnerability": vuln_100,
+            "adaptive_capacity": adaptive_capacity,
+        },
+        "diagnostics": {
+            "utci_c": utci_c,
+            "heat_index_c": heat_index_c,
+            "temperature_c": temp_c,
         },
     }

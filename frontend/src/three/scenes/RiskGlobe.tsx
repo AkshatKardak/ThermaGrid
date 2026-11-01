@@ -35,10 +35,20 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
   interactive = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const [selectedCity, setSelectedCity] = useState<CityRisk>(cities[0] || DEFAULT_CITIES[0]);
   const [hoveredCity, setHoveredCity] = useState<CityRisk | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
   const [useFallback, setUseFallback] = useState(false);
+
+  // Synchronize selectedCity whenever real cities data arrives or updates
+  useEffect(() => {
+    if (cities && cities.length > 0) {
+      // Find highest risk city among the real wards
+      const highest = [...cities].sort((a, b) => b.risk - a.risk)[0];
+      setSelectedCity(highest);
+    }
+  }, [cities]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -47,19 +57,19 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       return;
     }
 
-    const container = containerRef.current;
-    if (!container) return;
+    const canvasContainer = canvasRef.current;
+    if (!canvasContainer) return;
 
-    let width = container.clientWidth || 500;
-    let heightPx = container.clientHeight || 500;
+    let width = canvasContainer.clientWidth || 550;
+    let heightPx = canvasContainer.clientHeight || 500;
     const isMobile = window.innerWidth < 768;
 
     // --- 1. Scene & Camera ---
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(42, width / heightPx, 0.1, 100);
-    // Camera positioned to view globe with India centered
-    camera.position.set(0, 0.35, 3.1);
+    const camera = new THREE.PerspectiveCamera(40, width / heightPx, 0.1, 100);
+    // Camera positioned closer to globe for wider Earth presence
+    camera.position.set(0, 0.15, 2.38);
 
     const renderer = new THREE.WebGLRenderer({
       powerPreference: 'high-performance',
@@ -70,7 +80,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
-    container.appendChild(renderer.domElement);
+    canvasContainer.appendChild(renderer.domElement);
 
     // --- 2. Post-Processing Bloom (Subtle Earth rim glow, NOT neon blowout) ---
     let composer: EffectComposer | null = null;
@@ -300,12 +310,12 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     const observer = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
     });
-    observer.observe(container);
+    observer.observe(canvasContainer);
 
     const onResize = () => {
-      if (!container) return;
-      width = container.clientWidth || 500;
-      heightPx = container.clientHeight || 500;
+      if (!canvasContainer) return;
+      width = canvasContainer.clientWidth || 550;
+      heightPx = canvasContainer.clientHeight || 500;
       camera.aspect = width / heightPx;
       camera.updateProjectionMatrix();
       renderer.setSize(width, heightPx);
@@ -375,19 +385,25 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full flex flex-col justify-between"
-      style={{ minHeight: height }}
+      className="relative w-full h-full min-h-[460px] lg:min-h-[500px] flex flex-col justify-between overflow-hidden rounded-[14px]"
+      style={{ height }}
     >
+      {/* 3D WebGL Canvas Layer - absolute so it never inflates parent flex height */}
+      <div
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-auto"
+      />
+
       {/* Top Status Readout */}
-      <div className="w-full flex items-center justify-between p-4 z-10 pointer-events-none">
+      <div className="w-full flex items-center justify-between p-4 sm:p-5 z-10 pointer-events-none">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-[#38BDF8] animate-ping" />
           <span className="text-xs font-mono font-medium text-[#D7E0E7] uppercase tracking-[0.10em]">
             National Synoptic Thermal Field
           </span>
         </div>
-        <div className="text-[11px] font-mono text-[#38BDF8] bg-[#101820]/90 px-2.5 py-1 rounded-[6px] border border-white/10">
-          Telemetry Active
+        <div className="text-[11px] font-mono text-[#38BDF8] bg-[#101820]/90 px-2.5 py-1 rounded-[6px] border border-white/10 backdrop-blur-sm">
+          Live Synoptic Feed
         </div>
       </div>
 
@@ -407,17 +423,17 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
             </span>
           </div>
           <div className="text-[10px] text-[#8B9AA8]">
-            WBGT {hoveredCity.wbgt || 34.2}°C • Temp {hoveredCity.temp || 38.5}°C
+            WBGT {hoveredCity.wbgt || 26.4}°C • Temp {hoveredCity.temp || 28.3}°C
           </div>
         </div>
       )}
 
       {/* Bottom Telemetry Card for Selected City */}
-      <div className="w-full p-4 z-10 pointer-events-auto">
-        <div className="bg-[#101820]/95 border border-white/10 rounded-[10px] p-3 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md shadow-lg">
+      <div className="w-full p-4 sm:p-5 z-10 pointer-events-auto">
+        <div className="bg-[#101820]/90 border border-white/10 rounded-[10px] p-3 sm:p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md shadow-xl">
           <div className="flex items-center gap-2.5">
             <div
-              className="w-3 h-3 rounded-full shrink-0"
+              className="w-3 h-3 rounded-full shrink-0 animate-pulse"
               style={{
                 backgroundColor: heatColor(selectedCity.risk),
               }}
@@ -437,13 +453,13 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
                 {(selectedCity.risk * 100).toFixed(1)} / 100
               </strong>
             </div>
-            {selectedCity.temp && (
+            {selectedCity.temp !== undefined && (
               <div>
                 <span className="text-[#8B9AA8] text-[10px] uppercase block">Dry-Bulb</span>
                 <span className="text-white font-semibold">{selectedCity.temp}°C</span>
               </div>
             )}
-            {selectedCity.wbgt && (
+            {selectedCity.wbgt !== undefined && (
               <div>
                 <span className="text-[#8B9AA8] text-[10px] uppercase block">ISO WBGT</span>
                 <span className="text-[#FF704F] font-semibold">{selectedCity.wbgt}°C</span>

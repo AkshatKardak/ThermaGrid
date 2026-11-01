@@ -6,6 +6,7 @@ Reads environment variables strictly from .env and system environment.
 from functools import lru_cache
 from typing import List
 import os
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,8 +26,19 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
     # Database
-    database_url: str = "postgresql+psycopg://heatsense:heatsense_secure_pass_demo@localhost:5432/heatsense"
+    database_url: str = Field(default="", description="Postgres DSN — required, no default")
     fallback_sqlite_url: str = f"sqlite:///{os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'heatsense_dev.db')}"
+
+    # Risk Data Gates
+    allow_synthetic_risk: bool = False
+    max_observation_age_min: int = 180
+    min_completeness: float = 0.9
+
+    @model_validator(mode="after")
+    def _require_db_url(self):
+        if not self.database_url and self.app_env != "development":
+            raise ValueError("DATABASE_URL must be set")
+        return self
 
     # Clerk (auth)
     clerk_secret_key: str = ""

@@ -17,14 +17,25 @@ from src.ingestion.open_meteo import OpenMeteoClient
 from app.models.location import Location
 from app.models.weather import WeatherObservation
 from app.core.config import get_settings
+from app.core.errors import DataSourceUnavailable
 
 settings = get_settings()
 open_meteo_client = OpenMeteoClient(base_url=settings.OPEN_METEO_BASE_URL)
 
 
+def assert_risk_inputs(obs: dict, settings) -> None:
+    if obs.get("is_synthetic") and not getattr(settings, "allow_synthetic_risk", False):
+        raise DataSourceUnavailable("Synthetic observations cannot drive a live risk score")
+    age_min = obs.get("age_minutes", 0)
+    if age_min > getattr(settings, "max_observation_age_min", 180):
+        raise DataSourceUnavailable(f"Observation is stale ({age_min} min old)")
+    if obs.get("completeness", 1.0) < getattr(settings, "min_completeness", 0.9):
+        raise DataSourceUnavailable("Observation is incomplete")
+
+
 class WeatherService:
     @staticmethod
-    def get_current_weather(db: Session, location_id: int) -> Dict[str, Any]:
+    def get_current_weather(db: Session, location_id: int, for_risk: bool = False) -> Dict[str, Any]:
         """
         Retrieves current surface weather for a specific location/ward.
         """
@@ -40,23 +51,40 @@ class WeatherService:
         )
 
         curr = weather_data.get("current_weather", {})
-        temp = curr.get("temperature", 34.5)
-        wind = curr.get("windspeed", 2.2)
+        temp = curr.get("temperature")
+        wind = curr.get("windspeed")
         
         # Hourly slice for humidity & solar radiation
         hourly = weather_data.get("hourly", {})
-        rhs = hourly.get("relative_humidity_2m", [55.0])
-        sols = hourly.get("shortwave_radiation_instant", [650.0])
-        apps = hourly.get("apparent_temperature", [temp + 4.0])
+        rhs = hourly.get("relative_humidity_2m", [])
+        sols = hourly.get("shortwave_radiation_instant", [])
+        apps = hourly.get("apparent_temperature", [])
 
-        rh = rhs[0] if rhs else 55.0
-        sol = sols[0] if sols else 650.0
-        app_t = apps[0] if apps else temp + 4.0
+        if for_risk:
+            if temp is None:
+                raise DataSourceUnavailable("Missing temperature in upstream observation")
+            if wind is None:
+                raise DataSourceUnavailable("Missing wind speed in upstream observation")
+            if not rhs or rhs[0] is None:
+                raise DataSourceUnavailable("Missing relative humidity in upstream observation")
+            if not sols or sols[0] is None:
+                raise DataSourceUnavailable("Missing solar radiation in upstream observation")
+            rh = rhs[0]
+            sol = sols[0]
+            app_t = apps[0] if (apps and apps[0] is not None) else (temp + 4.0)
+        else:
+            if temp is None:
+                temp = 34.5
+            if wind is None:
+                wind = 2.2
+            rh = rhs[0] if (rhs and rhs[0] is not None) else 55.0
+            sol = sols[0] if (sols and sols[0] is not None) else 650.0
+            app_t = apps[0] if (apps and apps[0] is not None) else (temp + 4.0)
 
         is_demo = weather_data.get("is_demo", False)
         demo_label = weather_data.get("demo_label", None) if is_demo else None
 
-        return {
+        obs_dict = {
             "location_id": location.id,
             "city": location.city,
             "ward_name": location.ward_name,
@@ -70,8 +98,16 @@ class WeatherService:
             "apparent_temperature_c": float(app_t),
             "source_name": weather_data.get("data_source", "Open-Meteo"),
             "is_demo": is_demo,
+            "is_synthetic": is_demo,
             "demo_label": demo_label,
+            "age_minutes": weather_data.get("age_minutes", 0),
+            "completeness": weather_data.get("completeness", 1.0),
         }
+
+        if for_risk:
+            assert_risk_inputs(obs_dict, settings)
+
+        return obs_dict
 
     @staticmethod
     def get_weather_forecast(db: Session, location_id: int, days: int = 5) -> Dict[str, Any]:

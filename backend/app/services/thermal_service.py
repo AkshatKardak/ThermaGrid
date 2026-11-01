@@ -21,11 +21,11 @@ from app.models.location import Location
 
 class ThermalService:
     @staticmethod
-    def get_current_thermal_indices(db: Session, location_id: int) -> Dict[str, Any]:
+    def get_current_thermal_indices(db: Session, location_id: int, for_risk: bool = False) -> Dict[str, Any]:
         """
         Computes current WBGT, UTCI, and Heat Index for a ward using current weather.
         """
-        weather = WeatherService.get_current_weather(db, location_id)
+        weather = WeatherService.get_current_weather(db, location_id, for_risk=for_risk)
         temp_c = weather["temperature_c"]
         rh_pct = weather["rel_humidity_pct"]
         wind_ms = weather["wind_speed_ms"]
@@ -75,34 +75,38 @@ class ThermalService:
     @staticmethod
     def get_thermal_history(db: Session, location_id: int, days: int = 2) -> Dict[str, Any]:
         """
-        Computes hourly time-series of thermal indices over past/forecast hours.
+        Hourly thermal indices computed from STORED OBSERVATIONS only.
+        Never derives history from forecasts.
         """
-        forecast = WeatherService.get_weather_forecast(db, location_id, days=days)
+        from datetime import datetime, timedelta, timezone
+        from src.historical.store import HistoricalStore, HistoricalDataUnavailable
+
+        end = datetime.now(timezone.utc)
+        start = end - timedelta(days=days)
+
+        store = HistoricalStore(db)
+        obs = store.read_range(location_id, start, end)      # DataFrame
+
+        if obs is None or obs.empty:
+            raise HistoricalDataUnavailable(
+                f"No stored observations for location {location_id} between {start.date()} and {end.date()}"
+            )
+
         items = []
-
-        for h in forecast["hourly"]:
-            t = h["temperature_c"]
-            rh = h["rel_humidity_pct"]
-            w = h["wind_speed_ms"]
-            s = h["solar_radiation_wm2"]
-
-            wbgt_v = calculate_wbgt(t, rh, w, s)["wbgt"]
-            utci_v = calculate_utci(t, rh, w, s)["utci"]
-            hi_v = calculate_heat_index(t, rh)["heat_index_c"]
-
+        for row in obs.itertuples():
+            t, rh, w, s = row.temperature_c, row.relative_humidity_pct, row.wind_speed_ms, row.solar_radiation_wm2
             items.append({
-                "time": h["time"],
-                "wbgt_c": wbgt_v,
-                "utci_c": utci_v,
-                "heat_index_c": hi_v,
+                "time": row.observed_at.isoformat(),
                 "temperature_c": t,
+                "wbgt_c": calculate_wbgt(t, rh, w, s)["wbgt"],
+                "utci_c": calculate_utci(t, rh, w, s)["utci"],
+                "heat_index_c": calculate_heat_index(t, rh)["heat_index_c"],
             })
 
         return {
-            "location_id": forecast["location_id"],
-            "city": forecast["city"],
-            "ward_name": forecast["ward_name"],
+            "location_id": location_id,
             "items": items,
-            "is_demo": forecast["is_demo"],
-            "demo_label": forecast["demo_label"],
+            "source": "observed",
+            "is_synthetic": bool(obs["is_synthetic"].any()) if "is_synthetic" in obs else False,
+            "count": len(items),
         }

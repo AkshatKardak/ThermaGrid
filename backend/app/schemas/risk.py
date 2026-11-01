@@ -56,7 +56,10 @@ class RiskForecastOut(BaseModel):
     ward_name: str
     forecast_days: int
     items: List[HourlyRiskForecastItem]
-    model_name: str
+    model_name: Optional[str] = None
+    method: Optional[str] = None
+    is_model_backed: bool = False
+    interval_kind: Optional[str] = None
     is_demo: bool = False
     demo_label: Optional[str] = None
     provenance: Optional[ProvenanceEnvelope] = None
@@ -79,6 +82,8 @@ class SimulationScenarioResponse(BaseModel):
     risk_reduction_points: float
     range_low: float = Field(description="Lower plausible risk reduction bound")
     range_high: float = Field(description="Upper plausible risk reduction bound")
+    range_basis: Optional[str] = "heuristic ±25%, not a modelled uncertainty distribution"
+    confidence: Optional[str] = "low"
     assumptions: List[str] = Field(description="Explicit physical and microclimate behavioral assumptions")
     baseline_wbgt_c: float
     simulated_wbgt_c: float
@@ -88,7 +93,7 @@ class SimulationScenarioResponse(BaseModel):
     is_model_backed: bool = False
     demo_label: str = "DEMO DATA (Microclimate Intervention Simulation)"
     disclaimer: str = Field(
-        default="SIMULATION ESTIMATE: Microclimate perturbation outputs carry theoretical uncertainty bounds and do not represent validated physical field sensor recordings.",
+        default="SIMULATION ESTIMATE: Microclimate perturbation outputs are illustrative and carry theoretical uncertainty bounds; they do not represent validated physical field sensor recordings.",
         description="Mandatory simulation disclaimer"
     )
     provenance: Optional[ProvenanceEnvelope] = None

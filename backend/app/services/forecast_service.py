@@ -68,10 +68,24 @@ class ForecastService:
             )
 
             score = risk_eval["risk_score"]
-            # Confidence bounds: wider in future hours (growing forecast uncertainty)
-            lead_hour_penalty = (i / len(hourly_records)) * 4.5
-            lower_bound = max(0.0, round(score - (3.5 + lead_hour_penalty), 1))
-            upper_bound = min(100.0, round(score + (3.5 + lead_hour_penalty), 1))
+
+            predicted = None
+            is_model_backed = False
+            method = "weather_derived_projection"
+            if ml_pipeline is not None and getattr(ml_pipeline, "is_trained", False):
+                pred = ml_pipeline.predict_with_confidence(
+                    features=build_forecast_features(h, location), horizon_hours=i
+                )
+                predicted = pred["value"]
+                lower_bound, upper_bound = pred["lower"], pred["upper"]
+                is_model_backed = bool(pred.get("is_model_backed", True))
+                method = "quantile_gbm" if is_model_backed else "weather_derived_projection"
+
+            if predicted is None:
+                # Heuristic widening — NOT a prediction interval.
+                lead_hour_penalty = (i / len(hourly_records)) * 4.5
+                lower_bound = max(0.0, round(score - (3.5 + lead_hour_penalty), 1))
+                upper_bound = min(100.0, round(score + (3.5 + lead_hour_penalty), 1))
 
             items.append({
                 "time": h["time"],
@@ -89,7 +103,9 @@ class ForecastService:
             "ward_name": location.ward_name,
             "forecast_days": days,
             "items": items,
-            "model_name": "GradientBoostingRegressor (Quantile 10-50-90 Ensemble)",
+            "method": method,
+            "is_model_backed": is_model_backed,
+            "interval_kind": "prediction_interval" if is_model_backed else "heuristic_uncertainty",
             "is_demo": weather_fc["is_demo"],
             "demo_label": weather_fc["demo_label"],
         }

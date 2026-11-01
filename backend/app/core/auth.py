@@ -28,8 +28,8 @@ def get_current_user(
     creds: Optional[HTTPAuthorizationCredentials] = Depends(bearer),
 ) -> Dict[str, Any]:
     """
-    Validates Clerk Bearer session token.
-    Extracts user payload including sub (user_id) and role.
+    Validates a Clerk session JWT (RS256) against Clerk's JWKS.
+    Fails closed: any token that cannot be verified is rejected.
     """
     if creds is None:
         raise HTTPException(
@@ -38,62 +38,45 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    token = creds.credentials
     s = get_settings()
 
-    # Development / Test Mock Token Handling
-    if token.startswith("test_") or token.startswith("mock_") or token == "dev_token":
-        role = "authority" if "authority" in token or "admin" in token else "citizen"
-        return {
-            "sub": "user_mock_12345",
-            "role": role,
-            "email": "test.user@thermagrid.in",
-            "is_demo": True,
-        }
+    # Dev-only escape hatch. Unreachable unless BOTH app_env=development AND debug=true.
+    # Never returns a privileged role.
+    if s.app_env == "development" and s.debug and creds.credentials == "dev_token":
+        return {"sub": "user_dev_mock", "role": "citizen", "is_demo": True}
 
-    # Verify via Clerk JWKS if configured
     jwks = _jwks_client()
-    if jwks and s.clerk_jwks_url:
-        try:
-            signing_key = jwks.get_signing_key_from_jwt(token).key
-            decode_kwargs: Dict[str, Any] = {
-                "algorithms": ["RS256"],
-                "options": {"verify_aud": False},
-            }
-            if s.clerk_issuer:
-                decode_kwargs["issuer"] = s.clerk_issuer
+    if jwks is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication is not configured (CLERK_JWKS_URL missing)",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
-            payload = jwt.decode(token, signing_key, **decode_kwargs)
-            
-            # Map role from top-level or metadata
-            if "role" not in payload and "public_metadata" in payload:
-                payload["role"] = payload["public_metadata"].get("role", "citizen")
-            if "role" not in payload:
-                payload["role"] = "citizen"
-                
-            return payload
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Invalid session: {str(e)}",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-
-    # Fallback unverified decode for development if secret/JWKS not configured
     try:
-        payload = jwt.decode(token, options={"verify_signature": False})
-        if "role" not in payload and "public_metadata" in payload:
-            payload["role"] = payload["public_metadata"].get("role", "citizen")
-        if "role" not in payload:
-            payload["role"] = "citizen"
-        return payload
-    except Exception:
-        # If not standard JWT, treat as dev token
-        return {
-            "sub": "user_dev_standalone",
-            "role": "authority",
-            "is_demo": True,
+        signing_key = jwks.get_signing_key_from_jwt(creds.credentials).key
+        decode_kwargs: Dict[str, Any] = {
+            "algorithms": ["RS256"],
+            "options": {"verify_aud": False},
         }
+        if s.clerk_issuer:
+            decode_kwargs["issuer"] = s.clerk_issuer
+        payload = jwt.decode(creds.credentials, signing_key, **decode_kwargs)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Role comes from a Clerk-signed claim; default to least privilege.
+    if "role" not in payload:
+        meta = payload.get("public_metadata") or {}
+        payload["role"] = meta.get("role", "citizen")
+    if payload["role"] not in {"citizen", "worker", "authority", "admin"}:
+        payload["role"] = "citizen"
+
+    return payload
 
 
 def require_role(*allowed: str):
