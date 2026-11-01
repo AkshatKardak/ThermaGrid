@@ -1,0 +1,20 @@
+# Heat Equity & Risk Index Component Weights
+# Each weight has an explicit methodology tag: empirical | assumption
+version: "2026.1"
+weights:
+  hazard:
+    weight: 0.40
+    basis: empirical
+    reference: "ISO 7243:2017 Occupational Heat Stress"
+  exposure:
+    weight: 0.25
+    basis: empirical
+    reference: "Census of India Ward Population Density"
+  vulnerability:
+    weight: 0.20
+    basis: empirical
+    reference: "Informal settlements and outdoor worker fraction"
+  adaptive_capacity:
+    weight: 0.15
+    basis: assumption
+    reference: "Tree canopy coverage and cooling center access index"

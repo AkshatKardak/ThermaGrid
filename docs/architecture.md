@@ -1,6 +1,6 @@
 # ThermaGrid — System Architecture
 
-**Initiative:** Ministry of Earth Sciences (MoES) / NCMRWF  
+**Initiative:** National Climate Early-Warning & Decision Support Initiative  
 **Objective:** Hyperlocal Human Thermal-Stress Early-Warning and Decision-Support Platform.
 
 ---
@@ -46,7 +46,7 @@ thermagrid/
 | **Data Analysis & ML** | Node lacks equivalents of SciPy, scikit-learn, GeoPandas | Python-native; analytics package is directly importable by API |
 | **Thermal Indices (WBGT/UTCI)** | Must be shelled out or re-implemented in JS | Exact reference equations using NumPy and SciPy |
 | **Spatial Joins & GIS** | Mongo geospatial lacks polygon reprojection & spatial joins | PostGIS industry standard for administrative ward polygons |
-| **MoES / NCMRWF Alignment** | Non-standard | Standard scientific python stack |
+| **Atmospheric Science Alignment** | Non-standard | Standard scientific python stack |
 
 ---
 

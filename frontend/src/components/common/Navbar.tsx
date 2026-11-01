@@ -38,7 +38,7 @@ export const Navbar: React.FC = () => {
                   Therma<span className="text-[#FF704F]">Grid</span>
                 </span>
                 <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold uppercase bg-white/10 text-[#8B9AA8] whitespace-nowrap">
-                  MoES / NCMRWF
+                  National Telemetry
                 </span>
               </div>
               <p className="hidden md:block text-[10px] text-[#8B9AA8] -mt-0.5 tracking-wide whitespace-nowrap">

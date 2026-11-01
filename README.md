@@ -1,7 +1,7 @@
 # ThermaGrid
 
 > **Hyperlocal Human Thermal-Stress Early-Warning and Decision-Support Platform**  
-> *Ministry of Earth Sciences (MoES) / NCMRWF Initiative*  
+> *National Climate Early-Warning & Decision Support Initiative*  
 > Aligned with NDMA National Heat Action Plan Guidelines (2020) and ISO 7243:2017 standards.
 
 ---

@@ -4,11 +4,12 @@ Computes projected risk reduction, UHI mitigation, and population protected
 when urban heat resilience interventions are applied.
 """
 
-from typing import Dict, Any
+from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 from app.models.location import Location
 from app.services.risk_service import RiskService
 from app.services.thermal_service import ThermalService
+from app.schemas.provenance import create_provenance
 
 
 class SimulationService:
@@ -70,6 +71,19 @@ class SimulationService:
         pop_benefiting = int(location.population * (cool_roof_frac * 0.45 + canopy_frac * 0.5 + 0.15))
         pop_benefiting = min(location.population, max(500, pop_benefiting))
 
+        # Plausible uncertainty range (+/- 25%)
+        range_low = round(max(0.0, actual_reduction * 0.75), 1)
+        range_high = round(actual_reduction * 1.25, 1)
+
+        assumptions: List[str] = [
+            f"Cool roof albedo assumed >= 0.70 with {cool_roofs_adoption_pct:.0f}% compliant roof area.",
+            f"Urban tree canopy expansion of {green_cover_expansion_pct:.0f}% with mature crown transpiration.",
+            f"{misting_shelters_count} localized misting shelters operating at 100% capacity during peak hours.",
+            f"Outdoor work schedule shifted by {shift_outdoor_hours_by} hour(s) to avoid peak solar irradiance (12:00 - 15:00).",
+        ]
+
+        disclaimer = "SIMULATION ESTIMATE: Microclimate perturbation outputs carry theoretical uncertainty bounds and do not represent validated physical field sensor recordings."
+
         return {
             "location_id": location.id,
             "city": location.city,
@@ -77,10 +91,22 @@ class SimulationService:
             "baseline_risk_score": baseline_risk["risk_score"],
             "simulated_risk_score": simulated_score,
             "risk_reduction_points": actual_reduction,
+            "range_low": range_low,
+            "range_high": range_high,
+            "assumptions": assumptions,
             "baseline_wbgt_c": baseline_thermal["wbgt_c"],
             "simulated_wbgt_c": simulated_wbgt,
             "estimated_uhi_reduction_c": total_uhi_reduction,
             "population_protected_count": pop_benefiting,
             "is_demo": True,
+            "is_model_backed": False,
             "demo_label": "DEMO DATA (Urban Resilience What-If Simulation)",
+            "disclaimer": disclaimer,
+            "provenance": create_provenance(
+                source="synthetic",
+                is_synthetic=True,
+                is_model_backed=False,
+                completeness=1.0,
+                quality_score=0.90,
+            ),
         }

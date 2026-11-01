@@ -79,7 +79,7 @@ export const AuthorityDashboard: React.FC = () => {
       ward: 'Pan-City',
       level: 'Advisory',
       color: '#F59E0B',
-      msg: 'MoES synoptic warning broadcast pushed to 420,000 enrolled citizens.',
+      msg: 'Synoptic warning broadcast pushed to 420,000 enrolled citizens.',
     },
   ]);
 

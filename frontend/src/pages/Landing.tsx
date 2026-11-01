@@ -89,7 +89,7 @@ export const Landing: React.FC = () => {
           {/* Eyebrow: mono, amethyst dot */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1F3445]/80 border border-white/10 text-xs font-mono text-[#D7E0E7]">
             <span className="w-2 h-2 rounded-full bg-[#9B6FD8] animate-pulse" />
-            <span className="text-[#8B9AA8]">MoES / NCMRWF High-Impact Initiative</span>
+            <span className="text-[#8B9AA8]">National Climate Early-Warning Initiative</span>
           </div>
 
           {/* Headline: Word-by-word entrance reveal */}
@@ -246,7 +246,7 @@ export const Landing: React.FC = () => {
           <ProvenanceChip
             label="Licensing & Open Code"
             value="MIT Open Science Standard"
-            sub="MoES/NCMRWF initiative"
+            sub="National Climate Telemetry"
           />
           <ProvenanceChip
             label="Inference Latency"

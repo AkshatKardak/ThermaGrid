@@ -48,7 +48,7 @@ def seed_database():
                 ),
                 DataSource(
                     name="IMD Automatic Weather Station (AWS) Network",
-                    provider="India Meteorological Department (MoES, Govt. of India)",
+                    provider="India Meteorological Department (Govt. of India)",
                     url="https://mausam.imd.gov.in",
                     spatial_resolution="Station Point Observations",
                     temporal_resolution="15-minute / Hourly",

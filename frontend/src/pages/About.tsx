@@ -63,7 +63,7 @@ export const About: React.FC = () => {
       <div className="space-y-3 pb-4 border-b border-white/8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1F3445] border border-white/10 text-xs font-mono text-[#D7E0E7]">
           <span className="w-2 h-2 rounded-full bg-[#9B6FD8]" />
-          <span>MoES / NCMRWF High-Impact Initiative</span>
+          <span>National Climate Early-Warning Initiative</span>
         </div>
         <h1 className={`${TYPOGRAPHY.h1} text-white`}>
           Methodology, Model Card & Provenance Registry

@@ -2,6 +2,7 @@
 ThermaGrid - FastAPI Application Entry Point.
 """
 
+import os
 import time
 import logging
 from contextlib import asynccontextmanager
@@ -55,9 +56,16 @@ async def lifespan(app: FastAPI):
     """
     logger.info(f"Starting {settings.app_name} in [{settings.app_env}] mode.")
     Base.metadata.create_all(bind=engine)
-    start_scheduler()
+    should_run_scheduler = (
+        settings.app_env != "testing"
+        and os.getenv("TESTING") != "true"
+        and os.getenv("PYTEST_CURRENT_TEST") is None
+    )
+    if should_run_scheduler:
+        start_scheduler()
     yield
-    stop_scheduler()
+    if should_run_scheduler:
+        stop_scheduler()
     logger.info(f"Shutting down {settings.app_name}.")
 
 
@@ -65,7 +73,7 @@ def create_application() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         version="0.1.0",
-        description="Hyperlocal human thermal-stress early-warning and decision-support platform (MoES / NCMRWF).",
+        description="Hyperlocal human thermal-stress early-warning and decision-support platform.",
         lifespan=lifespan,
     )
 

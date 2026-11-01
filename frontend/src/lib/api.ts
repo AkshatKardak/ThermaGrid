@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useAuth } from '@clerk/clerk-react';
 import { useMemo } from 'react';
 import { env } from '../config/env';
 
@@ -21,22 +20,9 @@ apiClient.interceptors.request.use(async (config) => {
   return config;
 });
 
-// React Hook with Clerk Session Token attachment
+// React Hook for API Client access (fallback-safe without ClerkProvider)
 export function useApi() {
-  const { getToken } = useAuth();
   return useMemo(() => {
-    const api = axios.create({ baseURL: env.API_BASE_URL });
-    api.interceptors.request.use(async (cfg) => {
-      try {
-        const token = await getToken();
-        if (token && cfg.headers) {
-          cfg.headers.Authorization = `Bearer ${token}`;
-        }
-      } catch {
-        // Continue unauthenticated if Clerk token fails
-      }
-      return cfg;
-    });
-    return api;
-  }, [getToken]);
+    return apiClient;
+  }, []);
 }

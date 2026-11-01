@@ -50,7 +50,7 @@ class OpenMeteoClient:
         try:
             req = urllib.request.Request(
                 url,
-                headers={"User-Agent": "ThermaGrid-India-MoES/1.0 (Climate Risk Early Warning)"},
+                headers={"User-Agent": "ThermaGrid-India/1.0 (Climate Risk Early Warning)"},
             )
             with urllib.request.urlopen(req, timeout=timeout_seconds) as resp:
                 data = json.loads(resp.read().decode("utf-8"))

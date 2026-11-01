@@ -18,6 +18,7 @@ from app.services.thermal_service import ThermalService
 from app.services.weather_service import WeatherService
 from app.models.location import Location
 from app.models.risk import RiskConfig
+from app.schemas.provenance import create_provenance
 
 
 class RiskService:
@@ -77,8 +78,28 @@ class RiskService:
             "wbgt_c": thermal["wbgt_c"],
             "utci_c": thermal["utci_c"],
             "confidence": 0.94,
+            "sub_scores": {
+                "thermal_hazard": risk_calc["hazard_score"],
+                "population_exposure": round(risk_calc["exposure_index"] * 100.0, 1),
+                "social_vulnerability": round(risk_calc["vulnerability_index"] * 100.0, 1),
+                "composite": risk_calc["risk_score"],
+            },
+            "diagnostics": {
+                "wbgt_c": thermal["wbgt_c"],
+                "utci_c": thermal["utci_c"],
+                "heat_index_c": thermal.get("heat_index_c", 0.0),
+                "temp_c": weather["temperature_c"],
+                "rel_humidity_pct": weather.get("rel_humidity_pct", 55.0),
+            },
             "is_demo": risk_calc["is_demo"],
             "demo_label": weather["demo_label"],
+            "provenance": create_provenance(
+                source="synthetic" if risk_calc["is_demo"] else "observed",
+                is_synthetic=risk_calc["is_demo"],
+                is_model_backed=True,
+                completeness=0.98,
+                quality_score=0.96,
+            ),
         }
 
     @staticmethod

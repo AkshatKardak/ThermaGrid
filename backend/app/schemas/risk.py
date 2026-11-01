@@ -4,7 +4,8 @@ Pydantic schemas for Risk scores, forecasts, and what-if simulation.
 
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from app.schemas.provenance import ProvenanceEnvelope
 
 
 class FactorContribution(BaseModel):
@@ -32,8 +33,11 @@ class RiskCurrentOut(BaseModel):
     wbgt_c: float
     utci_c: float
     confidence: float
+    sub_scores: Optional[Dict[str, float]] = None
+    diagnostics: Optional[Dict[str, float]] = None
     is_demo: bool = False
     demo_label: Optional[str] = None
+    provenance: Optional[ProvenanceEnvelope] = None
 
 
 class HourlyRiskForecastItem(BaseModel):
@@ -55,6 +59,7 @@ class RiskForecastOut(BaseModel):
     model_name: str
     is_demo: bool = False
     demo_label: Optional[str] = None
+    provenance: Optional[ProvenanceEnvelope] = None
 
 
 class SimulationScenarioRequest(BaseModel):
@@ -72,9 +77,18 @@ class SimulationScenarioResponse(BaseModel):
     baseline_risk_score: float
     simulated_risk_score: float
     risk_reduction_points: float
+    range_low: float = Field(description="Lower plausible risk reduction bound")
+    range_high: float = Field(description="Upper plausible risk reduction bound")
+    assumptions: List[str] = Field(description="Explicit physical and microclimate behavioral assumptions")
     baseline_wbgt_c: float
     simulated_wbgt_c: float
     estimated_uhi_reduction_c: float
     population_protected_count: int
     is_demo: bool = True
+    is_model_backed: bool = False
     demo_label: str = "DEMO DATA (Microclimate Intervention Simulation)"
+    disclaimer: str = Field(
+        default="SIMULATION ESTIMATE: Microclimate perturbation outputs carry theoretical uncertainty bounds and do not represent validated physical field sensor recordings.",
+        description="Mandatory simulation disclaimer"
+    )
+    provenance: Optional[ProvenanceEnvelope] = None

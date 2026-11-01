@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/react';
 import App from './App';
 import './index.css';
 import { env } from './config/env';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 // Initialize Sentry Frontend Crash Monitoring
 if (env.SENTRY_DSN) {
@@ -15,13 +16,28 @@ if (env.SENTRY_DSN) {
   });
 }
 
-// Fallback key if user hasn't added their clerk key yet in dev mode
-const clerkPublishableKey = env.CLERK_PUBLISHABLE_KEY || 'pk_test_aGVhdHNlbnNlLWluZGlhLmNsZXJrLmFjY291bnRzLmRldiQ';
+// Only mount ClerkProvider if a valid live/test key is provided
+const isClerkKeyConfigured = Boolean(
+  env.CLERK_PUBLISHABLE_KEY &&
+  (env.CLERK_PUBLISHABLE_KEY.startsWith('pk_test_') || env.CLERK_PUBLISHABLE_KEY.startsWith('pk_live_')) &&
+  !env.CLERK_PUBLISHABLE_KEY.includes('heatsense-india')
+);
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element #root not found in document');
+}
+
+createRoot(rootElement).render(
   <React.StrictMode>
-    <ClerkProvider publishableKey={clerkPublishableKey}>
-      <App />
-    </ClerkProvider>
+    <ErrorBoundary>
+      {isClerkKeyConfigured ? (
+        <ClerkProvider publishableKey={env.CLERK_PUBLISHABLE_KEY!}>
+          <App />
+        </ClerkProvider>
+      ) : (
+        <App />
+      )}
+    </ErrorBoundary>
   </React.StrictMode>
 );

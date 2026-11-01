@@ -520,7 +520,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
           </span>
         </div>
         <div className="text-[11px] font-mono text-[#8B9AA8] bg-[#101820]/80 px-2.5 py-1 rounded-[6px] border border-white/6">
-          MoES Synoptic Telemetry
+          National Synoptic Telemetry
         </div>
       </div>
 
