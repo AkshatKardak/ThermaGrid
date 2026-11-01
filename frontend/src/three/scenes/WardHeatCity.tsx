@@ -20,14 +20,14 @@ export interface WardColumnData {
 
 interface WardHeatCityProps {
   wards?: WardColumnData[];
-  gridSize?: number; // e.g. 14 for 14x14 = 196 wards
+  gridSize?: number; // 14 desktop / 9 mobile
   onWardSelect?: (wardId: number | string) => void;
   height?: number | string;
 }
 
 export const WardHeatCity: React.FC<WardHeatCityProps> = ({
   wards,
-  gridSize = 14,
+  gridSize: userGridSize,
   onWardSelect,
   height = 540,
 }) => {
@@ -37,18 +37,25 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
   // Generate N x N wards if not provided
+  const isMobileInitial = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const gridSize = userGridSize || (isMobileInitial ? 9 : 14);
+
   const cityWards = React.useMemo(() => {
     if (wards && wards.length > 0) return wards;
 
     const items: WardColumnData[] = [];
-    const wardPrefixes = ['M/East', 'A/Colaba', 'F/North', 'G/South', 'H/West', 'K/East', 'L/Kurla', 'P/North', 'R/Central', 'N/Ghatkopar', 'S/Bhandup', 'T/Mulund', 'C/Marine', 'D/Malabar'];
+    const wardPrefixes = [
+      'M/East', 'A/Colaba', 'F/North', 'G/South', 'H/West', 'K/East',
+      'L/Kurla', 'P/North', 'R/Central', 'N/Ghatkopar', 'S/Bhandup', 'T/Mulund'
+    ];
     const count = gridSize * gridSize;
 
     for (let i = 0; i < count; i++) {
       const row = Math.floor(i / gridSize);
       const col = i % gridSize;
-      // Synthesize realistic spatial clustering (hot central/eastern wards)
-      const distFromCenter = Math.sqrt(Math.pow(row - gridSize / 2, 2) + Math.pow(col - gridSize / 2, 2));
+      const distFromCenter = Math.sqrt(
+        Math.pow(row - gridSize / 2, 2) + Math.pow(col - gridSize / 2, 2)
+      );
       const baseRisk = 0.88 - (distFromCenter / gridSize) * 0.65;
       const noise = (Math.sin(row * 2.1) + Math.cos(col * 1.8)) * 0.08;
       const risk = Math.min(0.98, Math.max(0.12, baseRisk + noise));
@@ -78,17 +85,16 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
 
     // --- 1. Scene & Depth Fog ---
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b1219);
-    // Fog: scene.fog = new THREE.Fog(0x0B1219, 9, 20) per specification
-    scene.fog = new THREE.Fog(0x0b1219, 9, 22);
+    scene.background = new THREE.Color(0x101820);
+    scene.fog = new THREE.FogExp2(0x101820, 0.035);
 
     // --- 2. Camera ---
     const camera = new THREE.PerspectiveCamera(45, width / heightPx, 0.1, 100);
-    // Orbit camera on radius ~8.6 at height 6.2 looking at center (0, 1.1, 0)
-    camera.position.set(6.8, 6.2, 5.2);
+    // Orbit camera at radius 8.6, height 6.2, lookAt(0, 1.1, 0)
+    camera.position.set(6.0, 6.2, 6.0);
     camera.lookAt(0, 1.1, 0);
 
-    // --- 3. WebGL Renderer ---
+    // --- 3. Renderer ---
     const renderer = new THREE.WebGLRenderer({
       powerPreference: 'high-performance',
       antialias: !isMobile,
@@ -105,9 +111,9 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
       const renderPass = new RenderPass(scene, camera);
       const bloomPass = new UnrealBloomPass(
         new THREE.Vector2(width / 2, heightPx / 2),
-        0.6, // bloom strength
-        0.7, // radius
-        0.2  // threshold
+        0.55,
+        0.5,
+        0.22
       );
       composer = new EffectComposer(renderer);
       composer.addPass(renderPass);
@@ -118,28 +124,27 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 - 0.05; // Prevent camera going below ground
+    controls.maxPolarAngle = Math.PI / 2 - 0.08;
     controls.minDistance = 4.0;
     controls.maxDistance = 18.0;
     controls.target.set(0, 1.1, 0);
 
-    // --- 6. Lighting (Key, Ambient, and Amethyst Rim Light) ---
-    const ambientLight = new THREE.AmbientLight(0x8899bb, 0.55);
+    let isDragging = false;
+    controls.addEventListener('start', () => { isDragging = true; });
+    controls.addEventListener('end', () => { isDragging = false; });
+
+    // --- 6. Lighting (Amethyst rim point light from behind-left) ---
+    const ambientLight = new THREE.AmbientLight(0x8899bb, 0.65);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
-    keyLight.position.set(6, 9, 5);
-    scene.add(keyLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    dirLight.position.set(6, 9, 5);
+    scene.add(dirLight);
 
-    // Rim point light in amethyst #9B6FD8 from (-7, 4, -6)
+    // Amethyst rim light from behind-left (-7, 4, -6)
     const amethystRim = new THREE.PointLight(new THREE.Color(THREE_TOKENS.accent), 2.5, 20);
     amethystRim.position.set(-7, 4, -6);
     scene.add(amethystRim);
-
-    // Secondary fill light
-    const fillLight = new THREE.PointLight(0x3c566a, 0.8, 15);
-    fillLight.position.set(0, 8, 0);
-    scene.add(fillLight);
 
     // --- 7. Ground Grid ---
     const totalCount = Math.min(cityWards.length, gridSize * gridSize);
@@ -155,8 +160,10 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
     boxGeo.translate(0, 0.5, 0);
 
     const boxMat = new THREE.MeshStandardMaterial({
-      roughness: 0.55,
-      metalness: 0.25,
+      roughness: 0.6,
+      metalness: 0.2,
+      transparent: true,
+      opacity: 0.95,
     });
 
     const instancedMesh = new THREE.InstancedMesh(boxGeo, boxMat, totalCount);
@@ -164,9 +171,11 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
 
     const dummy = new THREE.Object3D();
     const halfGrid = (gridSize - 1) / 2;
-    const defaultHeights = new Float32Array(totalCount);
+    const baseHeights = new Float32Array(totalCount);
+    const originalColors: THREE.Color[] = [];
     const currentLifts = new Float32Array(totalCount);
     const targetLifts = new Float32Array(totalCount);
+    const columnCoords: { x: number; z: number; cx: number; cz: number }[] = [];
 
     for (let i = 0; i < totalCount; i++) {
       const ward = cityWards[i];
@@ -177,16 +186,20 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
       const cx = (col - halfGrid) * spacing;
       const cz = (row - halfGrid) * spacing;
 
+      columnCoords.push({ x: col, z: row, cx, cz });
+
       // Height formula: h = 0.18 + risk * 3.1
       const h = 0.18 + normRisk * 3.1;
-      defaultHeights[i] = h;
+      baseHeights[i] = h;
 
       dummy.position.set(cx, 0, cz);
-      dummy.scale.set(1, h, 1);
+      dummy.scale.set(1, 0.01, 1); // starts flat for diagonal entrance stagger
       dummy.updateMatrix();
 
       instancedMesh.setMatrixAt(i, dummy.matrix);
-      instancedMesh.setColorAt(i, new THREE.Color(heatColor(normRisk)));
+      const colColor = new THREE.Color(heatColor(normRisk));
+      originalColors.push(colColor);
+      instancedMesh.setColorAt(i, colColor);
     }
 
     instancedMesh.instanceMatrix.needsUpdate = true;
@@ -199,7 +212,6 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let hoveredInstanceId = -1;
-    let selectedInstanceId = -1;
 
     const updateMouse = (e: MouseEvent) => {
       const rect = renderer.domElement.getBoundingClientRect();
@@ -211,47 +223,64 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
     const handlePointerMove = (e: MouseEvent) => {
       updateMouse(e);
       raycaster.setFromCamera(mouse, camera);
-      const intersection = raycaster.intersectObject(instancedMesh);
+      const hits = raycaster.intersectObject(instancedMesh);
 
-      if (intersection.length > 0 && intersection[0].instanceId !== undefined) {
-        const id = intersection[0].instanceId;
+      if (hits.length > 0 && hits[0].instanceId !== undefined) {
+        const id = hits[0].instanceId;
         if (id !== hoveredInstanceId) {
           hoveredInstanceId = id;
+          renderer.domElement.style.cursor = 'pointer';
           const ward = cityWards[id];
           setHoveredWard(ward);
+
+          // Spring lift hovered column +0.5; dim neighbors to 55%
+          for (let j = 0; j < totalCount; j++) {
+            if (j === id) {
+              targetLifts[j] = 0.5;
+              instancedMesh.setColorAt(j, originalColors[j].clone().multiplyScalar(1.2));
+            } else {
+              targetLifts[j] = 0.0;
+              // Dim neighbors to 55%
+              instancedMesh.setColorAt(j, originalColors[j].clone().multiplyScalar(0.55));
+            }
+          }
+          if (instancedMesh.instanceColor) instancedMesh.instanceColor.needsUpdate = true;
         }
       } else {
-        hoveredInstanceId = -1;
-        setHoveredWard(null);
+        if (hoveredInstanceId !== -1) {
+          hoveredInstanceId = -1;
+          renderer.domElement.style.cursor = 'default';
+          setHoveredWard(null);
+          // Restore all colors and lifts
+          for (let j = 0; j < totalCount; j++) {
+            targetLifts[j] = 0.0;
+            instancedMesh.setColorAt(j, originalColors[j]);
+          }
+          if (instancedMesh.instanceColor) instancedMesh.instanceColor.needsUpdate = true;
+        }
       }
     };
 
     const handleClick = (e: MouseEvent) => {
       updateMouse(e);
       raycaster.setFromCamera(mouse, camera);
-      const intersection = raycaster.intersectObject(instancedMesh);
+      const hits = raycaster.intersectObject(instancedMesh);
 
-      if (intersection.length > 0 && intersection[0].instanceId !== undefined) {
-        const id = intersection[0].instanceId;
-        selectedInstanceId = id;
+      if (hits.length > 0 && hits[0].instanceId !== undefined) {
+        const id = hits[0].instanceId;
         const ward = cityWards[id];
         setActiveWard(ward);
         if (onWardSelect) onWardSelect(ward.id);
-
-        // Spring lift: set target lift +0.6 for clicked column
-        for (let j = 0; j < totalCount; j++) {
-          targetLifts[j] = j === id ? 0.6 : 0.0;
-        }
       }
     };
 
     renderer.domElement.addEventListener('pointermove', handlePointerMove);
     renderer.domElement.addEventListener('click', handleClick);
 
-    // --- 10. Visibility & Resize Handlers ---
+    // --- 10. Visibility & Resize ---
     let isVisible = true;
-    const observer = new IntersectionObserver((entries) => {
-      isVisible = entries[0].isIntersecting;
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
     });
     observer.observe(container);
 
@@ -271,43 +300,76 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
     };
     window.addEventListener('resize', onResize);
 
-    // --- 11. Render Loop with Smooth Spring Lifting ---
+    // --- 11. Animation Loop ---
     let rafId: number;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
+    let entranceComplete = false;
 
     const animate = () => {
       rafId = requestAnimationFrame(animate);
-
       if (!isVisible) return;
 
       const dt = clock.getDelta();
-      controls.update();
+      const elapsed = clock.getElapsedTime();
+      const elapsedMs = elapsed * 1000;
 
-      // Smoothly damp instance lifts (+0.6 on select)
-      let matricesDirty = false;
-      for (let i = 0; i < totalCount; i++) {
-        const diff = targetLifts[i] - currentLifts[i];
-        if (Math.abs(diff) > 0.002) {
-          currentLifts[i] += diff * Math.min(1.0, dt * 10.0);
-          const row = Math.floor(i / gridSize);
-          const col = i % gridSize;
-          const cx = (col - halfGrid) * spacing;
-          const cz = (row - halfGrid) * spacing;
-          const baseH = defaultHeights[i];
-          const totalH = baseH + currentLifts[i];
+      // Entrance diagonal stagger: delay = (x + z) * 14ms over 900ms total
+      let matricesNeedUpdate = false;
 
-          dummy.position.set(cx, currentLifts[i] * 0.4, cz);
-          dummy.scale.set(1, totalH, 1);
-          dummy.updateMatrix();
+      if (!entranceComplete) {
+        let allGrown = true;
+        for (let i = 0; i < totalCount; i++) {
+          const coord = columnCoords[i];
+          const delay = (coord.x + coord.z) * 14;
+          const targetH = baseHeights[i];
 
-          instancedMesh.setMatrixAt(i, dummy.matrix);
-          matricesDirty = true;
+          if (elapsedMs > delay) {
+            const progress = Math.min(1.0, (elapsedMs - delay) / 500);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const currentH = Math.max(0.01, ease * targetH);
+
+            dummy.position.set(coord.cx, 0, coord.cz);
+            dummy.scale.set(1, currentH, 1);
+            dummy.updateMatrix();
+            instancedMesh.setMatrixAt(i, dummy.matrix);
+
+            if (progress < 1.0) allGrown = false;
+          } else {
+            allGrown = false;
+          }
+        }
+        matricesNeedUpdate = true;
+        if (allGrown && elapsedMs > 1100) entranceComplete = true;
+      } else {
+        // Idle spring physics for hovered column lift (+0.5)
+        for (let i = 0; i < totalCount; i++) {
+          const diff = targetLifts[i] - currentLifts[i];
+          if (Math.abs(diff) > 0.001) {
+            currentLifts[i] += diff * Math.min(1.0, dt * 12.0); // smooth spring ease
+            const coord = columnCoords[i];
+            dummy.position.set(coord.cx, currentLifts[i], coord.cz);
+            dummy.scale.set(1, baseHeights[i], 1);
+            dummy.updateMatrix();
+            instancedMesh.setMatrixAt(i, dummy.matrix);
+            matricesNeedUpdate = true;
+          }
         }
       }
 
-      if (matricesDirty) {
+      if (matricesNeedUpdate) {
         instancedMesh.instanceMatrix.needsUpdate = true;
       }
+
+      // Idle camera orbit 0.16 rad/s at radius ~8.6 if user not dragging
+      if (!isDragging) {
+        const orbitAngle = elapsed * 0.16;
+        const radius = 8.6;
+        camera.position.x = Math.sin(orbitAngle) * radius;
+        camera.position.z = Math.cos(orbitAngle) * radius;
+        camera.lookAt(0, 1.1, 0);
+      }
+
+      controls.update();
 
       if (composer) {
         composer.render();
@@ -317,7 +379,7 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
     };
     animate();
 
-    // --- 12. Cleanup & Disposal ---
+    // --- 12. Cleanup ---
     return () => {
       cancelAnimationFrame(rafId);
       observer.disconnect();
@@ -339,118 +401,90 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
     };
   }, [cityWards, gridSize, onWardSelect]);
 
-  const activeOrHovered = hoveredWard || activeWard;
-
   return (
     <div
       ref={containerRef}
-      className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-[#0B1219] shadow-2xl"
+      className="relative w-full rounded-[14px] overflow-hidden border border-white/8 bg-[#101820] shadow-2xl flex flex-col justify-between"
       style={{ minHeight: height }}
+      aria-hidden="true"
     >
-      {/* City Stage Header Bar */}
-      <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10 pointer-events-none">
-        <div>
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#9B6FD8] animate-pulse" />
-            <h3 className="text-sm font-semibold text-white tracking-wide font-display">
-              Ward Heat City — Hyperlocal Extruded Surface
-            </h3>
-          </div>
-          <p className="text-[11px] text-[#8B9AA8] font-mono mt-0.5">
-            Height + Chroma = Human Thermal Strain Index (Instanced GPU Mesh)
-          </p>
+      {/* Stage Header & Legend Top-Right */}
+      <div className="w-full flex items-center justify-between p-5 z-10 pointer-events-none">
+        <div className="space-y-0.5">
+          <span className="text-xs font-mono font-medium text-[#D7E0E7] uppercase tracking-[0.10em] block">
+            Hyperlocal Ward Heat City (Extruded Risk Landscape)
+          </span>
+          <span className="text-[11px] font-mono text-[#5F7183] block">
+            Height + Color = Normative Human Thermal Stress Index
+          </span>
         </div>
 
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[#D7E0E7]">
-            {cityWards.length} Wards Active
+        {/* Legend Top-Right */}
+        <div className="flex items-center gap-2 bg-[#1F3445]/80 backdrop-blur-md px-3 py-1.5 rounded-[8px] border border-white/8 text-[11px] font-mono">
+          <span className="text-[#8B9AA8]">Risk:</span>
+          <span className="flex items-center gap-1 text-[#2FA37C]">
+            <span className="w-2 h-2 rounded-full bg-[#2FA37C]" /> Low
           </span>
-          <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#9B6FD8]/20 border border-[#9B6FD8]/40 text-[#9B6FD8]">
-            Amethyst Rim Light Active
+          <span className="flex items-center gap-1 text-[#E8C547]">
+            <span className="w-2 h-2 rounded-full bg-[#E8C547]" /> Mod
+          </span>
+          <span className="flex items-center gap-1 text-[#FF704F]">
+            <span className="w-2 h-2 rounded-full bg-[#FF704F]" /> High
+          </span>
+          <span className="flex items-center gap-1 text-[#C31D3C]">
+            <span className="w-2 h-2 rounded-full bg-[#C31D3C]" /> Ext
           </span>
         </div>
       </div>
 
-      {/* Floating Hover / Click Tooltip */}
+      {/* Tooltip on Hover */}
       {hoveredWard && tooltipPos && (
         <div
-          className="absolute z-20 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-3"
+          className="absolute z-30 pointer-events-none px-3.5 py-2 rounded-[8px] bg-[#101820]/95 backdrop-blur-md border border-white/16 shadow-2xl text-xs font-mono space-y-1 transition-transform duration-75"
           style={{
-            left: `${tooltipPos.x}px`,
-            top: `${tooltipPos.y}px`,
+            left: `${Math.min(window.innerWidth - 220, tooltipPos.x + 16)}px`,
+            top: `${Math.max(10, tooltipPos.y - 48)}px`,
           }}
         >
-          <div className="bg-[#101820]/95 border border-white/15 rounded-xl p-3 shadow-2xl backdrop-blur-md min-w-[180px] text-xs">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="font-bold text-white tracking-tight">{hoveredWard.name}</span>
+          <div className="font-bold text-white flex items-center justify-between gap-4">
+            <span>{hoveredWard.name}</span>
+            <span style={{ color: heatColor(hoveredWard.risk) }}>
+              HTSI {Math.round(hoveredWard.risk > 1 ? hoveredWard.risk : hoveredWard.risk * 100)}
+            </span>
+          </div>
+          <div className="text-[10px] text-[#8B9AA8] flex items-center gap-3">
+            <span>WBGT: {hoveredWard.wbgt || 33.5}°C</span>
+            <span>Pop: {hoveredWard.population ? `${(hoveredWard.population / 1000).toFixed(0)}k` : 'N/A'}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Caption Bottom-Left & Selected Ward Card Bottom-Right */}
+      <div className="w-full p-4 flex flex-wrap items-end justify-between gap-4 z-10 pointer-events-none">
+        <div className="text-[11px] font-mono text-[#5F7183] bg-[#101820]/80 px-3 py-1.5 rounded-[6px] border border-white/6">
+          Left-drag to orbit • Scroll to zoom • Hover/click column to isolate ward
+        </div>
+
+        {activeWard && (
+          <div className="pointer-events-auto bg-[#1F3445]/90 backdrop-blur-md border border-white/16 rounded-[10px] p-3 text-xs font-mono space-y-1 shadow-2xl">
+            <div className="flex items-center justify-between gap-4">
+              <span className="font-bold text-white">{activeWard.name}</span>
               <span
-                className="w-2.5 h-2.5 rounded-full shrink-0"
-                style={{ backgroundColor: heatColor(hoveredWard.risk) }}
-              />
+                className="font-bold px-2 py-0.5 rounded text-[10px]"
+                style={{
+                  backgroundColor: `${heatColor(activeWard.risk)}25`,
+                  color: heatColor(activeWard.risk),
+                }}
+              >
+                Score {Math.round(activeWard.risk > 1 ? activeWard.risk : activeWard.risk * 100)}
+              </span>
             </div>
-            <div className="space-y-1 font-mono text-[11px]">
-              <div className="flex justify-between">
-                <span className="text-[#8B9AA8]">Risk Score:</span>
-                <span className="font-bold" style={{ color: heatColor(hoveredWard.risk) }}>
-                  {(hoveredWard.risk * 100).toFixed(1)} / 100
-                </span>
-              </div>
-              {hoveredWard.wbgt && (
-                <div className="flex justify-between">
-                  <span className="text-[#8B9AA8]">Est. WBGT:</span>
-                  <span className="text-[#FF704F] font-semibold">{hoveredWard.wbgt}°C</span>
-                </div>
-              )}
-              {hoveredWard.population && (
-                <div className="flex justify-between">
-                  <span className="text-[#8B9AA8]">Population:</span>
-                  <span className="text-white">{hoveredWard.population.toLocaleString('en-IN')}</span>
-                </div>
-              )}
-            </div>
-            <div className="mt-2 pt-1.5 border-t border-white/10 text-[9px] text-[#8B9AA8] italic">
-              Click to lift column and pin details
+            <div className="text-[10px] text-[#8B9AA8]">
+              Est. WBGT: {activeWard.wbgt}°C • Dry-Bulb: {activeWard.temp}°C
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Persistent Selected Ward Footer Strip */}
-      {activeOrHovered && (
-        <div className="absolute bottom-4 left-4 right-4 z-10 pointer-events-none">
-          <div className="bg-[#1F3445]/90 border border-white/15 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md pointer-events-auto">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-3.5 h-3.5 rounded-md"
-                style={{ backgroundColor: heatColor(activeOrHovered.risk) }}
-              />
-              <div>
-                <span className="font-bold text-white text-sm">{activeOrHovered.name}</span>
-                <span className="text-[11px] text-[#8B9AA8] ml-2 font-mono">
-                  NDMA Risk Band:{' '}
-                  <strong style={{ color: heatColor(activeOrHovered.risk) }}>
-                    {activeOrHovered.risk >= 0.85
-                      ? 'EXTREME'
-                      : activeOrHovered.risk >= 0.70
-                      ? 'VERY HIGH'
-                      : activeOrHovered.risk >= 0.50
-                      ? 'HIGH'
-                      : activeOrHovered.risk >= 0.25
-                      ? 'MODERATE'
-                      : 'SAFE'}
-                  </strong>
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 font-mono text-xs">
-              <span>Risk: <strong style={{ color: heatColor(activeOrHovered.risk) }}>{(activeOrHovered.risk * 100).toFixed(1)}</strong></span>
-              {activeOrHovered.wbgt && <span>WBGT: <strong className="text-[#FF704F]">{activeOrHovered.wbgt}°C</strong></span>}
-              {activeOrHovered.temp && <span>T: <strong>{activeOrHovered.temp}°C</strong></span>}
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

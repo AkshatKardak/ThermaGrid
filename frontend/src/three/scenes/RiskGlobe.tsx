@@ -10,7 +10,7 @@ import { heatColor } from '../heat';
 import { latLngToVec3, getFacingYRotation } from '../geo';
 import { atmosphereVertexShader, atmosphereFragmentShader } from '../shaders/atmosphere.glsl';
 import { isWebGLAvailable, disposeThreeHierarchy } from '../useRenderLoop';
-import { StaticGlobe, DEFAULT_CITIES, type StaticCityData } from '../fallbacks/StaticGlobe';
+import { StaticGlobe, DEFAULT_CITIES } from '../fallbacks/StaticGlobe';
 
 export interface CityRisk {
   name: string;
@@ -31,15 +31,16 @@ interface RiskGlobeProps {
 export const RiskGlobe: React.FC<RiskGlobeProps> = ({
   cities = DEFAULT_CITIES,
   onCitySelect,
-  height = 520,
+  height = 560,
   interactive = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedCity, setSelectedCity] = useState<CityRisk>(cities[0] || DEFAULT_CITIES[0]);
+  const [hoveredCity, setHoveredCity] = useState<CityRisk | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
   const [useFallback, setUseFallback] = useState(false);
 
   useEffect(() => {
-    // Check WebGL availability and prefers-reduced-motion
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!isWebGLAvailable() || reducedMotion) {
       setUseFallback(true);
@@ -50,16 +51,16 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     if (!container) return;
 
     let width = container.clientWidth || 600;
-    let heightPx = container.clientHeight || 520;
+    let heightPx = container.clientHeight || 560;
     const isMobile = window.innerWidth < 768;
 
-    // --- 1. Scene, Camera, Renderer ---
+    // --- 1. Scene & Camera ---
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x101820, 0.035);
 
     const camera = new THREE.PerspectiveCamera(45, width / heightPx, 0.1, 100);
-    // Standard camera position as per spec: (0, 0.22, 4.75)
-    camera.position.set(0, 0.22, 4.75);
+    // Start camera z at 6.5 (dollies to 4.75 during entrance)
+    camera.position.set(0, 0.22, 6.5);
 
     const renderer = new THREE.WebGLRenderer({
       powerPreference: 'high-performance',
@@ -69,19 +70,19 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     renderer.setSize(width, heightPx);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.15;
     container.appendChild(renderer.domElement);
 
-    // --- 2. Post-Processing (Bloom on Desktop only) ---
+    // --- 2. Post-Processing Bloom ---
     let composer: EffectComposer | null = null;
+    let bloomPass: UnrealBloomPass | null = null;
     if (!isMobile) {
       const renderPass = new RenderPass(scene, camera);
-      // Half resolution bloom pass for 60fps performance budget
-      const bloomPass = new UnrealBloomPass(
+      bloomPass = new UnrealBloomPass(
         new THREE.Vector2(width / 2, heightPx / 2),
-        0.68, // strength
-        0.5,  // radius
-        0.22  // threshold
+        0.0, // starts at 0, ramps to 0.68
+        0.5,
+        0.22
       );
       composer = new EffectComposer(renderer);
       composer.addPass(renderPass);
@@ -96,25 +97,24 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       controls.enablePan = false;
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.4;
-      controls.target.set(0.65, 0, 0); // focus towards offset globe
+      controls.autoRotate = false;
+      controls.target.set(0.65, 0, 0);
     }
 
     // --- 4. Lights ---
-    const ambientLight = new THREE.AmbientLight(0x8899bb, 0.7);
+    const ambientLight = new THREE.AmbientLight(0x8899bb, 0.75);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.25);
     dirLight.position.set(5, 4, 3);
     scene.add(dirLight);
 
-    // Amethyst rim light for atmospheric palette coherence
-    const rimLight = new THREE.PointLight(new THREE.Color(THREE_TOKENS.accent), 2.2, 12);
+    // Amethyst rim light for atmospheric coherence
+    const rimLight = new THREE.PointLight(new THREE.Color(THREE_TOKENS.accent), 2.4, 14);
     rimLight.position.set(-4, 3, -4);
     scene.add(rimLight);
 
-    // --- 5. Starfield Shell ---
+    // --- 5. Starfield 900 Points ---
     const starCount = 900;
     const starGeo = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starCount * 3);
@@ -123,7 +123,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       const v = Math.random();
       const theta = u * 2.0 * Math.PI;
       const phi = Math.acos(2.0 * v - 1.0);
-      const r = 7.0 + Math.random() * 9.0; // 7-16 shell
+      const r = 7.0 + Math.random() * 9.0;
       starPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
       starPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       starPositions[i * 3 + 2] = r * Math.cos(phi);
@@ -131,19 +131,19 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
     const starMat = new THREE.PointsMaterial({
       color: 0x8899bb,
-      size: 0.028,
+      size: 0.026,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.0, // fades in during entrance
     });
     const starField = new THREE.Points(starGeo, starMat);
     scene.add(starField);
 
-    // --- 6. Globe Group (Offset Right for Hero Copy Legibility) ---
+    // --- 6. Globe Group ---
     const globeGroup = new THREE.Group();
-    // Offset right: x ≈ 0.95 to 1.05 on desktop, centered on mobile
     globeGroup.position.x = isMobile ? 0 : 0.95;
-    // Set initial Y-rotation facing India (lng ~78° -> ~3.35 rad)
-    globeGroup.rotation.y = getFacingYRotation(78.5);
+    const initialFacingY = getFacingYRotation(78.5);
+    globeGroup.rotation.y = initialFacingY;
+    globeGroup.scale.set(0.86, 0.86, 0.86); // scales to 1.0 during entrance
     scene.add(globeGroup);
 
     // Base Sphere
@@ -154,11 +154,13 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       roughness: 0.92,
       metalness: 0.15,
       emissive: 0x0a141c,
+      transparent: true,
+      opacity: 0.0,
     });
     const baseSphere = new THREE.Mesh(sphereGeo, sphereMat);
     globeGroup.add(baseSphere);
 
-    // Dot-Grid Surface Points (sample every 6° lat/lng)
+    // Dot-Grid Surface Points (every 6° lat/lng)
     const dotPositions: number[] = [];
     for (let lat = -90; lat <= 90; lat += 6) {
       for (let lng = -180; lng <= 180; lng += 6) {
@@ -172,12 +174,12 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       color: 0x3c566a,
       size: 0.011,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.0,
     });
     const dotGrid = new THREE.Points(dotGeo, dotMat);
     globeGroup.add(dotGrid);
 
-    // Atmosphere Halo (Fresnel back-side shader at 1.12R)
+    // Atmosphere Shell (1.12 radius)
     const atmosGeo = new THREE.SphereGeometry(1.12, 48, 48);
     const atmosMat = new THREE.ShaderMaterial({
       vertexShader: atmosphereVertexShader,
@@ -186,85 +188,172 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       blending: THREE.AdditiveBlending,
       transparent: true,
       depthWrite: false,
+      opacity: 0.0,
     });
     const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
     globeGroup.add(atmosMesh);
 
-    // --- 7. Heat Columns for Cities ---
-    const raycastTargets: { mesh: THREE.Mesh; city: CityRisk }[] = [];
+    // --- 7. City Heat Columns (Ordered by Lng for Entrance Wave) ---
+    const sortedCities = [...cities].sort((a, b) => a.lng - b.lng);
     const upVector = new THREE.Vector3(0, 1, 0);
+    const columnObjects: {
+      group: THREE.Group;
+      cylinderMesh: THREE.Mesh;
+      tipMesh: THREE.Mesh;
+      baseDotMesh: THREE.Mesh;
+      city: CityRisk;
+      normal: THREE.Vector3;
+      basePos: THREE.Vector3;
+      h: number;
+      lngIndex: number;
+      origColor: THREE.Color;
+    }[] = [];
 
-    cities.forEach((city) => {
+    // Find highest risk city for expanding 4s periodic pulse ring
+    let highestRiskCity = sortedCities[0];
+    for (const c of sortedCities) {
+      if (c.risk > highestRiskCity.risk) highestRiskCity = c;
+    }
+
+    sortedCities.forEach((city, idx) => {
       const basePos = latLngToVec3(city.lat, city.lng, 1.0);
       const normal = basePos.clone().normalize();
       const quaternion = new THREE.Quaternion().setFromUnitVectors(upVector, normal);
 
-      // Height h = 0.10 + risk * 0.55
       const h = 0.10 + city.risk * 0.55;
       const colColor = new THREE.Color(heatColor(city.risk));
 
       const cityGroup = new THREE.Group();
       cityGroup.position.copy(basePos);
       cityGroup.quaternion.copy(quaternion);
+      cityGroup.scale.set(1, 0.001, 1); // starts flat for longitudinal entrance wave
 
-      // Base footprint ring
       const baseDotGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.003, 8);
       const baseDotMat = new THREE.MeshBasicMaterial({ color: colColor });
       const baseDotMesh = new THREE.Mesh(baseDotGeo, baseDotMat);
       baseDotMesh.position.y = 0.001;
       cityGroup.add(baseDotMesh);
 
-      // Extruded cylinder column
       const cylinderGeo = new THREE.CylinderGeometry(0.012, 0.012, h, 6, 1, true);
-      cylinderGeo.translate(0, h / 2, 0); // translate so base sits on surface
+      cylinderGeo.translate(0, h / 2, 0);
       const cylinderMat = new THREE.MeshBasicMaterial({
-        color: colColor,
+        color: colColor.clone(),
         transparent: true,
         opacity: 0.92,
       });
       const cylinderMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
       cityGroup.add(cylinderMesh);
 
-      // Glowing tip sphere
       const tipGeo = new THREE.SphereGeometry(0.021, 8, 8);
-      const tipMat = new THREE.MeshBasicMaterial({ color: colColor });
+      const tipMat = new THREE.MeshBasicMaterial({ color: colColor.clone() });
       const tipMesh = new THREE.Mesh(tipGeo, tipMat);
       tipMesh.position.y = h;
       cityGroup.add(tipMesh);
 
       globeGroup.add(cityGroup);
-      raycastTargets.push({ mesh: cylinderMesh, city });
+      columnObjects.push({
+        group: cityGroup,
+        cylinderMesh,
+        tipMesh,
+        baseDotMesh,
+        city,
+        normal,
+        basePos,
+        h,
+        lngIndex: idx,
+        origColor: colColor,
+      });
     });
 
-    // --- 8. Raycasting for Pointer Hover ---
+    // --- 8. Periodic Ring Pulse Mesh for Highest-Risk City ---
+    const highestRiskBasePos = latLngToVec3(highestRiskCity.lat, highestRiskCity.lng, 1.003);
+    const highestRiskNormal = highestRiskBasePos.clone().normalize();
+    const ringGeo = new THREE.RingGeometry(0.02, 0.035, 32);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(heatColor(highestRiskCity.risk)),
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+    const pulseRing = new THREE.Mesh(ringGeo, ringMat);
+    pulseRing.position.copy(highestRiskBasePos);
+    pulseRing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), highestRiskNormal);
+    globeGroup.add(pulseRing);
+
+    // --- 9. Raycasting & Hover ---
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    let currentHovered: typeof columnObjects[0] | null = null;
 
     const onPointerMove = (e: MouseEvent) => {
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
+      setTooltipPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(
-        raycastTargets.map((t) => t.mesh),
+      const hits = raycaster.intersectObjects(
+        columnObjects.flatMap((c) => [c.cylinderMesh, c.tipMesh]),
         false
       );
 
-      if (intersects.length > 0) {
-        const hit = raycastTargets.find((t) => t.mesh === intersects[0].object);
-        if (hit) {
-          setSelectedCity(hit.city);
-          if (onCitySelect) onCitySelect(hit.city.name);
+      if (hits.length > 0) {
+        const hitObj = columnObjects.find(
+          (c) => c.cylinderMesh === hits[0].object || c.tipMesh === hits[0].object
+        );
+        if (hitObj && hitObj !== currentHovered) {
+          // Revert previous hovered
+          if (currentHovered) {
+            (currentHovered.cylinderMesh.material as THREE.MeshBasicMaterial).color.copy(
+              currentHovered.origColor
+            );
+            (currentHovered.tipMesh.material as THREE.MeshBasicMaterial).color.copy(
+              currentHovered.origColor
+            );
+          }
+          currentHovered = hitObj;
+          renderer.domElement.style.cursor = 'pointer';
+
+          // Brighten column to 120%
+          const brightened = hitObj.origColor.clone().multiplyScalar(1.25);
+          (hitObj.cylinderMesh.material as THREE.MeshBasicMaterial).color.copy(brightened);
+          (hitObj.tipMesh.material as THREE.MeshBasicMaterial).color.copy(brightened);
+
+          setHoveredCity(hitObj.city);
+          setSelectedCity(hitObj.city);
+          if (onCitySelect) onCitySelect(hitObj.city.name);
+        }
+      } else {
+        if (currentHovered) {
+          (currentHovered.cylinderMesh.material as THREE.MeshBasicMaterial).color.copy(
+            currentHovered.origColor
+          );
+          (currentHovered.tipMesh.material as THREE.MeshBasicMaterial).color.copy(
+            currentHovered.origColor
+          );
+          currentHovered = null;
+          renderer.domElement.style.cursor = 'default';
+          setHoveredCity(null);
         }
       }
     };
     renderer.domElement.addEventListener('pointermove', onPointerMove);
 
-    // --- 9. Visibility & Resize Handlers ---
+    // --- 10. Scroll Linkage (0 -> 0.8 rad offset) ---
+    let scrollOffset = 0;
+    const onScroll = () => {
+      const heroHeight = container.clientHeight || 600;
+      const progress = Math.min(1.0, Math.max(0, window.scrollY / heroHeight));
+      scrollOffset = progress * 0.8;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // --- 11. Visibility & Resize ---
     let isVisible = true;
-    const observer = new IntersectionObserver((entries) => {
-      isVisible = entries[0].isIntersecting;
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
     });
     observer.observe(container);
 
@@ -276,7 +365,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     const onResize = () => {
       if (!container) return;
       width = container.clientWidth || 600;
-      heightPx = container.clientHeight || 520;
+      heightPx = container.clientHeight || 560;
       camera.aspect = width / heightPx;
       camera.updateProjectionMatrix();
       renderer.setSize(width, heightPx);
@@ -284,25 +373,92 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     };
     window.addEventListener('resize', onResize);
 
-    // --- 10. Animation Loop ---
+    // --- 12. Main Animation Timeline Loop ---
     let rafId: number;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
 
     const animate = () => {
       rafId = requestAnimationFrame(animate);
-
       if (!isVisible) return;
 
       const dt = clock.getDelta();
-      const elapsed = clock.getElapsedTime();
+      const elapsed = clock.getElapsedTime(); // seconds
+      const elapsedMs = elapsed * 1000;
 
-      // Slow auto-rotation + gentle vertical bob
-      globeGroup.rotation.y += 0.05 * dt;
-      globeGroup.position.y = Math.sin(elapsed * 0.6) * 0.018;
+      // === ENTRANCE CHOREOGRAPHY (0 -> 1800ms) ===
+      if (elapsedMs < 1900) {
+        // Camera dolly z: 6.5 -> 4.75 over 0-900ms (ease-out cubic)
+        const camProgress = Math.min(1.0, elapsedMs / 900);
+        const camEase = 1 - Math.pow(1 - camProgress, 3);
+        camera.position.z = 6.5 - camEase * (6.5 - 4.75);
 
-      if (controls) {
-        controls.update();
+        // Globe scale: 0.86 -> 1.0, opacity: 0 -> 1.0
+        const scaleProgress = Math.min(1.0, elapsedMs / 900);
+        const scaleEase = 1 - Math.pow(1 - scaleProgress, 3);
+        const currentScale = 0.86 + scaleEase * 0.14;
+        globeGroup.scale.set(currentScale, currentScale, currentScale);
+
+        sphereMat.opacity = scaleEase;
+        dotMat.opacity = scaleEase * 0.9;
+
+        // Bloom ramp: 0 -> 0.68
+        if (bloomPass) {
+          bloomPass.strength = scaleEase * 0.68;
+        }
+
+        // Longitudinal wave: 600-1800ms, staggered by 18ms per city
+        columnObjects.forEach((col) => {
+          const startTime = 600 + col.lngIndex * 18;
+          if (elapsedMs > startTime) {
+            const colProg = Math.min(1.0, (elapsedMs - startTime) / 450);
+            const colEase = 1 - Math.pow(1 - colProg, 3);
+            col.group.scale.set(1, Math.max(0.01, colEase), 1);
+          }
+        });
+
+        // Atmosphere & starfield fade in: 1200-1800ms
+        if (elapsedMs > 1200) {
+          const fadeProg = Math.min(1.0, (elapsedMs - 1200) / 600);
+          starMat.opacity = fadeProg * 0.65;
+          atmosMat.opacity = fadeProg;
+        }
+      } else {
+        // Fully settled entrance
+        camera.position.z = 4.75;
+        globeGroup.scale.set(1, 1, 1);
+        sphereMat.opacity = 1.0;
+        dotMat.opacity = 0.9;
+        starMat.opacity = 0.65;
+        if (bloomPass) bloomPass.strength = 0.68;
+        columnObjects.forEach((col) => col.group.scale.set(1, 1, 1));
       }
+
+      // === IDLE ANIMATION ===
+      // Rotation: 0.05 rad/s + scroll linkage offset
+      const baseRotation = initialFacingY + elapsed * 0.05 + scrollOffset;
+      globeGroup.rotation.y = baseRotation;
+
+      // Group vertical bob ±0.018 at 0.6 Hz
+      globeGroup.position.y = Math.sin(elapsed * 0.6 * Math.PI * 2) * 0.018;
+
+      // Atmosphere breathing ±5% at 0.25 Hz
+      if (elapsedMs >= 1800) {
+        const breathe = 1.0 + Math.sin(elapsed * 0.25 * Math.PI * 2) * 0.05;
+        atmosMesh.scale.set(breathe, breathe, breathe);
+      }
+
+      // Periodic Expanding Ring Pulse every 4 seconds (1400ms duration)
+      const ringCycle = elapsed % 4.0;
+      if (ringCycle < 1.4) {
+        const ringProg = ringCycle / 1.4;
+        const ringScale = 1.0 + ringProg * 0.8; // 1 -> 1.8
+        pulseRing.scale.set(ringScale, ringScale, ringScale);
+        ringMat.opacity = Math.max(0, 0.9 * (1.0 - ringProg));
+      } else {
+        ringMat.opacity = 0;
+      }
+
+      if (controls) controls.update();
 
       if (composer) {
         composer.render();
@@ -312,12 +468,13 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     };
     animate();
 
-    // --- 11. Cleanup & WebGL Disposal ---
+    // --- 13. Cleanup ---
     return () => {
       cancelAnimationFrame(rafId);
       observer.disconnect();
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onScroll);
       renderer.domElement.removeEventListener('pointermove', onPointerMove);
 
       if (controls) controls.dispose();
@@ -350,40 +507,60 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-b from-[#1F3445]/60 to-[#101820] flex flex-col items-center justify-between shadow-2xl"
+      className="relative w-full rounded-[14px] overflow-hidden border border-white/8 bg-gradient-to-b from-[#1F3445]/40 to-[#101820] flex flex-col items-center justify-between shadow-2xl"
       style={{ minHeight: height }}
       aria-hidden="true"
     >
       {/* Telemetry Header */}
       <div className="w-full flex items-center justify-between p-5 z-10 pointer-events-none">
         <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#FF704F] animate-ping" />
-          <span className="text-xs font-mono font-semibold text-[#D7E0E7] uppercase tracking-wider">
-            Synoptic 3D Thermal Surveillance
+          <div className="w-2 h-2 rounded-full bg-[#9B6FD8] animate-ping" />
+          <span className="text-xs font-mono font-medium text-[#D7E0E7] uppercase tracking-[0.10em]">
+            National Synoptic Thermal Field
           </span>
         </div>
-        <div className="text-[11px] font-mono text-[#8B9AA8] bg-[#101820]/70 px-2 py-1 rounded border border-white/5">
+        <div className="text-[11px] font-mono text-[#8B9AA8] bg-[#101820]/80 px-2.5 py-1 rounded-[6px] border border-white/6">
           MoES Synoptic Telemetry
         </div>
       </div>
 
-      {/* Scrim Overlay Gradient: keeps left text legible if overlaying, transparent on right */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#101820]/95 via-[#101820]/40 to-transparent pointer-events-none w-1/3 z-5" />
+      {/* Left Scrim Overlay: keeps headline readable when globe is wide */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#101820]/95 via-[#101820]/50 to-transparent pointer-events-none w-1/3 z-5" />
 
-      {/* Selected City Telemetry Pill in Bottom Bar */}
+      {/* Hover Tooltip (HTML overlay via direct positioning) */}
+      {hoveredCity && tooltipPos && (
+        <div
+          className="absolute z-30 pointer-events-none px-3 py-1.5 rounded-[6px] bg-[#101820]/95 backdrop-blur-md border border-white/16 shadow-xl text-xs font-mono transition-transform duration-75"
+          style={{
+            left: `${Math.min(window.innerWidth - 200, tooltipPos.x + 12)}px`,
+            top: `${Math.max(10, tooltipPos.y - 36)}px`,
+          }}
+        >
+          <div className="font-bold text-white flex items-center gap-2">
+            <span>{hoveredCity.name}</span>
+            <span style={{ color: heatColor(hoveredCity.risk) }}>
+              HTSI {(hoveredCity.risk * 100).toFixed(0)}
+            </span>
+          </div>
+          <div className="text-[10px] text-[#8B9AA8]">
+            WBGT {hoveredCity.wbgt || 34.2}°C • Temp {hoveredCity.temp || 38.5}°C
+          </div>
+        </div>
+      )}
+
+      {/* Selected City Telemetry Bar */}
       <div className="w-full p-4 z-10">
-        <div className="bg-[#101820]/90 border border-white/10 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md">
+        <div className="bg-[#101820]/90 border border-white/8 rounded-[10px] p-3 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md">
           <div className="flex items-center gap-2.5">
             <div
-              className="w-3.5 h-3.5 rounded-full shadow-md"
+              className="w-3 h-3 rounded-full"
               style={{
                 backgroundColor: heatColor(selectedCity.risk),
-                boxShadow: `0 0 10px ${heatColor(selectedCity.risk)}`,
               }}
             />
             <div>
-              <span className="font-semibold text-white tracking-wide">{selectedCity.name}</span>
-              <span className="text-[10px] text-[#8B9AA8] font-mono ml-2">
+              <span className="font-semibold text-[#D7E0E7] tracking-wide">{selectedCity.name}</span>
+              <span className="text-[10px] text-[#5F7183] font-mono ml-2">
                 {selectedCity.lat.toFixed(2)}°N, {selectedCity.lng.toFixed(2)}°E
               </span>
             </div>
@@ -391,37 +568,25 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
 
           <div className="flex items-center gap-4 font-mono text-xs">
             <div>
-              <span className="text-[#8B9AA8] text-[10px] block">THERMAL RISK</span>
+              <span className="text-[#5F7183] text-[10px] uppercase block">Thermal Stress</span>
               <strong style={{ color: heatColor(selectedCity.risk) }}>
                 {(selectedCity.risk * 100).toFixed(1)} / 100
               </strong>
             </div>
             {selectedCity.temp && (
               <div>
-                <span className="text-[#8B9AA8] text-[10px] block">AIR TEMP</span>
-                <span className="text-white font-semibold">{selectedCity.temp}°C</span>
+                <span className="text-[#5F7183] text-[10px] uppercase block">Dry-Bulb</span>
+                <span className="text-[#D7E0E7] font-semibold">{selectedCity.temp}°C</span>
               </div>
             )}
             {selectedCity.wbgt && (
               <div>
-                <span className="text-[#8B9AA8] text-[10px] block">EST. WBGT</span>
+                <span className="text-[#5F7183] text-[10px] uppercase block">ISO WBGT</span>
                 <span className="text-[#FF704F] font-semibold">{selectedCity.wbgt}°C</span>
               </div>
             )}
           </div>
         </div>
-      </div>
-
-      {/* Accessibility DOM List for Screen Readers */}
-      <div className="sr-only">
-        <h2>Synoptic 3D Thermal Surveillance Data</h2>
-        <ul>
-          {cities.map((c) => (
-            <li key={c.name}>
-              {c.name}: Risk score {(c.risk * 100).toFixed(0)} out of 100, Temp {c.temp || 'N/A'}°C
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );

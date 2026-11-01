@@ -1,52 +1,79 @@
 import React, { useState } from 'react';
-import { HardHat, ShieldCheck, Shirt } from 'lucide-react';
-import { Card } from '../components/common/Card';
-import { DemoBadge } from '../components/common/DemoBadge';
+import { HardHat, Sun, Umbrella, ShieldAlert, AlertTriangle } from 'lucide-react';
+import { Card } from '../components/ui/Card';
+import { KpiNumeral } from '../components/ui/KpiNumeral';
+import { SectionHeader } from '../components/ui/SectionHeader';
+import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { WorkRestAdvisory } from '../components/risk/WorkRestAdvisory';
-import { HourlyStrip } from '../components/risk/HourlyStrip';
+import { DemoBadge } from '../components/common/DemoBadge';
 import { useCurrentThermal } from '../hooks/useThermal';
-import { useRiskForecast } from '../hooks/useForecast';
+import { useCurrentRisk } from '../hooks/useRisk';
 import { useWards } from '../hooks/useWards';
 import { useAppStore } from '../store/useAppStore';
+import { getRiskBand } from '../theme/tokens';
+import { TYPOGRAPHY } from '../theme/typography';
+
+type Occupation = 'construction' | 'delivery' | 'vendor' | 'traffic' | 'agriculture';
+type Intensity = 'met3' | 'met4' | 'met5' | 'met6';
+type Exposure = 'sun' | 'partial' | 'shade';
+type ShiftDuration = '4h' | '6h' | '8h';
 
 export const WorkerRisk: React.FC = () => {
   const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
   const { data: wards } = useWards(selectedCity);
   const { data: thermal } = useCurrentThermal(selectedLocationId);
-  const { data: forecast } = useRiskForecast(selectedLocationId);
+  const { data: risk } = useCurrentRisk(selectedLocationId);
 
-  // Occupational custom parameters
-  const [workload, setWorkload] = useState<'moderate' | 'heavy' | 'very_heavy'>('moderate');
-  const [ppeType, setPpeType] = useState<number>(0.0); // CAV in °C
-  const [isAcclimatized, setIsAcclimatized] = useState<boolean>(true);
+  // Form State using Segmented Controls
+  const [occupation, setOccupation] = useState<Occupation>('construction');
+  const [intensity, setIntensity] = useState<Intensity>('met5');
+  const [exposure, setExposure] = useState<Exposure>('sun');
+  const [shiftHours, setShiftHours] = useState<ShiftDuration>('8h');
 
-  const baseWbgt = thermal?.wbgt_c || 29.5;
-  const effectiveWbgt = Number((baseWbgt + ppeType + (isAcclimatized ? 0.0 : 2.0)).toFixed(1));
+  const selectedWard = wards?.find((w) => w.id === selectedLocationId) || wards?.[0];
+
+  // Base ambient scores
+  const generalScore = risk?.risk_score ?? 74;
+  const baseWbgt = thermal?.wbgt_c ?? 29.8;
+
+  // Work adjustment computation
+  const metBonus = intensity === 'met6' ? 14 : intensity === 'met5' ? 10 : intensity === 'met4' ? 6 : 2;
+  const sunBonus = exposure === 'sun' ? 8 : exposure === 'partial' ? 4 : 0;
+  const shiftBonus = shiftHours === '8h' ? 5 : shiftHours === '6h' ? 3 : 0;
+
+  const totalDelta = metBonus + sunBonus + shiftBonus;
+  const workAdjustedScore = Math.min(100, Math.round(generalScore + totalDelta));
+  const effectiveWbgt = +(baseWbgt + (exposure === 'sun' ? 2.5 : exposure === 'partial' ? 1.0 : 0.0) + (intensity === 'met6' ? 2.0 : 1.0)).toFixed(1);
+
+  const generalBand = getRiskBand(generalScore);
+  const workBand = getRiskBand(workAdjustedScore);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/10">
+    <div className="space-y-12">
+      {/* Header & Ward Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/8">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-extrabold text-white font-display">
-              Occupational Heat Strain & Worker Safety (ISO 7243)
+            <h1 className={`${TYPOGRAPHY.h1} text-white`}>
+              Occupational Heat Strain & Work-Rest Protocols
             </h1>
             {thermal?.is_demo && <DemoBadge label={thermal.demo_label} />}
           </div>
-          <p className="text-xs text-[#8B9AA8] mt-0.5">
-            Wet Bulb Globe Temperature (WBGT) screening and mandatory rest cycles for outdoor and industrial workers
+          <p className={TYPOGRAPHY.bodyL}>
+            Calibrated ISO 7243 screening models for outdoor physical labourers, Gig-workers, and construction trades in {selectedWard?.ward_name || selectedCity}.
           </p>
         </div>
 
         {/* Ward Selector */}
         <div className="flex items-center gap-2">
-          <label htmlFor="worker-ward-select" className="text-xs text-[#8B9AA8]">Ward:</label>
+          <label htmlFor="worker-ward" className="text-xs font-mono text-[#8B9AA8]">
+            Ward:
+          </label>
           <select
-            id="worker-ward-select"
+            id="worker-ward"
             value={selectedLocationId}
             onChange={(e) => setSelectedLocationId(Number(e.target.value))}
-            className="bg-[#1F3445] text-white text-xs px-3 py-2 rounded-lg border border-white/10 outline-none cursor-pointer"
+            className="bg-[#1F3445] text-white text-xs font-mono px-3 py-2 rounded-[8px] border border-white/10 outline-none cursor-pointer"
           >
             {wards?.map((w) => (
               <option key={w.id} value={w.id}>
@@ -57,125 +84,193 @@ export const WorkerRisk: React.FC = () => {
         </div>
       </div>
 
-      {/* Interactive PPE and Workload Configurator */}
+      {/* 1. Three-Step Form as Segmented Controls */}
       <Card
-        title="Workplace Parameter Configuration"
-        subtitle="Adjust PPE clothing insulation and metabolic rate for customized heat-strain screening"
+        tier="l1"
+        title="Occupational Profile & Exposure Parameters"
+        subtitle="Step 1 to 4: Define metabolic work rate and direct solar irradiance"
+        cornerTicks
       >
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          
-          {/* Workload Rate */}
+        <div className="space-y-6">
+          {/* Step 1: Occupation */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#D7E0E7] flex items-center gap-1.5">
-              <HardHat className="w-3.5 h-3.5 text-[#9B6FD8]" />
-              Metabolic Workload Rate
+            <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8] flex items-center gap-2">
+              <HardHat className="w-4 h-4 text-[#9B6FD8]" />
+              Step 1: Trade / Occupation
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="flex flex-wrap gap-2">
               {[
-                { id: 'moderate', label: 'Moderate', desc: '300W (Masonry/Plastering)' },
-                { id: 'heavy', label: 'Heavy', desc: '400W (Excavation/Trenching)' },
-                { id: 'very_heavy', label: 'Very Heavy', desc: '500W (Asphalt paving)' },
-              ].map((item) => (
+                { id: 'construction', label: 'Construction Worker', sub: 'Masonry / Steel' },
+                { id: 'delivery', label: 'Gig Courier', sub: 'Two-wheeler / Logistics' },
+                { id: 'vendor', label: 'Street Vendor', sub: 'Pavement / Kiosk' },
+                { id: 'traffic', label: 'Traffic Police', sub: 'Road Junction' },
+                { id: 'agriculture', label: 'Agricultural / Grounds', sub: 'Field Labor' },
+              ].map((opt) => (
                 <button
-                  key={item.id}
-                  onClick={() => setWorkload(item.id as any)}
-                  className={`p-2.5 rounded-lg border text-left text-xs transition-all ${
-                    workload === item.id
-                      ? 'bg-[#9B6FD8] text-white border-[#9B6FD8] font-bold shadow-md'
-                      : 'bg-[#101820]/60 text-[#8B9AA8] border-white/5 hover:border-white/20'
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setOccupation(opt.id as Occupation)}
+                  className={`px-3.5 py-2 rounded-[8px] text-xs font-mono text-left transition-all ${
+                    occupation === opt.id
+                      ? 'bg-[#101820] text-white border border-[#9B6FD8] [box-shadow:inset_0_1px_0_rgba(155,111,216,0.4)]'
+                      : 'bg-[#2F4A5E]/30 text-[#8B9AA8] border border-white/6 hover:text-white'
                   }`}
                 >
-                  <div className="font-semibold">{item.label}</div>
-                  <div className="text-[10px] opacity-75 mt-0.5">{item.desc}</div>
+                  <div className="font-semibold">{opt.label}</div>
+                  <div className="text-[10px] text-[#5F7183] mt-0.5">{opt.sub}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* PPE Clothing Adjustment Value (CAV) */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#D7E0E7] flex items-center gap-1.5">
-              <Shirt className="w-3.5 h-3.5 text-[#F59E0B]" />
-              PPE & Clothing Adjustment Value (CAV)
-            </label>
-            <select
-              value={ppeType}
-              onChange={(e) => setPpeType(Number(e.target.value))}
-              className="w-full bg-[#101820] text-white text-xs px-3 py-2.5 rounded-lg border border-white/10 outline-none cursor-pointer"
-            >
-              <option value={0.0}>Standard Cotton Shirt & Pants (+0.0°C)</option>
-              <option value={1.5}>Hard Hat + High-Visibility Safety Vest (+1.5°C)</option>
-              <option value={3.0}>Double-Layer Coveralls (+3.0°C)</option>
-              <option value={8.0}>Chemical / Vapor-Impermeable Suit (+8.0°C)</option>
-            </select>
-            <p className="text-[11px] text-[#8B9AA8]">
-              Per ISO 7243 Annex E clothing correction values
-            </p>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 border-t border-white/6">
+            {/* Step 2: Intensity MET 3-6 */}
+            <div className="space-y-2">
+              <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+                Step 2: Exertion Intensity
+              </label>
+              <SegmentedControl<Intensity>
+                options={[
+                  { value: 'met3', label: 'Light', sublabel: '3.0 MET' },
+                  { value: 'met4', label: 'Moderate', sublabel: '4.2 MET' },
+                  { value: 'met5', label: 'Heavy', sublabel: '5.5 MET' },
+                  { value: 'met6', label: 'Extreme', sublabel: '6.8 MET' },
+                ]}
+                value={intensity}
+                onChange={setIntensity}
+                className="w-full flex"
+              />
+            </div>
 
-          {/* Acclimatization State */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#D7E0E7] flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2FA37C]" />
-              Worker Acclimatization
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setIsAcclimatized(true)}
-                className={`p-2.5 rounded-lg border text-xs text-left transition-all ${
-                  isAcclimatized
-                    ? 'bg-[#2FA37C] text-white border-[#2FA37C] font-bold'
-                    : 'bg-[#101820]/60 text-[#8B9AA8] border-white/5'
-                }`}
-              >
-                <div>Acclimatized</div>
-                <div className="text-[10px] opacity-75 mt-0.5">&gt; 14 days on site</div>
-              </button>
-              <button
-                onClick={() => setIsAcclimatized(false)}
-                className={`p-2.5 rounded-lg border text-xs text-left transition-all ${
-                  !isAcclimatized
-                    ? 'bg-[#FF704F] text-white border-[#FF704F] font-bold'
-                    : 'bg-[#101820]/60 text-[#8B9AA8] border-white/5'
-                }`}
-              >
-                <div>Unacclimatized</div>
-                <div className="text-[10px] opacity-75 mt-0.5">New hire (+2°C penalty)</div>
-              </button>
+            {/* Step 3: Exposure Sun / Shade */}
+            <div className="space-y-2">
+              <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+                Step 3: Direct Solar Exposure
+              </label>
+              <SegmentedControl<Exposure>
+                options={[
+                  { value: 'sun', label: 'Direct Sun', sublabel: '+3.5°C Rad' },
+                  { value: 'partial', label: 'Partial', sublabel: '+1.2°C Rad' },
+                  { value: 'shade', label: 'Covered', sublabel: 'Ambient' },
+                ]}
+                value={exposure}
+                onChange={setExposure}
+                className="w-full flex"
+              />
+            </div>
+
+            {/* Step 4: Shift Duration */}
+            <div className="space-y-2">
+              <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+                Step 4: Shift Window
+              </label>
+              <SegmentedControl<ShiftDuration>
+                options={[
+                  { value: '4h', label: '4 Hours', sublabel: 'Morning' },
+                  { value: '6h', label: '6 Hours', sublabel: 'Split' },
+                  { value: '8h', label: '8 Hours', sublabel: 'Full Shift' },
+                ]}
+                value={shiftHours}
+                onChange={setShiftHours}
+                className="w-full flex"
+              />
             </div>
           </div>
-
         </div>
       </Card>
 
-      {/* ISO 7243 Screening Output */}
+      {/* 2. Output: Work-Adjusted Score vs General Score as 2 Large Numerals with Delta Chip */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        {/* General Population Score */}
+        <div className="p-6 rounded-[14px] bg-[#1F3445] border border-white/8 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+              Baseline General Exposure
+            </span>
+            <span
+              className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full"
+              style={{
+                backgroundColor: `${generalBand.color}20`,
+                color: generalBand.color,
+              }}
+            >
+              {generalBand.label}
+            </span>
+          </div>
+
+          <KpiNumeral
+            value={generalScore}
+            size="xl"
+            color={generalBand.color}
+            suffix="/100"
+            sublabel="Standard resting ambient population strain"
+          />
+
+          <div className="text-xs font-mono text-[#8B9AA8] border-t border-white/6 pt-3 flex justify-between">
+            <span>Ambient Dry-Bulb: {risk?.temperature_c?.toFixed(1) || '37.0'}°C</span>
+            <span>WBGT: {baseWbgt.toFixed(1)}°C</span>
+          </div>
+        </div>
+
+        {/* Work-Adjusted Score with Delta Chip */}
+        <div className="p-6 rounded-[14px] bg-[#263E50] border border-white/16 space-y-4 [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)] relative corner-ticks">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase tracking-[0.10em] text-white font-semibold">
+              Work-Adjusted Thermal Strain
+            </span>
+            <span
+              className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full"
+              style={{
+                backgroundColor: `${workBand.color}25`,
+                color: workBand.color,
+              }}
+            >
+              {workBand.label}
+            </span>
+          </div>
+
+          <div className="flex items-baseline gap-4">
+            <KpiNumeral
+              value={workAdjustedScore}
+              size="xl"
+              color={workBand.color}
+              suffix="/100"
+              delta={{ value: totalDelta, label: 'Work Excess' }}
+            />
+          </div>
+
+          <div className="text-xs font-mono text-[#D7E0E7] border-t border-white/8 pt-3 flex justify-between">
+            <span>Effective Metabolic WBGT: {effectiveWbgt}°C</span>
+            <span className="text-[#FF704F] font-bold">Delta: +{totalDelta} HTSI</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Work/Rest Schedule Generator & Hydration Cadence */}
       <WorkRestAdvisory
         wbgt={effectiveWbgt}
-        category={effectiveWbgt >= 32.2 ? 'Stop Work' : effectiveWbgt >= 30 ? 'Very High' : effectiveWbgt >= 28 ? 'High' : 'Moderate'}
+        category={workBand.label}
         guidance={
           effectiveWbgt >= 32.2
-            ? 'Cease outdoor heavy manual labor immediately. High hyperthermia and heat stroke risk under direct solar load.'
-            : effectiveWbgt >= 30
-            ? 'Implement strict 15 min work / 45 min rest schedule in air-conditioned or ventilated shaded canopies.'
-            : effectiveWbgt >= 28
-            ? 'Enforce 30 min work / 30 min rest cycles. Provide continuous chilled ORS water.'
-            : 'Standard 45 min work / 15 min rest cycle. Maintain regular hydration.'
+            ? 'Mandatory cessation of strenuous manual outdoor labor. Shift work to early morning (05:30 - 09:30) or nighttime hours. Activate mandatory shaded hydration cooling camps.'
+            : effectiveWbgt >= 30.0
+            ? 'Strict 15m work / 45m shaded rest cycle per hour. Provide chilled ORS electrolyte fluids. Monitor workers for heat syncope, dizziness, or cessation of sweating.'
+            : 'Implement 30m work / 30m rest cycle. Continuous access to shaded hydration stations.'
         }
       />
 
-      {/* Diurnal Hourly Strip for Work Shift Planning */}
-      <Card
-        title="Shift Planning Diurnal Forecast"
-        subtitle="Schedule intense heavy lifting and concrete pours during low-stress morning hours"
-      >
-        {forecast?.items ? (
-          <HourlyStrip items={forecast.items} />
-        ) : (
-          <div className="h-28 flex items-center justify-center text-xs text-[#8B9AA8]">
-            Loading shift forecast...
-          </div>
-        )}
-      </Card>
+      {/* 4. Prominent Legal & Medical Disclaimer */}
+      <div className="p-5 rounded-[12px] bg-[#101820] border border-white/8 flex items-start gap-4">
+        <AlertTriangle className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
+        <div className="text-xs text-[#8B9AA8] space-y-1">
+          <span className="font-mono font-bold text-white uppercase tracking-wider block">
+            Occupational Health & Safety Disclaimer (ISO 7243:2017)
+          </span>
+          <p className="leading-relaxed">
+            This screening module calculates thermal strain based on ISO 7243:2017 screening thresholds and the National Disaster Management Authority (NDMA) Heat Wave Guidelines. It is intended as an administrative decision-support tool for contractor shift planning, not an individual clinical diagnosis. In case of acute symptoms of heat stroke (confusion, body temperature &gt; 40°C, delirium), immediately dial 108.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
-import { HardHat, Droplets, Timer, AlertOctagon } from 'lucide-react';
-import { Card } from '../common/Card';
+import { Droplets, Timer, AlertOctagon } from 'lucide-react';
+import { Card } from '../ui/Card';
 
 interface WorkRestAdvisoryProps {
   wbgt: number;
@@ -14,86 +14,120 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
   guidance,
 }) => {
   // ISO 7243:2017 screening schedule calculations
-  let workPct = 100;
-  let restPct = 0;
+  let workMin = 60;
+  let restMin = 0;
   let hydrationMlPerHour = 250;
 
   if (wbgt >= 32.2) {
-    workPct = 0;
-    restPct = 100;
+    workMin = 0;
+    restMin = 60;
     hydrationMlPerHour = 1000;
   } else if (wbgt >= 30.0) {
-    workPct = 25;
-    restPct = 75;
+    workMin = 15;
+    restMin = 45;
     hydrationMlPerHour = 800;
   } else if (wbgt >= 28.0) {
-    workPct = 50;
-    restPct = 50;
+    workMin = 30;
+    restMin = 30;
     hydrationMlPerHour = 600;
   } else if (wbgt >= 26.0) {
-    workPct = 75;
-    restPct = 25;
+    workMin = 45;
+    restMin = 15;
     hydrationMlPerHour = 450;
   }
+
+  const workPct = Math.round((workMin / 60) * 100);
+  const restPct = 100 - workPct;
 
   return (
     <Card
       title="Occupational Heat Strain Protocol (ISO 7243:2017)"
-      subtitle="Standardized work-rest scheduling for moderate metabolic physical exertion (~300W)"
+      subtitle="Standardized work-rest scheduling and hydration cadence for physical exertion"
+      tier="l2"
     >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        
-        {/* Work / Rest Breakdown */}
-        <div className="bg-[#101820]/60 p-4 rounded-xl border border-white/5 space-y-2">
-          <div className="flex items-center gap-2 text-xs text-[#8B9AA8]">
-            <Timer className="w-4 h-4 text-[#9B6FD8]" />
-            <span>Hourly Cycle</span>
+      <div className="space-y-6">
+        {/* Timeline Bar showing Work (Amber) / Rest (Teal) blocks */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs font-mono">
+            <span className="text-[#8B9AA8]">60-Minute Cycle Timeline</span>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1.5 text-[#F59E0B]">
+                <span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B]" />
+                Work: {workMin}m ({workPct}%)
+              </span>
+              <span className="flex items-center gap-1.5 text-[#2FA37C]">
+                <span className="w-2.5 h-2.5 rounded-sm bg-[#2FA37C]" />
+                Rest: {restMin}m ({restPct}%)
+              </span>
+            </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-mono font-bold text-[#D7E0E7]">{workPct}% Work</span>
-            <span className="text-xs font-mono text-[#FF704F]">/ {restPct}% Rest</span>
+
+          {/* Visual block bar */}
+          <div className="w-full h-8 rounded-[8px] overflow-hidden flex bg-[#101820] border border-white/8 p-0.5">
+            {workPct > 0 && (
+              <div
+                className="h-full bg-[#F59E0B] rounded-l-[6px] flex items-center justify-center text-[11px] font-mono font-bold text-black transition-all duration-300"
+                style={{ width: `${workPct}%` }}
+              >
+                {workPct >= 20 ? `${workMin}m Work` : ''}
+              </div>
+            )}
+            {restPct > 0 && (
+              <div
+                className="h-full bg-[#2FA37C] rounded-r-[6px] flex items-center justify-center text-[11px] font-mono font-bold text-black transition-all duration-300"
+                style={{ width: `${restPct}%` }}
+              >
+                {restPct >= 20 ? `${restMin}m Rest` : ''}
+              </div>
+            )}
           </div>
-          <p className="text-[11px] text-[#8B9AA8]">
-            {workPct > 0 ? `${(workPct * 60) / 100} min physical work per hour` : 'Cease strenuous outdoor tasks'}
-          </p>
         </div>
 
-        {/* Hydration Requirement */}
-        <div className="bg-[#101820]/60 p-4 rounded-xl border border-white/5 space-y-2">
-          <div className="flex items-center gap-2 text-xs text-[#8B9AA8]">
-            <Droplets className="w-4 h-4 text-[#2FA37C]" />
-            <span>Hydration Rate</span>
+        {/* Hydration Cadence & WBGT Strip */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-[#1F3445]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
+            <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
+              <Timer className="w-4 h-4 text-[#9B6FD8]" />
+              <span>Shift Rest Interval</span>
+            </div>
+            <div className="text-xl font-mono font-bold text-white tabular-nums">
+              Every {60 - restMin} mins
+            </div>
+            <p className="text-[11px] text-[#8B9AA8]">
+              Move to ventilated shade or cooling tent
+            </p>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-mono font-bold text-[#2FA37C]">{hydrationMlPerHour} ml</span>
-            <span className="text-xs font-mono text-[#8B9AA8]">/ hour</span>
+
+          <div className="bg-[#1F3445]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
+            <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
+              <Droplets className="w-4 h-4 text-[#2FA37C]" />
+              <span>Hydration Cadence</span>
+            </div>
+            <div className="text-xl font-mono font-bold text-[#2FA37C] tabular-nums">
+              {hydrationMlPerHour} ml / hr
+            </div>
+            <p className="text-[11px] text-[#8B9AA8]">
+              Drink 200–250ml cool water / ORS every 15–20m
+            </p>
           </div>
-          <p className="text-[11px] text-[#8B9AA8]">
-            Electrolytes & ORS water at 20-min intervals
-          </p>
+
+          <div className="bg-[#1F3445]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
+            <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
+              <AlertOctagon className="w-4 h-4 text-[#FF704F]" />
+              <span>WBGT Stress Level</span>
+            </div>
+            <div className="text-xl font-mono font-bold text-[#FF704F] tabular-nums">
+              {wbgt.toFixed(1)}°C
+            </div>
+            <p className="text-[11px] text-[#8B9AA8]">{category}</p>
+          </div>
         </div>
 
-        {/* WBGT Thermal Threshold */}
-        <div className="bg-[#101820]/60 p-4 rounded-xl border border-white/5 space-y-2">
-          <div className="flex items-center gap-2 text-xs text-[#8B9AA8]">
-            <HardHat className="w-4 h-4 text-[#F59E0B]" />
-            <span>Effective WBGT</span>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-mono font-bold text-[#D7E0E7]">{wbgt.toFixed(1)}°C</span>
-            <span className="text-xs font-mono text-[#8B9AA8]">({category})</span>
-          </div>
-          <p className="text-[11px] text-[#8B9AA8]">
-            Stop-work threshold: 32.2°C (OSHA/ISO)
-          </p>
-        </div>
-
-      </div>
-
-      <div className="p-3 rounded-lg bg-[#FF704F]/10 border border-[#FF704F]/20 text-xs text-[#D7E0E7] flex items-start gap-2.5">
-        <AlertOctagon className="w-4 h-4 text-[#FF704F] flex-shrink-0 mt-0.5" />
-        <div>
-          <span className="font-semibold text-[#FF704F]">Workplace Directive: </span>
+        {/* Advisory Note */}
+        <div className="p-3.5 rounded-[8px] bg-[#101820] border border-white/8 text-xs text-[#D7E0E7] leading-relaxed">
+          <span className="font-mono font-bold text-[#FF704F] uppercase tracking-wider block mb-1 text-[11px]">
+            Action Advisory:
+          </span>
           {guidance}
         </div>
       </div>

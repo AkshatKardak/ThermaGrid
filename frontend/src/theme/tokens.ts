@@ -2,27 +2,42 @@
  * ThermaGrid Design Tokens
  * Midnight Climate Palette (Single Source of Truth)
  *
- * RULE: Interactive accent (Amethyst #9B6FD8) is for chrome and UI controls ONLY.
- * Risk is ALWAYS encoded by the heat scale (safe -> extreme), NEVER by accent.
+ * LAW OF USAGE:
+ * - Amethyst (#9B6FD8): UI Chrome, buttons, active nav, focus rings, "live" indicators, 3D rim light ONLY.
+ *   NEVER used for a risk value.
+ * - Heat scale: Risk values and bands ONLY. Never a headline, a border, or a hover state.
+ * - Never pure black (#000000) or pure white (#FFFFFF).
+ * - Max one saturated element per viewport region.
  */
 
 export const THEME_COLORS = {
-  bg: '#101820',          // Midnight
-  surface: '#1F3445',     // Panel
-  surfaceElevated: '#263E50', // Raised Panel
-  border: 'rgba(255, 255, 255, 0.10)',
-  text: '#D7E0E7',
-  textDim: '#8B9AA8',
+  // Page canvas & base
+  bg: '#101820', // Midnight
+
+  // Surface tiers (L1 -> L3)
+  surface: '#1F3445', // L1 card
+  surfaceElevated: '#263E50', // L2 raised
+  surfaceRecessed: '#2F4A5E', // L3 recessed / well / input
+  surfaceOverlay: 'rgba(31, 52, 69, 0.82)', // L3 modal/sheet
+
+  // Borders & hairlines
+  border: 'rgba(255, 255, 255, 0.08)',
+  borderEmphasized: 'rgba(255, 255, 255, 0.16)',
+
+  // Typography shades (never pure white)
+  text: '#D7E0E7', // Primary
+  textDim: '#8B9AA8', // Secondary
+  textFaint: '#5F7183', // Captions, labels, hairlines
 
   // Interactive Accent (UI Chrome ONLY)
-  accent: '#9B6FD8',      // Amethyst
+  accent: '#9B6FD8', // Amethyst
   accentDim: '#7F56BD',
   accentSoft: 'rgba(155, 111, 216, 0.18)',
 
-  // Alert
+  // Alert indicator
   alert: '#FF704F',
 
-  // Heat Scale (Normative thermal bands)
+  // Heat Scale (Normative thermal bands - RISK ONLY)
   heatScale: {
     safe: '#2FA37C',
     moderate: '#E8C547',
@@ -30,6 +45,22 @@ export const THEME_COLORS = {
     veryhigh: '#FF704F',
     extreme: '#C31D3C',
   },
+} as const;
+
+export const THEME_RADIUS = {
+  chips: '6px',
+  inputs: '8px',
+  buttons: '8px',
+  cards: '14px',
+  overlays: '22px',
+  pills: '9999px',
+} as const;
+
+export const THEME_SHADOWS = {
+  l1: 'none',
+  l2: '0 20px 60px -30px rgba(0, 0, 0, 0.90)',
+  l3: '0 30px 80px -40px rgba(0, 0, 0, 0.95)',
+  highlight: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)',
 } as const;
 
 export type RiskBand = 'safe' | 'moderate' | 'high' | 'veryhigh' | 'extreme';
