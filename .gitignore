@@ -1,0 +1,76 @@
+# Environment variables and secrets
+.env
+*.env
+**/.env
+**/.env.*
+.env.local
+.env.*.local
+!.env.example
+!**/.env.example
+
+# Node.js packages, build output & caches
+node_modules/
+**/node_modules/
+frontend/node_modules/
+dist/
+**/dist/
+dist-ssr/
+frontend/dist/
+.vite/
+frontend/.vite/
+frontend/.vite-temp/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Python packages, bytecode & virtual environments
+.venv/
+**/.venv/
+backend/.venv/
+analytics/.venv/
+venv/
+**/venv/
+env/
+**/env/
+ENV/
+**/ENV/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+**/.pytest_cache/
+.coverage
+htmlcov/
+build/
+**/build/
+*.egg-info/
+**/*.egg-info/
+
+# Databases, PostGIS & Local Cache
+*.sqlite
+*.sqlite3
+*.db
+pgdata/
+heatsense_dev.db
+thermagrid_dev.db
+
+# Machine Learning & Large Artifacts
+analytics/models/*.pkl
+analytics/models/*.joblib
+analytics/models/*.onnx
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# OS and Editor artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

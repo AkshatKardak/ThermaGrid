@@ -1,0 +1,73 @@
+{
+  "model_type": "GradientBoostingRegressor (Ensemble with Quantile Bounds)",
+  "metrics": {
+    "mae": 0.181,
+    "rmse": 0.269,
+    "r2": 0.996
+  },
+  "baseline_comparison": {
+    "persistence": {
+      "mae": 0.733,
+      "rmse": 0.924,
+      "r2": 0.955
+    },
+    "linear_ridge": {
+      "mae": 0.079,
+      "rmse": 0.103,
+      "r2": 0.999
+    }
+  },
+  "improvement_over_baseline": {
+    "mae_reduction_pct": 75.33
+  },
+  "feature_importance": [
+    {
+      "feature": "temp_c",
+      "importance": 82.67
+    },
+    {
+      "feature": "wbgt_lag1",
+      "importance": 16.21
+    },
+    {
+      "feature": "rel_humidity_pct",
+      "importance": 1.01
+    },
+    {
+      "feature": "temp_lag1",
+      "importance": 0.04
+    },
+    {
+      "feature": "solar_radiation_wm2",
+      "importance": 0.03
+    },
+    {
+      "feature": "wind_speed_ms",
+      "importance": 0.01
+    },
+    {
+      "feature": "hour_cos",
+      "importance": 0.01
+    },
+    {
+      "feature": "uhi_excess_c",
+      "importance": 0.01
+    },
+    {
+      "feature": "rh_lag1",
+      "importance": 0.01
+    },
+    {
+      "feature": "hour_sin",
+      "importance": 0.0
+    },
+    {
+      "feature": "day_of_year_sin",
+      "importance": 0.0
+    },
+    {
+      "feature": "day_of_year_cos",
+      "importance": 0.0
+    }
+  ]
+}

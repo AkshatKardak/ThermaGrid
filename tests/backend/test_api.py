@@ -1,0 +1,151 @@
+"""
+FastAPI Backend integration tests using TestClient.
+"""
+
+import sys
+import os
+import pytest
+from fastapi.testclient import TestClient
+
+# Set PYTHONPATH
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(BASE_DIR, "backend"))
+sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
+
+from app.main import app
+from app.db.seed import seed_database
+from app.services.alert_service import maybe_alert
+
+# Ensure database is seeded for test runs
+seed_database()
+
+client = TestClient(app)
+
+
+def test_health_check():
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "healthy"
+    assert "ThermaGrid" in data["app"]
+
+
+def test_list_locations():
+    response = client.get("/api/v1/locations")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) >= 1
+    first_ward = data[0]
+    assert "ward_code" in first_ward
+    assert "population_density_per_km2" in first_ward
+
+
+def test_get_current_weather():
+    response = client.get("/api/v1/weather/current?location_id=1")
+    assert response.status_code == 200
+    data = response.json()
+    assert "temperature_c" in data
+    assert "rel_humidity_pct" in data
+    assert "wind_speed_ms" in data
+
+
+def test_get_current_thermal_indices():
+    response = client.get("/api/v1/thermal/current?location_id=1")
+    assert response.status_code == 200
+    data = response.json()
+    assert "wbgt_c" in data
+    assert "utci_c" in data
+    assert "heat_index_c" in data
+    assert "wbgt_category" in data
+
+
+def test_get_current_risk():
+    response = client.get("/api/v1/risk/current?location_id=1")
+    assert response.status_code == 200
+    data = response.json()
+    assert "risk_score" in data
+    assert 0.0 <= data["risk_score"] <= 100.0
+    assert "band" in data
+    assert "factor_breakdown" in data
+    assert len(data["factor_breakdown"]) >= 3
+    assert "explanation" in data
+
+
+def test_what_if_simulation():
+    payload = {
+        "location_id": 1,
+        "green_cover_expansion_pct": 20.0,
+        "cool_roofs_adoption_pct": 35.0,
+        "misting_shelters_count": 4,
+        "shift_outdoor_hours_by": 2,
+    }
+    response = client.post("/api/v1/simulation", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["is_demo"] is True
+    assert "DEMO DATA" in data["demo_label"]
+    assert data["simulated_risk_score"] <= data["baseline_risk_score"]
+    assert data["risk_reduction_points"] >= 0.0
+    assert data["population_protected_count"] > 0
+
+
+def test_cooling_centres_list():
+    response = client.get("/api/v1/cooling-centres")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) >= 1
+    assert "capacity_persons" in data[0]
+
+
+def test_data_sources_provenance():
+    response = client.get("/api/v1/data-sources")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) >= 3
+    for source in data:
+        assert "name" in source
+        assert "provider" in source
+        assert "license" in source
+        assert "spatial_resolution" in source
+
+
+def test_clerk_auth_me():
+    # Calling /auth/me without bearer token raises 401
+    resp_unauth = client.get("/api/v1/auth/me")
+    assert resp_unauth.status_code == 401
+
+    # Calling with valid bearer token returns user profile
+    headers = {"Authorization": "Bearer test_authority_jwt_token"}
+    resp_auth = client.get("/api/v1/auth/me", headers=headers)
+    assert resp_auth.status_code == 200
+    data = resp_auth.json()
+    assert data["role"] == "authority"
+    assert "user_id" in data
+
+
+def test_role_guard_authority_403_for_citizens():
+    # Citizen token accessing authority endpoint gets 403 Forbidden
+    citizen_headers = {"Authorization": "Bearer test_citizen_jwt_token"}
+    resp = client.get("/api/v1/auth/authority-only", headers=citizen_headers)
+    assert resp.status_code == 403
+
+    # Authority token gets 200 OK
+    auth_headers = {"Authorization": "Bearer test_authority_jwt_token"}
+    resp_ok = client.get("/api/v1/auth/authority-only", headers=auth_headers)
+    assert resp_ok.status_code == 200
+    assert resp_ok.json()["status"] == "authorized"
+
+
+import asyncio
+
+def test_alert_threshold_dispatch():
+    # Below threshold (e.g. 50 < 80) -> returns False
+    did_alert_low = asyncio.run(maybe_alert("test@mcgm.gov.in", risk=50.0, ward="Ward A", peak="14:00"))
+    assert did_alert_low is False
+
+    # Above threshold (e.g. 85 >= 80) -> dispatches via active channel
+    did_alert_high = asyncio.run(maybe_alert("test@mcgm.gov.in", risk=85.0, ward="Ward M/East", peak="14:00"))
+    assert did_alert_high is True

@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+:root {
+  /* base surfaces */
+  --bg: #101820;              /* Midnight   */
+  --surface: #1F3445;         /* Panel      */
+  --surface-2: #263E50;       /* raised panel */
+  --border: rgba(255, 255, 255, 0.10);
+  --text: #D7E0E7;
+  --text-dim: #8B9AA8;
+
+  /* interactive accent — buttons, links, active states, "live" indicators ONLY */
+  --accent: #9B6FD8;          /* Amethyst   */
+  --accent-dim: #7F56BD;
+  --accent-soft: rgba(155, 111, 216, 0.18);
+
+  /* alert */
+  --alert: #FF704F;
+
+  /* heat scale — identical everywhere; NEVER reuse the accent colour here */
+  --safe: #2FA37C;
+  --moderate: #E8C547;
+  --high: #F59E0B;
+  --veryhigh: #FF704F;
+  --extreme: #C31D3C;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: normal;
+}
+
+code, pre, .font-mono, .data-readout {
+  font-family: var(--font-mono);
+  letter-spacing: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface-2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+
+/* Glass panel utility */
+.glass-panel {
+  background: rgba(31, 52, 69, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.glass-panel-elevated {
+  background: rgba(38, 62, 80, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
