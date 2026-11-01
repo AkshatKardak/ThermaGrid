@@ -63,79 +63,74 @@ export const Landing: React.FC = () => {
 
   return (
     <div className="space-y-24 sm:space-y-32">
-      {/* 1. Hero Section (7/5 split, full-bleed 3D RiskGlobe, scrim, spotlight cursor) */}
+      {/* 1. Hero Section (Separate 2-Column Grid: Left Editorial Panel + Right Dedicated 3D Earth Console) */}
       <section
         ref={heroRef}
-        className="relative min-h-[640px] lg:min-h-[720px] rounded-[14px] overflow-hidden border border-white/8 bg-[#101820] flex items-center corner-ticks"
+        className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch"
       >
         <SpotlightCursor containerRef={heroRef} />
 
-        {/* 3D RiskGlobe Canvas (Right-Weighted) */}
-        <div className="absolute top-0 right-0 bottom-0 w-full lg:w-3/5 h-full z-0 opacity-80 lg:opacity-100">
-          <RiskGlobe height="100%" />
-        </div>
+        {/* Left Panel (7 cols): Editorial, Narrative, and Actions */}
+        <div className="lg:col-span-7 bg-[#1F3445]/50 backdrop-blur-md border border-white/10 rounded-[14px] p-6 sm:p-10 lg:p-12 flex flex-col justify-between corner-ticks shadow-2xl relative z-10">
+          <div className="space-y-6">
+            {/* Eyebrow badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101820]/90 border border-white/10 text-xs font-mono text-[#D7E0E7] w-fit">
+              <span className="w-2 h-2 rounded-full bg-[#38BDF8] animate-pulse" />
+              <span className="text-[#8B9AA8]">National Climate Early-Warning Initiative</span>
+            </div>
 
-        {/* Scrim Overlay: keeps text on the left pristine and legible */}
-        <div
-          className="absolute inset-0 pointer-events-none z-10"
-          style={{
-            background:
-              'linear-gradient(90deg, #101820 0%, #101820 42%, rgba(16, 24, 32, 0.88) 58%, transparent 80%)',
-          }}
-        />
+            {/* Headline: Word-by-word entrance reveal */}
+            <motion.h1
+              variants={wordContainer}
+              initial="hidden"
+              animate="visible"
+              className={`${TYPOGRAPHY.displayXl} text-white flex flex-wrap gap-x-3.5 gap-y-1`}
+            >
+              {HERO_WORDS.map((word, idx) => (
+                <motion.span
+                  key={idx}
+                  variants={wordItem}
+                  className={word === 'Thermal' || word === 'Stress' ? 'text-[#FF704F]' : ''}
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </motion.h1>
 
-        {/* Hero Left Content (7-col rail) */}
-        <div className="relative z-20 max-w-2xl p-6 sm:p-10 lg:p-14 space-y-8">
-          {/* Eyebrow: mono, amethyst dot */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1F3445]/80 border border-white/10 text-xs font-mono text-[#D7E0E7]">
-            <span className="w-2 h-2 rounded-full bg-[#9B6FD8] animate-pulse" />
-            <span className="text-[#8B9AA8]">National Climate Early-Warning Initiative</span>
-          </div>
+            {/* Narrative Lead */}
+            <p className={`${TYPOGRAPHY.bodyL} text-[#8B9AA8] max-w-xl leading-relaxed`}>
+              Not a generic weather forecast. ThermaGrid pinpoints <span className="text-white font-medium">who is at risk</span>, <span className="text-white font-medium">where</span>, <span className="text-white font-medium">when it peaks</span>, <span className="text-white font-medium">why</span>, and <span className="text-white font-medium">what action to take</span> — calibrated down to the urban municipal ward.
+            </p>
 
-          {/* Headline: Word-by-word entrance reveal */}
-          <motion.h1
-            variants={wordContainer}
-            initial="hidden"
-            animate="visible"
-            className={`${TYPOGRAPHY.displayXl} text-white flex flex-wrap gap-x-3.5 gap-y-1`}
-          >
-            {HERO_WORDS.map((word, idx) => (
-              <motion.span
-                key={idx}
-                variants={wordItem}
-                className={word === 'Thermal' || word === 'Stress' ? 'text-[#FF704F]' : ''}
+            {/* CTAs */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <Link
+                to="/citizen"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-[8px] bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all duration-120 shadow-lg shadow-[#9B6FD8]/25"
               >
-                {word}
-              </motion.span>
-            ))}
-          </motion.h1>
-
-          {/* One-sentence lead (max 68ch, off-centre) */}
-          <p className={TYPOGRAPHY.bodyL}>
-            Not a generic weather forecast. ThermaGrid pinpoints who is at risk, where, when it peaks, why, and what action to take — calibrated down to the urban municipal ward.
-          </p>
-
-          {/* Two CTAs: Primary Amethyst, Secondary Ghost */}
-          <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Link
-              to="/citizen"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-[8px] bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-sm font-semibold transition-all duration-120 hover:-translate-y-[1px] active:translate-y-0"
-            >
-              <ShieldAlert className="w-4 h-4" />
-              Citizen Protection
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              to="/worker"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-[8px] bg-transparent hover:bg-white/5 border border-white/16 text-[#D7E0E7] text-sm font-semibold transition-all duration-120 hover:-translate-y-[1px] active:translate-y-0"
-            >
-              <HardHat className="w-4 h-4 text-[#F59E0B]" />
-              Worker Safety
-            </Link>
+                <ShieldAlert className="w-4 h-4" />
+                Citizen Protection
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                to="/worker"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
+              >
+                <HardHat className="w-4 h-4 text-[#F59E0B]" />
+                Worker Safety
+              </Link>
+              <Link
+                to="/authority"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
+              >
+                <ArrowRight className="w-4 h-4 text-[#38BDF8]" />
+                Authority Console
+              </Link>
+            </div>
           </div>
 
           {/* 3-Stat Rail with Numerals Count-up */}
-          <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/8 max-w-lg">
+          <div className="grid grid-cols-3 gap-6 pt-8 mt-6 border-t border-white/8">
             <div>
               <span className="block font-mono text-xl sm:text-2xl font-bold text-white tracking-tight">
                 ISO 7243
@@ -163,10 +158,9 @@ export const Landing: React.FC = () => {
           </div>
         </div>
 
-        {/* Scroll hint bottom-centre */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 opacity-60 text-xs font-mono text-[#8B9AA8] pointer-events-none">
-          <span>SCROLL TO EXPLORE</span>
-          <ChevronDown className="w-4 h-4 animate-bounce" />
+        {/* Right Panel (5 cols): Dedicated 3D Interactive Earth Terminal */}
+        <div className="lg:col-span-5 bg-[#101820] border border-white/10 rounded-[14px] overflow-hidden flex flex-col corner-ticks relative min-h-[520px] lg:min-h-[580px] shadow-2xl">
+          <RiskGlobe height="100%" interactive={true} />
         </div>
       </section>
 

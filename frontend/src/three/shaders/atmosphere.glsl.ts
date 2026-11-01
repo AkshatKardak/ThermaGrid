@@ -1,6 +1,6 @@
 /**
  * Atmospheric Fresnel glow shader for the Earth globe.
- * Emits an ethereal Amethyst (#9B6FD8) halo around the planet rim.
+ * Emits an authentic Earth Rayleigh scattering blue/cyan atmospheric rim.
  */
 
 export const atmosphereVertexShader = /* glsl */ `
@@ -16,9 +16,9 @@ export const atmosphereFragmentShader = /* glsl */ `
 varying vec3 vN;
 
 void main() {
-  // Fresnel glow intensity based on view angle against normal
-  float i = pow(0.72 - dot(vN, vec3(0.0, 0.0, 1.0)), 3.2);
-  // Amethyst tint (#9B6FD8: 0.61, 0.44, 0.85)
-  gl_FragColor = vec4(0.608, 0.435, 0.847, 1.0) * clamp(i, 0.0, 1.0);
+  // Fresnel atmospheric glow intensity based on view angle against normal
+  float i = pow(0.68 - dot(vN, vec3(0.0, 0.0, 1.0)), 2.8);
+  // Natural Earth Rayleigh scattering blue (#38BDF8 / #0284C7: 0.22, 0.65, 0.96)
+  gl_FragColor = vec4(0.22, 0.65, 0.96, 1.0) * clamp(i * 0.9, 0.0, 1.0);
 }
 `;
