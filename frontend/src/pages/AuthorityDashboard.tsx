@@ -17,13 +17,15 @@ import { RiskBadge } from '../components/risk/RiskBadge';
 import { WardHeatCity } from '../three/scenes/WardHeatCity';
 import { LeafletBaseMap } from '../components/maps/LeafletBaseMap';
 import { InterventionQueue } from '../components/dashboard/InterventionQueue';
+import { useRole } from '../hooks/useRole';
 import { useWards } from '../hooks/useWards';
 import { useAllWardsRisk } from '../hooks/useRisk';
 import { useCoolingCentres } from '../hooks/useCoolingCentres';
-import { useAppStore, type UserRole } from '../store/useAppStore';
+import { useAppStore } from '../store/useAppStore';
 import { apiClient } from '../lib/api';
 import { getRiskBand } from '../theme/tokens';
 import { TYPOGRAPHY } from '../theme/typography';
+import { Link } from 'react-router-dom';
 
 type ViewMode = '3d_city' | '2d_gis';
 type SortField = 'rank' | 'name' | 'wbgt' | 'risk';
@@ -33,9 +35,8 @@ export const AuthorityDashboard: React.FC = () => {
     selectedCity,
     selectedLocationId,
     setSelectedLocationId,
-    userRole,
-    setUserRole,
   } = useAppStore();
+  const { isAuthority } = useRole();
 
   const { data: wards } = useWards(selectedCity);
   const { data: wardsRisk } = useAllWardsRisk(selectedCity);
@@ -83,31 +84,36 @@ export const AuthorityDashboard: React.FC = () => {
     },
   ]);
 
-  // Role Gate: Citizens get a clean 403 Access page, not a broken screen
-  if (userRole === 'citizen') {
+  // Role Gate: Authority Console is for municipal officers
+  if (!isAuthority) {
     return (
-      <div className="min-h-[500px] flex items-center justify-center">
-        <div className="max-w-md w-full p-8 rounded-[14px] bg-[#1F3445] border border-white/10 text-center space-y-5 corner-ticks">
-          <div className="w-14 h-14 rounded-full bg-[#FF704F]/15 border border-[#FF704F]/30 flex items-center justify-center mx-auto text-[#FF704F]">
+      <div className="min-h-[500px] flex items-center justify-center py-12">
+        <div className="max-w-md w-full p-8 rounded-[14px] bg-[#1F3445] border border-white/10 text-center space-y-5 corner-ticks shadow-2xl">
+          <div className="w-14 h-14 rounded-full bg-[#9B6FD8]/15 border border-[#9B6FD8]/30 flex items-center justify-center mx-auto text-[#9B6FD8]">
             <Lock className="w-7 h-7" />
           </div>
           <div className="space-y-1">
-            <h2 className={`${TYPOGRAPHY.h2} text-white`}>403 Access Restricted</h2>
+            <h2 className={`${TYPOGRAPHY.h2} text-white`}>Municipal Authority Console</h2>
             <p className="text-xs text-[#8B9AA8] font-mono uppercase tracking-[0.10em]">
-              Authority & Disaster Management Console Only
+              Restricted to Municipal Officers
             </p>
           </div>
           <p className="text-xs text-[#D7E0E7] leading-relaxed">
-            This module contains municipal emergency broadcast triggers, ward intervention queues, and priority resource dispatch. Please authenticate as a municipal administrator or switch your workspace role.
+            This console is for municipal officers managing emergency dispatches, intervention queues, and ward-wide broadcast telemetry. Sign in with an authorized municipal account to access this module.
           </p>
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={() => setUserRole('authority')}
-              className="px-5 py-2.5 rounded-[8px] bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all cursor-pointer"
+          <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              to="/app"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-[8px] bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-[#D7E0E7] transition-all text-center"
             >
-              Switch Role to Municipal Authority
-            </button>
+              Back to Overview
+            </Link>
+            <Link
+              to="/sign-in"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-[8px] bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all text-center"
+            >
+              Sign In with Authority Account
+            </Link>
           </div>
         </div>
       </div>

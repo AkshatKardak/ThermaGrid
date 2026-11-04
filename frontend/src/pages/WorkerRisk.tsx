@@ -5,6 +5,7 @@ import { KpiNumeral } from '../components/ui/KpiNumeral';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { WorkRestAdvisory } from '../components/risk/WorkRestAdvisory';
+import { WorkerShiftCard } from '../components/worker/WorkerShiftCard';
 import { DemoBadge } from '../components/common/DemoBadge';
 import { useCurrentThermal } from '../hooks/useThermal';
 import { useCurrentRisk } from '../hooks/useRisk';
@@ -258,6 +259,11 @@ export const WorkerRisk: React.FC = () => {
             : 'Implement 30m work / 30m rest cycle. Continuous access to shaded hydration stations.'
         }
       />
+
+      {/* P1-6 Feature: Official Printable Worker Shift Card */}
+      <section className="space-y-4">
+        <WorkerShiftCard locationId={selectedLocationId} />
+      </section>
 
       {/* 4. Prominent Legal & Medical Disclaimer */}
       <div className="p-5 rounded-[12px] bg-[#101820] border border-white/8 flex items-start gap-4">

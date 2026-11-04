@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
 import * as Sentry from '@sentry/react';
+import './i18n';
 import App from './App';
 import './index.css';
 import { env } from './config/env';
@@ -32,7 +33,18 @@ createRoot(rootElement).render(
   <React.StrictMode>
     <ErrorBoundary>
       {isClerkKeyConfigured ? (
-        <ClerkProvider publishableKey={env.CLERK_PUBLISHABLE_KEY!}>
+        <ClerkProvider
+          publishableKey={env.CLERK_PUBLISHABLE_KEY!}
+          appearance={{
+            variables: {
+              colorPrimary: '#9B6FD8',
+              colorBackground: '#1F3445',
+              colorText: '#D7E0E7',
+              borderRadius: '14px',
+              fontFamily: 'IBM Plex Sans, sans-serif',
+            },
+          }}
+        >
           <App />
         </ClerkProvider>
       ) : (

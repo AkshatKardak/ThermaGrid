@@ -146,7 +146,7 @@ export const Landing: React.FC = () => {
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <Link
-                to="/citizen"
+                to="/app/heat-risk"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all duration-120 shadow-lg shadow-[#9B6FD8]/25"
               >
                 <ShieldAlert className="w-4 h-4" />
@@ -154,14 +154,14 @@ export const Landing: React.FC = () => {
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <Link
-                to="/worker"
+                to="/app/worker"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
               >
                 <HardHat className="w-4 h-4 text-[#F59E0B]" />
                 Worker Safety
               </Link>
               <Link
-                to="/authority"
+                to="/app/authority"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
               >
                 <ArrowRight className="w-4 h-4 text-[#38BDF8]" />
@@ -206,7 +206,7 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* 2. Section: Two Wards, Same Temperature (The 7/5 Asymmetric Pair) */}
-      <section className="space-y-6">
+      <section id="two-wards" className="space-y-6">
         <SectionHeader
           label="HYPERLOCAL PARADIGM BENCHMARK"
           title="Two Wards, Same Temperature, Different Alert Grade"
@@ -228,7 +228,7 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* 4. Section: How It Works (5-Step Horizontal Rail with Hairline Connectors) */}
-      <section className="space-y-6">
+      <section id="how-it-works" className="space-y-6">
         <SectionHeader
           label="END-TO-END COMPUTATIONAL PIPELINE"
           title="From Raw Satellite Telemetry to Targeted Life-Saving Intervention"
@@ -263,7 +263,7 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* 5. Section: Provenance Strip (4 Mono Facts) */}
-      <section className="p-6 rounded-[14px] bg-[#1F3445]/40 border border-white/8 space-y-4">
+      <section id="methodology" className="p-6 rounded-[14px] bg-[#1F3445]/40 border border-white/8 space-y-4">
         <div className="text-[11px] font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
           Data Provenance & Model Auditability
         </div>

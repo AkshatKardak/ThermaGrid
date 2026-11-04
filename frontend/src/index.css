@@ -193,3 +193,42 @@ code, pre, .font-mono, .data-readout {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Single pulse animation for dangerous avoid window */
+@keyframes pulseOnce {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(195, 29, 60, 0.4); }
+  50% { transform: scale(1.01); box-shadow: 0 0 0 8px rgba(195, 29, 60, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(195, 29, 60, 0); }
+}
+.animate-pulse-once {
+  animation: pulseOnce 700ms cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
+}
+
+/* Print CSS for single clean page shift card */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #101820 !important;
+  }
+  header, footer, nav, .no-print, .film-grain, .vignette-overlay, .bg-grid-pattern {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  .shift-card-print {
+    background: #ffffff !important;
+    color: #101820 !important;
+    border: 1.5px solid #101820 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    padding: 20px !important;
+  }
+  .shift-card-print * {
+    color: #101820 !important;
+    text-shadow: none !important;
+  }
+}

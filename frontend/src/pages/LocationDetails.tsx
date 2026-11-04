@@ -17,6 +17,7 @@ import { RiskBadge } from '../components/risk/RiskBadge';
 import { TrendChart } from '../components/charts/TrendChart';
 import { ForecastConfidenceChart } from '../components/charts/ForecastConfidenceChart';
 import { TerrainFlythrough } from '../three/scenes/TerrainFlythrough';
+import { CoolingCentresList } from '../components/cooling/CoolingCentresList';
 import { DemoBadge } from '../components/common/DemoBadge';
 import { useWardDetails } from '../hooks/useWards';
 import { useCurrentRisk } from '../hooks/useRisk';
@@ -250,6 +251,11 @@ export const LocationDetails: React.FC = () => {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* 5. Usable Cooling Centres in Proximity */}
+      <section className="space-y-4">
+        <CoolingCentresList city={ward?.city || 'Mumbai'} />
       </section>
     </div>
   );

@@ -18,10 +18,14 @@ import { FactorBars } from '../components/risk/FactorBars';
 import { HourlyStrip } from '../components/risk/HourlyStrip';
 import { AlertBanner } from '../components/dashboard/AlertBanner';
 import { DemoBadge } from '../components/common/DemoBadge';
+import { SafeWindowCard } from '../components/planner/SafeWindowCard';
+import { TonightCard } from '../components/risk/TonightCard';
+import { IndoorHeatCard } from '../components/risk/IndoorHeatCard';
+import { CoolingCentresList } from '../components/cooling/CoolingCentresList';
 import { useCurrentRisk } from '../hooks/useRisk';
 import { useCurrentThermal } from '../hooks/useThermal';
 import { useRiskForecast } from '../hooks/useForecast';
-import { useCoolingCentres, useAlerts } from '../hooks/useCoolingCentres';
+import { useAlerts } from '../hooks/useCoolingCentres';
 import { useWards } from '../hooks/useWards';
 import { useAppStore } from '../store/useAppStore';
 import { getRiskBand } from '../theme/tokens';
@@ -37,11 +41,6 @@ export const CitizenDashboard: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const selectedWard = wards?.find((w) => w.id === selectedLocationId) || wards?.[0];
-  const { data: coolingCentres } = useCoolingCentres(
-    selectedCity,
-    selectedWard?.latitude,
-    selectedWard?.longitude
-  );
 
   const filteredWards = wards?.filter((w) =>
     w.ward_name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -51,7 +50,6 @@ export const CitizenDashboard: React.FC = () => {
   const riskScore = risk?.risk_score ?? 78;
   const currentBand = getRiskBand(riskScore);
 
-  // 5-day simulated forecast items based on current trajectory
   const fiveDayForecast = [
     { day: 'Today', score: riskScore, confidence: 96 },
     { day: 'Tomorrow', score: Math.min(100, Math.round(riskScore * 1.05)), confidence: 92 },
@@ -70,7 +68,7 @@ export const CitizenDashboard: React.FC = () => {
             <Search className="w-4 h-4 text-[#8B9AA8] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search Mumbai municipal ward, pincode, or landmark..."
+              placeholder="Search municipal ward, pincode, or landmark..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-[8px] bg-[#101820] border border-white/10 text-xs font-mono text-white placeholder-[#5F7183] focus:border-[#9B6FD8] outline-none"
@@ -84,7 +82,7 @@ export const CitizenDashboard: React.FC = () => {
                       setSelectedLocationId(w.id);
                       setSearchQuery('');
                     }}
-                    className="w-full px-3.5 py-2 text-left text-xs font-mono hover:bg-[#263E50] text-[#D7E0E7] flex items-center justify-between"
+                    className="w-full px-3.5 py-2 text-left text-xs font-mono hover:bg-[#263E50] text-[#D7E0E7] flex items-center justify-between cursor-pointer"
                   >
                     <span>{w.ward_name}</span>
                     <span className="text-[10px] text-[#8B9AA8]">{w.ward_code}</span>
@@ -100,7 +98,7 @@ export const CitizenDashboard: React.FC = () => {
             onClick={() => {
               if (wards && wards.length > 0) setSelectedLocationId(wards[0].id);
             }}
-            className="w-full md:w-auto px-4 py-2.5 rounded-[8px] bg-[#2F4A5E]/50 hover:bg-[#2F4A5E] border border-white/8 text-xs font-mono text-[#D7E0E7] flex items-center justify-center gap-2 transition-colors"
+            className="w-full md:w-auto px-4 py-2.5 rounded-[8px] bg-[#2F4A5E]/50 hover:bg-[#2F4A5E] border border-white/8 text-xs font-mono text-[#D7E0E7] flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             <Crosshair className="w-3.5 h-3.5 text-[#9B6FD8]" />
             <span>Use My Location</span>
@@ -116,7 +114,7 @@ export const CitizenDashboard: React.FC = () => {
             <button
               key={w.id}
               onClick={() => setSelectedLocationId(w.id)}
-              className={`px-2.5 py-1 rounded-[6px] text-xs font-mono transition-all ${
+              className={`px-2.5 py-1 rounded-[6px] text-xs font-mono transition-all cursor-pointer ${
                 w.id === selectedLocationId
                   ? 'bg-[#9B6FD8]/20 border border-[#9B6FD8]/40 text-white'
                   : 'bg-[#101820]/60 border border-white/6 text-[#8B9AA8] hover:text-white'
@@ -131,7 +129,7 @@ export const CitizenDashboard: React.FC = () => {
       {/* Active Heat Alerts Banner */}
       {alerts && alerts.length > 0 && <AlertBanner alerts={alerts} />}
 
-      {/* 2. Hero Risk Block: Numeral-XL score, band pill, peak time, sparkline */}
+      {/* 2. Hero Risk Block */}
       <div className="rounded-[14px] bg-[#1F3445] border border-white/8 p-6 sm:p-8 space-y-6 corner-ticks relative">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/8">
           <div>
@@ -142,7 +140,7 @@ export const CitizenDashboard: React.FC = () => {
               {risk?.is_demo && <DemoBadge label={risk.demo_label} />}
             </div>
             <h1 className={`${TYPOGRAPHY.h1} text-white mt-1`}>
-              Human Thermal Stress Assessment
+              Citizen Heat Risk Overview
             </h1>
           </div>
 
@@ -201,30 +199,24 @@ export const CitizenDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* 24-Hour Sparkline Progression Bar */}
-        <div className="pt-2">
-          <div className="text-[11px] font-mono text-[#8B9AA8] mb-2 flex items-center justify-between">
-            <span>24-Hour Thermal Progression</span>
-            <span>Diurnal Sun Arc</span>
-          </div>
-          <div className="h-3 w-full rounded-full bg-[#101820] flex overflow-hidden p-0.5 border border-white/5">
-            {forecast?.items?.slice(0, 24).map((item, idx) => {
-              const b = getRiskBand(item.predicted_risk_score);
-              return (
-                <div
-                  key={idx}
-                  className="flex-1 h-full first:rounded-l-full last:rounded-r-full transition-all duration-300"
-                  style={{ backgroundColor: b.color }}
-                  title={`${item.time.slice(11, 16)}: ${item.predicted_risk_score.toFixed(0)}/100`}
-                />
-              );
-            })}
-          </div>
-        </div>
       </div>
 
-      {/* 3. Hourly Strip (8-Cell Heat-Scaled Segment) */}
+      {/* 3. P0-1 Feature: Safe-Window Planner */}
+      <section className="space-y-4">
+        <SafeWindowCard locationId={selectedLocationId} />
+      </section>
+
+      {/* 4. P0-2 Feature: Tonight's Heat Risk (Tropical Nights) */}
+      <section className="space-y-4">
+        <TonightCard locationId={selectedLocationId} />
+      </section>
+
+      {/* 5. P0-3 Feature: Indoor Heat by Building Type */}
+      <section className="space-y-4">
+        <IndoorHeatCard locationId={selectedLocationId} />
+      </section>
+
+      {/* 6. Hourly Strip */}
       <section className="space-y-4">
         <SectionHeader
           label="DIURNAL CYCLE TRAJECTORY"
@@ -242,9 +234,8 @@ export const CitizenDashboard: React.FC = () => {
         </Card>
       </section>
 
-      {/* 4. Asymmetric 7/5 Split: Action Advisory (L2) vs Biophysical Factor Breakdown */}
+      {/* 7. Asymmetric 7/5 Split: Action Advisory vs Factor Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Advisory Card (L2 Tier) - 7 cols */}
         <div className="lg:col-span-7">
           <Card
             tier="l2"
@@ -303,7 +294,6 @@ export const CitizenDashboard: React.FC = () => {
           </Card>
         </div>
 
-        {/* Biophysical Factor Breakdown - 5 cols */}
         <div className="lg:col-span-5">
           <Card
             tier="l1"
@@ -322,97 +312,9 @@ export const CitizenDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. 5-Day Forecast: Row of Band Chips with Confidence */}
+      {/* 8. P1-7 Feature: Usable Cooling Centres */}
       <section className="space-y-4">
-        <SectionHeader
-          label="EXTENDED SYNOPTIC OUTLOOK"
-          title="5-Day Thermal Trend & Prediction Confidence"
-        />
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          {fiveDayForecast.map((fc, i) => {
-            const b = getRiskBand(fc.score);
-            return (
-              <div
-                key={i}
-                className="p-4 rounded-[10px] bg-[#1F3445] border border-white/8 space-y-2 text-center"
-              >
-                <span className="text-xs font-mono text-[#8B9AA8] block">{fc.day}</span>
-                <div className="flex items-center justify-center">
-                  <span
-                    className="w-3 h-3 rounded-full mr-2"
-                    style={{ backgroundColor: b.color }}
-                  />
-                  <span className="text-sm font-mono font-bold text-white tabular-nums">
-                    {fc.score}/100
-                  </span>
-                </div>
-                <span
-                  className="text-[10px] font-mono px-2 py-0.5 rounded font-bold block"
-                  style={{
-                    backgroundColor: `${b.color}20`,
-                    color: b.color,
-                  }}
-                >
-                  {b.label}
-                </span>
-                <span className="text-[10px] font-mono text-[#5F7183] block">
-                  Conf: {fc.confidence}%
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 6. Nearby Help: Designated Cooling Centres */}
-      <section className="space-y-4">
-        <SectionHeader
-          label="MUNICIPAL RELIEF INFRASTRUCTURE"
-          title="Nearest Municipal Cooling Shelters & Water Points"
-          lead="Air-conditioned public concourses, primary health posts, and shaded hydration shelters open for public relief."
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {coolingCentres?.slice(0, 3).map((centre) => (
-            <div
-              key={centre.id}
-              className="p-5 rounded-[12px] bg-[#1F3445] border border-white/8 hover:-translate-y-[2px] transition-transform duration-200 flex flex-col justify-between space-y-4"
-            >
-              <div>
-                <div className="flex items-center justify-between text-xs text-[#8B9AA8] mb-1">
-                  <span className="text-[10px] font-mono text-[#2FA37C] font-bold uppercase">
-                    {centre.facility_type}
-                  </span>
-                  {centre.distance_km !== undefined && (
-                    <span className="font-mono text-[#9B6FD8] font-bold">
-                      {centre.distance_km.toFixed(1)} km away
-                    </span>
-                  )}
-                </div>
-                <h4 className="text-sm font-bold text-white font-display">{centre.name}</h4>
-                <p className="text-xs text-[#8B9AA8] mt-1 flex items-start gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#5F7183] shrink-0 mt-0.5" />
-                  {centre.address}
-                </p>
-              </div>
-
-              <div className="border-t border-white/6 pt-2.5 text-xs font-mono space-y-1 text-[#8B9AA8]">
-                <div className="flex justify-between">
-                  <span>Capacity:</span>
-                  <span className="text-white">{centre.capacity_persons} persons</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Hours:</span>
-                  <span className="text-white">{centre.operating_hours}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Helpline:</span>
-                  <span className="text-[#D7E0E7]">{centre.contact_phone}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <CoolingCentresList city={selectedCity} />
       </section>
     </div>
   );

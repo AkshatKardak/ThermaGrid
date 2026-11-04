@@ -1,0 +1,87 @@
+{
+  "nav": {
+    "overview": "Overview",
+    "heat_risk": "Heat Risk",
+    "worker": "Worker",
+    "authority": "Authority",
+    "analytics": "Analytics",
+    "simulation": "Simulation",
+    "about": "About",
+    "account": "Account",
+    "sign_in": "Sign In",
+    "get_started": "Get Started",
+    "open_app": "Open App"
+  },
+  "bands": {
+    "safe": "Low / Safe",
+    "moderate": "Moderate",
+    "high": "High Risk",
+    "veryhigh": "Very High Risk",
+    "extreme": "Extreme Emergency"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "saved": "Saved",
+    "delete": "Delete",
+    "directions": "Directions",
+    "call": "Call",
+    "copy_text": "Copy text",
+    "share": "Share",
+    "print": "Print A5 Card",
+    "search_placeholder": "Search municipal ward, pincode, or landmark...",
+    "use_location": "Use My Location",
+    "recent_wards": "Recent Wards:"
+  },
+  "overview": {
+    "greeting": "Hello",
+    "telemetry_hub": "National Climate Telemetry Hub",
+    "view_advisory": "View Full Citizen Advisory",
+    "print_shift_card": "Print Worker Shift Card",
+    "risk_index": "Current Ward Risk Index",
+    "people_you_watch": "People You Watch",
+    "manage_circle": "Manage Circle →"
+  },
+  "planner": {
+    "title": "When Can I Go Out?",
+    "subtitle": "Activity Safe-Window Planner",
+    "planned_duration": "Planned Duration",
+    "minutes": "minutes",
+    "recommended": "Recommended Safe Windows",
+    "avoid_title": "Dangerous Window To Avoid",
+    "no_safe_window": "No Safe Window Available Today",
+    "activities": {
+      "walk": "Walk",
+      "commute": "Commute",
+      "exercise": "Exercise",
+      "work": "Work"
+    }
+  },
+  "tonight": {
+    "title": "Tonight's Heat Recovery",
+    "subtitle": "Overnight Biometeorology",
+    "tropical_night": "Tropical Night",
+    "adequate_cooling": "Adequate Cooling",
+    "night_min": "Night Minimum",
+    "guidance_title": "Night Sleep & Protection Guidance"
+  },
+  "indoor": {
+    "title": "Inside Your Home",
+    "subtitle": "Built Environment Thermodynamics",
+    "estimated_chip": "Estimated, not measured",
+    "select_archetype": "Select Housing & Floor Archetype",
+    "outdoor_now": "Outdoor Now",
+    "indoor_estimated": "Indoor Estimated",
+    "peak_time": "Indoor Peak Expected at"
+  },
+  "cooling": {
+    "title": "Designated Cooling Centres",
+    "subtitle": "Municipal Climate Adaptation",
+    "filter_open": "Filter: Open Now",
+    "showing_open": "Showing Open Only",
+    "open_now": "Open Now",
+    "closed": "Closed",
+    "hours_unknown": "Hours Unknown",
+    "capacity": "Capacity"
+  }
+}

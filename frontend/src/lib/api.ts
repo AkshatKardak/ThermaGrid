@@ -12,17 +12,22 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(async (config) => {
-  // Read session token if stored or injected
-  const token = localStorage.getItem('thermagrid_token') || localStorage.getItem('heatsense_token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+  try {
+    // Clerk session token integration
+    const clerk = (window as any).Clerk;
+    if (clerk?.session) {
+      const token = await clerk.session.getToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+  } catch (e) {
+    // Ignore error in non-clerk environments
   }
   return config;
 });
 
-// React Hook for API Client access (fallback-safe without ClerkProvider)
+// React Hook for API Client access
 export function useApi() {
-  return useMemo(() => {
-    return apiClient;
-  }, []);
+  return useMemo(() => apiClient, []);
 }
