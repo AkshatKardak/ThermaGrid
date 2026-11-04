@@ -1,17 +1,76 @@
 """
-Thermal Risk endpoints: current score, multi-day forecast, ward drilldowns.
+Thermal Risk endpoints: current score, multi-day forecast, night-time risk, indoor heat, ward drilldowns.
 """
 
-from typing import List, Optional
+import os
+import yaml
+from typing import List, Optional, Dict, Any
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.services.risk_service import RiskService
 from app.services.forecast_service import ForecastService
+from app.services.weather_service import WeatherService
+from app.services.thermal_service import ThermalService
 from app.schemas.risk import RiskCurrentOut, RiskForecastOut
 
 router = APIRouter(prefix="/risk", tags=["Thermal Risk"])
+
+ARCHETYPES_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+    "analytics",
+    "config",
+    "building_archetypes.yaml",
+)
+
+NIGHT_GUIDANCE_TEMPLATES = {
+    "safe": [
+        "Normal overnight cooling expected",
+        "Natural cross-ventilation is sufficient for restorative sleep",
+        "No special night-time precautions needed",
+    ],
+    "moderate": [
+        "Keep bedroom windows open for evening cross-ventilation",
+        "Use ceiling fans to maintain air circulation",
+        "Hydrate with a glass of water before sleeping",
+    ],
+    "high": [
+        "Tropical night: minimum temperature stays above 25°C",
+        "Sleep in the coolest room, preferably lowest floor",
+        "Keep windows on opposite sides open to induce cross-breeze",
+        "Wear lightweight cotton sleepwear and stay hydrated",
+    ],
+    "veryhigh": [
+        "Sleep on the lowest floor",
+        "Open windows on two sides for cross-ventilation",
+        "Wet the floor before sleeping",
+        "Check on elderly neighbours tonight",
+    ],
+    "extreme": [
+        "Acute nocturnal heat emergency: zero thermal relief",
+        "Sleep on the lowest floor away from concrete roof heat storage",
+        "Dampen floor or mist sheets with cool water for evaporative cooling",
+        "Conduct immediate welfare check on elderly family and neighbours",
+    ],
+}
+
+
+def _load_archetypes() -> Dict[str, Any]:
+    defaults = {
+        "tin_roof_top_floor": {"indoor_delta_c": 6.0, "lag_hours": 2.5, "basis": "assumption — calibrate with field data"},
+        "rcc_top_floor": {"indoor_delta_c": 4.0, "lag_hours": 2.0, "basis": "assumption"},
+        "rcc_ground_floor": {"indoor_delta_c": 1.5, "lag_hours": 3.0, "basis": "assumption"},
+        "with_ac": {"indoor_delta_c": -3.0, "lag_hours": 1.0, "basis": "assumption"},
+    }
+    if os.path.exists(ARCHETYPES_PATH):
+        try:
+            with open(ARCHETYPES_PATH, "r") as f:
+                return yaml.safe_load(f) or defaults
+        except Exception:
+            return defaults
+    return defaults
 
 
 @router.get("/current", response_model=RiskCurrentOut)
@@ -24,6 +83,172 @@ def get_current_risk(
     factor breakdown, and deterministic explanation.
     """
     return RiskService.get_current_risk(db, location_id)
+
+
+@router.get("/night")
+def get_night_risk(
+    location_id: int = Query(1, description="Ward Location ID"),
+    db: Session = Depends(get_db),
+):
+    """
+    Computes overnight thermal stress and tropical night flag (min >= 25.0°C)
+    over 20:00 -> 06:00 forecast hours with templated guidance.
+    """
+    try:
+        weather_fc = WeatherService.get_weather_forecast(db, location_id, days=2)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    hourly = weather_fc.get("hourly", [])
+    if not hourly:
+        return {
+            "available": False,
+            "message": "tonight's data not yet available",
+            "night_min_c": None,
+            "tropical_night": False,
+            "band": "moderate",
+            "guidance": ["Tonight's data not yet available — check back at next model cycle."],
+            "hourly_overnight": [],
+        }
+
+    # Extract hours between 20:00 tonight and 06:00 tomorrow morning
+    overnight_samples = []
+    for it in hourly[:36]:
+        ts = it.get("timestamp", "")
+        h = None
+        try:
+            if "T" in ts:
+                h = int(ts.split("T")[1].split(":")[0])
+            elif " " in ts:
+                h = int(ts.split(" ")[1].split(":")[0])
+        except Exception:
+            continue
+
+        if h is not None and (h >= 20 or h <= 6):
+            time_label = f"{h:02d}:00"
+            temp = it.get("temperature_c", 28.0)
+            overnight_samples.append({
+                "time": time_label,
+                "hour": h,
+                "temp_c": round(float(temp), 1),
+                "wbgt_c": round(float(it.get("wbgt_c", temp * 0.82)), 1),
+                "timestamp": ts,
+            })
+
+    if len(overnight_samples) < 4:
+        return {
+            "available": False,
+            "message": "tonight's data not yet available",
+            "night_min_c": None,
+            "tropical_night": False,
+            "band": "moderate",
+            "guidance": ["Tonight's data not yet available — check back at next model cycle."],
+            "hourly_overnight": overnight_samples,
+        }
+
+    night_temps = [s["temp_c"] for s in overnight_samples]
+    night_min_c = min(night_temps)
+    tropical_night = bool(night_min_c >= 25.0)
+
+    if night_min_c < 20.0:
+        band = "safe"
+    elif night_min_c < 25.0:
+        band = "moderate"
+    elif night_min_c < 28.0:
+        band = "high"
+    elif night_min_c < 31.0:
+        band = "veryhigh"
+    else:
+        band = "extreme"
+
+    guidance = NIGHT_GUIDANCE_TEMPLATES.get(band, NIGHT_GUIDANCE_TEMPLATES["veryhigh"])
+
+    return {
+        "available": True,
+        "night_min_c": round(night_min_c, 1),
+        "tropical_night": tropical_night,
+        "band": band,
+        "guidance": guidance,
+        "hourly_overnight": overnight_samples[:11],  # 20:00 to 06:00 = 11 intervals
+    }
+
+
+@router.get("/indoor")
+def get_indoor_risk(
+    location_id: int = Query(1, description="Ward Location ID"),
+    archetype: str = Query("tin_roof_top_floor", description="Building archetype"),
+    db: Session = Depends(get_db),
+):
+    """
+    Computes estimated indoor temperatures and thermal lag relative to outdoor conditions
+    using documented building archetypes.
+    """
+    archetypes = _load_archetypes()
+    arch_key = archetype.strip().lower()
+    if arch_key not in archetypes:
+        arch_key = "tin_roof_top_floor"
+
+    arch_cfg = archetypes[arch_key]
+    delta = float(arch_cfg.get("indoor_delta_c", 4.0))
+    lag = float(arch_cfg.get("lag_hours", 2.0))
+    basis = arch_cfg.get("basis", "assumption")
+
+    try:
+        current_wx = WeatherService.get_current_weather(db, location_id)
+        current_th = ThermalService.get_current_thermal_indices(db, location_id, for_risk=True)
+        fc = WeatherService.get_weather_forecast(db, location_id, days=1)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    outdoor_now_c = round(float(current_wx.get("temperature_c", 32.0)), 1)
+    indoor_now_c = round(outdoor_now_c + delta, 1)
+
+    # Calculate outdoor diurnal peak from today's forecast
+    hourly = fc.get("hourly", [])
+    if hourly:
+        peak_sample = max(hourly, key=lambda x: x.get("temperature_c", 0.0))
+        outdoor_peak_c = float(peak_sample.get("temperature_c", outdoor_now_c))
+        peak_ts = peak_sample.get("timestamp", "")
+        try:
+            peak_dt = datetime.fromisoformat(peak_ts.replace("Z", "+00:00"))
+        except Exception:
+            peak_dt = datetime.now()
+    else:
+        outdoor_peak_c = outdoor_now_c + 2.5
+        peak_dt = datetime.now()
+
+    indoor_peak_c = round(outdoor_peak_c + delta, 1)
+    indoor_peak_dt = peak_dt + timedelta(hours=lag)
+    indoor_peak_time = indoor_peak_dt.strftime("%H:%M")
+
+    current_wbgt = float(current_th.get("wbgt_c", 27.0))
+    wbgt_indoor = round(current_wbgt + (delta * 0.65), 1)
+
+    if indoor_now_c < 28.0:
+        band = "safe"
+    elif indoor_now_c < 33.0:
+        band = "moderate"
+    elif indoor_now_c < 38.0:
+        band = "high"
+    elif indoor_now_c < 42.0:
+        band = "veryhigh"
+    else:
+        band = "extreme"
+
+    return {
+        "location_id": location_id,
+        "archetype": arch_key,
+        "outdoor_now_c": outdoor_now_c,
+        "indoor_now_c": indoor_now_c,
+        "indoor_peak_c": indoor_peak_c,
+        "indoor_peak_time": indoor_peak_time,
+        "wbgt_indoor": wbgt_indoor,
+        "band": band,
+        "method": "archetype_delta",
+        "basis": basis,
+        "lag_hours": lag,
+        "note": f"Building envelope causes indoor peak to lag {lag}h behind outdoor diurnal solar maximum.",
+    }
 
 
 @router.get("/forecast", response_model=RiskForecastOut)

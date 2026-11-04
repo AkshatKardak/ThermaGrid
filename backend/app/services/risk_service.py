@@ -6,7 +6,7 @@ Generates deterministic factor breakdown and natural-language explanations.
 
 import sys
 import os
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 

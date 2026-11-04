@@ -18,3 +18,18 @@ weights:
     weight: 0.15
     basis: assumption
     reference: "Tree canopy coverage and cooling center access index"
+
+planner:
+  activity_thresholds:
+    exercise:
+      threshold: 45
+      description: "High metabolic heat generation requires lower ambient stress"
+    work:
+      threshold: 50
+      description: "Sustained occupational manual labor with continuous thermal loading"
+    walk:
+      threshold: 60
+      description: "Moderate walking or low-intensity essential errands"
+    commute:
+      threshold: 65
+      description: "Transit commute with intermittent shade and hydration access"

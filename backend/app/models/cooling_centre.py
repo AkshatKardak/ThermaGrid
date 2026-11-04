@@ -3,7 +3,7 @@ Cooling Centre ORM model.
 """
 
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text, JSON
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, JSON, Boolean
 from app.db.base import Base
 
 
@@ -22,7 +22,18 @@ class CoolingCentre(Base):
     current_occupancy = Column(Integer, default=20)
     amenities = Column(JSON, nullable=True)  # ["Air Conditioning", "Clean ORS Water", "Emergency Paramedic", "Shaded Seating"]
     operating_hours = Column(String(100), default="08:00 - 20:00")
+    opening_hours = Column(JSON, nullable=True)  # Structured schedule
+    current_status = Column(String(50), default="open")  # open | closed | unknown
+    is_free = Column(Boolean, default=True)
     contact_phone = Column(String(50), default="108 / 1916")
     is_active = Column(Integer, default=1)
     is_demo = Column(Integer, default=0)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    @property
+    def capacity(self) -> int:
+        return self.capacity_persons
+
+    @property
+    def phone(self) -> str:
+        return self.contact_phone

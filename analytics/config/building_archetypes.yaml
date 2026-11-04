@@ -1,0 +1,16 @@
+tin_roof_top_floor:
+  indoor_delta_c: 6.0
+  lag_hours: 2.5
+  basis: "assumption — calibrate with field data"
+rcc_top_floor:
+  indoor_delta_c: 4.0
+  lag_hours: 2.0
+  basis: "assumption"
+rcc_ground_floor:
+  indoor_delta_c: 1.5
+  lag_hours: 3.0
+  basis: "assumption"
+with_ac:
+  indoor_delta_c: -3.0
+  lag_hours: 1.0
+  basis: "assumption"

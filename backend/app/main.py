@@ -30,6 +30,10 @@ from app.api.routes.interventions import router as interventions_router
 from app.api.routes.cooling_centres import router as cooling_centres_router
 from app.api.routes.alerts import router as alerts_router
 from app.api.routes.data_sources import router as data_sources_router
+from app.api.routes.planner import router as planner_router
+from app.api.routes.subscriptions import router as subscriptions_router
+from app.api.routes.dependents import router as dependents_router
+from app.api.routes.worker import router as worker_router
 
 setup_logging()
 logger = logging.getLogger("thermagrid.main")
@@ -119,12 +123,13 @@ def create_application() -> FastAPI:
             "version": "0.1.0",
         }
 
-    # Deliberate exception endpoint for Sentry verification
-    @app.get("/sentry-debug", tags=["Health"])
-    async def trigger_sentry_error():
-        """Deliberate 1/0 exception for verifying backend Sentry event capture."""
-        _ = 1 / 0
-        return {"detail": "unreachable"}
+    # Deliberate exception endpoint for Sentry verification (gated behind debug)
+    if settings.debug:
+        @app.get("/sentry-debug", tags=["Health"])
+        async def trigger_sentry_error():
+            """Deliberate 1/0 exception for verifying backend Sentry event capture."""
+            _ = 1 / 0
+            return {"detail": "unreachable"}
 
     # Mount API v1 Routers
     api_prefix = settings.api_v1_prefix
@@ -140,6 +145,10 @@ def create_application() -> FastAPI:
     app.include_router(cooling_centres_router, prefix=api_prefix)
     app.include_router(alerts_router, prefix=api_prefix)
     app.include_router(data_sources_router, prefix=api_prefix)
+    app.include_router(planner_router, prefix=api_prefix)
+    app.include_router(subscriptions_router, prefix=api_prefix)
+    app.include_router(dependents_router, prefix=api_prefix)
+    app.include_router(worker_router, prefix=api_prefix)
 
     return app
 

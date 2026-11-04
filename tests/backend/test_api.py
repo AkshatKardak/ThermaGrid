@@ -149,3 +149,149 @@ def test_alert_threshold_dispatch():
     # Above threshold (e.g. 85 >= 80) -> dispatches via active channel
     did_alert_high = asyncio.run(maybe_alert("test@mcgm.gov.in", risk=85.0, ward="Ward M/East", peak="14:00"))
     assert did_alert_high is True
+
+
+def test_safe_windows_planner():
+    # 45 min walking window
+    res = client.get("/api/v1/planner/safe-windows?location_id=1&activity=walk&duration_min=45")
+    assert res.status_code == 200
+    data = res.json()
+    assert "windows" in data
+    assert "avoid" in data
+    assert "threshold" in data
+    threshold = data["threshold"]
+
+    # Verify that every returned window sample has peak_risk < threshold
+    for w in data["windows"]:
+        assert w["peak_risk"] < threshold
+
+    # 90 min exercise window
+    res90 = client.get("/api/v1/planner/safe-windows?location_id=1&activity=exercise&duration_min=90")
+    assert res90.status_code == 200
+    data90 = res90.json()
+    thresh_ex = data90["threshold"]
+    for w in data90["windows"]:
+        assert w["peak_risk"] < thresh_ex
+
+
+def test_night_risk_tropical_nights():
+    res = client.get("/api/v1/risk/night?location_id=1")
+    assert res.status_code == 200
+    data = res.json()
+    assert "tropical_night" in data
+    assert "guidance" in data
+    assert isinstance(data["guidance"], list)
+    assert len(data["guidance"]) >= 1
+    if data["night_min_c"] is not None:
+        assert data["tropical_night"] == (data["night_min_c"] >= 25.0)
+
+
+def test_indoor_heat_archetype():
+    res = client.get("/api/v1/risk/indoor?location_id=1&archetype=tin_roof_top_floor")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["method"] == "archetype_delta"
+    assert "basis" in data
+    assert data["indoor_now_c"] > data["outdoor_now_c"]
+    assert "indoor_peak_time" in data
+    assert "lag_hours" in data
+
+
+def test_subscriptions_user_scoping_and_validation():
+    user1_headers = {"Authorization": "Bearer test_authority_jwt_token"}
+    user2_headers = {"Authorization": "Bearer test_citizen_jwt_token"}
+
+    # Validation: missing destination must return 422
+    invalid_res = client.post(
+        "/api/v1/subscriptions",
+        headers=user1_headers,
+        json={"channel": "email", "destination": "", "threshold": 75},
+    )
+    assert invalid_res.status_code == 422
+
+    # User 1 creates subscription
+    sub1_res = client.post(
+        "/api/v1/subscriptions",
+        headers=user1_headers,
+        json={
+            "ward_id": 1,
+            "channel": "email",
+            "destination": "authority@thermagrid.demo",
+            "threshold": 75,
+            "language": "en",
+            "quiet_hours": "22:00-06:00",
+        },
+    )
+    assert sub1_res.status_code == 201
+    sub1_data = sub1_res.json()
+    sub1_id = sub1_data["id"]
+
+    # User 2 lists subscriptions - should NOT see User 1's subscription
+    user2_list = client.get("/api/v1/subscriptions", headers=user2_headers)
+    assert user2_list.status_code == 200
+    user2_ids = [s["id"] for s in user2_list.json()]
+    assert sub1_id not in user2_ids
+
+    # User 2 tries to delete User 1's subscription - gets 404
+    del_forbidden = client.delete(f"/api/v1/subscriptions/{sub1_id}", headers=user2_headers)
+    assert del_forbidden.status_code == 404
+
+    # User 1 deletes their own subscription
+    del_ok = client.delete(f"/api/v1/subscriptions/{sub1_id}", headers=user1_headers)
+    assert del_ok.status_code == 204
+
+
+def test_dependents_care_circle_scoping():
+    user1_headers = {"Authorization": "Bearer test_authority_jwt_token"}
+    user2_headers = {"Authorization": "Bearer test_citizen_jwt_token"}
+
+    # User 1 adds a dependent
+    dep_res = client.post(
+        "/api/v1/dependents",
+        headers=user1_headers,
+        json={
+            "name": "Amma",
+            "ward_id": 1,
+            "age_band": "elderly",
+            "phone": "+919876543210",
+            "consent_note": "Informed and consented",
+        },
+    )
+    assert dep_res.status_code == 201
+    dep_id = dep_res.json()["id"]
+
+    # User 2 lists dependents - should NOT see User 1's dependent
+    user2_deps = client.get("/api/v1/dependents", headers=user2_headers)
+    assert user2_deps.status_code == 200
+    assert dep_id not in [d["id"] for d in user2_deps.json()]
+
+    # Clean up
+    del_dep = client.delete(f"/api/v1/dependents/{dep_id}", headers=user1_headers)
+    assert del_dep.status_code == 204
+
+
+def test_worker_shift_card():
+    res = client.get("/api/v1/worker/shift-card?location_id=1&met=6&exposure=sun&start=09:00&end=18:00")
+    assert res.status_code == 200
+    data = res.json()
+    assert "breaks" in data
+    assert len(data["breaks"]) >= 2
+    assert "water_ml_per_hour" in data
+    assert data["water_ml_per_hour"] >= 500
+    assert "disclaimer" in data
+    assert "not medical advice" in data["disclaimer"].lower()
+    assert "wbgt_series" in data
+
+
+def test_cooling_centres_usable_details():
+    res = client.get("/api/v1/cooling-centres?near_lat=19.05&near_lon=72.85")
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data) >= 1
+    c = data[0]
+    assert "distance_km" in c
+    assert c["distance_km"] is not None
+    assert "directions_url" in c
+    assert "google.com/maps/dir" in c["directions_url"]
+    assert "is_open_now" in c
+    assert "current_status" in c

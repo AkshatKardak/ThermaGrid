@@ -10,6 +10,8 @@ from app.models.risk import RiskScore, RiskForecast, RiskConfig
 from app.models.cooling_centre import CoolingCentre
 from app.models.alert import Alert
 from app.models.data_source import DataSource
+from app.models.subscription import Subscription
+from app.models.dependent import Dependent
 
 __all__ = [
     "User",
@@ -23,4 +25,6 @@ __all__ = [
     "CoolingCentre",
     "Alert",
     "DataSource",
+    "Subscription",
+    "Dependent",
 ]

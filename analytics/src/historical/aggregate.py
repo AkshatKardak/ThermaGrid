@@ -1,9 +1,23 @@
 """
 Historical Aggregation Module: Daily and Monthly Biometeorological Summaries.
+Includes Tropical Night detection (night-time minimum temperature >= 25.0°C).
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import numpy as np
+
+
+def _extract_hour(ts: str) -> Optional[int]:
+    try:
+        if "T" in ts:
+            time_part = ts.split("T")[1]
+        elif " " in ts:
+            time_part = ts.split(" ")[1]
+        else:
+            return None
+        return int(time_part.split(":")[0])
+    except Exception:
+        return None
 
 
 def aggregate_daily(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -13,6 +27,8 @@ def aggregate_daily(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     - wbgt_max, wbgt_mean (if present)
     - rh_min, rh_mean
     - extreme_hours_count (hours with temp >= 40°C or wbgt >= 32°C)
+    - night_min_temp_c (minimum temperature between 20:00 and 06:00)
+    - tropical_night (true iff night_min_temp_c >= 25.0°C)
     """
     days: Dict[str, List[Dict[str, Any]]] = {}
     for r in records:
@@ -39,6 +55,17 @@ def aggregate_daily(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         
         # Extreme hours: temp >= 40.0 or wbgt >= 32.0
         ext_count = sum(1 for t in temps if t >= 40.0)
+
+        # Night hours (20:00 to 06:00)
+        night_temps = []
+        for it in items:
+            ts = it.get("timestamp", "")
+            h = _extract_hour(ts)
+            if h is not None and (h >= 20 or h <= 6) and it.get("temperature_c") is not None:
+                night_temps.append(it["temperature_c"])
+
+        night_min = min(night_temps) if night_temps else None
+        tropical_night = bool(night_min >= 25.0) if night_min is not None else False
         
         daily_summaries.append({
             "date": d,
@@ -49,6 +76,8 @@ def aggregate_daily(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             "wbgt_mean_c": wbgt_mean,
             "rh_mean_pct": round(float(np.mean(rhs)), 1) if rhs else None,
             "hours_above_40c": ext_count,
+            "night_min_temp_c": round(night_min, 1) if night_min is not None else None,
+            "tropical_night": tropical_night,
             "observations_count": len(items),
         })
         
