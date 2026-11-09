@@ -23,9 +23,9 @@
   --text-faint: #5F7183;
 
   /* Interactive Accent (UI Chrome & interaction ONLY - never risk values) */
-  --accent: #9B6FD8;          /* Amethyst */
-  --accent-dim: #7F56BD;
-  --accent-soft: rgba(155, 111, 216, 0.18);
+  --accent: #7FA6C9;          /* steel blue — interactive chrome only */
+  --accent-dim: #5C82A3;
+  --accent-soft: rgba(127, 166, 201, 0.16);
 
   /* Alert */
   --alert: #FF704F;

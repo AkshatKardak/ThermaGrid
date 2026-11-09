@@ -97,7 +97,7 @@ export const CoolingCentresList: React.FC<CoolingCentresListProps> = ({ city = '
 
                   <div className="flex flex-wrap items-center gap-3 text-xs text-[#8B9AA8] pt-1">
                     <div className="flex items-center gap-1 font-mono text-[11px]">
-                      <Users className="w-3.5 h-3.5 text-[#9B6FD8]" />
+                      <Users className="w-3.5 h-3.5 text-[#8B9AA8]" />
                       <span>Capacity: {centre.capacity_persons}</span>
                     </div>
 
@@ -116,7 +116,7 @@ export const CoolingCentresList: React.FC<CoolingCentresListProps> = ({ city = '
                       href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-mono text-[#D7E0E7] transition-colors"
                     >
-                      <Phone className="w-3 h-3 text-[#9B6FD8]" />
+                      <Phone className="w-3 h-3 text-[#8B9AA8]" />
                       <span>{phone}</span>
                     </a>
                   ) : (
@@ -127,7 +127,7 @@ export const CoolingCentresList: React.FC<CoolingCentresListProps> = ({ city = '
                     href={directionsUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all group"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold transition-all group"
                   >
                     <Navigation className="w-3 h-3 group-hover:scale-110 transition-transform" />
                     <span>Directions</span>

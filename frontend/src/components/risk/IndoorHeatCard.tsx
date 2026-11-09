@@ -29,8 +29,8 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/8">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Home className="w-4 h-4 text-[#9B6FD8]" />
-            <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#9B6FD8]">
+            <Home className="w-4 h-4 text-[#8B9AA8]" />
+            <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#8B9AA8]">
               Built Environment Thermodynamics
             </span>
           </div>
@@ -42,7 +42,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
 
         {/* Estimated Chip */}
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-[#8B9AA8] self-start sm:self-auto">
-          <HelpCircle className="w-3 h-3 text-[#9B6FD8]" />
+          <HelpCircle className="w-3 h-3 text-[#8B9AA8]" />
           <span>Estimated, not measured</span>
         </div>
       </div>
@@ -60,7 +60,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
               onClick={() => setArchetype(arch.id)}
               className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                 archetype === arch.id
-                  ? 'bg-[#9B6FD8]/20 border-[#9B6FD8] text-white shadow-sm'
+                  ? 'bg-[#7FA6C9]/15 border-[#7FA6C9] text-white shadow-sm'
                   : 'bg-[#101820] border-white/10 text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/5'
               }`}
             >
@@ -123,15 +123,15 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
           </div>
 
           {/* Thermal Lag Insight Banner */}
-          <div className="p-3.5 rounded-xl bg-[#9B6FD8]/10 border border-[#9B6FD8]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="p-3.5 rounded-xl bg-[#101820] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2.5 text-[#D7E0E7]">
-              <Clock className="w-4 h-4 text-[#9B6FD8] shrink-0" />
+              <Clock className="w-4 h-4 text-[#8B9AA8] shrink-0" />
               <div>
                 <span className="font-semibold text-white">Indoor Peak Expected at {data?.indoor_peak_time}</span>
                 <p className="text-[11px] text-[#8B9AA8]">{data?.note}</p>
               </div>
             </div>
-            <div className="text-right sm:shrink-0 text-[11px] font-mono text-[#9B6FD8]">
+            <div className="text-right sm:shrink-0 text-[11px] font-mono text-[#8B9AA8]">
               Estimated Peak: <strong className="text-white">{data?.indoor_peak_c}°C</strong> ({data?.lag_hours}h lag)
             </div>
           </div>

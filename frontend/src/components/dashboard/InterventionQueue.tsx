@@ -41,7 +41,7 @@ export const InterventionQueue: React.FC = () => {
       status: 'Scheduled',
       priority: 'Medium',
       icon: Bell,
-      color: '#9B6FD8',
+      color: '#7FA6C9',
       time: 'Every 2 Hours',
     },
   ];

@@ -127,7 +127,7 @@ export const Account: React.FC = () => {
     <div className="space-y-10 max-w-5xl mx-auto pb-16">
       {/* Page Title */}
       <div className="space-y-1 pb-4 border-b border-white/10">
-        <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#9B6FD8] block">
+        <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#8B9AA8] block">
           User Settings & Direct Telemetry
         </span>
         <h1 className="text-2xl sm:text-3xl font-bold font-display text-white">
@@ -142,7 +142,7 @@ export const Account: React.FC = () => {
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-white/8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#9B6FD8]/15 border border-[#9B6FD8]/30 flex items-center justify-center text-[#9B6FD8]">
+            <div className="w-10 h-10 rounded-full bg-[#7FA6C9]/15 border border-[#7FA6C9]/30 flex items-center justify-center text-[#7FA6C9]">
               <UserIcon className="w-5 h-5" />
             </div>
             <div>
@@ -157,7 +157,7 @@ export const Account: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded-full text-xs font-mono font-semibold uppercase bg-white/5 border border-white/10 text-white">
-              Role: <span className="text-[#9B6FD8]">{role}</span>
+              Role: <span className="text-[#7FA6C9]">{role}</span>
             </span>
           </div>
         </div>
@@ -165,7 +165,7 @@ export const Account: React.FC = () => {
         {/* Language Preference */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
           <div className="flex items-center gap-2 text-xs text-[#D7E0E7]">
-            <Globe className="w-4 h-4 text-[#9B6FD8]" />
+            <Globe className="w-4 h-4 text-[#8B9AA8]" />
             <span>Interface Language</span>
           </div>
           <select
@@ -239,7 +239,7 @@ export const Account: React.FC = () => {
                   onClick={() => setChannel('email')}
                   className={`p-2 rounded-lg border text-xs font-mono flex items-center justify-center gap-1.5 cursor-pointer ${
                     channel === 'email'
-                      ? 'bg-[#9B6FD8]/20 border-[#9B6FD8] text-white font-bold'
+                      ? 'bg-[#7FA6C9]/20 border-[#7FA6C9] text-white font-bold'
                       : 'bg-[#1F3445] border-white/10 text-[#8B9AA8]'
                   }`}
                 >
@@ -262,7 +262,7 @@ export const Account: React.FC = () => {
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 required
-                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#9B6FD8]"
+                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#7FA6C9]"
               />
             </div>
 
@@ -312,7 +312,7 @@ export const Account: React.FC = () => {
               step={5}
               value={threshold}
               onChange={(e) => setThreshold(Number(e.target.value))}
-              className="w-full accent-[#9B6FD8] h-1.5 bg-[#1F3445] rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-[#7FA6C9] h-1.5 bg-[#1F3445] rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
@@ -330,7 +330,7 @@ export const Account: React.FC = () => {
             <button
               type="submit"
               disabled={isCreating}
-              className="px-4 py-2 rounded-lg bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all cursor-pointer shadow-sm"
+              className="px-4 py-2 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold transition-all cursor-pointer shadow-sm"
             >
               {isCreating ? 'Saving...' : 'Save Subscription'}
             </button>
@@ -378,7 +378,7 @@ export const Account: React.FC = () => {
                         onClick={() => handleTestAlert(sub.id)}
                         className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-[#D7E0E7] flex items-center gap-1 transition-colors cursor-pointer"
                       >
-                        {isTested ? <Check className="w-3.5 h-3.5 text-[#2FA37C]" /> : <Send className="w-3 h-3 text-[#9B6FD8]" />}
+                        {isTested ? <Check className="w-3.5 h-3.5 text-[#2FA37C]" /> : <Send className="w-3 h-3 text-[#7FA6C9]" />}
                         <span>{isTested ? 'Dispatched' : 'Send test alert'}</span>
                       </button>
 
@@ -406,7 +406,7 @@ export const Account: React.FC = () => {
       {/* 3. Care Circle - People You Watch (P1-5) */}
       <Card className="p-6 space-y-6">
         <div className="space-y-1 pb-3 border-b border-white/8">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#9B6FD8]">
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#8B9AA8]">
             <Heart className="w-4 h-4 text-[#FF704F]" />
             <span>Care Circle</span>
           </div>
@@ -429,7 +429,7 @@ export const Account: React.FC = () => {
                 value={depName}
                 onChange={(e) => setDepName(e.target.value)}
                 required
-                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#9B6FD8]"
+                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#7FA6C9]"
               />
             </div>
 
@@ -475,7 +475,7 @@ export const Account: React.FC = () => {
               placeholder="+919876543210"
               value={depPhone}
               onChange={(e) => setDepPhone(e.target.value)}
-              className="w-full sm:w-1/2 bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#9B6FD8]"
+              className="w-full sm:w-1/2 bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#7FA6C9]"
             />
           </div>
 
@@ -487,7 +487,7 @@ export const Account: React.FC = () => {
             <button
               type="submit"
               disabled={isCreatingDep}
-              className="px-4 py-2 rounded-lg bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all cursor-pointer self-end sm:self-auto"
+              className="px-4 py-2 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold transition-all cursor-pointer self-end sm:self-auto"
             >
               {isCreatingDep ? 'Adding...' : 'Add to Care Circle'}
             </button>

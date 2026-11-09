@@ -96,7 +96,7 @@ export const WorkerRisk: React.FC = () => {
           {/* Step 1: Occupation */}
           <div className="space-y-2">
             <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8] flex items-center gap-2">
-              <HardHat className="w-4 h-4 text-[#9B6FD8]" />
+              <HardHat className="w-4 h-4 text-[#8B9AA8]" />
               Step 1: Trade / Occupation
             </label>
             <div className="flex flex-wrap gap-2">
@@ -113,7 +113,7 @@ export const WorkerRisk: React.FC = () => {
                   onClick={() => setOccupation(opt.id as Occupation)}
                   className={`px-3.5 py-2 rounded-[8px] text-xs font-mono text-left transition-all ${
                     occupation === opt.id
-                      ? 'bg-[#101820] text-white border border-[#9B6FD8] [box-shadow:inset_0_1px_0_rgba(155,111,216,0.4)]'
+                      ? 'bg-[#101820] text-white border border-[#7FA6C9] [box-shadow:inset_0_1px_0_rgba(127, 166, 201,0.4)]'
                       : 'bg-[#2F4A5E]/30 text-[#8B9AA8] border border-white/6 hover:text-white'
                   }`}
                 >

@@ -62,7 +62,7 @@ export const About: React.FC = () => {
       {/* 1. Header */}
       <div className="space-y-3 pb-4 border-b border-white/8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1F3445] border border-white/10 text-xs font-mono text-[#D7E0E7]">
-          <span className="w-2 h-2 rounded-full bg-[#9B6FD8]" />
+          <span className="w-2 h-2 rounded-full bg-[#7FA6C9]" />
           <span>National Climate Early-Warning Initiative</span>
         </div>
         <h1 className={`${TYPOGRAPHY.h1} text-white`}>
@@ -95,7 +95,7 @@ export const About: React.FC = () => {
                   className="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer hover:bg-white/5 transition-colors"
                 >
                   <div className="space-y-1">
-                    <span className="text-[11px] font-mono uppercase text-[#9B6FD8] tracking-[0.10em] block">
+                    <span className="text-[11px] font-mono uppercase text-[#8B9AA8] tracking-[0.10em] block">
                       {item.standard}
                     </span>
                     <h3 className={`${TYPOGRAPHY.h3} text-white`}>{item.title}</h3>
@@ -110,7 +110,7 @@ export const About: React.FC = () => {
                 {isOpen && (
                   <div className="p-5 pt-0 border-t border-white/6 space-y-4">
                     {/* Formula box */}
-                    <div className="p-3.5 rounded-[8px] bg-[#101820] border border-white/8 font-mono text-xs text-[#9B6FD8] overflow-x-auto">
+                    <div className="p-3.5 rounded-[8px] bg-[#101820] border border-white/8 font-mono text-xs text-[#7FA6C9] overflow-x-auto">
                       <code>{item.formula}</code>
                     </div>
 
@@ -238,7 +238,7 @@ export const About: React.FC = () => {
                       href={src.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="hover:text-[#9B6FD8] inline-flex items-center gap-1.5 transition-colors"
+                      className="hover:text-[#7FA6C9] inline-flex items-center gap-1.5 transition-colors"
                     >
                       {src.name} <ExternalLink className="w-3 h-3 text-[#5F7183]" />
                     </a>

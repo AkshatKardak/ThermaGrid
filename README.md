@@ -105,7 +105,7 @@ flowchart TD
   end
 
   subgraph Backend ["Backend API (FastAPI)"]
-    API["FastAPI REST Endpoints (/api/v1)"]
+    API["FastAPI REST Endpoints (/api)"]
     AuthGuard["RS256 JWT Authentication"]
     Sched["APScheduler (Hourly Ingestion & Alerts)"]
   end

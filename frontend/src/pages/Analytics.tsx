@@ -58,7 +58,7 @@ export const Analytics: React.FC = () => {
             <h1 className={`${TYPOGRAPHY.h1} text-white`}>
               Thermal Biometeorology & ML Analytics
             </h1>
-            <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-[#9B6FD8]/15 text-[#9B6FD8] border border-[#9B6FD8]/30">
+            <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-[#7FA6C9]/15 text-[#7FA6C9] border border-[#7FA6C9]/30">
               Synoptic Telemetry
             </span>
           </div>
@@ -78,7 +78,7 @@ export const Analytics: React.FC = () => {
             onClick={handleExportCSV}
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[#263E50] hover:bg-[#2F4A5E] border border-white/12 text-xs font-mono font-semibold text-white transition-all cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5 text-[#9B6FD8]" />
+            <Download className="w-3.5 h-3.5 text-[#7FA6C9]" />
             Export CSV
           </button>
         </div>

@@ -66,7 +66,7 @@ export const ForecastConfidenceChart: React.FC<ForecastConfidenceChartProps> = (
             type="monotone"
             dataKey="upper"
             stroke="none"
-            fill="#9B6FD8"
+            fill="#7FA6C9"
             fillOpacity={0.15}
             name="80% Upper Bound"
           />

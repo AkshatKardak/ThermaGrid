@@ -81,7 +81,7 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
             cy="200"
             r="170"
             fill="#14232E"
-            stroke="rgba(155, 111, 216, 0.3)"
+            stroke="rgba(127, 166, 201, 0.3)"
             strokeWidth="1.5"
           />
           <circle cx="200" cy="200" r="130" fill="none" stroke="rgba(255, 255, 255, 0.05)" strokeDasharray="3 3" />

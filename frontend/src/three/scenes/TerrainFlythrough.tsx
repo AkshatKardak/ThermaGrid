@@ -328,7 +328,7 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
       <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10 pointer-events-none">
         <div>
           <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-[#9B6FD8]" />
+            <Compass className="w-4 h-4 text-[#8B9AA8]" />
             <h3 className="text-sm font-semibold text-white tracking-wide font-display">
               Urban Heat Island (UHI) 3D Terrain Flythrough
             </h3>
@@ -363,7 +363,7 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
       <div className="absolute top-16 left-4 right-4 z-10 pointer-events-none">
         <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden">
           <div
-            className="bg-gradient-to-r from-[#FF704F] to-[#9B6FD8] h-full transition-all duration-100"
+            className="bg-gradient-to-r from-[#FF704F] to-[#7FA6C9] h-full transition-all duration-100"
             style={{ width: `${(flythroughProgress * 100).toFixed(1)}%` }}
           />
         </div>
@@ -392,7 +392,7 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
                 onClick={() => setActiveHotspot(h)}
                 className={`px-2.5 py-1 rounded-lg text-[10px] font-mono transition-colors ${
                   activeHotspot.id === h.id
-                    ? 'bg-[#9B6FD8] text-white font-semibold'
+                    ? 'bg-[#7FA6C9] text-white font-semibold'
                     : 'bg-white/5 text-[#8B9AA8] hover:text-white'
                 }`}
               >

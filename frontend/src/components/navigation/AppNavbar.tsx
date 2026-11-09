@@ -49,7 +49,7 @@ export const AppNavbar: React.FC = () => {
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Brand -> /app */}
           <Link to="/app" onClick={closeMenu} className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF704F] to-[#9B6FD8] p-0.5 flex items-center justify-center shadow-lg shadow-[#FF704F]/20">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF704F] to-[#7FA6C9] p-0.5 flex items-center justify-center shadow-lg shadow-[#FF704F]/20">
               <div className="w-full h-full bg-[#101820] rounded-[7px] flex items-center justify-center">
                 <Flame className="w-4 h-4 text-[#FF704F] group-hover:scale-110 transition-transform" />
               </div>
@@ -59,7 +59,7 @@ export const AppNavbar: React.FC = () => {
                 Therma<span className="text-[#FF704F]">Grid</span>
               </span>
               {isAuthority && (
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold uppercase bg-[#9B6FD8]/20 border border-[#9B6FD8]/40 text-[#9B6FD8]">
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold uppercase bg-[#7FA6C9]/20 border border-[#7FA6C9]/40 text-[#7FA6C9]">
                   Authority
                 </span>
               )}
@@ -81,11 +81,11 @@ export const AppNavbar: React.FC = () => {
                   to={item.to}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     isActive
-                      ? 'bg-[#9B6FD8]/20 text-white border border-[#9B6FD8]/40 shadow-sm'
+                      ? 'bg-[#7FA6C9]/20 text-white border border-[#7FA6C9]/40 shadow-sm'
                       : 'text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/5'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-[#9B6FD8]' : ''}`} />
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-[#7FA6C9]' : ''}`} />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -107,7 +107,7 @@ export const AppNavbar: React.FC = () => {
                   to={item.to}
                   className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     isActive
-                      ? 'bg-[#9B6FD8]/20 text-white border border-[#9B6FD8]/40 shadow-sm'
+                      ? 'bg-[#7FA6C9]/20 text-white border border-[#7FA6C9]/40 shadow-sm'
                       : 'text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/5'
                   }`}
                 >
@@ -120,7 +120,7 @@ export const AppNavbar: React.FC = () => {
               to="/app/account"
               className={`p-1.5 rounded-lg text-xs transition-colors ${
                 location.pathname.startsWith('/app/account')
-                  ? 'bg-[#9B6FD8]/20 text-white border border-[#9B6FD8]/40'
+                  ? 'bg-[#7FA6C9]/20 text-white border border-[#7FA6C9]/40'
                   : 'text-[#8B9AA8] hover:text-white'
               }`}
               title="Account & Alerts"
@@ -133,7 +133,7 @@ export const AppNavbar: React.FC = () => {
           <div className="flex items-center gap-2.5 shrink-0">
             {/* City Selector */}
             <div className="flex items-center gap-1.5 bg-[#1F3445] px-2.5 py-1.5 rounded-lg border border-white/10 text-xs">
-              <MapPin className="w-3.5 h-3.5 text-[#9B6FD8] shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#8B9AA8] shrink-0" />
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
@@ -216,11 +216,11 @@ export const AppNavbar: React.FC = () => {
                         onClick={closeMenu}
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                           isActive
-                            ? 'bg-[#9B6FD8]/25 text-white border border-[#9B6FD8]/40 shadow-sm'
+                            ? 'bg-[#7FA6C9]/25 text-white border border-[#7FA6C9]/40 shadow-sm'
                             : 'text-[#8B9AA8] hover:text-white hover:bg-white/5'
                         }`}
                       >
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#9B6FD8]' : ''}`} />
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#7FA6C9]' : ''}`} />
                         <span>{item.label}</span>
                       </Link>
                     );

@@ -28,7 +28,7 @@ export const ScrollProgressRail: React.FC = () => {
       aria-hidden="true"
     >
       <div
-        className="w-full bg-[#9B6FD8] transition-all duration-75"
+        className="w-full bg-[#7FA6C9] transition-all duration-75"
         style={{ height: `${progress}%` }}
       />
     </div>

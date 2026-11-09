@@ -42,7 +42,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({ risk, thermal }) => {
       value: risk ? `${risk.risk_score.toFixed(1)}` : '--',
       subtext: risk ? risk.band_label : 'Hazard × Exp × Vuln',
       icon: AlertTriangle,
-      color: risk ? risk.alert_color : '#9B6FD8',
+      color: risk ? risk.alert_color : '#7FA6C9',
     },
   ];
 

@@ -33,7 +33,7 @@ export function SegmentedControl<T extends string | number>({
             onClick={() => onChange(opt.value)}
             className={`px-3 py-1.5 rounded-[6px] text-xs font-mono transition-all duration-150 flex flex-col items-center justify-center ${
               isSelected
-                ? 'bg-[#1F3445] text-[#D7E0E7] shadow-sm border border-white/12 [box-shadow:inset_0_1px_0_rgba(155,111,216,0.3)]'
+                ? 'bg-[#1F3445] text-[#D7E0E7] shadow-sm border border-white/12 [box-shadow:inset_0_1px_0_rgba(127, 166, 201,0.3)]'
                 : 'text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/5 border border-transparent'
             }`}
           >

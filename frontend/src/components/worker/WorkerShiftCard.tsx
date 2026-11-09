@@ -92,7 +92,7 @@ NOTICE: ${data.disclaimer}
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3.5 py-1.5 rounded-lg bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print A5 card</span>
@@ -167,7 +167,7 @@ NOTICE: ${data.disclaimer}
         <div className="flex items-start justify-between border-b border-white/10 pb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#9B6FD8] px-2 py-0.5 rounded bg-[#9B6FD8]/15 border border-[#9B6FD8]/30">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#7FA6C9] px-2 py-0.5 rounded bg-[#7FA6C9]/15 border border-[#7FA6C9]/30">
                 Official Shift Advisory
               </span>
               <span className="text-xs font-mono text-[#8B9AA8]">
@@ -232,7 +232,7 @@ NOTICE: ${data.disclaimer}
                 className="p-3.5 rounded-xl bg-[#101820] border border-white/10 space-y-1 relative"
               >
                 <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="font-bold text-[#9B6FD8]">{b.start} – {b.end}</span>
+                  <span className="font-bold text-[#7FA6C9]">{b.start} – {b.end}</span>
                   <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/5 text-[#8B9AA8]">
                     {b.duration || 'Rest'}
                   </span>

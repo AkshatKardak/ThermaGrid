@@ -3,7 +3,7 @@
  * Midnight Climate Palette (Single Source of Truth)
  *
  * LAW OF USAGE:
- * - Amethyst (#9B6FD8): UI Chrome, buttons, active nav, focus rings, "live" indicators, 3D rim light ONLY.
+ * - Steel Blue (#7FA6C9): UI Chrome, buttons, active nav, focus rings, "live" indicators, 3D rim light ONLY.
  *   NEVER used for a risk value.
  * - Heat scale: Risk values and bands ONLY. Never a headline, a border, or a hover state.
  * - Never pure black (#000000) or pure white (#FFFFFF).
@@ -30,9 +30,9 @@ export const THEME_COLORS = {
   textFaint: '#5F7183', // Captions, labels, hairlines
 
   // Interactive Accent (UI Chrome ONLY)
-  accent: '#9B6FD8', // Amethyst
-  accentDim: '#7F56BD',
-  accentSoft: 'rgba(155, 111, 216, 0.18)',
+  accent: '#7FA6C9', // steel blue — interactive chrome only
+  accentDim: '#5C82A3',
+  accentSoft: 'rgba(127,166,201,0.16)',
 
   // Alert indicator
   alert: '#FF704F',

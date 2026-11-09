@@ -131,24 +131,25 @@ def create_application() -> FastAPI:
             _ = 1 / 0
             return {"detail": "unreachable"}
 
-    # Mount API v1 Routers
+    # Mount API Routers
     api_prefix = settings.api_v1_prefix
-    app.include_router(auth_router, prefix=api_prefix)
-    app.include_router(locations_router, prefix=api_prefix)
-    app.include_router(weather_router, prefix=api_prefix)
-    app.include_router(thermal_router, prefix=api_prefix)
-    app.include_router(risk_router, prefix=api_prefix)
-    app.include_router(analytics_router, prefix=api_prefix)
-    app.include_router(forecast_router, prefix=api_prefix)
-    app.include_router(simulation_router, prefix=api_prefix)
-    app.include_router(interventions_router, prefix=api_prefix)
-    app.include_router(cooling_centres_router, prefix=api_prefix)
-    app.include_router(alerts_router, prefix=api_prefix)
-    app.include_router(data_sources_router, prefix=api_prefix)
-    app.include_router(planner_router, prefix=api_prefix)
-    app.include_router(subscriptions_router, prefix=api_prefix)
-    app.include_router(dependents_router, prefix=api_prefix)
-    app.include_router(worker_router, prefix=api_prefix)
+    for prefix in set([api_prefix, "/api"]):
+        app.include_router(auth_router, prefix=prefix)
+        app.include_router(locations_router, prefix=prefix)
+        app.include_router(weather_router, prefix=prefix)
+        app.include_router(thermal_router, prefix=prefix)
+        app.include_router(risk_router, prefix=prefix)
+        app.include_router(analytics_router, prefix=prefix)
+        app.include_router(forecast_router, prefix=prefix)
+        app.include_router(simulation_router, prefix=prefix)
+        app.include_router(interventions_router, prefix=prefix)
+        app.include_router(cooling_centres_router, prefix=prefix)
+        app.include_router(alerts_router, prefix=prefix)
+        app.include_router(data_sources_router, prefix=prefix)
+        app.include_router(planner_router, prefix=prefix)
+        app.include_router(subscriptions_router, prefix=prefix)
+        app.include_router(dependents_router, prefix=prefix)
+        app.include_router(worker_router, prefix=prefix)
 
     return app
 

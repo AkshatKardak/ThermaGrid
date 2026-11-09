@@ -26,7 +26,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
     return (
       <Card className="p-6 space-y-3">
         <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8] uppercase tracking-wider">
-          <Moon className="w-4 h-4 text-[#9B6FD8]" />
+          <Moon className="w-4 h-4 text-[#8B9AA8]" />
           <span>Overnight Thermal Recovery</span>
         </div>
         <h3 className={`${TYPOGRAPHY.h3} text-white`}>Tonight</h3>
@@ -73,8 +73,8 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Moon className="w-4 h-4 text-[#9B6FD8]" />
-              <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#9B6FD8]">
+              <Moon className="w-4 h-4 text-[#8B9AA8]" />
+              <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#8B9AA8]">
                 Overnight Biometeorology
               </span>
             </div>
@@ -147,7 +147,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
             <motion.path
               d={pathD}
               fill="none"
-              stroke={data.tropical_night ? '#FF704F' : '#9B6FD8'}
+              stroke={data.tropical_night ? '#FF704F' : '#2FA37C'}
               strokeWidth="2.5"
               strokeLinecap="round"
               initial={{ pathLength: 0 }}
@@ -163,7 +163,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
                   cy={p.y}
                   r="3"
                   fill="#101820"
-                  stroke={data.tropical_night ? '#FF704F' : '#9B6FD8'}
+                  stroke={data.tropical_night ? '#FF704F' : '#2FA37C'}
                   strokeWidth="2"
                 />
                 {idx % 2 === 0 && (
@@ -194,7 +194,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
                 key={idx}
                 className="flex items-start gap-2 p-2.5 rounded-lg bg-white/[0.02] border border-white/5 text-xs text-[#D7E0E7]"
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-[#9B6FD8] mt-1.5 shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#7FA6C9] mt-1.5 shrink-0" />
                 <span className="leading-snug">{item}</span>
               </div>
             ))}

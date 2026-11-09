@@ -89,7 +89,7 @@ export const AuthorityDashboard: React.FC = () => {
     return (
       <div className="min-h-[500px] flex items-center justify-center py-12">
         <div className="max-w-md w-full p-8 rounded-[14px] bg-[#1F3445] border border-white/10 text-center space-y-5 corner-ticks shadow-2xl">
-          <div className="w-14 h-14 rounded-full bg-[#9B6FD8]/15 border border-[#9B6FD8]/30 flex items-center justify-center mx-auto text-[#9B6FD8]">
+          <div className="w-14 h-14 rounded-full bg-[#7FA6C9]/15 border border-[#7FA6C9]/30 flex items-center justify-center mx-auto text-[#7FA6C9]">
             <Lock className="w-7 h-7" />
           </div>
           <div className="space-y-1">
@@ -110,7 +110,7 @@ export const AuthorityDashboard: React.FC = () => {
             </Link>
             <Link
               to="/sign-in"
-              className="w-full sm:w-auto px-4 py-2.5 rounded-[8px] bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all text-center"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-[8px] bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold transition-all text-center"
             >
               Sign In with Authority Account
             </Link>
@@ -207,7 +207,7 @@ export const AuthorityDashboard: React.FC = () => {
             onClick={() => setViewMode('3d_city')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-xs font-mono transition-all ${
               viewMode === '3d_city'
-                ? 'bg-[#101820] text-white border border-[#9B6FD8] [box-shadow:inset_0_1px_0_rgba(155,111,216,0.3)]'
+                ? 'bg-[#101820] text-white border border-[#7FA6C9] [box-shadow:inset_0_1px_0_rgba(127, 166, 201,0.3)]'
                 : 'text-[#8B9AA8] hover:text-white'
             }`}
           >
@@ -218,7 +218,7 @@ export const AuthorityDashboard: React.FC = () => {
             onClick={() => setViewMode('2d_gis')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-xs font-mono transition-all ${
               viewMode === '2d_gis'
-                ? 'bg-[#101820] text-white border border-[#9B6FD8] [box-shadow:inset_0_1px_0_rgba(155,111,216,0.3)]'
+                ? 'bg-[#101820] text-white border border-[#7FA6C9] [box-shadow:inset_0_1px_0_rgba(127, 166, 201,0.3)]'
                 : 'text-[#8B9AA8] hover:text-white'
             }`}
           >
@@ -440,7 +440,7 @@ export const AuthorityDashboard: React.FC = () => {
                   onChange={(e) => setBroadcastMessage(e.target.value)}
                   placeholder="e.g. WBGT exceeds 33.5°C in Shivaji Nagar. Suspend outdoor construction shifts 12:00-16:00. Open transit cooling relief posts."
                   rows={3}
-                  className="w-full bg-[#101820] border border-white/10 rounded-[8px] p-3 text-xs text-white placeholder:text-[#5F7183] focus:border-[#9B6FD8] outline-none"
+                  className="w-full bg-[#101820] border border-white/10 rounded-[8px] p-3 text-xs text-white placeholder:text-[#5F7183] focus:border-[#7FA6C9] outline-none"
                 />
               </div>
 

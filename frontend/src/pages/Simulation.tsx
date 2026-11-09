@@ -98,7 +98,7 @@ export const Simulation: React.FC = () => {
           onClick={handleReset}
           className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] bg-[#2F4A5E]/40 hover:bg-[#2F4A5E] border border-white/8 text-xs font-mono text-[#D7E0E7] transition-all shrink-0 cursor-pointer"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-[#9B6FD8]" />
+          <RefreshCw className="w-3.5 h-3.5 text-[#7FA6C9]" />
           Reset to Baseline
         </button>
       </div>

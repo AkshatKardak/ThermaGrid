@@ -10,7 +10,6 @@ import { latLngToVec3, getFacingYRotation } from '../geo';
 import { atmosphereVertexShader, atmosphereFragmentShader } from '../shaders/atmosphere.glsl';
 import { isWebGLAvailable, disposeThreeHierarchy } from '../useRenderLoop';
 import { StaticGlobe, DEFAULT_CITIES } from '../fallbacks/StaticGlobe';
-import { loadEarthTexture } from '../textures/earthTexture';
 
 export interface CityRisk {
   name: string;
@@ -41,10 +40,8 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
   const [useFallback, setUseFallback] = useState(false);
 
-  // Synchronize selectedCity whenever real cities data arrives or updates
   useEffect(() => {
     if (cities && cities.length > 0) {
-      // Find highest risk city among the real wards
       const highest = [...cities].sort((a, b) => b.risk - a.risk)[0];
       setSelectedCity(highest);
     }
@@ -68,7 +65,6 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(40, width / heightPx, 0.1, 100);
-    // Camera positioned closer to globe for wider Earth presence
     camera.position.set(0, 0.15, 2.38);
 
     const renderer = new THREE.WebGLRenderer({
@@ -78,20 +74,18 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     });
     renderer.setSize(width, heightPx);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.5));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
     canvasContainer.appendChild(renderer.domElement);
 
-    // --- 2. Post-Processing Bloom (Subtle Earth rim glow, NOT neon blowout) ---
+    // --- 2. Post-Processing Bloom (Restrained strictly <= 0.12 for heat columns) ---
     let composer: EffectComposer | null = null;
     let bloomPass: UnrealBloomPass | null = null;
     if (!isMobile) {
       const renderPass = new RenderPass(scene, camera);
       bloomPass = new UnrealBloomPass(
         new THREE.Vector2(width / 2, heightPx / 2),
-        0.28, // subtle, refined bloom
-        0.45,
-        0.55  // higher threshold prevents blowout
+        0.10, // strength <= 0.12 strictly
+        0.3,
+        0.75  // threshold captures only heat column tips
       );
       composer = new EffectComposer(renderer);
       composer.addPass(renderPass);
@@ -111,71 +105,44 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     }
 
     // --- 4. Lights ---
-    const ambientLight = new THREE.AmbientLight(0x94a3b8, 0.85);
+    const ambientLight = new THREE.AmbientLight(0xd7e0e7, 0.6);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfff8eb, 1.4);
-    sunLight.position.set(5, 3, 4);
-    scene.add(sunLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(5, 3, 4);
+    scene.add(dirLight);
 
-    // Earth atmospheric sky-blue rim light (replaces purple)
-    const earthRimLight = new THREE.PointLight(0x38bdf8, 1.8, 12);
-    earthRimLight.position.set(-3.5, 2.5, -3.5);
-    scene.add(earthRimLight);
-
-    // --- 5. Starfield ---
-    const starCount = 600;
-    const starGeo = new THREE.BufferGeometry();
-    const starPositions = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const r = 5.5 + Math.random() * 6.0;
-      starPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      starPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      starPositions[i * 3 + 2] = r * Math.cos(phi);
-    }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    const starMat = new THREE.PointsMaterial({
-      color: 0x94a3b8,
-      size: 0.02,
-      transparent: true,
-      opacity: 0.5,
-    });
-    const starField = new THREE.Points(starGeo, starMat);
-    scene.add(starField);
-
-    // --- 6. Globe Group (Centered in dedicated viewport) ---
+    // --- 5. Globe Group (Oriented toward India) ---
     const globeGroup = new THREE.Group();
     globeGroup.position.set(0, 0, 0);
-    const initialFacingY = getFacingYRotation(78.5); // Orient toward India (78.5°E)
+    const initialFacingY = getFacingYRotation(78.5); // India centroid (78.5°E)
     globeGroup.rotation.y = initialFacingY;
     scene.add(globeGroup);
 
-    // Base Earth Sphere with authentic texture map
-    const sphereSegments = isMobile ? 36 : 64;
+    // Flat dark #141C24 diagram sphere (no photoreal texture, no stars)
+    const sphereSegments = isMobile ? 32 : 48;
     const sphereGeo = new THREE.SphereGeometry(1.0, sphereSegments, sphereSegments);
-
-    const earthTexture = loadEarthTexture((loadedTex) => {
-      if (baseSphere && baseSphere.material) {
-        (baseSphere.material as THREE.MeshStandardMaterial).map = loadedTex;
-        (baseSphere.material as THREE.MeshStandardMaterial).needsUpdate = true;
-      }
-    });
-
-    const sphereMat = new THREE.MeshStandardMaterial({
-      map: earthTexture,
-      roughness: 0.78,
-      metalness: 0.12,
+    const sphereMat = new THREE.MeshBasicMaterial({
+      color: 0x141C24,
+      wireframe: false,
     });
     const baseSphere = new THREE.Mesh(sphereGeo, sphereMat);
     globeGroup.add(baseSphere);
 
-    // Earth Atmosphere Shell (1.06 radius - tight, authentic Rayleigh glow)
-    const atmosGeo = new THREE.SphereGeometry(1.06, 48, 48);
-    const atmosMat = new THREE.ShaderMaterial({
+    // Subtle #22303C graticule at 12% opacity
+    const graticuleGeo = new THREE.SphereGeometry(1.002, 24, 24);
+    const graticuleMat = new THREE.MeshBasicMaterial({
+      color: 0x22303C,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.12,
+    });
+    const graticuleMesh = new THREE.Mesh(graticuleGeo, graticuleMat);
+    globeGroup.add(graticuleMesh);
+
+    // Thin subtle fresnel rim
+    const rimGeo = new THREE.SphereGeometry(1.04, 36, 36);
+    const rimMat = new THREE.ShaderMaterial({
       vertexShader: atmosphereVertexShader,
       fragmentShader: atmosphereFragmentShader,
       side: THREE.BackSide,
@@ -183,10 +150,10 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       transparent: true,
       depthWrite: false,
     });
-    const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
-    globeGroup.add(atmosMesh);
+    const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+    globeGroup.add(rimMesh);
 
-    // --- 7. City Heat Stress Pillars ---
+    // --- 6. City Heat Stress Pillars ---
     const sortedCities = [...cities].sort((a, b) => a.lng - b.lng);
     const upVector = new THREE.Vector3(0, 1, 0);
     const columnObjects: {
@@ -230,12 +197,12 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       const cylinderMat = new THREE.MeshBasicMaterial({
         color: colColor.clone(),
         transparent: true,
-        opacity: 0.88,
+        opacity: 0.90,
       });
       const cylinderMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
       cityGroup.add(cylinderMesh);
 
-      // Glowing tip sphere
+      // Tip sphere
       const tipGeo = new THREE.SphereGeometry(0.014, 8, 8);
       const tipMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const tipMesh = new THREE.Mesh(tipGeo, tipMat);
@@ -257,7 +224,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       });
     });
 
-    // --- 8. Dynamic Pulse Ring over highest-risk centroid ---
+    // --- 7. Pulse Ring over highest-risk centroid ---
     const ringGeo = new THREE.RingGeometry(0.018, 0.024, 24);
     const ringMat = new THREE.MeshBasicMaterial({
       color: new THREE.Color(heatColor(highestRiskCity.risk)),
@@ -272,7 +239,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     pulseRing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), highestNormal);
     globeGroup.add(pulseRing);
 
-    // --- 9. Raycasting & Hover Interaction ---
+    // --- 8. Raycasting & Interaction ---
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
 
@@ -305,7 +272,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     };
     renderer.domElement.addEventListener('pointermove', onPointerMove);
 
-    // --- 10. Visibility & Resize Handling ---
+    // --- 9. Visibility & Resize ---
     let isVisible = true;
     const observer = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
@@ -323,7 +290,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     };
     window.addEventListener('resize', onResize);
 
-    // --- 11. Animation Loop ---
+    // --- 10. Animation Loop ---
     let rafId: number;
     const clock = new THREE.Clock();
 
@@ -333,10 +300,10 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
 
       const elapsed = clock.getElapsedTime();
 
-      // Slow, steady Earth rotation (0.04 rad/s)
+      // Steady diagram rotation (0.04 rad/s)
       globeGroup.rotation.y = initialFacingY + elapsed * 0.04;
 
-      // Pulse ring animation (expanding and fading over 3s cycle)
+      // Pulse ring animation
       const pulseCycle = (elapsed % 3.0) / 3.0;
       const ringScale = 1.0 + pulseCycle * 3.5;
       pulseRing.scale.set(ringScale, ringScale, 1.0);
@@ -388,7 +355,6 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       className="relative w-full h-full min-h-[460px] lg:min-h-[500px] flex flex-col justify-between overflow-hidden rounded-[14px]"
       style={{ height }}
     >
-      {/* 3D WebGL Canvas Layer - absolute so it never inflates parent flex height */}
       <div
         ref={canvasRef}
         className="absolute inset-0 w-full h-full pointer-events-auto"
@@ -397,12 +363,12 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       {/* Top Status Readout */}
       <div className="w-full flex items-center justify-between p-4 sm:p-5 z-10 pointer-events-none">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#38BDF8] animate-ping" />
+          <div className="w-2 h-2 rounded-full bg-[#7FA6C9] animate-ping" />
           <span className="text-xs font-mono font-medium text-[#D7E0E7] uppercase tracking-[0.10em]">
             National Synoptic Thermal Field
           </span>
         </div>
-        <div className="text-[11px] font-mono text-[#38BDF8] bg-[#101820]/90 px-2.5 py-1 rounded-[6px] border border-white/10 backdrop-blur-sm">
+        <div className="text-[11px] font-mono text-[#8B9AA8] bg-[#101820]/90 px-2.5 py-1 rounded-[6px] border border-white/10 backdrop-blur-sm">
           Live Synoptic Feed
         </div>
       </div>
@@ -410,7 +376,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       {/* Hover Tooltip */}
       {hoveredCity && tooltipPos && (
         <div
-          className="absolute z-30 pointer-events-none px-3 py-1.5 rounded-[6px] bg-[#101820]/95 backdrop-blur-md border border-[#38BDF8]/40 shadow-xl text-xs font-mono"
+          className="absolute z-30 pointer-events-none px-3 py-1.5 rounded-[6px] bg-[#101820]/95 backdrop-blur-md border border-[#7FA6C9]/40 shadow-xl text-xs font-mono"
           style={{
             left: `${Math.min(window.innerWidth - 220, tooltipPos.x - 20)}px`,
             top: `${Math.max(10, tooltipPos.y - 45)}px`,
@@ -433,7 +399,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
         <div className="bg-[#101820]/90 border border-white/10 rounded-[10px] p-3 sm:p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md shadow-xl">
           <div className="flex items-center gap-2.5">
             <div
-              className="w-3 h-3 rounded-full shrink-0 animate-pulse"
+              className="w-3 h-3 rounded-full shrink-0"
               style={{
                 backgroundColor: heatColor(selectedCity.risk),
               }}

@@ -1,35 +1,27 @@
 import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  ArrowRight,
-  ShieldAlert,
-  HardHat,
-  ChevronDown,
-  Database,
-  ThermometerSun,
-  Activity,
-  AlertTriangle,
-  Zap,
-} from 'lucide-react';
+import { useUser } from '@clerk/clerk-react';
 
 import { RiskGlobe, CityRisk } from '../three/scenes/RiskGlobe';
 import { WardHeatCity } from '../three/scenes/WardHeatCity';
 import { TwoWardsComparison } from '../components/dashboard/TwoWardsComparison';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { KpiNumeral } from '../components/ui/KpiNumeral';
-import { SpotlightCursor } from '../components/ui/SpotlightCursor';
 import { ProvenanceChip } from '../components/ui/ProvenanceChip';
 import { TYPOGRAPHY } from '../theme/typography';
-import { wordContainer, wordItem } from '../theme/motion';
 import { useAllWardsRisk } from '../hooks/useRisk';
 import { useWards } from '../hooks/useWards';
 import { DEFAULT_CITIES } from '../three/fallbacks/StaticGlobe';
 
-const HERO_WORDS = ['Hyperlocal', 'Thermal', 'Stress', '&', 'Early-Warning', 'Platform'];
-
 export const Landing: React.FC = () => {
+  const { isSignedIn, isLoaded } = useUser();
   const heroRef = useRef<HTMLDivElement>(null);
+
+  // If user is already authenticated, immediately route to main telemetry hub
+  if (isLoaded && isSignedIn) {
+    return <Navigate to="/app" replace />;
+  }
 
   // Fetch real observed ward risk and demographic metadata from backend
   const { data: wardsRisk } = useAllWardsRisk();
@@ -73,98 +65,79 @@ export const Landing: React.FC = () => {
     {
       num: '01',
       title: 'Data Ingestion',
-      icon: Database,
       desc: 'IMD synoptic AWS, ERA5 reanalysis, and municipal census telemetry streamed hourly.',
     },
     {
       num: '02',
       title: 'Thermal Indices',
-      icon: ThermometerSun,
       desc: 'Physics-based Liljegren WBGT, 6th-order UTCI polynomial, and Rothfusz Heat Index.',
     },
     {
       num: '03',
       title: 'ML Forecasting',
-      icon: Activity,
       desc: 'XGBoost gradient boosting with 72-hour lag features and recursive uncertainty cones.',
     },
     {
       num: '04',
       title: 'Risk Modeling',
-      icon: AlertTriangle,
       desc: 'Iso-thermal exposure intersecting tin roofs, tree canopy deficits, and outdoor labour.',
     },
     {
       num: '05',
       title: 'Action Trigger',
-      icon: Zap,
       desc: 'Automated municipal cooling shelters, hydration alerts, and worker safety protocols.',
     },
   ];
 
   return (
     <div className="space-y-24 sm:space-y-32">
-      {/* 1. Hero Section (Balanced 2-Column Grid: Left Editorial Panel (5 cols) + Right Expansive 3D Earth Console (7 cols)) */}
+      {/* 1. Hero Section: Left Narrative (7 cols / 60%) + Right Dark Diagram Globe (5 cols / 40%) */}
       <section
         ref={heroRef}
         className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch"
       >
-        <SpotlightCursor containerRef={heroRef} />
-
-        {/* Left Panel (5 cols): Editorial, Narrative, and Actions with compact proportional spacing */}
-        <div className="lg:col-span-5 bg-[#1F3445]/50 backdrop-blur-md border border-white/10 rounded-[14px] p-6 sm:p-7 flex flex-col justify-between corner-ticks shadow-2xl relative z-10 min-h-[460px] lg:h-[500px]">
-          <div className="space-y-4">
-            {/* Eyebrow badge */}
+        {/* Left Column (60% weight): Type + Numbers primary focus */}
+        <div className="lg:col-span-7 bg-[#1F3445]/50 border border-white/10 rounded-[14px] p-6 sm:p-8 flex flex-col justify-between corner-ticks shadow-2xl relative z-10 min-h-[460px] lg:h-[520px]">
+          <div className="space-y-5">
+            {/* Eyebrow */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101820]/90 border border-white/10 text-xs font-mono text-[#D7E0E7] w-fit">
-              <span className="w-2 h-2 rounded-full bg-[#38BDF8] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#7FA6C9]" />
               <span className="text-[#8B9AA8]">National Climate Early-Warning Initiative</span>
             </div>
 
-            {/* Headline: Word-by-word entrance reveal */}
+            {/* Headline: Single 180ms fade-up */}
             <motion.h1
-              variants={wordContainer}
-              initial="hidden"
-              animate="visible"
-              className="font-display text-3xl sm:text-4xl lg:text-[38px] font-black tracking-tight leading-[1.08] text-white flex flex-wrap gap-x-2.5 gap-y-1"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="font-display text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight leading-[1.08] text-white"
             >
-              {HERO_WORDS.map((word, idx) => (
-                <motion.span
-                  key={idx}
-                  variants={wordItem}
-                  className={word === 'Thermal' || word === 'Stress' ? 'text-[#FF704F]' : ''}
-                >
-                  {word}
-                </motion.span>
-              ))}
+              Hyperlocal Thermal Stress &amp; Early-Warning Platform
             </motion.h1>
 
             {/* Narrative Lead */}
-            <p className="text-sm text-[#8B9AA8] max-w-lg leading-relaxed">
+            <p className="text-sm text-[#8B9AA8] max-w-xl leading-relaxed">
               Not a generic weather forecast. ThermaGrid pinpoints <span className="text-white font-medium">who is at risk</span>, <span className="text-white font-medium">where</span>, <span className="text-white font-medium">when it peaks</span>, <span className="text-white font-medium">why</span>, and <span className="text-white font-medium">what action to take</span> — calibrated down to the urban municipal ward.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            {/* Action Buttons (Strictly typography only, no lucide icons above fold) */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
                 to="/app/heat-risk"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold transition-all duration-120 shadow-lg shadow-[#9B6FD8]/25"
+                className="px-4 py-2.5 rounded-[8px] bg-[#7FA6C9] hover:bg-[#5C82A3] text-[#101820] text-xs font-mono font-bold transition-all duration-120 shadow-sm"
               >
-                <ShieldAlert className="w-4 h-4" />
                 Citizen Protection
-                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <Link
                 to="/app/worker"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
+                className="px-4 py-2.5 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
               >
-                <HardHat className="w-4 h-4 text-[#F59E0B]" />
                 Worker Safety
               </Link>
               <Link
                 to="/app/authority"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
+                className="px-4 py-2.5 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
               >
-                <ArrowRight className="w-4 h-4 text-[#38BDF8]" />
                 Authority Console
               </Link>
             </div>
@@ -173,7 +146,7 @@ export const Landing: React.FC = () => {
           {/* 3-Stat Rail with Real Live Data from API */}
           <div className="grid grid-cols-3 gap-4 pt-5 mt-4 border-t border-white/8">
             <div>
-              <span className="block font-mono text-xl sm:text-2xl font-bold text-white tracking-tight">
+              <span className="block font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">
                 {peakWbgt}°C
               </span>
               <span className={TYPOGRAPHY.micro}>Peak ISO WBGT</span>
@@ -199,13 +172,13 @@ export const Landing: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Panel (7 cols): Dedicated Expansive 3D Interactive Earth Terminal */}
-        <div className="lg:col-span-7 bg-[#101820] border border-white/10 rounded-[14px] overflow-hidden flex flex-col corner-ticks relative shadow-2xl min-h-[460px] lg:h-[500px]">
+        {/* Right Column (40% width): Dark India Thermal Diagram Globe */}
+        <div className="lg:col-span-5 bg-[#101820] border border-white/10 rounded-[14px] overflow-hidden flex flex-col corner-ticks relative shadow-2xl min-h-[460px] lg:h-[520px]">
           <RiskGlobe height="100%" interactive={true} cities={liveCities} />
         </div>
       </section>
 
-      {/* 2. Section: Two Wards, Same Temperature (The 7/5 Asymmetric Pair) */}
+      {/* 2. Section: Two Wards, Same Temperature */}
       <section id="two-wards" className="space-y-6">
         <SectionHeader
           label="HYPERLOCAL PARADIGM BENCHMARK"
@@ -215,7 +188,7 @@ export const Landing: React.FC = () => {
         <TwoWardsComparison />
       </section>
 
-      {/* 3. Section: 3D Ward Heat City (Authority & Municipal View) */}
+      {/* 3. Section: 3D Ward Heat City */}
       <section className="space-y-6">
         <SectionHeader
           label="EXTRUDED URBAN HEAT FIELD"
@@ -227,7 +200,7 @@ export const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Section: How It Works (5-Step Horizontal Rail with Hairline Connectors) */}
+      {/* 4. Section: How It Works (Row and numerals, no icon cards) */}
       <section id="how-it-works" className="space-y-6">
         <SectionHeader
           label="END-TO-END COMPUTATIONAL PIPELINE"
@@ -235,37 +208,27 @@ export const Landing: React.FC = () => {
           lead="ThermaGrid bridges numerical weather prediction and urban epidemiology through five validated stages."
         />
 
-        <div className="relative grid grid-cols-1 md:grid-cols-5 gap-6">
-          {/* Horizontal Hairline Connector */}
-          <div className="hidden md:block absolute top-10 left-8 right-8 h-[1px] bg-white/10 z-0" />
-
-          {workflowSteps.map((step, idx) => {
-            const Icon = step.icon;
-            return (
-              <div
-                key={idx}
-                className="relative z-10 rounded-[14px] bg-[#1F3445] border border-white/8 p-5 space-y-3 hover:-translate-y-[2px] transition-transform duration-200"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-[8px] bg-[#101820] border border-white/10 flex items-center justify-center text-[#9B6FD8]">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <span className="text-xs font-mono font-bold text-[#5F7183]">{step.num}</span>
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-white font-display">{step.title}</h4>
-                  <p className="text-xs text-[#8B9AA8] mt-1 leading-relaxed">{step.desc}</p>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {workflowSteps.map((step, idx) => (
+            <div
+              key={idx}
+              className="rounded-[14px] bg-[#1F3445]/60 border border-white/8 p-5 space-y-2.5 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xl font-bold text-white tabular-nums">{step.num}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#7FA6C9]" />
               </div>
-            );
-          })}
+              <h4 className="text-sm font-bold text-white font-display">{step.title}</h4>
+              <p className="text-xs text-[#8B9AA8] leading-relaxed">{step.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* 5. Section: Provenance Strip (4 Mono Facts) */}
+      {/* 5. Section: Provenance Strip */}
       <section id="methodology" className="p-6 rounded-[14px] bg-[#1F3445]/40 border border-white/8 space-y-4">
         <div className="text-[11px] font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
-          Data Provenance & Model Auditability
+          Data Provenance &amp; Model Auditability
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <ProvenanceChip
@@ -279,7 +242,7 @@ export const Landing: React.FC = () => {
             sub="Polygon boundary joins"
           />
           <ProvenanceChip
-            label="Licensing & Open Code"
+            label="Licensing &amp; Open Code"
             value="MIT Open Science Standard"
             sub="National Climate Telemetry"
           />

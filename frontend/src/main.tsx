@@ -37,7 +37,7 @@ createRoot(rootElement).render(
           publishableKey={env.CLERK_PUBLISHABLE_KEY!}
           appearance={{
             variables: {
-              colorPrimary: '#9B6FD8',
+              colorPrimary: '#7FA6C9',
               colorBackground: '#1F3445',
               colorText: '#D7E0E7',
               borderRadius: '14px',

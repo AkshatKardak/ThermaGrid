@@ -32,8 +32,7 @@ export const HourlyStrip: React.FC<HourlyStripProps> = ({ items }) => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between text-xs">
-        <div className="flex items-center gap-1.5 text-[#8B9AA8]">
-          <Clock className="w-3.5 h-3.5" />
+        <div className="text-[11px] font-mono uppercase tracking-wider text-[#8B9AA8]">
           <span>Diurnal Heat Progression (24 Hours)</span>
         </div>
         <div className="flex items-center gap-2">

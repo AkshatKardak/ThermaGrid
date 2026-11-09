@@ -32,7 +32,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
     <Card className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/8">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#9B6FD8] block mb-1">
+          <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#8B9AA8] block mb-1">
             Activity Safe-Window Planner
           </span>
           <h3 className={`${TYPOGRAPHY.h3} text-white`}>When Can I Go Out?</h3>
@@ -50,7 +50,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
               onClick={() => setActivity(act.id)}
               className={`px-3 py-1.5 rounded-[6px] text-xs font-mono font-medium transition-all cursor-pointer ${
                 activity === act.id
-                  ? 'bg-[#9B6FD8] text-white shadow-sm font-semibold'
+                  ? 'bg-[#7FA6C9] text-white shadow-sm font-semibold'
                   : 'text-[#8B9AA8] hover:text-[#D7E0E7]'
               }`}
             >
@@ -77,7 +77,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
           step={15}
           value={durationMin}
           onChange={(e) => setDurationMin(Number(e.target.value))}
-          className="w-full accent-[#9B6FD8] h-1.5 bg-[#101820] rounded-lg appearance-none cursor-pointer"
+          className="w-full accent-[#7FA6C9] h-1.5 bg-[#101820] rounded-lg appearance-none cursor-pointer"
         />
         <div className="flex justify-between text-[10px] font-mono text-[#5F7183]">
           <span>15 min</span>

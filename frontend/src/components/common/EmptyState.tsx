@@ -35,7 +35,7 @@ export const ErrorState: React.FC<{
       {onRetry && (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-semibold tracking-wide transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-semibold tracking-wide transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Retry Connection

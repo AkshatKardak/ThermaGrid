@@ -11,7 +11,7 @@ export const THREE_TOKENS = {
   panelElevated: THEME_COLORS.surfaceElevated, // #263E50 Raised Panel
   text: THEME_COLORS.text,                  // #D7E0E7 Text
   textDim: THEME_COLORS.textDim,            // #8B9AA8 Secondary Text
-  accent: THEME_COLORS.accent,              // #9B6FD8 Amethyst (UI chrome & rim lighting ONLY)
+  accent: THEME_COLORS.accent,              // #7FA6C9 Steel Blue (UI chrome & rim lighting ONLY)
   accentDim: THEME_COLORS.accentDim,
   accentSoft: THEME_COLORS.accentSoft,
   alert: THEME_COLORS.alert,                // #FF704F Alert

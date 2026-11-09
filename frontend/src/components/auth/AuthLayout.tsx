@@ -15,7 +15,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
         {/* Brand header */}
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#FF704F] to-[#9B6FD8] p-0.5 flex items-center justify-center shadow-lg shadow-[#FF704F]/20">
+            <div className="w-9 h-9 rounded-lg bg-[#1F3445] border border-white/10 p-0.5 flex items-center justify-center shadow-lg">
               <div className="w-full h-full bg-[#101820] rounded-[7px] flex items-center justify-center">
                 <Flame className="w-5 h-5 text-[#FF704F] group-hover:scale-110 transition-transform" />
               </div>
@@ -26,7 +26,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
           </Link>
 
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight text-white font-display">{title}</h1>
+            <h1 className="text-xl font-bold tracking-tight text-white font-display">{title}</h1>
             <p className="text-xs text-[#8B9AA8]">{subtitle}</p>
           </div>
         </div>

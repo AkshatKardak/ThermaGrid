@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 this.setState({ hasError: false, error: null });
                 window.location.reload();
               }}
-              className="px-4 py-2 bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-mono font-semibold rounded-[8px] transition-all cursor-pointer"
+              className="px-4 py-2 bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold rounded-[8px] transition-all cursor-pointer"
             >
               Reload Interface
             </button>

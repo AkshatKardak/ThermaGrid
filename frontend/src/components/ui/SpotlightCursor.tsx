@@ -54,7 +54,7 @@ export const SpotlightCursor: React.FC<SpotlightCursorProps> = ({ containerRef }
       ref={glowRef}
       className="absolute top-0 left-0 w-[400px] h-[400px] rounded-full pointer-events-none opacity-0 transition-opacity duration-300 z-10"
       style={{
-        background: 'radial-gradient(circle, rgba(155, 111, 216, 0.08) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(127, 166, 201, 0.08) 0%, transparent 70%)',
         willChange: 'transform',
       }}
       aria-hidden="true"

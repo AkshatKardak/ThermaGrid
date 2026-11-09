@@ -1,12 +1,12 @@
 import React from 'react';
-import { SignIn } from '@clerk/clerk-react';
-import { useSearchParams } from 'react-router-dom';
+import { SignIn, useUser } from '@clerk/clerk-react';
+import { useSearchParams, Navigate } from 'react-router-dom';
 import { AuthLayout } from '../components/auth/AuthLayout';
 import { DemoAccountPanel } from '../components/auth/DemoAccountPanel';
 
 const clerkAppearance = {
   variables: {
-    colorPrimary: '#9B6FD8',
+    colorPrimary: '#7FA6C9',
     colorBackground: '#1F3445',
     colorText: '#D7E0E7',
     borderRadius: '14px',
@@ -18,14 +18,19 @@ const clerkAppearance = {
     headerSubtitle: 'text-[#8B9AA8]',
     socialButtonsBlockButton: 'bg-[#101820] border-white/10 text-white hover:bg-[#263E50]',
     formFieldLabel: 'text-[#8B9AA8]',
-    formFieldInput: 'bg-[#101820] border-white/10 text-white focus:border-[#9B6FD8]',
-    footerActionLink: 'text-[#9B6FD8] hover:text-[#7F56BD]',
+    formFieldInput: 'bg-[#101820] border-white/10 text-white focus:border-[#7FA6C9]',
+    footerActionLink: 'text-[#7FA6C9] hover:text-[#5C82A3]',
   },
 };
 
 export const SignInPage: React.FC = () => {
+  const { isSignedIn, isLoaded } = useUser();
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get('redirect_url') || '/app';
+
+  if (isLoaded && isSignedIn) {
+    return <Navigate to="/app" replace />;
+  }
 
   return (
     <AuthLayout
@@ -37,6 +42,7 @@ export const SignInPage: React.FC = () => {
         path="/sign-in"
         signUpUrl="/sign-up"
         fallbackRedirectUrl={redirectUrl}
+        forceRedirectUrl="/app"
         appearance={clerkAppearance}
       />
       <DemoAccountPanel />

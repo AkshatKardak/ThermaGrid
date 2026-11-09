@@ -32,8 +32,8 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="min-h-screen flex flex-col bg-[#101820] text-[#D7E0E7] relative selection:bg-[#9B6FD8]/30 selection:text-white">
-          {/* Scroll progress rail (2px amethyst on right edge) */}
+        <div className="min-h-screen flex flex-col bg-[#101820] text-[#D7E0E7] relative selection:bg-[#7FA6C9]/30 selection:text-white">
+          {/* Scroll progress rail (2px steel blue on right edge) */}
           <ScrollProgressRail />
 
           {/* Film grain texture (fixed SVG feTurbulence at 2.8% opacity) */}

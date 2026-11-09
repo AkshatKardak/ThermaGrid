@@ -27,7 +27,7 @@ export const LayerControls: React.FC = () => {
             onClick={() => toggleLayer(layer.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
               isActive
-                ? 'bg-[#9B6FD8] text-white shadow-sm'
+                ? 'bg-[#7FA6C9] text-white shadow-sm'
                 : 'bg-white/5 text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/10'
             }`}
           >

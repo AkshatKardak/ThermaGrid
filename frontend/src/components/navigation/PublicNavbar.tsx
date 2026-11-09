@@ -15,7 +15,7 @@ export const PublicNavbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-[#FF704F] to-[#9B6FD8] p-0.5 flex items-center justify-center shadow-lg shadow-[#FF704F]/20 shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-[#FF704F] to-[#7FA6C9] p-0.5 flex items-center justify-center shadow-lg shadow-[#FF704F]/20 shrink-0">
               <div className="w-full h-full bg-[#101820] rounded-[7px] flex items-center justify-center">
                 <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF704F] group-hover:scale-110 transition-transform" />
               </div>
@@ -58,7 +58,7 @@ export const PublicNavbar: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Link
                   to="/app"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-semibold shadow-sm transition-all"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-semibold shadow-sm transition-all"
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" />
                   <span>Open App</span>
@@ -79,7 +79,7 @@ export const PublicNavbar: React.FC = () => {
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-[#9B6FD8] hover:bg-[#7F56BD] text-white text-xs font-semibold shadow-sm transition-all group"
+                  className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-semibold shadow-sm transition-all group"
                 >
                   <span>Get started</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

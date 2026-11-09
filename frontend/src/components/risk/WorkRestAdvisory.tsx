@@ -87,7 +87,7 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-[#1F3445]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
             <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
-              <Timer className="w-4 h-4 text-[#9B6FD8]" />
+              <Timer className="w-4 h-4 text-[#8B9AA8]" />
               <span>Shift Rest Interval</span>
             </div>
             <div className="text-xl font-mono font-bold text-white tabular-nums">
