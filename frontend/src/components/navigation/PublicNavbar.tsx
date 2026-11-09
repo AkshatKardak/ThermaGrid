@@ -15,14 +15,14 @@ export const PublicNavbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-[#FF704F] to-[#7FA6C9] p-0.5 flex items-center justify-center shadow-lg shadow-[#FF704F]/20 shrink-0">
-              <div className="w-full h-full bg-[#101820] rounded-[7px] flex items-center justify-center">
-                <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF704F] group-hover:scale-110 transition-transform" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-gradient-to-br from-[#7FA6C9] to-[#5C82A3] p-0.5 flex items-center justify-center shadow-lg shadow-[#7FA6C9]/20 shrink-0 transition-transform group-hover:scale-105">
+              <div className="w-full h-full bg-[#101820] rounded-[8px] flex items-center justify-center">
+                <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-[#7FA6C9] transition-colors" />
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-base sm:text-lg font-extrabold tracking-tight text-[#D7E0E7] font-display">
-                Therma<span className="text-[#FF704F]">Grid</span>
+                Therma<span className="bg-gradient-to-r from-[#7FA6C9] to-[#D7E0E7] bg-clip-text text-transparent">Grid</span>
               </span>
               <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold uppercase bg-white/10 text-[#8B9AA8]">
                 Public
@@ -79,7 +79,7 @@ export const PublicNavbar: React.FC = () => {
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-semibold shadow-sm transition-all group"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#7FA6C9] to-[#5C82A3] hover:opacity-95 text-[#101820] text-xs font-semibold shadow-md shadow-[#7FA6C9]/20 transition-all group"
                 >
                   <span>Get started</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

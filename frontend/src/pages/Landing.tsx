@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/clerk-react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 import { RiskGlobe, CityRisk } from '../three/scenes/RiskGlobe';
 import { WardHeatCity } from '../three/scenes/WardHeatCity';
@@ -17,6 +18,7 @@ import { DEFAULT_CITIES } from '../three/fallbacks/StaticGlobe';
 export const Landing: React.FC = () => {
   const { isSignedIn, isLoaded } = useUser();
   const heroRef = useRef<HTMLDivElement>(null);
+  const [isGlobeMaximized, setIsGlobeMaximized] = useState(false);
 
   // If user is already authenticated, immediately route to main telemetry hub
   if (isLoaded && isSignedIn) {
@@ -61,47 +63,74 @@ export const Landing: React.FC = () => {
     return wards?.length || wardsRisk?.length || 6;
   }, [wards, wardsRisk]);
 
-  const workflowSteps = [
+  // Enhanced 5-Stage Computational Pipeline with Thin Hairline Architecture
+  const pipelineStages = [
     {
-      num: '01',
-      title: 'Data Ingestion',
-      desc: 'IMD synoptic AWS, ERA5 reanalysis, and municipal census telemetry streamed hourly.',
+      step: '01',
+      total: '05',
+      name: 'Synoptic Ingestion',
+      badge: '15-min Cadence',
+      desc: 'Ingests real-time observations from IMD AWS network, ERA5 reanalysis, and decennial census polygons.',
+      spec: 'IMD AWS + ERA5 + Census',
+      metric: '1.1km Join',
     },
     {
-      num: '02',
-      title: 'Thermal Indices',
-      desc: 'Physics-based Liljegren WBGT, 6th-order UTCI polynomial, and Rothfusz Heat Index.',
+      step: '02',
+      total: '05',
+      name: 'Physiological Physics',
+      badge: 'ISO 7243 WBGT',
+      desc: 'Computes Liljegren wet-bulb globe temperature, 6th-order UTCI biometeorological polynomial, and NOAA heat index.',
+      spec: 'Liljegren (2008) · Rothfusz',
+      metric: 'Normative Phys.',
     },
     {
-      num: '03',
-      title: 'ML Forecasting',
-      desc: 'XGBoost gradient boosting with 72-hour lag features and recursive uncertainty cones.',
+      step: '03',
+      total: '05',
+      name: 'Microclimate Lag',
+      badge: 'Building Lag',
+      desc: 'Simulates envelope thermal retention and 2–3 hour indoor phase lag across tin roofs vs concrete RCC structures.',
+      spec: 'Q = U·A·ΔT + Solar Mass',
+      metric: '2–3h Delay',
     },
     {
-      num: '04',
-      title: 'Risk Modeling',
-      desc: 'Iso-thermal exposure intersecting tin roofs, tree canopy deficits, and outdoor labour.',
+      step: '04',
+      total: '05',
+      name: 'ML Risk Engine',
+      badge: 'XGBoost 72h',
+      desc: 'Gradient boosted quantile forecasting evaluating Hazard, Exposure, Vulnerability, and Adaptive Capacity.',
+      spec: 'R = w_h·H + w_e·E + w_v·V - w_a·A',
+      metric: '90% Conf. Cone',
     },
     {
-      num: '05',
-      title: 'Action Trigger',
-      desc: 'Automated municipal cooling shelters, hydration alerts, and worker safety protocols.',
+      step: '05',
+      total: '05',
+      name: 'Automated Dispatch',
+      badge: '<45ms SLA',
+      desc: 'Dispatches targeted WhatsApp/Email alerts, opens proximity-sorted cooling centres, and generates worker shift cards.',
+      spec: 'WhatsApp Cloud · A5 Shift Print',
+      metric: 'Municipal Direct',
     },
   ];
 
   return (
     <div className="space-y-24 sm:space-y-32">
-      {/* 1. Hero Section: Left Narrative (7 cols / 60%) + Right Dark Diagram Globe (5 cols / 40%) */}
+      {/* 1. Hero Section with Minimise / Maximise Interactive 3D Earth Console */}
       <section
         ref={heroRef}
         className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch"
       >
-        {/* Left Column (60% weight): Type + Numbers primary focus */}
-        <div className="lg:col-span-7 bg-[#1F3445]/50 border border-white/10 rounded-[14px] p-6 sm:p-8 flex flex-col justify-between corner-ticks shadow-2xl relative z-10 min-h-[460px] lg:h-[520px]">
+        {/* Narrative Column: adjusts between 7-col and 12-col when Earth is maximized */}
+        <div
+          className={`${
+            isGlobeMaximized ? 'lg:col-span-12' : 'lg:col-span-7'
+          } bg-[#1F3445]/50 border border-white/10 rounded-[14px] p-6 sm:p-8 flex flex-col justify-between corner-ticks shadow-2xl relative z-10 transition-all duration-300 min-h-[440px] ${
+            isGlobeMaximized ? 'lg:min-h-0' : 'lg:h-[520px]'
+          }`}
+        >
           <div className="space-y-5">
-            {/* Eyebrow */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101820]/90 border border-white/10 text-xs font-mono text-[#D7E0E7] w-fit">
-              <span className="w-2 h-2 rounded-full bg-[#7FA6C9]" />
+            {/* Eyebrow with #7FA6C9 gradient */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#7FA6C9]/15 via-[#7FA6C9]/10 to-transparent border border-[#7FA6C9]/30 text-xs font-mono text-[#D7E0E7] w-fit">
+              <span className="w-2 h-2 rounded-full bg-[#7FA6C9] animate-pulse" />
               <span className="text-[#8B9AA8]">National Climate Early-Warning Initiative</span>
             </div>
 
@@ -120,11 +149,11 @@ export const Landing: React.FC = () => {
               Not a generic weather forecast. ThermaGrid pinpoints <span className="text-white font-medium">who is at risk</span>, <span className="text-white font-medium">where</span>, <span className="text-white font-medium">when it peaks</span>, <span className="text-white font-medium">why</span>, and <span className="text-white font-medium">what action to take</span> — calibrated down to the urban municipal ward.
             </p>
 
-            {/* Action Buttons (Strictly typography only, no lucide icons above fold) */}
+            {/* Action Buttons with #7FA6C9 gradient */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
                 to="/app/heat-risk"
-                className="px-4 py-2.5 rounded-[8px] bg-[#7FA6C9] hover:bg-[#5C82A3] text-[#101820] text-xs font-mono font-bold transition-all duration-120 shadow-sm"
+                className="px-4 py-2.5 rounded-[8px] bg-gradient-to-r from-[#7FA6C9] to-[#5C82A3] hover:opacity-95 text-[#101820] text-xs font-mono font-bold transition-all duration-120 shadow-md shadow-[#7FA6C9]/20"
               >
                 Citizen Protection
               </Link>
@@ -172,8 +201,36 @@ export const Landing: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column (40% width): Dark India Thermal Diagram Globe */}
-        <div className="lg:col-span-5 bg-[#101820] border border-white/10 rounded-[14px] overflow-hidden flex flex-col corner-ticks relative shadow-2xl min-h-[460px] lg:h-[520px]">
+        {/* 3D Earth Console: Supports interactive Minimise & Maximise */}
+        <div
+          className={`${
+            isGlobeMaximized ? 'lg:col-span-12' : 'lg:col-span-5'
+          } bg-[#101820] border border-white/10 rounded-[14px] overflow-hidden flex flex-col corner-ticks relative shadow-2xl transition-all duration-300 ${
+            isGlobeMaximized ? 'min-h-[580px] lg:h-[640px]' : 'min-h-[460px] lg:h-[520px]'
+          }`}
+        >
+          {/* Top-Right Minimize/Maximize Toolbar */}
+          <div className="absolute top-4 right-4 z-20 pointer-events-auto">
+            <button
+              type="button"
+              onClick={() => setIsGlobeMaximized(!isGlobeMaximized)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#101820]/90 hover:bg-[#1F3445] border border-white/10 hover:border-[#7FA6C9]/50 text-xs font-mono text-[#D7E0E7] transition-all cursor-pointer backdrop-blur-md shadow-md"
+              title={isGlobeMaximized ? 'Minimize Earth View' : 'Maximize Earth View to Full Width'}
+            >
+              {isGlobeMaximized ? (
+                <>
+                  <Minimize2 className="w-3.5 h-3.5 text-[#7FA6C9]" />
+                  <span>Minimize View</span>
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="w-3.5 h-3.5 text-[#7FA6C9]" />
+                  <span>Maximize</span>
+                </>
+              )}
+            </button>
+          </div>
+
           <RiskGlobe height="100%" interactive={true} cities={liveCities} />
         </div>
       </section>
@@ -200,7 +257,7 @@ export const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Section: How It Works (Row and numerals, no icon cards) */}
+      {/* 4. Section: End-to-End Computational Pipeline (Thin Hairline Architecture) */}
       <section id="how-it-works" className="space-y-6">
         <SectionHeader
           label="END-TO-END COMPUTATIONAL PIPELINE"
@@ -208,20 +265,52 @@ export const Landing: React.FC = () => {
           lead="ThermaGrid bridges numerical weather prediction and urban epidemiology through five validated stages."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {workflowSteps.map((step, idx) => (
-            <div
-              key={idx}
-              className="rounded-[14px] bg-[#1F3445]/60 border border-white/8 p-5 space-y-2.5 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xl font-bold text-white tabular-nums">{step.num}</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#7FA6C9]" />
+        <div className="relative">
+          {/* Thin horizontal pipeline rail connecting cards */}
+          <div className="hidden lg:block absolute top-[28px] left-10 right-10 h-[1px] bg-gradient-to-r from-[#7FA6C9]/50 via-white/10 to-[#7FA6C9]/50 z-0 pointer-events-none" />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
+            {pipelineStages.map((stage, idx) => (
+              <div
+                key={idx}
+                className="rounded-[14px] bg-[#1F3445]/60 hover:bg-[#1F3445] border border-white/8 hover:border-[#7FA6C9]/50 p-5 flex flex-col justify-between space-y-4 transition-all duration-200 group shadow-lg hover:shadow-[#7FA6C9]/5"
+              >
+                {/* Stage Header */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-[#7FA6C9] tracking-wider">
+                      {stage.step} <span className="text-[#5F7183] font-normal">/ {stage.total}</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase bg-white/5 border border-white/8 text-[#8B9AA8] group-hover:border-[#7FA6C9]/30 transition-colors">
+                      {stage.badge}
+                    </span>
+                  </div>
+
+                  {/* Thin Hairline Divider */}
+                  <div className="h-[1px] w-full bg-white/6 group-hover:bg-[#7FA6C9]/25 transition-colors" />
+
+                  <div>
+                    <h4 className="text-sm font-bold text-white font-display group-hover:text-[#7FA6C9] transition-colors">
+                      {stage.name}
+                    </h4>
+                    <p className="text-xs text-[#8B9AA8] leading-relaxed mt-1.5">
+                      {stage.desc}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Thin Stage Specification Footer */}
+                <div className="pt-3 border-t border-white/5 space-y-1">
+                  <span className="text-[10px] font-mono text-[#5F7183] block truncate">
+                    {stage.spec}
+                  </span>
+                  <span className="text-[10px] font-mono text-[#7FA6C9] font-medium block">
+                    {stage.metric}
+                  </span>
+                </div>
               </div>
-              <h4 className="text-sm font-bold text-white font-display">{step.title}</h4>
-              <p className="text-xs text-[#8B9AA8] leading-relaxed">{step.desc}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 

@@ -49,14 +49,14 @@ export const AppNavbar: React.FC = () => {
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Brand -> /app */}
           <Link to="/app" onClick={closeMenu} className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF704F] to-[#7FA6C9] p-0.5 flex items-center justify-center shadow-lg shadow-[#FF704F]/20">
-              <div className="w-full h-full bg-[#101820] rounded-[7px] flex items-center justify-center">
-                <Flame className="w-4 h-4 text-[#FF704F] group-hover:scale-110 transition-transform" />
+            <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#7FA6C9] to-[#5C82A3] p-0.5 flex items-center justify-center shadow-lg shadow-[#7FA6C9]/20 transition-transform group-hover:scale-105">
+              <div className="w-full h-full bg-[#101820] rounded-[8px] flex items-center justify-center">
+                <Flame className="w-4 h-4 text-[#7FA6C9] transition-colors" />
               </div>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-base font-extrabold tracking-tight text-[#D7E0E7] font-display">
-                Therma<span className="text-[#FF704F]">Grid</span>
+                Therma<span className="bg-gradient-to-r from-[#7FA6C9] to-[#D7E0E7] bg-clip-text text-transparent">Grid</span>
               </span>
               {isAuthority && (
                 <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold uppercase bg-[#7FA6C9]/20 border border-[#7FA6C9]/40 text-[#7FA6C9]">

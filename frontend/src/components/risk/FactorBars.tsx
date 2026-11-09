@@ -2,32 +2,66 @@ import React from 'react';
 import type { FactorContribution } from '../../types';
 
 interface FactorBarsProps {
-  factors: FactorContribution[];
+  factors?: FactorContribution[] | Record<string, any> | null;
   limit?: number;
 }
 
 export const FactorBars: React.FC<FactorBarsProps> = ({ factors, limit = 5 }) => {
-  const displayed = factors.slice(0, limit);
+  const safeList: FactorContribution[] = React.useMemo(() => {
+    if (Array.isArray(factors)) {
+      return factors;
+    }
+    if (factors && typeof factors === 'object') {
+      return Object.entries(factors).map(([k, v]: [string, any]) => {
+        if (v && typeof v === 'object') {
+          return {
+            name: typeof v.name === 'string' ? v.name : k.replace('_', ' '),
+            share_pct: typeof v.share_pct === 'number' ? v.share_pct : 0,
+            value_unit: typeof v.value_unit === 'string' ? v.value_unit : '',
+          };
+        }
+        return {
+          name: k.replace('_', ' '),
+          share_pct: typeof v === 'number' ? v : 0,
+          value_unit: '',
+        };
+      });
+    }
+    return [];
+  }, [factors]);
+
+  const displayed = safeList.slice(0, limit);
+
+  if (displayed.length === 0) {
+    return (
+      <div className="h-28 flex items-center justify-center text-xs text-[#8B9AA8]">
+        No factor attribution data available.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3.5">
       {displayed.map((factor, index) => {
-        // Strict usage law: Heat scale for risk values, never amethyst
+        const nameStr = typeof factor?.name === 'string' ? factor.name : String(factor?.name ?? 'Factor');
+        const unitStr = typeof factor?.value_unit === 'string' ? factor.value_unit : '';
+        const pctNum = typeof factor?.share_pct === 'number' ? factor.share_pct : Number(factor?.share_pct) || 0;
+
         const barColor =
-          factor.share_pct > 30
+          pctNum > 30
             ? '#FF704F'
-            : factor.share_pct > 18
+            : pctNum > 18
             ? '#F59E0B'
             : '#2FA37C';
 
         return (
           <div key={index} className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-[#D7E0E7] font-medium">{factor.name}</span>
+              <span className="text-[#D7E0E7] font-medium">{nameStr}</span>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-[11px] text-[#8B9AA8]">{factor.value_unit}</span>
+                {unitStr && <span className="font-mono text-[11px] text-[#8B9AA8]">{unitStr}</span>}
                 <span className="font-mono font-semibold text-[#D7E0E7] w-12 text-right tabular-nums">
-                  {factor.share_pct.toFixed(1)}%
+                  {pctNum.toFixed(1)}%
                 </span>
               </div>
             </div>
@@ -37,7 +71,7 @@ export const FactorBars: React.FC<FactorBarsProps> = ({ factors, limit = 5 }) =>
               <div
                 className="h-full rounded-full transition-all duration-700 ease-out"
                 style={{
-                  width: `${Math.min(100, Math.max(2, factor.share_pct))}%`,
+                  width: `${Math.min(100, Math.max(2, pctNum))}%`,
                   backgroundColor: barColor,
                 }}
               />
