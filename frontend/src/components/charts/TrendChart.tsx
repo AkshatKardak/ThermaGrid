@@ -108,7 +108,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
               y={peakPoint.wbgt}
               r={4}
               fill="#FF704F"
-              stroke="#101820"
+              stroke="#0B141B"
               strokeWidth={2}
             />
           )}
@@ -117,7 +117,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
             content={({ active, payload, label }) => {
               if (!active || !payload || !payload.length) return null;
               return (
-                <div className="rounded-[8px] bg-[#101820]/95 backdrop-blur-md border border-white/16 p-3 shadow-2xl font-mono text-xs space-y-1.5">
+                <div className="rounded-[8px] bg-[#0B141B]/95 backdrop-blur-md border border-white/16 p-3 shadow-2xl font-mono text-xs space-y-1.5">
                   <div className="text-[10px] uppercase text-[#8B9AA8] tracking-wider border-b border-white/8 pb-1">
                     Hour: {label}
                   </div>

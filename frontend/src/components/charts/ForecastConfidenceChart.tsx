@@ -54,7 +54,7 @@ export const ForecastConfidenceChart: React.FC<ForecastConfidenceChartProps> = (
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#101820',
+              backgroundColor: '#0B141B',
               borderColor: 'rgba(255,255,255,0.15)',
               borderRadius: '8px',
               fontSize: '11px',
@@ -66,7 +66,7 @@ export const ForecastConfidenceChart: React.FC<ForecastConfidenceChartProps> = (
             type="monotone"
             dataKey="upper"
             stroke="none"
-            fill="#7FA6C9"
+            fill="#8FB3D9"
             fillOpacity={0.15}
             name="80% Upper Bound"
           />
@@ -74,7 +74,7 @@ export const ForecastConfidenceChart: React.FC<ForecastConfidenceChartProps> = (
             type="monotone"
             dataKey="lower"
             stroke="none"
-            fill="#101820"
+            fill="#0B141B"
             fillOpacity={1.0}
             name="80% Lower Bound"
           />

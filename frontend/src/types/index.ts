@@ -15,12 +15,12 @@ export interface Location {
   area_sq_km: number | null;
   population: number;
   population_density_per_km2: number;
-  outdoor_worker_ratio: number;
-  informal_settlement_ratio: number;
-  tree_canopy_fraction: number;
-  elderly_ratio: number;
-  children_ratio: number;
-  cooling_access_deficit: number;
+  outdoor_worker_ratio: number | null;
+  informal_settlement_ratio: number | null;
+  tree_canopy_fraction: number | null;
+  elderly_ratio: number | null;
+  children_ratio: number | null;
+  cooling_access_deficit: number | null;
   hospital_count: number;
   drinking_water_deficit: number;
   description: string | null;

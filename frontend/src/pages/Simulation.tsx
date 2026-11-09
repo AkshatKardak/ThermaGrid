@@ -96,9 +96,9 @@ export const Simulation: React.FC = () => {
         <button
           type="button"
           onClick={handleReset}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] bg-[#2F4A5E]/40 hover:bg-[#2F4A5E] border border-white/8 text-xs font-mono text-[#D7E0E7] transition-all shrink-0 cursor-pointer"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] bg-[#203A45]/40 hover:bg-[#203A45] border border-white/8 text-xs font-mono text-[#D7E0E7] transition-all shrink-0 cursor-pointer"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-[#7FA6C9]" />
+          <RefreshCw className="w-3.5 h-3.5 text-[#8FB3D9]" />
           Reset to Baseline
         </button>
       </div>
@@ -169,7 +169,7 @@ export const Simulation: React.FC = () => {
             title={`Simulated Ward Outcome (${selectedWard?.ward_name})`}
             subtitle="Comparing baseline observation against simulated biophysical response"
           >
-            <div className="grid grid-cols-2 gap-6 p-4 rounded-[10px] bg-[#101820]/80 border border-white/6 mb-4">
+            <div className="grid grid-cols-2 gap-6 p-4 rounded-[10px] bg-[#0B141B]/80 border border-white/6 mb-4">
               <div className="space-y-1">
                 <span className="text-[11px] font-mono uppercase text-[#8B9AA8] block">
                   Current Observed
@@ -240,7 +240,7 @@ export const Simulation: React.FC = () => {
         <Card tier="l1">
           <div className="overflow-x-auto max-h-[460px] overflow-y-auto">
             <table className="w-full border-collapse font-mono text-xs text-left">
-              <thead className="sticky top-0 bg-[#1F3445] z-10 border-b border-white/8 text-[11px] uppercase tracking-[0.10em] text-[#8B9AA8]">
+              <thead className="sticky top-0 bg-[#142630] z-10 border-b border-white/8 text-[11px] uppercase tracking-[0.10em] text-[#8B9AA8]">
                 <tr>
                   <th className="py-2.5 px-3">Ward Name</th>
                   <th className="py-2.5 px-3 text-center">Baseline Score</th>

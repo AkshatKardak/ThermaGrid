@@ -9,7 +9,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import sentry_sdk
 
 from app.core.config import get_settings
 from app.core.logging import setup_logging
@@ -38,15 +37,6 @@ from app.api.routes.worker import router as worker_router
 setup_logging()
 logger = logging.getLogger("thermagrid.main")
 settings = get_settings()
-
-# Initialize Sentry backend monitoring
-if settings.sentry_dsn:
-    sentry_sdk.init(
-        dsn=settings.sentry_dsn,
-        environment=settings.app_env,
-        traces_sample_rate=0.1,
-        send_default_pii=False,
-    )
 
 
 @asynccontextmanager
@@ -106,8 +96,6 @@ def create_application() -> FastAPI:
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
         logger.error(f"Unhandled exception at {request.url.path}: {exc}", exc_info=True)
-        if settings.sentry_dsn:
-            sentry_sdk.capture_exception(exc)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"detail": "An internal server error occurred. Please contact system administrator."},
@@ -122,14 +110,6 @@ def create_application() -> FastAPI:
             "environment": settings.app_env,
             "version": "0.1.0",
         }
-
-    # Deliberate exception endpoint for Sentry verification (gated behind debug)
-    if settings.debug:
-        @app.get("/sentry-debug", tags=["Health"])
-        async def trigger_sentry_error():
-            """Deliberate 1/0 exception for verifying backend Sentry event capture."""
-            _ = 1 / 0
-            return {"detail": "unreachable"}
 
     # Mount API Routers
     api_prefix = settings.api_v1_prefix

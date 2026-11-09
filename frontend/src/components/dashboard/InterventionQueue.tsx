@@ -41,7 +41,7 @@ export const InterventionQueue: React.FC = () => {
       status: 'Scheduled',
       priority: 'Medium',
       icon: Bell,
-      color: '#7FA6C9',
+      color: '#8FB3D9',
       time: 'Every 2 Hours',
     },
   ];
@@ -57,7 +57,7 @@ export const InterventionQueue: React.FC = () => {
           return (
             <div
               key={item.id}
-              className="p-3.5 rounded-xl bg-[#101820]/60 border border-white/5 flex items-center justify-between gap-3"
+              className="p-3.5 rounded-xl bg-[#0B141B]/60 border border-white/5 flex items-center justify-between gap-3"
             >
               <div className="flex items-center gap-3">
                 <div

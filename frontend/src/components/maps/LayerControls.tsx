@@ -12,7 +12,7 @@ export const LayerControls: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-wrap items-center gap-2 bg-[#1F3445]/90 backdrop-blur-md p-2 rounded-xl border border-white/10 text-xs">
+    <div className="flex flex-wrap items-center gap-2 bg-[#142630]/90 backdrop-blur-md p-2 rounded-xl border border-white/10 text-xs">
       <div className="flex items-center gap-1.5 text-[#8B9AA8] px-2 font-mono text-[11px] uppercase">
         <Layers className="w-3.5 h-3.5" />
         <span>Layers:</span>
@@ -27,7 +27,7 @@ export const LayerControls: React.FC = () => {
             onClick={() => toggleLayer(layer.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
               isActive
-                ? 'bg-[#7FA6C9] text-white shadow-sm'
+                ? 'bg-[#8FB3D9] text-white shadow-sm'
                 : 'bg-white/5 text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/10'
             }`}
           >

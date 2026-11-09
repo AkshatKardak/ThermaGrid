@@ -1,19 +1,18 @@
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Polygon, CircleMarker, Popup, useMap } from 'react-leaflet';
-import type { Location, RiskCurrent, CoolingCentre } from '../../types';
+import React, { useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, Polygon, CircleMarker, Tooltip, useMap } from 'react-leaflet';
+import type { Location, RiskCurrent } from '../../types';
 import { getRiskBand } from '../../theme/tokens';
-import { useAppStore } from '../../store/useAppStore';
 
 interface LeafletBaseMapProps {
   wards: Location[];
   wardsRisk?: RiskCurrent[];
-  coolingCentres?: CoolingCentre[];
   selectedLocationId?: number;
   onSelectLocation?: (id: number) => void;
-  height?: string;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-// Center map smoothly on location change
+// Smooth map panning when selected ward updates
 const MapUpdater: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
   const map = useMap();
   useEffect(() => {
@@ -25,171 +24,150 @@ const MapUpdater: React.FC<{ center: [number, number]; zoom: number }> = ({ cent
 export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
   wards,
   wardsRisk = [],
-  coolingCentres = [],
   selectedLocationId,
   onSelectLocation,
-  height = '500px',
+  className = 'w-full h-full',
+  style,
 }) => {
-  const { activeLayers } = useAppStore();
+  const [hasPulsed, setHasPulsed] = useState(false);
+
+  // Map risk by ward_code
+  const riskMap = useMemo(() => {
+    const map = new Map<string, RiskCurrent>();
+    wardsRisk.forEach((r) => map.set(r.ward_code, r));
+    return map;
+  }, [wardsRisk]);
+
+  // Identify highest risk ward for initial 900ms ring pulse
+  const highestRiskWard = useMemo(() => {
+    if (!wards.length) return null;
+    let maxWard = wards[0];
+    let maxScore = -1;
+    wards.forEach((w) => {
+      const r = riskMap.get(w.ward_code);
+      const score = r ? r.risk_score : 50;
+      if (score > maxScore) {
+        maxScore = score;
+        maxWard = w;
+      }
+    });
+    return maxWard;
+  }, [wards, riskMap]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasPulsed(true);
+    }, 900);
+    return () => clearTimeout(timer);
+  }, []);
 
   const selectedWard = wards.find((w) => w.id === selectedLocationId) || wards[0];
   const center: [number, number] = selectedWard
     ? [selectedWard.latitude, selectedWard.longitude]
     : [19.076, 72.8777];
 
-  // Helper map for risk by ward_code
-  const riskMap = new Map<string, RiskCurrent>();
-  wardsRisk.forEach((r) => riskMap.set(r.ward_code, r));
-
   return (
-    <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl z-0" style={{ height }}>
+    <div className={`relative overflow-hidden ${className}`} style={style}>
       <MapContainer
         center={center}
         zoom={12}
-        style={{ height: '100%', width: '100%', backgroundColor: '#101820' }}
+        style={{ height: '100%', width: '100%', backgroundColor: '#0B141B' }}
         attributionControl={false}
+        zoomControl={false}
       >
         <MapUpdater center={center} zoom={12} />
 
-        {/* CartoDB Dark Matter Basemap */}
+        {/* Dark desaturated CartoDB base tiles */}
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          maxZoom={19}
+          maxZoom={18}
+          className="filter brightness-[0.82] contrast-[1.12]"
         />
 
-        {/* Ward Polygons / Choropleth */}
-        {activeLayers.wardChoropleth &&
-          wards.map((ward) => {
-            const risk = riskMap.get(ward.ward_code);
-            const score = risk ? risk.risk_score : 50;
-            const band = getRiskBand(score);
-            const isSelected = ward.id === selectedLocationId;
+        {/* Ward Polygons */}
+        {wards.map((ward) => {
+          const risk = riskMap.get(ward.ward_code);
+          const score = risk ? risk.risk_score : 50;
+          const band = getRiskBand(score);
+          const isSelected = ward.id === selectedLocationId;
+          const wbgtVal = risk?.wbgt_c ? `${risk.wbgt_c.toFixed(1)}°C` : '32.4°C';
+          const workersVal = ward.outdoor_worker_ratio
+            ? `${(ward.outdoor_worker_ratio * 100).toFixed(0)}%`
+            : '28%';
 
-            if (ward.geometry_geojson && ward.geometry_geojson.coordinates) {
-              const polyCoords: [number, number][] = ward.geometry_geojson.coordinates[0].map(
-                (coord: number[]) => [coord[1], coord[0]] as [number, number]
-              );
+          if (ward.geometry_geojson && ward.geometry_geojson.coordinates) {
+            const polyCoords: [number, number][] = ward.geometry_geojson.coordinates[0].map(
+              (coord: number[]) => [coord[1], coord[0]] as [number, number]
+            );
 
-              return (
-                <Polygon
-                  key={`poly-${ward.id}`}
-                  positions={polyCoords}
-                  pathOptions={{
-                    fillColor: band.color,
-                    fillOpacity: isSelected ? 0.65 : 0.40,
-                    color: isSelected ? '#FFFFFF' : band.color,
-                    weight: isSelected ? 3 : 1.5,
-                  }}
-                  eventHandlers={{
-                    click: () => onSelectLocation && onSelectLocation(ward.id),
-                  }}
-                >
-                  <Popup>
-                    <div className="p-2 text-xs bg-[#101820] text-[#D7E0E7] rounded">
-                      <div className="font-bold text-sm">{ward.ward_name}</div>
-                      <div className="mt-1 font-mono font-bold" style={{ color: band.color }}>
-                        Risk Score: {score.toFixed(1)}/100 ({band.label})
-                      </div>
-                      <div className="text-[11px] text-[#8B9AA8] mt-1">
-                        Density: {ward.population_density_per_km2.toLocaleString()}/km²
-                      </div>
-                      <div className="text-[11px] text-[#8B9AA8]">
-                        Outdoor Workforce: {(ward.outdoor_worker_ratio * 100).toFixed(0)}%
-                      </div>
-                    </div>
-                  </Popup>
-                </Polygon>
-              );
-            }
-
-            // Fallback Circle Marker if no geometry
             return (
-              <CircleMarker
-                key={`circle-${ward.id}`}
-                center={[ward.latitude, ward.longitude]}
-                radius={isSelected ? 16 : 10}
+              <Polygon
+                key={`ward-poly-${ward.id}`}
+                positions={polyCoords}
                 pathOptions={{
                   fillColor: band.color,
-                  fillOpacity: 0.8,
+                  fillOpacity: isSelected ? 0.40 : 0.22,
                   color: isSelected ? '#FFFFFF' : band.color,
-                  weight: isSelected ? 3 : 1,
+                  weight: isSelected ? 2 : 1,
+                  opacity: isSelected ? 1 : 0.55,
                 }}
                 eventHandlers={{
-                  click: () => onSelectLocation && onSelectLocation(ward.id),
+                  mouseover: (e) => {
+                    const layer = e.target;
+                    layer.setStyle({
+                      opacity: 1,
+                      weight: 2,
+                    });
+                  },
+                  mouseout: (e) => {
+                    const layer = e.target;
+                    layer.setStyle({
+                      opacity: isSelected ? 1 : 0.55,
+                      weight: isSelected ? 2 : 1,
+                    });
+                  },
+                  click: () => {
+                    if (onSelectLocation) {
+                      onSelectLocation(ward.id);
+                    }
+                  },
                 }}
               >
-                <Popup>
-                  <div className="p-2 text-xs bg-[#101820] text-[#D7E0E7] rounded">
-                    <div className="font-bold">{ward.ward_name}</div>
-                    <div className="font-mono text-sm" style={{ color: band.color }}>
-                      Risk: {score.toFixed(1)} ({band.label})
+                <Tooltip sticky direction="top" opacity={0.96}>
+                  <div className="p-2 font-mono text-xs bg-[#142630] border border-white/10 text-[#D8E8E6] rounded-[6px] shadow-2xl space-y-1">
+                    <div className="font-bold text-white">{ward.ward_name}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold" style={{ color: band.color }}>
+                        Score: {score.toFixed(1)}/100
+                      </span>
+                      <span className="text-[#93A3B0]">({band.label})</span>
+                    </div>
+                    <div className="text-[11px] text-[#6B7C8A] pt-0.5 border-t border-white/5 flex items-center justify-between gap-3">
+                      <span>WBGT: {wbgtVal}</span>
+                      <span>Workers: {workersVal}</span>
                     </div>
                   </div>
-                </Popup>
-              </CircleMarker>
+                </Tooltip>
+              </Polygon>
             );
-          })}
+          }
+          return null;
+        })}
 
-        {/* Cooling Centres Layer */}
-        {activeLayers.coolingCentres &&
-          coolingCentres.map((centre) => (
-            <CircleMarker
-              key={`cooling-${centre.id}`}
-              center={[centre.latitude, centre.longitude]}
-              radius={7}
-              pathOptions={{
-                fillColor: '#2FA37C',
-                fillOpacity: 0.95,
-                color: '#FFFFFF',
-                weight: 2,
-              }}
-            >
-              <Popup>
-                <div className="p-2 text-xs bg-[#101820] text-[#D7E0E7] rounded max-w-xs">
-                  <div className="font-bold text-[#2FA37C] uppercase tracking-wider text-[10px]">
-                    Municipal Cooling Centre
-                  </div>
-                  <div className="font-bold text-sm text-white mt-0.5">{centre.name}</div>
-                  <div className="text-[11px] text-[#8B9AA8] mt-1">{centre.address}</div>
-                  <div className="text-[11px] font-mono text-white mt-1">
-                    Capacity: {centre.capacity_persons} | Open: {centre.operating_hours}
-                  </div>
-                </div>
-              </Popup>
-            </CircleMarker>
-          ))}
+        {/* Highest-risk ward single 900ms ring pulse on load */}
+        {highestRiskWard && !hasPulsed && (
+          <CircleMarker
+            center={[highestRiskWard.latitude, highestRiskWard.longitude]}
+            radius={28}
+            pathOptions={{
+              color: '#C31D3C',
+              weight: 2,
+              fillColor: '#C31D3C',
+              fillOpacity: 0.25,
+            }}
+          />
+        )}
       </MapContainer>
-
-      {/* Floating Map Legend */}
-      <div className="absolute bottom-4 left-4 z-[400] bg-[#101820]/90 backdrop-blur-md p-3 rounded-lg border border-white/10 text-xs shadow-xl space-y-1.5 pointer-events-auto">
-        <div className="font-bold font-display text-[11px] text-[#8B9AA8] uppercase tracking-wider mb-1">
-          Ward Heat Risk Scale
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-[#2FA37C]" />
-          <span className="text-[11px]">Safe (&lt;25)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-[#E8C547]" />
-          <span className="text-[11px]">Moderate (25-49)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-[#F59E0B]" />
-          <span className="text-[11px]">High (50-69)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-[#FF704F]" />
-          <span className="text-[11px]">Very High (70-84)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-[#C31D3C]" />
-          <span className="text-[11px]">Extreme (85-100)</span>
-        </div>
-        <div className="flex items-center gap-2 pt-1 border-t border-white/5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#2FA37C] ring-2 ring-white" />
-          <span className="text-[11px] text-[#2FA37C] font-semibold">Cooling Shelter</span>
-        </div>
-      </div>
     </div>
   );
 };

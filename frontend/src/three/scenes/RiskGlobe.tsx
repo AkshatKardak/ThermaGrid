@@ -76,14 +76,14 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.5));
     canvasContainer.appendChild(renderer.domElement);
 
-    // --- 2. Post-Processing Bloom (Restrained strictly <= 0.12 for heat columns) ---
+    // --- 2. Post-Processing Bloom (Reduced to 0.18, captures only heat columns) ---
     let composer: EffectComposer | null = null;
     let bloomPass: UnrealBloomPass | null = null;
     if (!isMobile) {
       const renderPass = new RenderPass(scene, camera);
       bloomPass = new UnrealBloomPass(
         new THREE.Vector2(width / 2, heightPx / 2),
-        0.10, // strength <= 0.12 strictly
+        0.18, // bloom <= 0.18 strictly
         0.3,
         0.75  // threshold captures only heat column tips
       );
@@ -279,6 +279,11 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     });
     observer.observe(canvasContainer);
 
+    const onVisibilityChange = () => {
+      // Pause loop immediately when tab is hidden
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     const onResize = () => {
       if (!canvasContainer) return;
       width = canvasContainer.clientWidth || 550;
@@ -296,12 +301,12 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
 
     const animate = () => {
       rafId = requestAnimationFrame(animate);
-      if (!isVisible) return;
+      if (!isVisible || document.hidden) return;
 
       const elapsed = clock.getElapsedTime();
 
-      // Steady diagram rotation (0.04 rad/s)
-      globeGroup.rotation.y = initialFacingY + elapsed * 0.04;
+      // Steady diagram rotation (0.02 rad/s)
+      globeGroup.rotation.y = initialFacingY + elapsed * 0.02;
 
       // Pulse ring animation
       const pulseCycle = (elapsed % 3.0) / 3.0;
@@ -323,6 +328,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
     return () => {
       cancelAnimationFrame(rafId);
       observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('resize', onResize);
       renderer.domElement.removeEventListener('pointermove', onPointerMove);
       if (controls) controls.dispose();
@@ -363,12 +369,12 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       {/* Top Status Readout */}
       <div className="w-full flex items-center justify-between p-4 sm:p-5 z-10 pointer-events-none">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#7FA6C9] animate-ping" />
+          <div className="w-2 h-2 rounded-full bg-[#8FB3D9] animate-ping" />
           <span className="text-xs font-mono font-medium text-[#D7E0E7] uppercase tracking-[0.10em]">
             National Synoptic Thermal Field
           </span>
         </div>
-        <div className="text-[11px] font-mono text-[#8B9AA8] bg-[#101820]/90 px-2.5 py-1 rounded-[6px] border border-white/10 backdrop-blur-sm">
+        <div className="text-[11px] font-mono text-[#8B9AA8] bg-[#0B141B]/90 px-2.5 py-1 rounded-[6px] border border-white/10 backdrop-blur-sm">
           Live Synoptic Feed
         </div>
       </div>
@@ -376,7 +382,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       {/* Hover Tooltip */}
       {hoveredCity && tooltipPos && (
         <div
-          className="absolute z-30 pointer-events-none px-3 py-1.5 rounded-[6px] bg-[#101820]/95 backdrop-blur-md border border-[#7FA6C9]/40 shadow-xl text-xs font-mono"
+          className="absolute z-30 pointer-events-none px-3 py-1.5 rounded-[6px] bg-[#0B141B]/95 backdrop-blur-md border border-[#8FB3D9]/40 shadow-xl text-xs font-mono"
           style={{
             left: `${Math.min(window.innerWidth - 220, tooltipPos.x - 20)}px`,
             top: `${Math.max(10, tooltipPos.y - 45)}px`,
@@ -396,7 +402,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
 
       {/* Bottom Telemetry Card for Selected City */}
       <div className="w-full p-4 sm:p-5 z-10 pointer-events-auto">
-        <div className="bg-[#101820]/90 border border-white/10 rounded-[10px] p-3 sm:p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md shadow-xl">
+        <div className="bg-[#0B141B]/90 border border-white/10 rounded-[10px] p-3 sm:p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md shadow-xl">
           <div className="flex items-center gap-2.5">
             <div
               className="w-3 h-3 rounded-full shrink-0"

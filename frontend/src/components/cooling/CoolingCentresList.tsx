@@ -38,7 +38,7 @@ export const CoolingCentresList: React.FC<CoolingCentresListProps> = ({ city = '
           className={`px-3 py-1.5 rounded-lg border text-xs font-mono transition-all self-start sm:self-auto cursor-pointer ${
             openOnly
               ? 'bg-[#2FA37C]/20 border-[#2FA37C] text-white font-semibold'
-              : 'bg-[#101820] border-white/10 text-[#8B9AA8] hover:text-[#D7E0E7]'
+              : 'bg-[#0B141B] border-white/10 text-[#8B9AA8] hover:text-[#D7E0E7]'
           }`}
         >
           {openOnly ? 'Showing Open Only' : 'Filter: Open Now'}
@@ -52,7 +52,7 @@ export const CoolingCentresList: React.FC<CoolingCentresListProps> = ({ city = '
           <div className="h-16 bg-white/5 rounded-xl animate-pulse" />
         </div>
       ) : filteredCentres.length === 0 ? (
-        <div className="p-6 text-center text-xs text-[#8B9AA8] bg-[#101820] rounded-xl border border-white/10">
+        <div className="p-6 text-center text-xs text-[#8B9AA8] bg-[#0B141B] rounded-xl border border-white/10">
           No cooling centres found matching this filter.
         </div>
       ) : (
@@ -79,7 +79,7 @@ export const CoolingCentresList: React.FC<CoolingCentresListProps> = ({ city = '
             return (
               <div
                 key={centre.id}
-                className="p-4 rounded-xl bg-[#101820] border border-white/10 space-y-3 hover:border-white/20 transition-all flex flex-col justify-between"
+                className="p-4 rounded-xl bg-[#0B141B] border border-white/10 space-y-3 hover:border-white/20 transition-all flex flex-col justify-between"
               >
                 <div className="space-y-2">
                   <div className="flex items-start justify-between gap-2">
@@ -127,7 +127,7 @@ export const CoolingCentresList: React.FC<CoolingCentresListProps> = ({ city = '
                     href={directionsUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold transition-all group"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8FB3D9] hover:bg-[#6E93B8] text-white text-xs font-mono font-semibold transition-all group"
                   >
                     <Navigation className="w-3 h-3 group-hover:scale-110 transition-transform" />
                     <span>Directions</span>

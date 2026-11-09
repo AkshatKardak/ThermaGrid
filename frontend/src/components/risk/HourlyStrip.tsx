@@ -71,7 +71,7 @@ export const HourlyStrip: React.FC<HourlyStripProps> = ({ items }) => {
                 }}
               >
                 {/* Tooltip */}
-                <div className="opacity-0 group-hover:opacity-100 absolute bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none z-20 bg-[#101820] text-[#D7E0E7] text-[10px] p-1.5 rounded border border-white/20 whitespace-nowrap shadow-xl">
+                <div className="opacity-0 group-hover:opacity-100 absolute bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none z-20 bg-[#0B141B] text-[#D7E0E7] text-[10px] p-1.5 rounded border border-white/20 whitespace-nowrap shadow-xl">
                   <div className="font-bold">{formatHour(h.time)}</div>
                   <div>Risk: {h.predicted_risk_score.toFixed(1)} ({band.label})</div>
                   <div>WBGT: {h.predicted_wbgt.toFixed(1)}°C</div>

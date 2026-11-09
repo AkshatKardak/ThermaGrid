@@ -32,7 +32,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="min-h-screen flex flex-col bg-[#101820] text-[#D7E0E7] relative selection:bg-[#7FA6C9]/30 selection:text-white">
+        <div className="min-h-screen flex flex-col bg-[#0B141B] text-[#D7E0E7] relative selection:bg-[#8FB3D9]/30 selection:text-white">
           {/* Scroll progress rail (2px steel blue on right edge) */}
           <ScrollProgressRail />
 

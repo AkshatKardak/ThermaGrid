@@ -9,7 +9,7 @@ export const CareCircleStrip: React.FC = () => {
 
   if (isLoading || !dependents || dependents.length === 0) {
     return (
-      <div className="p-4 rounded-xl bg-[#1F3445]/60 border border-white/10 flex items-center justify-between gap-4">
+      <div className="p-4 rounded-xl bg-[#142630]/60 border border-white/10 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-white/5 text-[#FF704F] flex items-center justify-center shrink-0">
             <Heart className="w-4 h-4" />
@@ -24,7 +24,7 @@ export const CareCircleStrip: React.FC = () => {
 
         <Link
           to="/app/account"
-          className="text-xs font-mono text-[#7FA6C9] hover:text-[#5C82A3] flex items-center gap-1 shrink-0 font-medium"
+          className="text-xs font-mono text-[#8FB3D9] hover:text-[#6E93B8] flex items-center gap-1 shrink-0 font-medium"
         >
           <span>Add person</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -49,7 +49,7 @@ export const CareCircleStrip: React.FC = () => {
         </div>
         <Link
           to="/app/account"
-          className="text-[11px] font-mono text-[#7FA6C9] hover:underline"
+          className="text-[11px] font-mono text-[#8FB3D9] hover:underline"
         >
           Manage Circle →
         </Link>
@@ -67,7 +67,7 @@ export const CareCircleStrip: React.FC = () => {
               className={`p-3 rounded-xl border flex items-center justify-between gap-2.5 transition-all ${
                 needsAlert
                   ? 'bg-[#FF704F]/10 border-[#FF704F]/40'
-                  : 'bg-[#101820] border-white/10'
+                  : 'bg-[#0B141B] border-white/10'
               }`}
             >
               <div className="min-w-0">

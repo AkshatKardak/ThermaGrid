@@ -19,7 +19,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   sticky = false,
 }) => {
   return (
-    <div className={`space-y-4 mb-8 ${sticky ? 'sticky top-20 z-20 py-2 backdrop-blur-md bg-[#101820]/90' : ''} ${className}`}>
+    <div className={`space-y-4 mb-8 ${sticky ? 'sticky top-20 z-20 py-2 backdrop-blur-md bg-[#0B141B]/90' : ''} ${className}`}>
       {/* Scaffold: mono uppercase label + hairline with 24px amethyst tick */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">

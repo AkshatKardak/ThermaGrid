@@ -142,7 +142,7 @@ export const Account: React.FC = () => {
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-white/8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#7FA6C9]/15 border border-[#7FA6C9]/30 flex items-center justify-center text-[#7FA6C9]">
+            <div className="w-10 h-10 rounded-full bg-[#8FB3D9]/15 border border-[#8FB3D9]/30 flex items-center justify-center text-[#8FB3D9]">
               <UserIcon className="w-5 h-5" />
             </div>
             <div>
@@ -157,7 +157,7 @@ export const Account: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded-full text-xs font-mono font-semibold uppercase bg-white/5 border border-white/10 text-white">
-              Role: <span className="text-[#7FA6C9]">{role}</span>
+              Role: <span className="text-[#8FB3D9]">{role}</span>
             </span>
           </div>
         </div>
@@ -171,7 +171,7 @@ export const Account: React.FC = () => {
           <select
             value={i18n.language}
             onChange={(e) => i18n.changeLanguage(e.target.value)}
-            className="bg-[#101820] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-mono outline-none"
+            className="bg-[#0B141B] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-mono outline-none"
           >
             <option value="en">English (EN)</option>
             <option value="hi">हिन्दी (Hindi)</option>
@@ -196,7 +196,7 @@ export const Account: React.FC = () => {
         </div>
 
         {/* Subscription Form */}
-        <form onSubmit={handleSaveSubscription} className="space-y-4 p-5 rounded-xl bg-[#101820] border border-white/10">
+        <form onSubmit={handleSaveSubscription} className="space-y-4 p-5 rounded-xl bg-[#0B141B] border border-white/10">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Ward select */}
             <div>
@@ -206,7 +206,7 @@ export const Account: React.FC = () => {
               <select
                 value={subWardId}
                 onChange={(e) => setSubWardId(Number(e.target.value))}
-                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none"
+                className="w-full bg-[#142630] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none"
               >
                 {wards?.map((w) => (
                   <option key={w.id} value={w.id}>
@@ -228,7 +228,7 @@ export const Account: React.FC = () => {
                   className={`p-2 rounded-lg border text-xs font-mono flex items-center justify-center gap-1.5 cursor-pointer ${
                     channel === 'whatsapp'
                       ? 'bg-[#2FA37C]/20 border-[#2FA37C] text-white font-bold'
-                      : 'bg-[#1F3445] border-white/10 text-[#8B9AA8]'
+                      : 'bg-[#142630] border-white/10 text-[#8B9AA8]'
                   }`}
                 >
                   <Smartphone className="w-3.5 h-3.5" />
@@ -239,8 +239,8 @@ export const Account: React.FC = () => {
                   onClick={() => setChannel('email')}
                   className={`p-2 rounded-lg border text-xs font-mono flex items-center justify-center gap-1.5 cursor-pointer ${
                     channel === 'email'
-                      ? 'bg-[#7FA6C9]/20 border-[#7FA6C9] text-white font-bold'
-                      : 'bg-[#1F3445] border-white/10 text-[#8B9AA8]'
+                      ? 'bg-[#8FB3D9]/20 border-[#8FB3D9] text-white font-bold'
+                      : 'bg-[#142630] border-white/10 text-[#8B9AA8]'
                   }`}
                 >
                   <Mail className="w-3.5 h-3.5" />
@@ -262,7 +262,7 @@ export const Account: React.FC = () => {
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 required
-                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#7FA6C9]"
+                className="w-full bg-[#142630] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8FB3D9]"
               />
             </div>
 
@@ -278,7 +278,7 @@ export const Account: React.FC = () => {
                   placeholder="22:00-06:00"
                   value={quietHours}
                   onChange={(e) => setQuietHours(e.target.value)}
-                  className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono outline-none"
+                  className="w-full bg-[#142630] border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono outline-none"
                 />
               </div>
             </div>
@@ -300,7 +300,7 @@ export const Account: React.FC = () => {
                 >
                   {currentThresholdBand.label}
                 </span>
-                <span className="font-mono text-white font-bold bg-[#1F3445] px-2 py-0.5 rounded border border-white/10">
+                <span className="font-mono text-white font-bold bg-[#142630] px-2 py-0.5 rounded border border-white/10">
                   {threshold} / 100
                 </span>
               </div>
@@ -312,7 +312,7 @@ export const Account: React.FC = () => {
               step={5}
               value={threshold}
               onChange={(e) => setThreshold(Number(e.target.value))}
-              className="w-full accent-[#7FA6C9] h-1.5 bg-[#1F3445] rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-[#8FB3D9] h-1.5 bg-[#142630] rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
@@ -330,7 +330,7 @@ export const Account: React.FC = () => {
             <button
               type="submit"
               disabled={isCreating}
-              className="px-4 py-2 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold transition-all cursor-pointer shadow-sm"
+              className="px-4 py-2 rounded-lg bg-[#8FB3D9] hover:bg-[#6E93B8] text-white text-xs font-mono font-semibold transition-all cursor-pointer shadow-sm"
             >
               {isCreating ? 'Saving...' : 'Save Subscription'}
             </button>
@@ -352,7 +352,7 @@ export const Account: React.FC = () => {
                 return (
                   <div
                     key={sub.id}
-                    className="p-3.5 rounded-xl bg-[#101820] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                    className="p-3.5 rounded-xl bg-[#0B141B] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -378,7 +378,7 @@ export const Account: React.FC = () => {
                         onClick={() => handleTestAlert(sub.id)}
                         className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-[#D7E0E7] flex items-center gap-1 transition-colors cursor-pointer"
                       >
-                        {isTested ? <Check className="w-3.5 h-3.5 text-[#2FA37C]" /> : <Send className="w-3 h-3 text-[#7FA6C9]" />}
+                        {isTested ? <Check className="w-3.5 h-3.5 text-[#2FA37C]" /> : <Send className="w-3 h-3 text-[#8FB3D9]" />}
                         <span>{isTested ? 'Dispatched' : 'Send test alert'}</span>
                       </button>
 
@@ -396,7 +396,7 @@ export const Account: React.FC = () => {
               })}
             </div>
           ) : (
-            <p className="text-xs text-[#8B9AA8] bg-[#101820] p-4 rounded-xl border border-white/10">
+            <p className="text-xs text-[#8B9AA8] bg-[#0B141B] p-4 rounded-xl border border-white/10">
               No alert subscriptions created yet. Use the form above to activate ward alerts.
             </p>
           )}
@@ -417,7 +417,7 @@ export const Account: React.FC = () => {
         </div>
 
         {/* Add Person Form */}
-        <form onSubmit={handleAddDependent} className="space-y-4 p-5 rounded-xl bg-[#101820] border border-white/10">
+        <form onSubmit={handleAddDependent} className="space-y-4 p-5 rounded-xl bg-[#0B141B] border border-white/10">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="text-[11px] font-mono uppercase text-[#8B9AA8] block mb-1">
@@ -429,7 +429,7 @@ export const Account: React.FC = () => {
                 value={depName}
                 onChange={(e) => setDepName(e.target.value)}
                 required
-                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#7FA6C9]"
+                className="w-full bg-[#142630] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8FB3D9]"
               />
             </div>
 
@@ -440,7 +440,7 @@ export const Account: React.FC = () => {
               <select
                 value={depWardId}
                 onChange={(e) => setDepWardId(Number(e.target.value))}
-                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none"
+                className="w-full bg-[#142630] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none"
               >
                 {wards?.map((w) => (
                   <option key={w.id} value={w.id}>
@@ -457,7 +457,7 @@ export const Account: React.FC = () => {
               <select
                 value={depAgeBand}
                 onChange={(e) => setDepAgeBand(e.target.value)}
-                className="w-full bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none"
+                className="w-full bg-[#142630] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none"
               >
                 <option value="elderly">Elderly (65+ years)</option>
                 <option value="child">Child / Infant</option>
@@ -475,7 +475,7 @@ export const Account: React.FC = () => {
               placeholder="+919876543210"
               value={depPhone}
               onChange={(e) => setDepPhone(e.target.value)}
-              className="w-full sm:w-1/2 bg-[#1F3445] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#7FA6C9]"
+              className="w-full sm:w-1/2 bg-[#142630] border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-[#8FB3D9]"
             />
           </div>
 
@@ -487,7 +487,7 @@ export const Account: React.FC = () => {
             <button
               type="submit"
               disabled={isCreatingDep}
-              className="px-4 py-2 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold transition-all cursor-pointer self-end sm:self-auto"
+              className="px-4 py-2 rounded-lg bg-[#8FB3D9] hover:bg-[#6E93B8] text-white text-xs font-mono font-semibold transition-all cursor-pointer self-end sm:self-auto"
             >
               {isCreatingDep ? 'Adding...' : 'Add to Care Circle'}
             </button>
@@ -508,7 +508,7 @@ export const Account: React.FC = () => {
                 return (
                   <div
                     key={dep.id}
-                    className="p-4 rounded-xl bg-[#101820] border border-white/10 flex items-center justify-between gap-3"
+                    className="p-4 rounded-xl bg-[#0B141B] border border-white/10 flex items-center justify-between gap-3"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -535,7 +535,7 @@ export const Account: React.FC = () => {
               })}
             </div>
           ) : (
-            <p className="text-xs text-[#8B9AA8] bg-[#101820] p-4 rounded-xl border border-white/10">
+            <p className="text-xs text-[#8B9AA8] bg-[#0B141B] p-4 rounded-xl border border-white/10">
               Your Care Circle is currently empty.
             </p>
           )}

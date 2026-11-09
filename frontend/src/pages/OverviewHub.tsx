@@ -107,7 +107,7 @@ export const OverviewHub: React.FC = () => {
           </Link>
           <Link
             to="/app/heat-risk"
-            className="px-3.5 py-1.5 rounded-[8px] bg-[#7FA6C9] hover:bg-[#5C82A3] text-[#101820] text-xs font-mono font-bold transition-all"
+            className="px-3.5 py-1.5 rounded-[8px] bg-[#8FB3D9] hover:bg-[#6E93B8] text-[#0B141B] text-xs font-mono font-bold transition-all"
           >
             Safe Windows
           </Link>
@@ -186,7 +186,7 @@ export const OverviewHub: React.FC = () => {
                     onClick={() => setSelectedLocationId(w.id)}
                     className={`h-8 border-b border-white/5 text-xs cursor-pointer transition-colors ${
                       isSelected
-                        ? 'bg-[#1F3445]/60 text-white font-medium'
+                        ? 'bg-[#142630]/60 text-white font-medium'
                         : 'hover:bg-white/[0.02] text-[#D7E0E7]'
                     }`}
                   >
@@ -226,7 +226,7 @@ export const OverviewHub: React.FC = () => {
 
         {/* Right Column: Subscriptions + Care Circle */}
         <div className="space-y-6">
-          <div className="p-6 rounded-[14px] bg-[#1F3445] border border-white/10 space-y-4">
+          <div className="p-6 rounded-[14px] bg-[#142630] border border-white/10 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/8">
               <div>
                 <h3 className="text-sm font-bold text-white font-display">Active Subscriptions</h3>
@@ -236,7 +236,7 @@ export const OverviewHub: React.FC = () => {
               </div>
               <Link
                 to="/app/account"
-                className="text-xs font-mono text-[#7FA6C9] hover:underline"
+                className="text-xs font-mono text-[#8FB3D9] hover:underline"
               >
                 Configure →
               </Link>
@@ -247,7 +247,7 @@ export const OverviewHub: React.FC = () => {
                 {subscriptions.slice(0, 3).map((sub) => (
                   <div
                     key={sub.id}
-                    className="flex items-center justify-between p-3 rounded-[8px] bg-[#101820] border border-white/8 text-xs font-mono"
+                    className="flex items-center justify-between p-3 rounded-[8px] bg-[#0B141B] border border-white/8 text-xs font-mono"
                   >
                     <div>
                       <span className="text-white font-medium">{sub.ward_name || (sub.ward_id ? `Ward #${sub.ward_id}` : 'Active Ward')}</span>
@@ -258,11 +258,11 @@ export const OverviewHub: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="p-4 rounded-[8px] bg-[#101820] border border-white/8 text-xs text-[#8B9AA8] flex items-center justify-between">
+              <div className="p-4 rounded-[8px] bg-[#0B141B] border border-white/8 text-xs text-[#8B9AA8] flex items-center justify-between">
                 <span>No live alerts configured for your profile.</span>
                 <Link
                   to="/app/account"
-                  className="text-xs font-mono text-[#7FA6C9] hover:underline"
+                  className="text-xs font-mono text-[#8FB3D9] hover:underline"
                 >
                   Enable alerts
                 </Link>

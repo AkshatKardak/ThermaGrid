@@ -60,8 +60,8 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
               onClick={() => setArchetype(arch.id)}
               className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                 archetype === arch.id
-                  ? 'bg-[#7FA6C9]/15 border-[#7FA6C9] text-white shadow-sm'
-                  : 'bg-[#101820] border-white/10 text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/5'
+                  ? 'bg-[#8FB3D9]/15 border-[#8FB3D9] text-white shadow-sm'
+                  : 'bg-[#0B141B] border-white/10 text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/5'
               }`}
             >
               <span className="text-xs font-semibold block leading-tight">{arch.label}</span>
@@ -77,7 +77,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
           {/* Dual Numerals Comparison */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Outdoor */}
-            <div className="p-4 rounded-xl bg-[#101820] border border-white/10 space-y-1">
+            <div className="p-4 rounded-xl bg-[#0B141B] border border-white/10 space-y-1">
               <span className="text-[10px] font-mono text-[#8B9AA8] uppercase block">Outdoor Now</span>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-mono font-bold text-[#D7E0E7]">
@@ -89,7 +89,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
             </div>
 
             {/* Indoor */}
-            <div className="p-4 rounded-xl bg-[#101820] border border-white/10 space-y-1 relative overflow-hidden">
+            <div className="p-4 rounded-xl bg-[#0B141B] border border-white/10 space-y-1 relative overflow-hidden">
               <div
                 className="absolute top-0 right-0 w-24 h-24 bg-[#FF704F]/5 rounded-full blur-xl pointer-events-none"
               />
@@ -123,7 +123,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
           </div>
 
           {/* Thermal Lag Insight Banner */}
-          <div className="p-3.5 rounded-xl bg-[#101820] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="p-3.5 rounded-xl bg-[#0B141B] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2.5 text-[#D7E0E7]">
               <Clock className="w-4 h-4 text-[#8B9AA8] shrink-0" />
               <div>

@@ -33,7 +33,7 @@ export const Slider: React.FC<SliderProps> = ({
         <label className="text-xs font-mono uppercase tracking-wider text-[#8B9AA8]">
           {label}
         </label>
-        <span className="text-sm font-mono font-bold text-[#D7E0E7] tabular-nums px-2 py-0.5 rounded bg-[#2F4A5E]/40 border border-white/8">
+        <span className="text-sm font-mono font-bold text-[#D7E0E7] tabular-nums px-2 py-0.5 rounded bg-[#203A45]/40 border border-white/8">
           {displayVal}
         </span>
       </div>
@@ -45,7 +45,7 @@ export const Slider: React.FC<SliderProps> = ({
         step={step}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-1.5 bg-[#2F4A5E] rounded-lg appearance-none cursor-pointer accent-[#7FA6C9]"
+        className="w-full h-1.5 bg-[#203A45] rounded-lg appearance-none cursor-pointer accent-[#8FB3D9]"
       />
 
       <div className="flex justify-between text-[10px] font-mono text-[#5F7183]">

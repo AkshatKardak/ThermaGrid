@@ -21,7 +21,7 @@ export function SegmentedControl<T extends string | number>({
 }: SegmentedControlProps<T>) {
   return (
     <div
-      className={`inline-flex p-1 rounded-[8px] bg-[#2F4A5E]/40 border border-white/8 ${className}`}
+      className={`inline-flex p-1 rounded-[8px] bg-[#203A45]/40 border border-white/8 ${className}`}
       role="group"
     >
       {options.map((opt) => {
@@ -33,7 +33,7 @@ export function SegmentedControl<T extends string | number>({
             onClick={() => onChange(opt.value)}
             className={`px-3 py-1.5 rounded-[6px] text-xs font-mono transition-all duration-150 flex flex-col items-center justify-center ${
               isSelected
-                ? 'bg-[#1F3445] text-[#D7E0E7] shadow-sm border border-white/12 [box-shadow:inset_0_1px_0_rgba(127, 166, 201,0.3)]'
+                ? 'bg-[#142630] text-[#D7E0E7] shadow-sm border border-white/12 [box-shadow:inset_0_1px_0_rgba(143, 179, 217,0.3)]'
                 : 'text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/5 border border-transparent'
             }`}
           >

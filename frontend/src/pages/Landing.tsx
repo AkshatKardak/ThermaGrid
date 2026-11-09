@@ -1,24 +1,22 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/clerk-react';
-import { Maximize2, Minimize2 } from 'lucide-react';
+import { ShieldCheck, ArrowRight } from 'lucide-react';
 
-import { RiskGlobe, CityRisk } from '../three/scenes/RiskGlobe';
-import { WardHeatCity } from '../three/scenes/WardHeatCity';
 import { TwoWardsComparison } from '../components/dashboard/TwoWardsComparison';
+import { WardHeatCity } from '../three/scenes/WardHeatCity';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { KpiNumeral } from '../components/ui/KpiNumeral';
 import { ProvenanceChip } from '../components/ui/ProvenanceChip';
 import { TYPOGRAPHY } from '../theme/typography';
 import { useAllWardsRisk } from '../hooks/useRisk';
 import { useWards } from '../hooks/useWards';
-import { DEFAULT_CITIES } from '../three/fallbacks/StaticGlobe';
+import { getRiskBand } from '../theme/tokens';
 
 export const Landing: React.FC = () => {
   const { isSignedIn, isLoaded } = useUser();
   const heroRef = useRef<HTMLDivElement>(null);
-  const [isGlobeMaximized, setIsGlobeMaximized] = useState(false);
 
   // If user is already authenticated, immediately route to main telemetry hub
   if (isLoaded && isSignedIn) {
@@ -29,19 +27,18 @@ export const Landing: React.FC = () => {
   const { data: wardsRisk } = useAllWardsRisk();
   const { data: wards } = useWards();
 
-  // Map real live observations from Open-Meteo & risk scoring pipeline to 3D Globe
-  const liveCities: CityRisk[] = React.useMemo(() => {
+  // Top ranked wards from real or fallback observations
+  const rankedWards = React.useMemo(() => {
     if (wardsRisk && wardsRisk.length > 0) {
-      return wardsRisk.map((w: any) => ({
-        name: w.ward_name.replace(/^Ward\s+/, '').split('(')[0].trim() || w.ward_name,
-        lat: w.latitude ?? 19.056,
-        lng: w.longitude ?? 72.931,
-        risk: (w.risk_score ?? 50) / 100,
-        temp: typeof w.temperature_c === 'number' ? Number(w.temperature_c.toFixed(1)) : 28.3,
-        wbgt: typeof w.wbgt_c === 'number' ? Number(w.wbgt_c.toFixed(1)) : 26.4,
-      }));
+      return [...wardsRisk].sort((a: any, b: any) => (b.risk_score || 0) - (a.risk_score || 0)).slice(0, 5);
     }
-    return DEFAULT_CITIES;
+    return [
+      { ward_name: 'Ward M/East (Govandi)', ward_code: 'WARD_ME', risk_score: 84.2, wbgt_c: 34.6, temperature_c: 38.2 },
+      { ward_name: 'Ward G/North (Dharavi)', ward_code: 'WARD_GN', risk_score: 79.5, wbgt_c: 33.8, temperature_c: 37.9 },
+      { ward_name: 'Ward L (Kurla East)', ward_code: 'WARD_L', risk_score: 73.1, wbgt_c: 33.1, temperature_c: 37.4 },
+      { ward_name: 'Ward H/East (Bandra E)', ward_code: 'WARD_HE', risk_score: 68.4, wbgt_c: 32.5, temperature_c: 36.8 },
+      { ward_name: 'Ward A (Colaba / Fort)', ward_code: 'WARD_A', risk_score: 38.6, wbgt_c: 28.2, temperature_c: 34.1 },
+    ];
   }, [wardsRisk]);
 
   // Real statistics derived from live backend observations
@@ -49,18 +46,18 @@ export const Landing: React.FC = () => {
     if (wardsRisk && wardsRisk.length > 0) {
       return Math.round(Math.max(...wardsRisk.map((w: any) => w.risk_score || 0)));
     }
-    return 54;
+    return 84;
   }, [wardsRisk]);
 
   const peakWbgt = React.useMemo(() => {
     if (wardsRisk && wardsRisk.length > 0) {
       return Number(Math.max(...wardsRisk.map((w: any) => w.wbgt_c || 0)).toFixed(1));
     }
-    return 26.4;
+    return 34.6;
   }, [wardsRisk]);
 
   const wardsCount = React.useMemo(() => {
-    return wards?.length || wardsRisk?.length || 6;
+    return wards?.length || wardsRisk?.length || 24;
   }, [wards, wardsRisk]);
 
   // Enhanced 5-Stage Computational Pipeline with Thin Hairline Architecture
@@ -114,24 +111,18 @@ export const Landing: React.FC = () => {
 
   return (
     <div className="space-y-24 sm:space-y-32">
-      {/* 1. Hero Section with Minimise / Maximise Interactive 3D Earth Console */}
+      {/* 1. Hero Section: Left Narrative (7 cols / 60%) + Right Live Ward Telemetry Matrix (5 cols / 40%) */}
       <section
         ref={heroRef}
         className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch"
       >
-        {/* Narrative Column: adjusts between 7-col and 12-col when Earth is maximized */}
-        <div
-          className={`${
-            isGlobeMaximized ? 'lg:col-span-12' : 'lg:col-span-7'
-          } bg-[#1F3445]/50 border border-white/10 rounded-[14px] p-6 sm:p-8 flex flex-col justify-between corner-ticks shadow-2xl relative z-10 transition-all duration-300 min-h-[440px] ${
-            isGlobeMaximized ? 'lg:min-h-0' : 'lg:h-[520px]'
-          }`}
-        >
+        {/* Left Column (60% weight): Type + Numbers primary focus */}
+        <div className="lg:col-span-7 bg-[#142630]/60 border border-white/[0.075] rounded-[14px] p-6 sm:p-8 flex flex-col justify-between corner-ticks shadow-2xl relative z-10 min-h-[460px] lg:h-[520px]">
           <div className="space-y-5">
-            {/* Eyebrow with #7FA6C9 gradient */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#7FA6C9]/15 via-[#7FA6C9]/10 to-transparent border border-[#7FA6C9]/30 text-xs font-mono text-[#D7E0E7] w-fit">
-              <span className="w-2 h-2 rounded-full bg-[#7FA6C9] animate-pulse" />
-              <span className="text-[#8B9AA8]">National Climate Early-Warning Initiative</span>
+            {/* Eyebrow with #8FB3D9 accent */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8FB3D9]/10 border border-[#8FB3D9]/25 text-xs font-mono text-[#D8E8E6] w-fit">
+              <span className="w-2 h-2 rounded-full bg-[#8FB3D9] animate-pulse" />
+              <span className="text-[#93A3B0]">National Climate Early-Warning Initiative</span>
             </div>
 
             {/* Headline: Single 180ms fade-up */}
@@ -145,27 +136,27 @@ export const Landing: React.FC = () => {
             </motion.h1>
 
             {/* Narrative Lead */}
-            <p className="text-sm text-[#8B9AA8] max-w-xl leading-relaxed">
+            <p className="text-sm text-[#93A3B0] max-w-xl leading-relaxed">
               Not a generic weather forecast. ThermaGrid pinpoints <span className="text-white font-medium">who is at risk</span>, <span className="text-white font-medium">where</span>, <span className="text-white font-medium">when it peaks</span>, <span className="text-white font-medium">why</span>, and <span className="text-white font-medium">what action to take</span> — calibrated down to the urban municipal ward.
             </p>
 
-            {/* Action Buttons with #7FA6C9 gradient */}
+            {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
                 to="/app/heat-risk"
-                className="px-4 py-2.5 rounded-[8px] bg-gradient-to-r from-[#7FA6C9] to-[#5C82A3] hover:opacity-95 text-[#101820] text-xs font-mono font-bold transition-all duration-120 shadow-md shadow-[#7FA6C9]/20"
+                className="px-4 py-2.5 rounded-[8px] bg-[#8FB3D9] hover:bg-[#A5C4E4] text-[#0B141B] text-xs font-mono font-bold transition-all shadow-md active:scale-[0.985]"
               >
                 Citizen Protection
               </Link>
               <Link
                 to="/app/worker"
-                className="px-4 py-2.5 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
+                className="px-4 py-2.5 rounded-[8px] bg-[#0B141B] hover:bg-[#203A45] border border-white/[0.075] text-[#D8E8E6] text-xs font-mono font-semibold transition-all"
               >
                 Worker Safety
               </Link>
               <Link
                 to="/app/authority"
-                className="px-4 py-2.5 rounded-[8px] bg-[#101820] hover:bg-[#1A2836] border border-white/12 text-[#D7E0E7] text-xs font-mono font-semibold transition-all duration-120"
+                className="px-4 py-2.5 rounded-[8px] bg-[#0B141B] hover:bg-[#203A45] border border-white/[0.075] text-[#D8E8E6] text-xs font-mono font-semibold transition-all"
               >
                 Authority Console
               </Link>
@@ -173,7 +164,7 @@ export const Landing: React.FC = () => {
           </div>
 
           {/* 3-Stat Rail with Real Live Data from API */}
-          <div className="grid grid-cols-3 gap-4 pt-5 mt-4 border-t border-white/8">
+          <div className="grid grid-cols-3 gap-4 pt-5 mt-4 border-t border-white/[0.075]">
             <div>
               <span className="block font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight tabular-nums">
                 {peakWbgt}°C
@@ -201,37 +192,70 @@ export const Landing: React.FC = () => {
           </div>
         </div>
 
-        {/* 3D Earth Console: Supports interactive Minimise & Maximise */}
-        <div
-          className={`${
-            isGlobeMaximized ? 'lg:col-span-12' : 'lg:col-span-5'
-          } bg-[#101820] border border-white/10 rounded-[14px] overflow-hidden flex flex-col corner-ticks relative shadow-2xl transition-all duration-300 ${
-            isGlobeMaximized ? 'min-h-[580px] lg:h-[640px]' : 'min-h-[460px] lg:h-[520px]'
-          }`}
-        >
-          {/* Top-Right Minimize/Maximize Toolbar */}
-          <div className="absolute top-4 right-4 z-20 pointer-events-auto">
-            <button
-              type="button"
-              onClick={() => setIsGlobeMaximized(!isGlobeMaximized)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#101820]/90 hover:bg-[#1F3445] border border-white/10 hover:border-[#7FA6C9]/50 text-xs font-mono text-[#D7E0E7] transition-all cursor-pointer backdrop-blur-md shadow-md"
-              title={isGlobeMaximized ? 'Minimize Earth View' : 'Maximize Earth View to Full Width'}
-            >
-              {isGlobeMaximized ? (
-                <>
-                  <Minimize2 className="w-3.5 h-3.5 text-[#7FA6C9]" />
-                  <span>Minimize View</span>
-                </>
-              ) : (
-                <>
-                  <Maximize2 className="w-3.5 h-3.5 text-[#7FA6C9]" />
-                  <span>Maximize</span>
-                </>
-              )}
-            </button>
+        {/* Right Column (40% weight): High-Density Live Ward Risk Telemetry Matrix */}
+        <div className="lg:col-span-5 bg-[#142630]/60 border border-white/[0.075] rounded-[14px] p-5 sm:p-6 flex flex-col justify-between corner-ticks shadow-2xl relative min-h-[460px] lg:h-[520px]">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.075]">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B7C8A] block">
+                  REAL-TIME WARD TELEMETRY
+                </span>
+                <h3 className="text-sm font-bold text-white font-display">
+                  Live Thermal Stress Rankings
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#8FB3D9]/10 border border-[#8FB3D9]/20 text-[#8FB3D9]">
+                Live Feed
+              </span>
+            </div>
+
+            {/* Ward list table */}
+            <div className="divide-y divide-white/[0.05]">
+              {rankedWards.map((w: any, idx: number) => {
+                const band = getRiskBand(w.risk_score || 50);
+                return (
+                  <div
+                    key={idx}
+                    className="py-2.5 flex items-center justify-between hover:bg-white/[0.03] px-2 rounded-[6px] transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                      <span className="font-mono text-xs text-[#6B7C8A] w-4 tabular-nums">
+                        {idx + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <span className="text-xs font-semibold text-white block truncate">
+                          {w.ward_name}
+                        </span>
+                        <span className="text-[10px] font-mono text-[#6B7C8A]">
+                          {w.ward_code} · {w.temperature_c?.toFixed(1) || '36.5'}°C Dry-Bulb
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="font-mono text-xs font-bold block tabular-nums" style={{ color: band.color }}>
+                        {w.risk_score?.toFixed(1) || '72.0'} / 100
+                      </span>
+                      <span className="text-[10px] font-mono text-[#93A3B0]">
+                        WBGT {w.wbgt_c?.toFixed(1) || '32.1'}°C
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <RiskGlobe height="100%" interactive={true} cities={liveCities} />
+          <div className="pt-3 border-t border-white/[0.075] flex items-center justify-between text-xs font-mono">
+            <span className="text-[#6B7C8A] text-[11px]">Provenance: IMD AWS + Open-Meteo</span>
+            <Link
+              to="/app"
+              className="text-[#8FB3D9] hover:text-[#A5C4E4] inline-flex items-center gap-1 transition-colors hover:underline text-[11px]"
+            >
+              <span>Explore All Wards</span>
+              <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -267,30 +291,30 @@ export const Landing: React.FC = () => {
 
         <div className="relative">
           {/* Thin horizontal pipeline rail connecting cards */}
-          <div className="hidden lg:block absolute top-[28px] left-10 right-10 h-[1px] bg-gradient-to-r from-[#7FA6C9]/50 via-white/10 to-[#7FA6C9]/50 z-0 pointer-events-none" />
+          <div className="hidden lg:block absolute top-[28px] left-10 right-10 h-[1px] bg-gradient-to-r from-[#8FB3D9]/50 via-white/10 to-[#8FB3D9]/50 z-0 pointer-events-none" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
             {pipelineStages.map((stage, idx) => (
               <div
                 key={idx}
-                className="rounded-[14px] bg-[#1F3445]/60 hover:bg-[#1F3445] border border-white/8 hover:border-[#7FA6C9]/50 p-5 flex flex-col justify-between space-y-4 transition-all duration-200 group shadow-lg hover:shadow-[#7FA6C9]/5"
+                className="rounded-[14px] bg-[#142630]/60 hover:bg-[#142630] border border-white/8 hover:border-[#8FB3D9]/50 p-5 flex flex-col justify-between space-y-4 transition-all duration-200 group shadow-lg hover:shadow-[#8FB3D9]/5"
               >
                 {/* Stage Header */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-[#7FA6C9] tracking-wider">
+                    <span className="font-mono text-xs font-bold text-[#8FB3D9] tracking-wider">
                       {stage.step} <span className="text-[#5F7183] font-normal">/ {stage.total}</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase bg-white/5 border border-white/8 text-[#8B9AA8] group-hover:border-[#7FA6C9]/30 transition-colors">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase bg-white/5 border border-white/8 text-[#8B9AA8] group-hover:border-[#8FB3D9]/30 transition-colors">
                       {stage.badge}
                     </span>
                   </div>
 
                   {/* Thin Hairline Divider */}
-                  <div className="h-[1px] w-full bg-white/6 group-hover:bg-[#7FA6C9]/25 transition-colors" />
+                  <div className="h-[1px] w-full bg-white/6 group-hover:bg-[#8FB3D9]/25 transition-colors" />
 
                   <div>
-                    <h4 className="text-sm font-bold text-white font-display group-hover:text-[#7FA6C9] transition-colors">
+                    <h4 className="text-sm font-bold text-white font-display group-hover:text-[#8FB3D9] transition-colors">
                       {stage.name}
                     </h4>
                     <p className="text-xs text-[#8B9AA8] leading-relaxed mt-1.5">
@@ -304,7 +328,7 @@ export const Landing: React.FC = () => {
                   <span className="text-[10px] font-mono text-[#5F7183] block truncate">
                     {stage.spec}
                   </span>
-                  <span className="text-[10px] font-mono text-[#7FA6C9] font-medium block">
+                  <span className="text-[10px] font-mono text-[#8FB3D9] font-medium block">
                     {stage.metric}
                   </span>
                 </div>
@@ -315,7 +339,7 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* 5. Section: Provenance Strip */}
-      <section id="methodology" className="p-6 rounded-[14px] bg-[#1F3445]/40 border border-white/8 space-y-4">
+      <section id="methodology" className="p-6 rounded-[14px] bg-[#142630]/40 border border-white/8 space-y-4">
         <div className="text-[11px] font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
           Data Provenance &amp; Model Auditability
         </div>

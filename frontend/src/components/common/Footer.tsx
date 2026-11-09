@@ -4,7 +4,7 @@ import { TYPOGRAPHY } from '../../theme/typography';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="mt-32 pt-8 pb-12 bg-[#101820]">
+    <footer className="mt-32 pt-8 pb-12 bg-[#0B141B]">
       {/* 1px hairline with 24px amethyst tick at left */}
       <div className="section-hairline mb-10" />
 
@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
                   href="https://mausam.imd.gov.in"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[#8B9AA8] hover:text-[#7FA6C9] flex items-center gap-1.5 transition-colors"
+                  className="text-[#8B9AA8] hover:text-[#8FB3D9] flex items-center gap-1.5 transition-colors"
                 >
                   National Surface Telemetry Network <ExternalLink className="w-3 h-3 text-[#5F7183]" />
                 </a>
@@ -46,7 +46,7 @@ export const Footer: React.FC = () => {
                   href="https://bhuvan.nrsc.gov.in"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[#8B9AA8] hover:text-[#7FA6C9] flex items-center gap-1.5 transition-colors"
+                  className="text-[#8B9AA8] hover:text-[#8FB3D9] flex items-center gap-1.5 transition-colors"
                 >
                   ISRO Bhuvan Remote Sensing <ExternalLink className="w-3 h-3 text-[#5F7183]" />
                 </a>
@@ -56,7 +56,7 @@ export const Footer: React.FC = () => {
                   href="https://open-meteo.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[#8B9AA8] hover:text-[#7FA6C9] flex items-center gap-1.5 transition-colors"
+                  className="text-[#8B9AA8] hover:text-[#8FB3D9] flex items-center gap-1.5 transition-colors"
                 >
                   ECMWF / GFS Numerical NWP <ExternalLink className="w-3 h-3 text-[#5F7183]" />
                 </a>

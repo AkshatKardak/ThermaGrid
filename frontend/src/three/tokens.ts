@@ -6,12 +6,12 @@
 import { THEME_COLORS, RISK_BANDS } from '../theme/tokens';
 
 export const THREE_TOKENS = {
-  bg: THEME_COLORS.bg,                      // #101820 Midnight
-  panel: THEME_COLORS.surface,              // #1F3445 Panel
-  panelElevated: THEME_COLORS.surfaceElevated, // #263E50 Raised Panel
+  bg: THEME_COLORS.bg,                      // #0B141B Midnight
+  panel: THEME_COLORS.surface,              // #142630 Panel
+  panelElevated: THEME_COLORS.surfaceElevated, // #203A45 Raised Panel
   text: THEME_COLORS.text,                  // #D7E0E7 Text
   textDim: THEME_COLORS.textDim,            // #8B9AA8 Secondary Text
-  accent: THEME_COLORS.accent,              // #7FA6C9 Steel Blue (UI chrome & rim lighting ONLY)
+  accent: THEME_COLORS.accent,              // #8FB3D9 Steel Blue (UI chrome & rim lighting ONLY)
   accentDim: THEME_COLORS.accentDim,
   accentSoft: THEME_COLORS.accentSoft,
   alert: THEME_COLORS.alert,                // #FF704F Alert

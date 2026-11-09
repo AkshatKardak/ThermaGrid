@@ -61,8 +61,8 @@ export const About: React.FC = () => {
     <div className="space-y-12">
       {/* 1. Header */}
       <div className="space-y-3 pb-4 border-b border-white/8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1F3445] border border-white/10 text-xs font-mono text-[#D7E0E7]">
-          <span className="w-2 h-2 rounded-full bg-[#7FA6C9]" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#142630] border border-white/10 text-xs font-mono text-[#D7E0E7]">
+          <span className="w-2 h-2 rounded-full bg-[#8FB3D9]" />
           <span>National Climate Early-Warning Initiative</span>
         </div>
         <h1 className={`${TYPOGRAPHY.h1} text-white`}>
@@ -87,7 +87,7 @@ export const About: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="rounded-[14px] bg-[#1F3445] border border-white/8 overflow-hidden transition-all duration-200"
+                className="rounded-[14px] bg-[#142630] border border-white/8 overflow-hidden transition-all duration-200"
               >
                 <button
                   type="button"
@@ -110,7 +110,7 @@ export const About: React.FC = () => {
                 {isOpen && (
                   <div className="p-5 pt-0 border-t border-white/6 space-y-4">
                     {/* Formula box */}
-                    <div className="p-3.5 rounded-[8px] bg-[#101820] border border-white/8 font-mono text-xs text-[#7FA6C9] overflow-x-auto">
+                    <div className="p-3.5 rounded-[8px] bg-[#0B141B] border border-white/8 font-mono text-xs text-[#8FB3D9] overflow-x-auto">
                       <code>{item.formula}</code>
                     </div>
 
@@ -197,7 +197,7 @@ export const About: React.FC = () => {
         </div>
 
         {/* Known Limitations Box */}
-        <div className="p-4 rounded-[12px] bg-[#101820] border border-white/8 text-xs text-[#8B9AA8] space-y-1.5 font-mono">
+        <div className="p-4 rounded-[12px] bg-[#0B141B] border border-white/8 text-xs text-[#8B9AA8] space-y-1.5 font-mono">
           <span className="text-white font-bold uppercase tracking-wider block text-[11px]">
             Known Limitations & Boundary Assumptions:
           </span>
@@ -221,7 +221,7 @@ export const About: React.FC = () => {
         <div className="overflow-x-auto rounded-[14px] border border-white/8">
           <table className="w-full text-left text-xs border-collapse font-mono">
             <thead>
-              <tr className="bg-[#101820] border-b border-white/8 text-[#8B9AA8] uppercase text-[10px] tracking-[0.10em]">
+              <tr className="bg-[#0B141B] border-b border-white/8 text-[#8B9AA8] uppercase text-[10px] tracking-[0.10em]">
                 <th className="p-3.5">Dataset Name</th>
                 <th className="p-3.5">Provider</th>
                 <th className="p-3.5">Spatial Resolution</th>
@@ -230,7 +230,7 @@ export const About: React.FC = () => {
                 <th className="p-3.5">Variables</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 bg-[#1F3445]/50 text-[#D7E0E7]">
+            <tbody className="divide-y divide-white/5 bg-[#142630]/50 text-[#D7E0E7]">
               {dataSources?.map((src) => (
                 <tr key={src.id} className="table-row-hover">
                   <td className="p-3.5 font-sans font-semibold text-white">
@@ -238,7 +238,7 @@ export const About: React.FC = () => {
                       href={src.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="hover:text-[#7FA6C9] inline-flex items-center gap-1.5 transition-colors"
+                      className="hover:text-[#8FB3D9] inline-flex items-center gap-1.5 transition-colors"
                     >
                       {src.name} <ExternalLink className="w-3 h-3 text-[#5F7183]" />
                     </a>
@@ -258,7 +258,7 @@ export const About: React.FC = () => {
       </section>
 
       {/* 5. Explicit "Not a Medical Device" Statement */}
-      <div className="p-6 rounded-[14px] bg-[#101820] border border-[#FF704F]/40 flex items-start gap-4 corner-ticks">
+      <div className="p-6 rounded-[14px] bg-[#0B141B] border border-[#FF704F]/40 flex items-start gap-4 corner-ticks">
         <AlertCircle className="w-6 h-6 text-[#FF704F] shrink-0 mt-0.5" />
         <div className="space-y-1.5 text-xs text-[#D7E0E7]">
           <span className="font-mono font-bold text-[#FF704F] uppercase tracking-wider block text-sm">

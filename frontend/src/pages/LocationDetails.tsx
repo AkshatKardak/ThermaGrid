@@ -93,7 +93,7 @@ export const LocationDetails: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <span className="text-xs font-mono text-[#7FA6C9] font-bold px-2 py-0.5 rounded bg-[#7FA6C9]/15 border border-[#7FA6C9]/30">
+              <span className="text-xs font-mono text-[#8FB3D9] font-bold px-2 py-0.5 rounded bg-[#8FB3D9]/15 border border-[#8FB3D9]/30">
                 {ward?.ward_code || 'WARD M/E'}
               </span>
               <h1 className={`${TYPOGRAPHY.h1} text-white`}>
@@ -134,7 +134,7 @@ export const LocationDetails: React.FC = () => {
           {fingerprintStats.map((stat, i) => (
             <div
               key={i}
-              className="p-3.5 rounded-[10px] bg-[#1F3445] border border-white/8 space-y-1 font-mono"
+              className="p-3.5 rounded-[10px] bg-[#142630] border border-white/8 space-y-1 font-mono"
             >
               <span className="text-[10px] uppercase text-[#5F7183] block truncate">
                 {stat.label}
@@ -205,7 +205,7 @@ export const LocationDetails: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowTerrain(!showTerrain)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-[#2F4A5E]/40 hover:bg-[#2F4A5E] border border-white/8 text-xs font-mono text-white transition-all shrink-0"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-[#203A45]/40 hover:bg-[#203A45] border border-white/8 text-xs font-mono text-white transition-all shrink-0"
           >
             <Compass className="w-3.5 h-3.5 text-[#8B9AA8]" />
             <span>{showTerrain ? 'Hide 3D Shader' : 'Load 3D Shader'}</span>
@@ -229,11 +229,11 @@ export const LocationDetails: React.FC = () => {
           {scopedInterventions.map((item) => (
             <div
               key={item.id}
-              className="p-5 rounded-[12px] bg-[#1F3445] border border-white/8 space-y-3 flex flex-col justify-between"
+              className="p-5 rounded-[12px] bg-[#142630] border border-white/8 space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-[10px] uppercase font-bold text-[#7FA6C9]">
+                  <span className="text-[10px] uppercase font-bold text-[#8FB3D9]">
                     {item.type}
                   </span>
                   <span className="text-[10px] text-[#2FA37C] bg-[#2FA37C]/15 border border-[#2FA37C]/30 px-2 py-0.5 rounded-full font-bold">

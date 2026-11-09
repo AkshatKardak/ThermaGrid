@@ -1,27 +1,34 @@
 import React from 'react';
 import { SignUp, useUser } from '@clerk/clerk-react';
 import { useSearchParams, Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { AuthLayout } from '../components/auth/AuthLayout';
 import { DemoAccountPanel } from '../components/auth/DemoAccountPanel';
 
 const clerkAppearance = {
   variables: {
-    colorPrimary: '#7FA6C9',
-    colorBackground: '#1F3445',
-    colorText: '#D7E0E7',
-    borderRadius: '14px',
+    colorPrimary: '#8FB3D9',
+    colorBackground: '#142630',
+    colorText: '#D8E8E6',
+    colorTextSecondary: '#93A3B0',
+    colorInputBackground: '#203A45',
+    colorInputText: '#D8E8E6',
+    borderRadius: '10px',
     fontFamily: 'IBM Plex Sans, sans-serif',
   },
   elements: {
-    card: 'bg-[#1F3445] border border-white/10 shadow-2xl rounded-[14px]',
+    card: 'bg-[#142630] border border-white/[0.075] shadow-2xl rounded-[10px]',
     headerTitle: 'text-white font-bold',
-    headerSubtitle: 'text-[#8B9AA8]',
-    socialButtonsBlockButton: 'bg-[#101820] border-white/10 text-white hover:bg-[#263E50] transition-colors',
-    formFieldLabel: 'text-[#8B9AA8]',
-    formFieldInput: 'bg-[#101820] border-white/10 text-white focus:border-[#7FA6C9] transition-colors',
-    footerActionLink: 'text-[#7FA6C9] hover:text-[#5C82A3] transition-colors',
-    formButtonPrimary: 'bg-gradient-to-r from-[#7FA6C9] to-[#5C82A3] hover:opacity-95 text-[#101820] font-semibold font-mono',
+    headerSubtitle: 'text-[#93A3B0]',
+    socialButtonsBlockButton:
+      'bg-[#203A45] border-white/[0.075] text-white hover:bg-white/[0.06] transition-colors',
+    formFieldLabel: 'text-[#93A3B0] text-xs font-mono',
+    formFieldInput:
+      'bg-[#203A45] border-white/[0.075] text-[#D8E8E6] focus:border-[#8FB3D9] focus:ring-2 focus:ring-[#8FB3D9]/20 transition-all text-xs font-mono',
+    footerActionLink: 'text-[#8FB3D9] hover:text-[#A5C4E4] transition-colors',
+    formButtonPrimary:
+      'bg-[#8FB3D9] hover:bg-[#A5C4E4] active:scale-[0.985] text-[#0B141B] font-bold font-mono transition-all',
+    dividerLine: 'bg-white/[0.075]',
+    dividerText: 'text-[#6B7C8A] text-xs font-mono',
   },
 };
 
@@ -36,15 +43,10 @@ export const SignUpPage: React.FC = () => {
 
   return (
     <AuthLayout
-      title="Create an account"
-      subtitle="Join ThermaGrid for ward-level thermal forecasts, indoor heat advisories, and custom alerts."
+      title="Create Workspace Account"
+      subtitle="Register to configure personal heat stress alerts and dependent care monitoring."
     >
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25 }}
-        className="w-full flex flex-col items-center"
-      >
+      <div className="w-full flex flex-col items-center">
         <SignUp
           routing="path"
           path="/sign-up"
@@ -54,7 +56,7 @@ export const SignUpPage: React.FC = () => {
           appearance={clerkAppearance}
         />
         <DemoAccountPanel />
-      </motion.div>
+      </div>
     </AuthLayout>
   );
 };

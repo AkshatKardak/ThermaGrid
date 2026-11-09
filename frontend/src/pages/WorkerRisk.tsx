@@ -74,7 +74,7 @@ export const WorkerRisk: React.FC = () => {
             id="worker-ward"
             value={selectedLocationId}
             onChange={(e) => setSelectedLocationId(Number(e.target.value))}
-            className="bg-[#1F3445] text-white text-xs font-mono px-3 py-2 rounded-[8px] border border-white/10 outline-none cursor-pointer"
+            className="bg-[#142630] text-white text-xs font-mono px-3 py-2 rounded-[8px] border border-white/10 outline-none cursor-pointer"
           >
             {wards?.map((w) => (
               <option key={w.id} value={w.id}>
@@ -113,8 +113,8 @@ export const WorkerRisk: React.FC = () => {
                   onClick={() => setOccupation(opt.id as Occupation)}
                   className={`px-3.5 py-2 rounded-[8px] text-xs font-mono text-left transition-all ${
                     occupation === opt.id
-                      ? 'bg-[#101820] text-white border border-[#7FA6C9] [box-shadow:inset_0_1px_0_rgba(127, 166, 201,0.4)]'
-                      : 'bg-[#2F4A5E]/30 text-[#8B9AA8] border border-white/6 hover:text-white'
+                      ? 'bg-[#0B141B] text-white border border-[#8FB3D9] [box-shadow:inset_0_1px_0_rgba(143, 179, 217,0.4)]'
+                      : 'bg-[#203A45]/30 text-[#8B9AA8] border border-white/6 hover:text-white'
                   }`}
                 >
                   <div className="font-semibold">{opt.label}</div>
@@ -183,7 +183,7 @@ export const WorkerRisk: React.FC = () => {
       {/* 2. Output: Work-Adjusted Score vs General Score as 2 Large Numerals with Delta Chip */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         {/* General Population Score */}
-        <div className="p-6 rounded-[14px] bg-[#1F3445] border border-white/8 space-y-4">
+        <div className="p-6 rounded-[14px] bg-[#142630] border border-white/8 space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
               Baseline General Exposure
@@ -214,7 +214,7 @@ export const WorkerRisk: React.FC = () => {
         </div>
 
         {/* Work-Adjusted Score with Delta Chip */}
-        <div className="p-6 rounded-[14px] bg-[#263E50] border border-white/16 space-y-4 [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)] relative corner-ticks">
+        <div className="p-6 rounded-[14px] bg-[#203A45] border border-white/16 space-y-4 [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)] relative corner-ticks">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono uppercase tracking-[0.10em] text-white font-semibold">
               Work-Adjusted Thermal Strain
@@ -266,7 +266,7 @@ export const WorkerRisk: React.FC = () => {
       </section>
 
       {/* 4. Prominent Legal & Medical Disclaimer */}
-      <div className="p-5 rounded-[12px] bg-[#101820] border border-white/8 flex items-start gap-4">
+      <div className="p-5 rounded-[12px] bg-[#0B141B] border border-white/8 flex items-start gap-4">
         <AlertTriangle className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
         <div className="text-xs text-[#8B9AA8] space-y-1">
           <span className="font-mono font-bold text-white uppercase tracking-wider block">

@@ -404,7 +404,7 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full rounded-[14px] overflow-hidden border border-white/8 bg-[#101820] shadow-2xl flex flex-col justify-between"
+      className="relative w-full rounded-[14px] overflow-hidden border border-white/8 bg-[#0B141B] shadow-2xl flex flex-col justify-between"
       style={{ minHeight: height }}
       aria-hidden="true"
     >
@@ -420,7 +420,7 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
         </div>
 
         {/* Legend Top-Right */}
-        <div className="flex items-center gap-2 bg-[#1F3445]/80 backdrop-blur-md px-3 py-1.5 rounded-[8px] border border-white/8 text-[11px] font-mono">
+        <div className="flex items-center gap-2 bg-[#142630]/80 backdrop-blur-md px-3 py-1.5 rounded-[8px] border border-white/8 text-[11px] font-mono">
           <span className="text-[#8B9AA8]">Risk:</span>
           <span className="flex items-center gap-1 text-[#2FA37C]">
             <span className="w-2 h-2 rounded-full bg-[#2FA37C]" /> Low
@@ -440,7 +440,7 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
       {/* Tooltip on Hover */}
       {hoveredWard && tooltipPos && (
         <div
-          className="absolute z-30 pointer-events-none px-3.5 py-2 rounded-[8px] bg-[#101820]/95 backdrop-blur-md border border-white/16 shadow-2xl text-xs font-mono space-y-1 transition-transform duration-75"
+          className="absolute z-30 pointer-events-none px-3.5 py-2 rounded-[8px] bg-[#0B141B]/95 backdrop-blur-md border border-white/16 shadow-2xl text-xs font-mono space-y-1 transition-transform duration-75"
           style={{
             left: `${Math.min(window.innerWidth - 220, tooltipPos.x + 16)}px`,
             top: `${Math.max(10, tooltipPos.y - 48)}px`,
@@ -461,12 +461,12 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
 
       {/* Caption Bottom-Left & Selected Ward Card Bottom-Right */}
       <div className="w-full p-4 flex flex-wrap items-end justify-between gap-4 z-10 pointer-events-none">
-        <div className="text-[11px] font-mono text-[#5F7183] bg-[#101820]/80 px-3 py-1.5 rounded-[6px] border border-white/6">
+        <div className="text-[11px] font-mono text-[#5F7183] bg-[#0B141B]/80 px-3 py-1.5 rounded-[6px] border border-white/6">
           Left-drag to orbit • Scroll to zoom • Hover/click column to isolate ward
         </div>
 
         {activeWard && (
-          <div className="pointer-events-auto bg-[#1F3445]/90 backdrop-blur-md border border-white/16 rounded-[10px] p-3 text-xs font-mono space-y-1 shadow-2xl">
+          <div className="pointer-events-auto bg-[#142630]/90 backdrop-blur-md border border-white/16 rounded-[10px] p-3 text-xs font-mono space-y-1 shadow-2xl">
             <div className="flex items-center justify-between gap-4">
               <span className="font-bold text-white">{activeWard.name}</span>
               <span

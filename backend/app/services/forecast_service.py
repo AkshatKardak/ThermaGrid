@@ -53,18 +53,25 @@ class ForecastService:
             utci_v = calculate_utci(t, rh, w, s)["utci"]
             hi_v = calculate_heat_index(t, rh)["heat_index_c"]
 
+            canopy = location.tree_canopy_fraction if location.tree_canopy_fraction is not None else 0.15
+            informal = location.informal_settlement_ratio if location.informal_settlement_ratio is not None else 0.30
+            cooling = location.cooling_access_deficit if location.cooling_access_deficit is not None else 0.40
+            outdoor = location.outdoor_worker_ratio if location.outdoor_worker_ratio is not None else 0.25
+            elderly = location.elderly_ratio if location.elderly_ratio is not None else 0.08
+            children = location.children_ratio if location.children_ratio is not None else 0.07
+
             risk_eval = compute_composite_risk(
                 temp_c=t,
                 wbgt_c=wbgt_v,
                 utci_c=utci_v,
                 heat_index_c=hi_v,
                 population_density_per_km2=location.population_density_per_km2,
-                outdoor_worker_ratio=location.outdoor_worker_ratio,
-                elderly_ratio=location.elderly_ratio,
-                children_ratio=location.children_ratio,
-                informal_settlement_ratio=location.informal_settlement_ratio,
-                vegetation_deficit_ratio=1.0 - location.tree_canopy_fraction,
-                cooling_access_deficit=location.cooling_access_deficit,
+                outdoor_worker_ratio=outdoor,
+                elderly_ratio=elderly,
+                children_ratio=children,
+                informal_settlement_ratio=informal,
+                vegetation_deficit_ratio=1.0 - canopy,
+                cooling_access_deficit=cooling,
             )
 
             score = risk_eval["risk_score"]

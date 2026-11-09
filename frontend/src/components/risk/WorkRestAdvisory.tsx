@@ -63,7 +63,7 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
           </div>
 
           {/* Visual block bar */}
-          <div className="w-full h-8 rounded-[8px] overflow-hidden flex bg-[#101820] border border-white/8 p-0.5">
+          <div className="w-full h-8 rounded-[8px] overflow-hidden flex bg-[#0B141B] border border-white/8 p-0.5">
             {workPct > 0 && (
               <div
                 className="h-full bg-[#F59E0B] rounded-l-[6px] flex items-center justify-center text-[11px] font-mono font-bold text-black transition-all duration-300"
@@ -85,7 +85,7 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
 
         {/* Hydration Cadence & WBGT Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#1F3445]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
+          <div className="bg-[#142630]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
             <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
               <Timer className="w-4 h-4 text-[#8B9AA8]" />
               <span>Shift Rest Interval</span>
@@ -98,7 +98,7 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
             </p>
           </div>
 
-          <div className="bg-[#1F3445]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
+          <div className="bg-[#142630]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
             <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
               <Droplets className="w-4 h-4 text-[#2FA37C]" />
               <span>Hydration Cadence</span>
@@ -111,7 +111,7 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
             </p>
           </div>
 
-          <div className="bg-[#1F3445]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
+          <div className="bg-[#142630]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
             <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
               <AlertOctagon className="w-4 h-4 text-[#FF704F]" />
               <span>WBGT Stress Level</span>
@@ -124,7 +124,7 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
         </div>
 
         {/* Advisory Note */}
-        <div className="p-3.5 rounded-[8px] bg-[#101820] border border-white/8 text-xs text-[#D7E0E7] leading-relaxed">
+        <div className="p-3.5 rounded-[8px] bg-[#0B141B] border border-white/8 text-xs text-[#D7E0E7] leading-relaxed">
           <span className="font-mono font-bold text-[#FF704F] uppercase tracking-wider block mb-1 text-[11px]">
             Action Advisory:
           </span>

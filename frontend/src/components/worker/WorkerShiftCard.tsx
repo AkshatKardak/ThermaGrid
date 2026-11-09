@@ -92,7 +92,7 @@ NOTICE: ${data.disclaimer}
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3.5 py-1.5 rounded-lg bg-[#7FA6C9] hover:bg-[#5C82A3] text-white text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-[#8FB3D9] hover:bg-[#6E93B8] text-white text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print A5 card</span>
@@ -110,7 +110,7 @@ NOTICE: ${data.disclaimer}
               type="time"
               value={start}
               onChange={(e) => setStart(e.target.value)}
-              className="w-full bg-[#101820] border border-white/10 rounded-lg p-2 text-white font-mono text-xs outline-none"
+              className="w-full bg-[#0B141B] border border-white/10 rounded-lg p-2 text-white font-mono text-xs outline-none"
             />
           </div>
 
@@ -122,7 +122,7 @@ NOTICE: ${data.disclaimer}
               type="time"
               value={end}
               onChange={(e) => setEnd(e.target.value)}
-              className="w-full bg-[#101820] border border-white/10 rounded-lg p-2 text-white font-mono text-xs outline-none"
+              className="w-full bg-[#0B141B] border border-white/10 rounded-lg p-2 text-white font-mono text-xs outline-none"
             />
           </div>
 
@@ -133,7 +133,7 @@ NOTICE: ${data.disclaimer}
             <select
               value={exposure}
               onChange={(e) => setExposure(e.target.value)}
-              className="w-full bg-[#101820] border border-white/10 rounded-lg p-2 text-white font-mono text-xs outline-none"
+              className="w-full bg-[#0B141B] border border-white/10 rounded-lg p-2 text-white font-mono text-xs outline-none"
             >
               <option value="sun">Direct Sunlight</option>
               <option value="shade">Covered / Shaded</option>
@@ -147,7 +147,7 @@ NOTICE: ${data.disclaimer}
             <select
               value={met}
               onChange={(e) => setMet(Number(e.target.value))}
-              className="w-full bg-[#101820] border border-white/10 rounded-lg p-2 text-white font-mono text-xs outline-none"
+              className="w-full bg-[#0B141B] border border-white/10 rounded-lg p-2 text-white font-mono text-xs outline-none"
             >
               <option value={4.0}>Moderate (4.0 MET)</option>
               <option value={6.0}>Heavy Manual (6.0 MET)</option>
@@ -161,13 +161,13 @@ NOTICE: ${data.disclaimer}
       <div
         ref={cardRef}
         id="printable-shift-card"
-        className="shift-card-print bg-[#1F3445] border border-white/15 rounded-[14px] p-6 sm:p-8 space-y-6 shadow-2xl relative corner-ticks text-[#D7E0E7]"
+        className="shift-card-print bg-[#142630] border border-white/15 rounded-[14px] p-6 sm:p-8 space-y-6 shadow-2xl relative corner-ticks text-[#D7E0E7]"
       >
         {/* Printable Card Header */}
         <div className="flex items-start justify-between border-b border-white/10 pb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#7FA6C9] px-2 py-0.5 rounded bg-[#7FA6C9]/15 border border-[#7FA6C9]/30">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8FB3D9] px-2 py-0.5 rounded bg-[#8FB3D9]/15 border border-[#8FB3D9]/30">
                 Official Shift Advisory
               </span>
               <span className="text-xs font-mono text-[#8B9AA8]">
@@ -192,7 +192,7 @@ NOTICE: ${data.disclaimer}
 
         {/* 2 Core Directives: Hydration & Heavy Work Windows */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl bg-[#101820] border border-white/10 flex items-center gap-3">
+          <div className="p-4 rounded-xl bg-[#0B141B] border border-white/10 flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#38BDF8]/15 text-[#38BDF8] flex items-center justify-center shrink-0">
               <Droplets className="w-5 h-5" />
             </div>
@@ -205,7 +205,7 @@ NOTICE: ${data.disclaimer}
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#101820] border border-white/10 flex items-center gap-3">
+          <div className="p-4 rounded-xl bg-[#0B141B] border border-white/10 flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#F59E0B]/15 text-[#F59E0B] flex items-center justify-center shrink-0">
               <Clock className="w-5 h-5" />
             </div>
@@ -229,10 +229,10 @@ NOTICE: ${data.disclaimer}
             {data?.breaks.map((b, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-xl bg-[#101820] border border-white/10 space-y-1 relative"
+                className="p-3.5 rounded-xl bg-[#0B141B] border border-white/10 space-y-1 relative"
               >
                 <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="font-bold text-[#7FA6C9]">{b.start} – {b.end}</span>
+                  <span className="font-bold text-[#8FB3D9]">{b.start} – {b.end}</span>
                   <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/5 text-[#8B9AA8]">
                     {b.duration || 'Rest'}
                   </span>
@@ -253,7 +253,7 @@ NOTICE: ${data.disclaimer}
               {data.wbgt_series.map((item, idx) => (
                 <div
                   key={idx}
-                  className="px-2.5 py-1.5 rounded-lg bg-[#101820] border border-white/5 text-center shrink-0"
+                  className="px-2.5 py-1.5 rounded-lg bg-[#0B141B] border border-white/5 text-center shrink-0"
                 >
                   <span className="text-[9px] font-mono text-[#5F7183] block">{item.time}</span>
                   <span

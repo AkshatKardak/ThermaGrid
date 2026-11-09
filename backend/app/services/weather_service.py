@@ -83,6 +83,7 @@ class WeatherService:
 
         is_demo = weather_data.get("is_demo", False)
         demo_label = weather_data.get("demo_label", None) if is_demo else None
+        source_name = "synthetic" if is_demo else weather_data.get("data_source", "Open-Meteo")
 
         obs_dict = {
             "location_id": location.id,
@@ -96,7 +97,7 @@ class WeatherService:
             "wind_speed_ms": float(wind),
             "solar_radiation_wm2": float(sol),
             "apparent_temperature_c": float(app_t),
-            "source_name": weather_data.get("data_source", "Open-Meteo"),
+            "source_name": source_name,
             "is_demo": is_demo,
             "is_synthetic": is_demo,
             "demo_label": demo_label,

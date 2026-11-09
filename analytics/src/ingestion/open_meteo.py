@@ -58,8 +58,12 @@ class OpenMeteoClient:
                 data["data_source"] = "Open-Meteo ECMWF/GFS Ensemble via API"
                 return data
         except Exception as e:
-            # Generate deterministic fallback calibrated to Indian pre-monsoon heat conditions
-            return self._generate_fallback_forecast(latitude, longitude, forecast_days)
+            # Generate fallback clearly flagged as synthetic with is_demo=True
+            fallback = self._generate_fallback_forecast(latitude, longitude, forecast_days)
+            fallback["is_demo"] = True
+            fallback["source_name"] = "synthetic"
+            fallback["data_source"] = "synthetic"
+            return fallback
 
     def _generate_fallback_forecast(
         self, latitude: float, longitude: float, forecast_days: int

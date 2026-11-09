@@ -13,7 +13,6 @@
     "@clerk/clerk-react": "^5.61.11",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
-    "@sentry/react": "^11.9.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-query": "^5.104.5",
     "axios": "^1.20.0",

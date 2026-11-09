@@ -106,7 +106,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
         </div>
 
         {/* SVG Overnight Curve (20:00 -> 06:00) */}
-        <div className="bg-[#101820] p-3 rounded-xl border border-white/10 space-y-1">
+        <div className="bg-[#0B141B] p-3 rounded-xl border border-white/10 space-y-1">
           <div className="flex justify-between items-center text-[10px] font-mono text-[#8B9AA8] px-1">
             <span>20:00 (Sunset)</span>
             <span className="text-[#F59E0B]">25°C Tropical Night Baseline</span>
@@ -162,7 +162,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
                   cx={p.x}
                   cy={p.y}
                   r="3"
-                  fill="#101820"
+                  fill="#0B141B"
                   stroke={data.tropical_night ? '#FF704F' : '#2FA37C'}
                   strokeWidth="2"
                 />
@@ -194,7 +194,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
                 key={idx}
                 className="flex items-start gap-2 p-2.5 rounded-lg bg-white/[0.02] border border-white/5 text-xs text-[#D7E0E7]"
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-[#7FA6C9] mt-1.5 shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#8FB3D9] mt-1.5 shrink-0" />
                 <span className="leading-snug">{item}</span>
               </div>
             ))}

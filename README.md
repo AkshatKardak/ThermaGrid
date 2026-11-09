@@ -88,7 +88,6 @@ Urban heatwaves are among the deadliest climate hazards, yet municipal disaster 
 - Three.js
 - Clerk
 - Resend
-- Sentry
 - Docker
 - Open-Meteo API
 
@@ -124,6 +123,136 @@ flowchart TD
   Frontend -->|Bearer JWT / REST API| Backend
   Backend --> Analytics
   Backend --> Storage
+```
+
+---
+
+## Frontend
+
+The frontend is built with React, TypeScript, and Vite. It provides an operational telemetry interface adhering to strict accessibility standards, low visual noise, and centralized design tokens.
+
+### Core Capabilities
+- **Mission Control Authority Console:** Full-bleed, map-first command interface with floating telemetry panels for city administrators, emergency alert broadcasting, and intervention management.
+- **Citizen Heat Risk Hub:** Ward-level real-time thermal stress index, safe-window outdoor errand planning, and dependent monitoring (Care Circles).
+- **Occupational Health Console:** Dynamic ISO 7243 rest-hydration cycle generation with printable A5 field shift cards.
+- **Design Token System:** Centralized design tokens located in `frontend/src/theme/tokens.ts` and mirrored via CSS variables in `frontend/src/index.css`.
+  - Palette surfaces: `--bg` (`#0B141B`), `--surface` (`#142630`), `--raised` (`#203A45`).
+  - Interactive accent: `--accent` (`#8FB3D9`) strictly reserved for primary actions, active navigation, and live telemetry indicators.
+  - Thermal risk scale: Normative heat scale (`#2FA37C`, `#E8C547`, `#F59E0B`, `#FF704F`, `#C31D3C`) strictly reserved for risk data.
+- **Cinematic Authentication:** Desktop split-screen featuring rotating 3D thermal globe and animated Clerk authentication card with demo bypass controls.
+
+### Build and Development
+```bash
+cd frontend
+npm install
+npm run dev      # Local Vite development server on port 5173
+npm run build    # Production bundle with TypeScript type-checking
+```
+
+---
+
+## Backend
+
+The backend is built using FastAPI (Python 3.11+) and delivers asynchronous REST endpoints and scheduled telemetry ingestion pipelines.
+
+### Core Capabilities
+- **Biometeorological Physics Engine:** Evaluates Liljegren (2008) Wet-Bulb Globe Temperature (WBGT), 6th-order polynomial Universal Thermal Climate Index (UTCI), and Rothfusz Heat Index equations.
+- **Indoor Thermal Lag Simulation:** Simulates roof and wall envelope thermal inertia (tin vs. concrete RCC) and 2–3 hour nocturnal phase lag.
+- **Multidimensional Spatial Risk Scoring:**
+  $$R = w_h H + w_e E + w_v V - w_a A$$
+  Evaluates hazard ($H$), exposure ($E$), vulnerability ($V$), and adaptive capacity ($A$) per ward.
+- **Automated Weather Ingestion:** Asynchronous scheduled job fetching hourly meteorological observations with truthful provenance tagging (`source_name`, `is_demo`).
+- **Emergency Alert Dispatch:** Multilingual notifications (English, Hindi, Marathi, Tamil, Bengali) over email and messaging channels.
+
+### Build and Execution
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+fastapi dev app/main.py    # Local API server on port 8000
+```
+
+---
+
+## Database
+
+The storage layer utilizes PostgreSQL with PostGIS for spatial operations, supported by SQLite for local zero-dependency development.
+
+### Architecture & Schemas
+- **Locations Table (`locations`):**
+  - Administrative boundary geometry (`geometry_geojson`, Polygon/MultiPolygon).
+  - Spatial and demographic attributes: `ward_code`, `ward_name`, `city`, `district`, `state`, `latitude`, `longitude`, `area_sq_km`, `population`, `population_density_per_km2`.
+  - Vulnerability ratios: `elderly_ratio`, `children_ratio`, `outdoor_worker_ratio`.
+  - Unsourced indicators (`informal_settlement_ratio`, `tree_canopy_fraction`, `cooling_access_deficit`) remain `NULL` with truthful provenance.
+- **Weather Observations Table (`weather_observations`):**
+  - Surface meteorological parameters: `temperature_c`, `rel_humidity_pct`, `wind_speed_ms`, `solar_radiation_wm2`, `apparent_temperature_c`.
+  - Provenance flags: `source_name` and `is_demo`.
+- **Database Seeding:**
+  ```bash
+  python scripts/seed_database.py
+  ```
+
+---
+
+## Deployment
+
+The system is designed for Linux container environments or standard VM deployments.
+
+### 1. Containerized Stack (Docker & Compose)
+```bash
+docker compose up -d --build
+```
+Containers started:
+- `backend`: FastAPI Uvicorn service on port 8000.
+- `database`: PostgreSQL with PostGIS spatial extensions on port 5432.
+- `frontend`: Static production build served through high-performance reverse proxy.
+
+### 2. Standalone Production Deployment (Native Systemd)
+Create a systemd unit file for the backend service (`/etc/systemd/system/thermagrid-backend.service`):
+```ini
+[Unit]
+Description=ThermaGrid FastAPI Backend Service
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/opt/thermagrid/backend
+EnvironmentFile=/opt/thermagrid/backend/.env
+ExecStart=/opt/thermagrid/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 4
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start the service:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable thermagrid-backend
+sudo systemctl start thermagrid-backend
+```
+
+### 3. NGINX Reverse Proxy Configuration
+```nginx
+server {
+    listen 80;
+    server_name thermagrid.example.com;
+
+    location / {
+        root /opt/thermagrid/frontend/dist;
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
 ```
 
 ---
@@ -219,7 +348,6 @@ CLERK_SECRET_KEY=
 CLERK_JWKS_URL=
 CLERK_ISSUER=
 CLERK_AUTHORIZED_PARTIES=
-SENTRY_DSN=
 RESEND_API_KEY=
 ALERT_FROM_EMAIL=
 WHATSAPP_PHONE_ID=
@@ -237,7 +365,6 @@ MODEL_ARTIFACT_PATH=
 ```env
 VITE_API_BASE_URL=
 VITE_CLERK_PUBLISHABLE_KEY=
-VITE_SENTRY_DSN=
 VITE_MAP_STYLE_URL=
 VITE_MAPBOX_TOKEN=
 VITE_APP_NAME=

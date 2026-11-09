@@ -17,12 +17,12 @@ class LocationBase(BaseModel):
     area_sq_km: Optional[float] = None
     population: int
     population_density_per_km2: float
-    outdoor_worker_ratio: float
-    informal_settlement_ratio: float
-    tree_canopy_fraction: float
-    elderly_ratio: float
-    children_ratio: float
-    cooling_access_deficit: float
+    outdoor_worker_ratio: Optional[float] = None
+    informal_settlement_ratio: Optional[float] = None
+    tree_canopy_fraction: Optional[float] = None
+    elderly_ratio: Optional[float] = None
+    children_ratio: Optional[float] = None
+    cooling_access_deficit: Optional[float] = None
     hospital_count: int
     drinking_water_deficit: float
     description: Optional[str] = None

@@ -33,5 +33,6 @@ class WeatherForecast(Base):
     rel_humidity_pct = Column(Float, nullable=False)
     wind_speed_ms = Column(Float, nullable=False)
     solar_radiation_wm2 = Column(Float, default=0.0)
+    source_name = Column(String(100), default="Open-Meteo Seamless")
     is_demo = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

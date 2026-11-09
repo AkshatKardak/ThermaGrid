@@ -61,7 +61,7 @@ export const CitizenDashboard: React.FC = () => {
   return (
     <div className="space-y-12">
       {/* 1. Location Bar: Search + Geolocate + Recent Chips */}
-      <div className="p-4 rounded-[14px] bg-[#1F3445] border border-white/8 space-y-3">
+      <div className="p-4 rounded-[14px] bg-[#142630] border border-white/8 space-y-3">
         <div className="flex flex-col md:flex-row items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1 w-full">
@@ -71,10 +71,10 @@ export const CitizenDashboard: React.FC = () => {
               placeholder="Search municipal ward, pincode, or landmark..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-[8px] bg-[#101820] border border-white/10 text-xs font-mono text-white placeholder-[#5F7183] focus:border-[#7FA6C9] outline-none"
+              className="w-full pl-10 pr-4 py-2.5 rounded-[8px] bg-[#0B141B] border border-white/10 text-xs font-mono text-white placeholder-[#5F7183] focus:border-[#8FB3D9] outline-none"
             />
             {searchQuery && filteredWards && filteredWards.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-[8px] bg-[#1F3445] border border-white/16 shadow-2xl z-40">
+              <div className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-[8px] bg-[#142630] border border-white/16 shadow-2xl z-40">
                 {filteredWards.map((w) => (
                   <button
                     key={w.id}
@@ -82,7 +82,7 @@ export const CitizenDashboard: React.FC = () => {
                       setSelectedLocationId(w.id);
                       setSearchQuery('');
                     }}
-                    className="w-full px-3.5 py-2 text-left text-xs font-mono hover:bg-[#263E50] text-[#D7E0E7] flex items-center justify-between cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left text-xs font-mono hover:bg-[#203A45] text-[#D7E0E7] flex items-center justify-between cursor-pointer"
                   >
                     <span>{w.ward_name}</span>
                     <span className="text-[10px] text-[#8B9AA8]">{w.ward_code}</span>
@@ -98,9 +98,9 @@ export const CitizenDashboard: React.FC = () => {
             onClick={() => {
               if (wards && wards.length > 0) setSelectedLocationId(wards[0].id);
             }}
-            className="w-full md:w-auto px-4 py-2.5 rounded-[8px] bg-[#2F4A5E]/50 hover:bg-[#2F4A5E] border border-white/8 text-xs font-mono text-[#D7E0E7] flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="w-full md:w-auto px-4 py-2.5 rounded-[8px] bg-[#203A45]/50 hover:bg-[#203A45] border border-white/8 text-xs font-mono text-[#D7E0E7] flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
-            <Crosshair className="w-3.5 h-3.5 text-[#7FA6C9]" />
+            <Crosshair className="w-3.5 h-3.5 text-[#8FB3D9]" />
             <span>Use My Location</span>
           </button>
         </div>
@@ -116,8 +116,8 @@ export const CitizenDashboard: React.FC = () => {
               onClick={() => setSelectedLocationId(w.id)}
               className={`px-2.5 py-1 rounded-[6px] text-xs font-mono transition-all cursor-pointer ${
                 w.id === selectedLocationId
-                  ? 'bg-[#7FA6C9]/20 border border-[#7FA6C9]/40 text-white'
-                  : 'bg-[#101820]/60 border border-white/6 text-[#8B9AA8] hover:text-white'
+                  ? 'bg-[#8FB3D9]/20 border border-[#8FB3D9]/40 text-white'
+                  : 'bg-[#0B141B]/60 border border-white/6 text-[#8B9AA8] hover:text-white'
               }`}
             >
               {w.ward_name}
@@ -130,7 +130,7 @@ export const CitizenDashboard: React.FC = () => {
       {alerts && alerts.length > 0 && <AlertBanner alerts={alerts} />}
 
       {/* 2. Hero Risk Block */}
-      <div className="rounded-[14px] bg-[#1F3445] border border-white/8 p-6 sm:p-8 space-y-6 corner-ticks relative">
+      <div className="rounded-[14px] bg-[#142630] border border-white/8 p-6 sm:p-8 space-y-6 corner-ticks relative">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/8">
           <div>
             <div className="flex items-center gap-2">
@@ -250,7 +250,7 @@ export const CitizenDashboard: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <div className="p-3.5 rounded-[8px] bg-[#101820]/60 border border-white/6 flex items-start gap-3">
+                <div className="p-3.5 rounded-[8px] bg-[#0B141B]/60 border border-white/6 flex items-start gap-3">
                   <Droplets className="w-5 h-5 text-[#2FA37C] shrink-0 mt-0.5" />
                   <div>
                     <span className="text-xs font-bold text-white block">Hydration Target</span>
@@ -260,7 +260,7 @@ export const CitizenDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-[8px] bg-[#101820]/60 border border-white/6 flex items-start gap-3">
+                <div className="p-3.5 rounded-[8px] bg-[#0B141B]/60 border border-white/6 flex items-start gap-3">
                   <Clock className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
                   <div>
                     <span className="text-xs font-bold text-white block">Peak Shelter</span>
@@ -270,8 +270,8 @@ export const CitizenDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-[8px] bg-[#101820]/60 border border-white/6 flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-[#7FA6C9] shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-[8px] bg-[#0B141B]/60 border border-white/6 flex items-start gap-3">
+                  <ShieldCheck className="w-5 h-5 text-[#8FB3D9] shrink-0 mt-0.5" />
                   <div>
                     <span className="text-xs font-bold text-white block">Vulnerable Cohorts</span>
                     <span className="text-xs text-[#8B9AA8] leading-normal">
@@ -280,7 +280,7 @@ export const CitizenDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-[8px] bg-[#101820]/60 border border-white/6 flex items-start gap-3">
+                <div className="p-3.5 rounded-[8px] bg-[#0B141B]/60 border border-white/6 flex items-start gap-3">
                   <Phone className="w-5 h-5 text-[#FF704F] shrink-0 mt-0.5" />
                   <div>
                     <span className="text-xs font-bold text-white block">Emergency Helpline</span>

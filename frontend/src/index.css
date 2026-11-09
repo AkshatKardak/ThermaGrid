@@ -7,30 +7,35 @@
 }
 
 :root {
-  /* Surfaces & canvas (Instrument-grade editorial) */
-  --bg: #101820;              /* Midnight canvas */
-  --surface: #1F3445;         /* L1 panel        */
-  --surface-2: #263E50;       /* L2 raised       */
-  --surface-3: #2F4A5E;       /* L3 recessed     */
-  
-  /* Hairline borders */
-  --border: rgba(255, 255, 255, 0.08);
-  --border-2: rgba(255, 255, 255, 0.16);
-  
-  /* Text tokens (never pure white #fff) */
-  --text: #D7E0E7;
-  --text-dim: #8B9AA8;
+  /* Arctic Observatory surfaces */
+  --bg: #0B141B;
+  --surface: #142630;
+  --raised: #203A45;
+  --hairline: rgba(255,255,255,.075);
+  --hairline-2: rgba(255,255,255,.14);
+
+  /* Legacy aliases */
+  --surface-2: #203A45;
+  --surface-3: #142630;
+  --border: rgba(255, 255, 255, 0.075);
+  --border-2: rgba(255, 255, 255, 0.14);
+
+  /* text */
+  --text: #D8E8E6;
+  --muted: #6B7C8A;
+  --dim: #93A3B0;
+  --text-dim: #6B7C8A;
   --text-faint: #5F7183;
 
-  /* Interactive Accent (UI Chrome & interaction ONLY - never risk values) */
-  --accent: #7FA6C9;          /* steel blue — interactive chrome only */
-  --accent-dim: #5C82A3;
-  --accent-soft: rgba(127, 166, 201, 0.16);
+  /* interactive accent — chrome only */
+  --accent: #8FB3D9;
+  --accent-dim: #6E93B8;
+  --accent-soft: rgba(143,179,217,.16);
 
-  /* Alert */
+  /* alert */
   --alert: #FF704F;
 
-  /* Heat scale (Risk ONLY, never decorative) */
+  /* RISK SCALE — semantically fixed, never used for chrome */
   --safe: #2FA37C;
   --moderate: #E8C547;
   --high: #F59E0B;
@@ -38,11 +43,13 @@
   --extreme: #C31D3C;
 
   /* Motion tokens */
-  --dur-fast: 120ms;
-  --dur-base: 200ms;
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-reveal: 600ms;
   --dur-slow: 320ms;
   --dur-scene: 700ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-motion: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
@@ -208,7 +215,7 @@ code, pre, .font-mono, .data-readout {
 @media print {
   body {
     background: #ffffff !important;
-    color: #101820 !important;
+    color: #0B141B !important;
   }
   header, footer, nav, .no-print, .film-grain, .vignette-overlay, .bg-grid-pattern {
     display: none !important;
@@ -220,15 +227,15 @@ code, pre, .font-mono, .data-readout {
   }
   .shift-card-print {
     background: #ffffff !important;
-    color: #101820 !important;
-    border: 1.5px solid #101820 !important;
+    color: #0B141B !important;
+    border: 1.5px solid #0B141B !important;
     box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     padding: 20px !important;
   }
   .shift-card-print * {
-    color: #101820 !important;
+    color: #0B141B !important;
     text-shadow: none !important;
   }
 }

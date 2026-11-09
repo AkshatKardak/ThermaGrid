@@ -42,7 +42,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({ risk, thermal }) => {
       value: risk ? `${risk.risk_score.toFixed(1)}` : '--',
       subtext: risk ? risk.band_label : 'Hazard × Exp × Vuln',
       icon: AlertTriangle,
-      color: risk ? risk.alert_color : '#7FA6C9',
+      color: risk ? risk.alert_color : '#8FB3D9',
     },
   ];
 
@@ -53,7 +53,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({ risk, thermal }) => {
         return (
           <div
             key={i}
-            className="p-3.5 rounded-xl bg-[#1F3445]/80 border border-white/10 flex flex-col justify-between"
+            className="p-3.5 rounded-xl bg-[#142630]/80 border border-white/10 flex flex-col justify-between"
           >
             <div className="flex items-center justify-between text-[#8B9AA8] text-xs">
               <span className="font-medium truncate pr-1">{card.label}</span>

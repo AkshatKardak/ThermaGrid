@@ -26,7 +26,7 @@ export const HeatCalendar: React.FC = () => {
           Synoptic Heat Stress Matrix (Monthly Average HTSI)
         </span>
         {hoveredCell && (
-          <div className="text-xs font-mono text-[#D7E0E7] bg-[#101820] px-2.5 py-1 rounded border border-white/10">
+          <div className="text-xs font-mono text-[#D7E0E7] bg-[#0B141B] px-2.5 py-1 rounded border border-white/10">
             {hoveredCell.month} {hoveredCell.year}:{' '}
             <span
               className="font-bold"

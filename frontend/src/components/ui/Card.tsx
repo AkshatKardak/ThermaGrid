@@ -27,17 +27,17 @@ export const Card: React.FC<CardProps> = ({
   let tierStyles = '';
   switch (tier) {
     case 'l2':
-      tierStyles = 'bg-[#263E50] border border-white/16 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.90)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)]';
+      tierStyles = 'bg-[#203A45] border border-white/16 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.90)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)]';
       break;
     case 'l3':
-      tierStyles = 'bg-[#1F3445]/85 backdrop-blur-[16px] border border-white/16 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.95)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)]';
+      tierStyles = 'bg-[#142630]/85 backdrop-blur-[16px] border border-white/16 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.95)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)]';
       break;
     case 'recessed':
-      tierStyles = 'bg-[#2F4A5E]/40 border border-white/8';
+      tierStyles = 'bg-[#203A45]/40 border border-white/8';
       break;
     case 'l1':
     default:
-      tierStyles = 'bg-[#1F3445] border border-white/8';
+      tierStyles = 'bg-[#142630] border border-white/8';
       break;
   }
 

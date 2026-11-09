@@ -46,9 +46,6 @@ class Settings(BaseSettings):
     clerk_issuer: str = ""
     clerk_authorized_parties: str = "http://localhost:5173"
 
-    # Sentry
-    sentry_dsn: str = ""
-
     # Resend (email)
     resend_api_key: str = ""
     alert_from_email: str = "ThermaGrid <onboarding@resend.dev>"

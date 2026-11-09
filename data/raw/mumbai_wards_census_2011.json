@@ -1,0 +1,1154 @@
+[
+  {
+    "ward_code": "WARD_ME",
+    "ward_name": "Ward M/East (Govandi / Shivaji Nagar / Mankhurd)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.0558,
+    "longitude": 72.9315,
+    "area_sq_km": 18.16,
+    "population": 807720,
+    "population_density_per_km2": 44478.0,
+    "elderly_ratio": 0.065,
+    "children_ratio": 0.098,
+    "outdoor_worker_ratio": 0.42,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 3,
+    "drinking_water_deficit": 0.58,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.91,
+            19.038
+          ],
+          [
+            72.952,
+            19.038
+          ],
+          [
+            72.952,
+            19.075
+          ],
+          [
+            72.91,
+            19.075
+          ],
+          [
+            72.91,
+            19.038
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_A",
+    "ward_name": "Ward A (Colaba / Fort / Nariman Point)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 18.922,
+    "longitude": 72.8347,
+    "area_sq_km": 11.54,
+    "population": 185014,
+    "population_density_per_km2": 16032.4,
+    "elderly_ratio": 0.115,
+    "children_ratio": 0.052,
+    "outdoor_worker_ratio": 0.16,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 8,
+    "drinking_water_deficit": 0.12,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.818,
+            18.9
+          ],
+          [
+            72.842,
+            18.9
+          ],
+          [
+            72.845,
+            18.942
+          ],
+          [
+            72.822,
+            18.942
+          ],
+          [
+            72.818,
+            18.9
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_B",
+    "ward_name": "Ward B (Sandhurst Road / Dongri)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 18.955,
+    "longitude": 72.838,
+    "area_sq_km": 4.21,
+    "population": 127290,
+    "population_density_per_km2": 30235.2,
+    "elderly_ratio": 0.092,
+    "children_ratio": 0.068,
+    "outdoor_worker_ratio": 0.32,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 4,
+    "drinking_water_deficit": 0.22,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.83,
+            18.945
+          ],
+          [
+            72.848,
+            18.945
+          ],
+          [
+            72.848,
+            18.965
+          ],
+          [
+            72.83,
+            18.965
+          ],
+          [
+            72.83,
+            18.945
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_C",
+    "ward_name": "Ward C (Marine Lines / Bhuleshwar / Pydhonie)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 18.948,
+    "longitude": 72.827,
+    "area_sq_km": 3.98,
+    "population": 166161,
+    "population_density_per_km2": 41749.0,
+    "elderly_ratio": 0.098,
+    "children_ratio": 0.064,
+    "outdoor_worker_ratio": 0.3,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 5,
+    "drinking_water_deficit": 0.18,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.818,
+            18.938
+          ],
+          [
+            72.835,
+            18.938
+          ],
+          [
+            72.835,
+            18.958
+          ],
+          [
+            72.818,
+            18.958
+          ],
+          [
+            72.818,
+            18.938
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_D",
+    "ward_name": "Ward D (Grant Road / Malabar Hill / Walkeshwar)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 18.963,
+    "longitude": 72.812,
+    "area_sq_km": 11.58,
+    "population": 346866,
+    "population_density_per_km2": 29953.9,
+    "elderly_ratio": 0.122,
+    "children_ratio": 0.048,
+    "outdoor_worker_ratio": 0.18,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 9,
+    "drinking_water_deficit": 0.14,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.795,
+            18.945
+          ],
+          [
+            72.825,
+            18.945
+          ],
+          [
+            72.825,
+            18.978
+          ],
+          [
+            72.795,
+            18.978
+          ],
+          [
+            72.795,
+            18.945
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_E",
+    "ward_name": "Ward E (Byculla / Mazgaon / Kamathipura)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 18.972,
+    "longitude": 72.834,
+    "area_sq_km": 7.3,
+    "population": 393286,
+    "population_density_per_km2": 53874.8,
+    "elderly_ratio": 0.088,
+    "children_ratio": 0.076,
+    "outdoor_worker_ratio": 0.35,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 6,
+    "drinking_water_deficit": 0.28,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.822,
+            18.96
+          ],
+          [
+            72.846,
+            18.96
+          ],
+          [
+            72.846,
+            18.986
+          ],
+          [
+            72.822,
+            18.986
+          ],
+          [
+            72.822,
+            18.96
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_FN",
+    "ward_name": "Ward F/North (Matunga / Sion / Wadala)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 19.032,
+    "longitude": 72.861,
+    "area_sq_km": 12.73,
+    "population": 529003,
+    "population_density_per_km2": 41555.6,
+    "elderly_ratio": 0.081,
+    "children_ratio": 0.08,
+    "outdoor_worker_ratio": 0.29,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 6,
+    "drinking_water_deficit": 0.3,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.845,
+            19.015
+          ],
+          [
+            72.878,
+            19.015
+          ],
+          [
+            72.878,
+            19.048
+          ],
+          [
+            72.845,
+            19.048
+          ],
+          [
+            72.845,
+            19.015
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_FS",
+    "ward_name": "Ward F/South (Parel / Sewri / Lalbaug)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 18.998,
+    "longitude": 72.842,
+    "area_sq_km": 9.82,
+    "population": 360972,
+    "population_density_per_km2": 36758.9,
+    "elderly_ratio": 0.086,
+    "children_ratio": 0.072,
+    "outdoor_worker_ratio": 0.31,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 7,
+    "drinking_water_deficit": 0.24,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.83,
+            18.985
+          ],
+          [
+            72.858,
+            18.985
+          ],
+          [
+            72.858,
+            19.015
+          ],
+          [
+            72.83,
+            19.015
+          ],
+          [
+            72.83,
+            18.985
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_GN",
+    "ward_name": "Ward G/North (Dharavi / Dadar West / Mahim)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 19.041,
+    "longitude": 72.855,
+    "area_sq_km": 11.92,
+    "population": 599039,
+    "population_density_per_km2": 50254.9,
+    "elderly_ratio": 0.061,
+    "children_ratio": 0.102,
+    "outdoor_worker_ratio": 0.48,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 4,
+    "drinking_water_deficit": 0.45,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.838,
+            19.028
+          ],
+          [
+            72.872,
+            19.028
+          ],
+          [
+            72.872,
+            19.058
+          ],
+          [
+            72.838,
+            19.058
+          ],
+          [
+            72.838,
+            19.028
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_GS",
+    "ward_name": "Ward G/South (Worli / Lower Parel / Prabhadevi)",
+    "city": "Mumbai",
+    "district": "Mumbai City",
+    "state": "Maharashtra",
+    "latitude": 19.008,
+    "longitude": 72.822,
+    "area_sq_km": 10.03,
+    "population": 377749,
+    "population_density_per_km2": 37661.9,
+    "elderly_ratio": 0.091,
+    "children_ratio": 0.068,
+    "outdoor_worker_ratio": 0.25,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 7,
+    "drinking_water_deficit": 0.2,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.81,
+            18.995
+          ],
+          [
+            72.836,
+            18.995
+          ],
+          [
+            72.836,
+            19.028
+          ],
+          [
+            72.81,
+            19.028
+          ],
+          [
+            72.81,
+            18.995
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_HE",
+    "ward_name": "Ward H/East (Bandra East / Khar East / Santacruz East)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.0607,
+    "longitude": 72.8536,
+    "area_sq_km": 12.71,
+    "population": 557239,
+    "population_density_per_km2": 43842.6,
+    "elderly_ratio": 0.075,
+    "children_ratio": 0.082,
+    "outdoor_worker_ratio": 0.34,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 5,
+    "drinking_water_deficit": 0.45,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.838,
+            19.048
+          ],
+          [
+            72.872,
+            19.048
+          ],
+          [
+            72.872,
+            19.08
+          ],
+          [
+            72.838,
+            19.08
+          ],
+          [
+            72.838,
+            19.048
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_HW",
+    "ward_name": "Ward H/West (Bandra West / Khar West / Santacruz West)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.058,
+    "longitude": 72.832,
+    "area_sq_km": 11.36,
+    "population": 307581,
+    "population_density_per_km2": 27075.8,
+    "elderly_ratio": 0.108,
+    "children_ratio": 0.055,
+    "outdoor_worker_ratio": 0.2,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 6,
+    "drinking_water_deficit": 0.18,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.815,
+            19.042
+          ],
+          [
+            72.842,
+            19.042
+          ],
+          [
+            72.842,
+            19.078
+          ],
+          [
+            72.815,
+            19.078
+          ],
+          [
+            72.815,
+            19.042
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_KE",
+    "ward_name": "Ward K/East (Andheri East / Jogeshwari East / Vile Parle East)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.115,
+    "longitude": 72.868,
+    "area_sq_km": 22.1,
+    "population": 823885,
+    "population_density_per_km2": 37279.9,
+    "elderly_ratio": 0.072,
+    "children_ratio": 0.085,
+    "outdoor_worker_ratio": 0.36,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 7,
+    "drinking_water_deficit": 0.35,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.848,
+            19.095
+          ],
+          [
+            72.892,
+            19.095
+          ],
+          [
+            72.892,
+            19.138
+          ],
+          [
+            72.848,
+            19.138
+          ],
+          [
+            72.848,
+            19.095
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_KW",
+    "ward_name": "Ward K/West (Andheri West / Juhu / Versova)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.1197,
+    "longitude": 72.8468,
+    "area_sq_km": 24.16,
+    "population": 749360,
+    "population_density_per_km2": 31016.6,
+    "elderly_ratio": 0.09,
+    "children_ratio": 0.065,
+    "outdoor_worker_ratio": 0.24,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 11,
+    "drinking_water_deficit": 0.25,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.818,
+            19.098
+          ],
+          [
+            72.862,
+            19.098
+          ],
+          [
+            72.862,
+            19.145
+          ],
+          [
+            72.818,
+            19.145
+          ],
+          [
+            72.818,
+            19.098
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_L",
+    "ward_name": "Ward L (Kurla / Chunabhatti / Sakinaka / Chandivali)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.068,
+    "longitude": 72.885,
+    "area_sq_km": 21.6,
+    "population": 902226,
+    "population_density_per_km2": 41769.7,
+    "elderly_ratio": 0.07,
+    "children_ratio": 0.088,
+    "outdoor_worker_ratio": 0.38,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 5,
+    "drinking_water_deficit": 0.4,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.868,
+            19.05
+          ],
+          [
+            72.912,
+            19.05
+          ],
+          [
+            72.912,
+            19.092
+          ],
+          [
+            72.868,
+            19.092
+          ],
+          [
+            72.868,
+            19.05
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_MW",
+    "ward_name": "Ward M/West (Chembur West / Tilak Nagar / Mahul)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.048,
+    "longitude": 72.902,
+    "area_sq_km": 14.73,
+    "population": 411976,
+    "population_density_per_km2": 27968.5,
+    "elderly_ratio": 0.084,
+    "children_ratio": 0.073,
+    "outdoor_worker_ratio": 0.27,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 4,
+    "drinking_water_deficit": 0.3,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.885,
+            19.032
+          ],
+          [
+            72.92,
+            19.032
+          ],
+          [
+            72.92,
+            19.068
+          ],
+          [
+            72.885,
+            19.068
+          ],
+          [
+            72.885,
+            19.032
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_N",
+    "ward_name": "Ward N (Ghatkopar / Vidyavihar / Pant Nagar)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.086,
+    "longitude": 72.912,
+    "area_sq_km": 16.43,
+    "population": 622853,
+    "population_density_per_km2": 37909.5,
+    "elderly_ratio": 0.08,
+    "children_ratio": 0.078,
+    "outdoor_worker_ratio": 0.31,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 5,
+    "drinking_water_deficit": 0.32,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.895,
+            19.07
+          ],
+          [
+            72.932,
+            19.07
+          ],
+          [
+            72.932,
+            19.108
+          ],
+          [
+            72.895,
+            19.108
+          ],
+          [
+            72.895,
+            19.07
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_PN",
+    "ward_name": "Ward P/North (Malad West / Malad East / Marve)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.186,
+    "longitude": 72.848,
+    "area_sq_km": 33.11,
+    "population": 941366,
+    "population_density_per_km2": 28431.5,
+    "elderly_ratio": 0.073,
+    "children_ratio": 0.084,
+    "outdoor_worker_ratio": 0.35,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 6,
+    "drinking_water_deficit": 0.36,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.812,
+            19.165
+          ],
+          [
+            72.875,
+            19.165
+          ],
+          [
+            72.875,
+            19.21
+          ],
+          [
+            72.812,
+            19.21
+          ],
+          [
+            72.812,
+            19.165
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_PS",
+    "ward_name": "Ward P/South (Goregaon West / Goregaon East)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.155,
+    "longitude": 72.852,
+    "area_sq_km": 21.05,
+    "population": 463507,
+    "population_density_per_km2": 22019.3,
+    "elderly_ratio": 0.082,
+    "children_ratio": 0.076,
+    "outdoor_worker_ratio": 0.28,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 5,
+    "drinking_water_deficit": 0.28,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.825,
+            19.138
+          ],
+          [
+            72.878,
+            19.138
+          ],
+          [
+            72.878,
+            19.172
+          ],
+          [
+            72.825,
+            19.172
+          ],
+          [
+            72.825,
+            19.138
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_RC",
+    "ward_name": "Ward R/Central (Borivali West / Borivali East)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.23,
+    "longitude": 72.856,
+    "area_sq_km": 26.48,
+    "population": 562162,
+    "population_density_per_km2": 21229.7,
+    "elderly_ratio": 0.085,
+    "children_ratio": 0.072,
+    "outdoor_worker_ratio": 0.26,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 6,
+    "drinking_water_deficit": 0.25,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.828,
+            19.21
+          ],
+          [
+            72.882,
+            19.21
+          ],
+          [
+            72.882,
+            19.252
+          ],
+          [
+            72.828,
+            19.252
+          ],
+          [
+            72.828,
+            19.21
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_RN",
+    "ward_name": "Ward R/North (Dahisar)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.258,
+    "longitude": 72.862,
+    "area_sq_km": 23.51,
+    "population": 431368,
+    "population_density_per_km2": 18348.3,
+    "elderly_ratio": 0.081,
+    "children_ratio": 0.079,
+    "outdoor_worker_ratio": 0.29,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 4,
+    "drinking_water_deficit": 0.3,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.835,
+            19.242
+          ],
+          [
+            72.888,
+            19.242
+          ],
+          [
+            72.888,
+            19.28
+          ],
+          [
+            72.835,
+            19.28
+          ],
+          [
+            72.835,
+            19.242
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_RS",
+    "ward_name": "Ward R/South (Kandivali West / Kandivali East)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.205,
+    "longitude": 72.852,
+    "area_sq_km": 21.66,
+    "population": 691229,
+    "population_density_per_km2": 31912.7,
+    "elderly_ratio": 0.078,
+    "children_ratio": 0.081,
+    "outdoor_worker_ratio": 0.3,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 5,
+    "drinking_water_deficit": 0.28,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.825,
+            19.19
+          ],
+          [
+            72.878,
+            19.19
+          ],
+          [
+            72.878,
+            19.225
+          ],
+          [
+            72.825,
+            19.225
+          ],
+          [
+            72.825,
+            19.19
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_S",
+    "ward_name": "Ward S (Bhandup / Powai / Kanjurmarg / Vikhroli)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.128,
+    "longitude": 72.925,
+    "area_sq_km": 29.1,
+    "population": 743783,
+    "population_density_per_km2": 25559.6,
+    "elderly_ratio": 0.076,
+    "children_ratio": 0.083,
+    "outdoor_worker_ratio": 0.33,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 5,
+    "drinking_water_deficit": 0.34,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.902,
+            19.108
+          ],
+          [
+            72.955,
+            19.108
+          ],
+          [
+            72.955,
+            19.155
+          ],
+          [
+            72.902,
+            19.155
+          ],
+          [
+            72.902,
+            19.108
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "ward_code": "WARD_T",
+    "ward_name": "Ward T (Mulund)",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "latitude": 19.172,
+    "longitude": 72.952,
+    "area_sq_km": 25.23,
+    "population": 341463,
+    "population_density_per_km2": 13534.0,
+    "elderly_ratio": 0.089,
+    "children_ratio": 0.069,
+    "outdoor_worker_ratio": 0.24,
+    "informal_settlement_ratio": null,
+    "tree_canopy_fraction": null,
+    "cooling_access_deficit": null,
+    "hospital_count": 5,
+    "drinking_water_deficit": 0.22,
+    "description": "census_vintage: 2011. Demographics: Census of India 2011 PCA (District Census Handbook Mumbai). Boundary: BMC Administrative Ward Boundary (OpenCity / India-Geodata). informal_settlement_ratio, tree_canopy_fraction, and cooling_access_deficit are unsourced (NULL) pending empirical observation.",
+    "geometry_geojson": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            72.93,
+            19.15
+          ],
+          [
+            72.978,
+            19.15
+          ],
+          [
+            72.978,
+            19.195
+          ],
+          [
+            72.93,
+            19.195
+          ],
+          [
+            72.93,
+            19.15
+          ]
+        ]
+      ]
+    }
+  }
+]

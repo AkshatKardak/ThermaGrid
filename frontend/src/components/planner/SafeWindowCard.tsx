@@ -42,7 +42,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
         </div>
 
         {/* Activity Segmented Control */}
-        <div className="flex items-center p-1 bg-[#101820] rounded-[8px] border border-white/10 self-start sm:self-auto">
+        <div className="flex items-center p-1 bg-[#0B141B] rounded-[8px] border border-white/10 self-start sm:self-auto">
           {ACTIVITIES.map((act) => (
             <button
               key={act.id}
@@ -50,7 +50,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
               onClick={() => setActivity(act.id)}
               className={`px-3 py-1.5 rounded-[6px] text-xs font-mono font-medium transition-all cursor-pointer ${
                 activity === act.id
-                  ? 'bg-[#7FA6C9] text-white shadow-sm font-semibold'
+                  ? 'bg-[#8FB3D9] text-white shadow-sm font-semibold'
                   : 'text-[#8B9AA8] hover:text-[#D7E0E7]'
               }`}
             >
@@ -66,7 +66,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
           <span className="font-mono text-[#8B9AA8] uppercase text-[11px] tracking-wider">
             Planned Duration
           </span>
-          <span className="font-mono text-white font-bold bg-[#101820] px-2 py-0.5 rounded border border-white/10">
+          <span className="font-mono text-white font-bold bg-[#0B141B] px-2 py-0.5 rounded border border-white/10">
             {durationMin} minutes
           </span>
         </div>
@@ -77,7 +77,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
           step={15}
           value={durationMin}
           onChange={(e) => setDurationMin(Number(e.target.value))}
-          className="w-full accent-[#7FA6C9] h-1.5 bg-[#101820] rounded-lg appearance-none cursor-pointer"
+          className="w-full accent-[#8FB3D9] h-1.5 bg-[#0B141B] rounded-lg appearance-none cursor-pointer"
         />
         <div className="flex justify-between text-[10px] font-mono text-[#5F7183]">
           <span>15 min</span>
@@ -130,7 +130,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
                         transition={{ duration: 0.25, delay: idx * 0.07 }}
                         className="rounded-xl border transition-all overflow-hidden"
                         style={{
-                          backgroundColor: '#101820',
+                          backgroundColor: '#0B141B',
                           borderColor: 'rgba(255, 255, 255, 0.1)',
                         }}
                       >
@@ -183,7 +183,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
                     );
                   })
                 ) : (
-                  <div className="p-3.5 rounded-xl bg-[#101820] border border-white/10 text-xs text-[#8B9AA8]">
+                  <div className="p-3.5 rounded-xl bg-[#0B141B] border border-white/10 text-xs text-[#8B9AA8]">
                     No window satisfies the strict thermal limit for {activity}.
                   </div>
                 )}

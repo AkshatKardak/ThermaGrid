@@ -8,7 +8,7 @@ interface ProvenanceChipProps {
 
 export const ProvenanceChip: React.FC<ProvenanceChipProps> = ({ label, value, sub }) => {
   return (
-    <div className="flex flex-col p-3 rounded-[8px] bg-[#1F3445]/50 border border-white/6 space-y-1">
+    <div className="flex flex-col p-3 rounded-[8px] bg-[#142630]/50 border border-white/6 space-y-1">
       <span className="text-[10px] font-mono uppercase tracking-[0.10em] text-[#5F7183]">
         {label}
       </span>

@@ -58,7 +58,7 @@ export const Analytics: React.FC = () => {
             <h1 className={`${TYPOGRAPHY.h1} text-white`}>
               Thermal Biometeorology & ML Analytics
             </h1>
-            <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-[#7FA6C9]/15 text-[#7FA6C9] border border-[#7FA6C9]/30">
+            <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-[#8FB3D9]/15 text-[#8FB3D9] border border-[#8FB3D9]/30">
               Synoptic Telemetry
             </span>
           </div>
@@ -69,30 +69,30 @@ export const Analytics: React.FC = () => {
 
         {/* Action Controls & Data Timestamp Stamp */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="px-3 py-1.5 rounded-[6px] bg-[#101820] border border-white/8 text-[11px] font-mono text-[#8B9AA8]">
+          <div className="px-3 py-1.5 rounded-[6px] bg-[#0B141B] border border-white/8 text-[11px] font-mono text-[#8B9AA8]">
             Data as of: <span className="text-white font-semibold">{dataTimestamp} UTC</span>
           </div>
 
           <button
             type="button"
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[#263E50] hover:bg-[#2F4A5E] border border-white/12 text-xs font-mono font-semibold text-white transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[#203A45] hover:bg-[#203A45] border border-white/12 text-xs font-mono font-semibold text-white transition-all cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5 text-[#7FA6C9]" />
+            <Download className="w-3.5 h-3.5 text-[#8FB3D9]" />
             Export CSV
           </button>
         </div>
       </div>
 
       {/* Ward Selector Bar */}
-      <div className="flex items-center justify-between p-3.5 rounded-[10px] bg-[#1F3445]/60 border border-white/8">
+      <div className="flex items-center justify-between p-3.5 rounded-[10px] bg-[#142630]/60 border border-white/8">
         <span className="text-xs font-mono text-[#8B9AA8]">
           Selected Focal Ward: <strong className="text-white">{selectedWard?.ward_name}</strong>
         </span>
         <select
           value={selectedLocationId}
           onChange={(e) => setSelectedLocationId(Number(e.target.value))}
-          className="bg-[#101820] text-white text-xs font-mono px-3 py-1.5 rounded-[6px] border border-white/10 outline-none cursor-pointer"
+          className="bg-[#0B141B] text-white text-xs font-mono px-3 py-1.5 rounded-[6px] border border-white/10 outline-none cursor-pointer"
         >
           {wards?.map((w) => (
             <option key={w.id} value={w.id}>
@@ -187,7 +187,7 @@ export const Analytics: React.FC = () => {
                     </div>
 
                     {/* Horizontal Progress Bar */}
-                    <div className="w-full h-2 rounded-full bg-[#101820] overflow-hidden border border-white/5">
+                    <div className="w-full h-2 rounded-full bg-[#0B141B] overflow-hidden border border-white/5">
                       <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{

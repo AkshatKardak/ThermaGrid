@@ -41,18 +41,25 @@ class RiskService:
         w_exposure = config.weight_exposure if config else 0.25
         w_vulnerability = config.weight_vulnerability if config else 0.25
 
+        canopy = location.tree_canopy_fraction if location.tree_canopy_fraction is not None else 0.15
+        informal = location.informal_settlement_ratio if location.informal_settlement_ratio is not None else 0.30
+        cooling = location.cooling_access_deficit if location.cooling_access_deficit is not None else 0.40
+        outdoor = location.outdoor_worker_ratio if location.outdoor_worker_ratio is not None else 0.25
+        elderly = location.elderly_ratio if location.elderly_ratio is not None else 0.08
+        children = location.children_ratio if location.children_ratio is not None else 0.07
+
         risk_calc = compute_composite_risk(
             temp_c=weather["temperature_c"],
             wbgt_c=thermal["wbgt_c"],
             utci_c=thermal["utci_c"],
             heat_index_c=thermal["heat_index_c"],
             population_density_per_km2=location.population_density_per_km2,
-            outdoor_worker_ratio=location.outdoor_worker_ratio,
-            elderly_ratio=location.elderly_ratio,
-            children_ratio=location.children_ratio,
-            informal_settlement_ratio=location.informal_settlement_ratio,
-            vegetation_deficit_ratio=1.0 - location.tree_canopy_fraction,
-            cooling_access_deficit=location.cooling_access_deficit,
+            outdoor_worker_ratio=outdoor,
+            elderly_ratio=elderly,
+            children_ratio=children,
+            informal_settlement_ratio=informal,
+            vegetation_deficit_ratio=1.0 - canopy,
+            cooling_access_deficit=cooling,
             weight_hazard=w_hazard,
             weight_exposure=w_exposure,
             weight_vulnerability=w_vulnerability,

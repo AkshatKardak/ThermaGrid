@@ -111,7 +111,7 @@ export const DistributionPlot: React.FC<DistributionPlotProps> = ({ wardsRisk })
                   if (!active || !payload || !payload.length) return null;
                   const item = payload[0].payload;
                   return (
-                    <div className="rounded-[8px] bg-[#101820]/95 backdrop-blur-md border border-white/16 p-2.5 font-mono text-xs space-y-1 shadow-2xl">
+                    <div className="rounded-[8px] bg-[#0B141B]/95 backdrop-blur-md border border-white/16 p-2.5 font-mono text-xs space-y-1 shadow-2xl">
                       <div className="font-bold text-white">Score Bin: {item.bin}</div>
                       <div className="text-[#8B9AA8]">Band: {item.band}</div>
                       <div className="text-white font-bold" style={{ color: item.color }}>
@@ -140,7 +140,7 @@ export const DistributionPlot: React.FC<DistributionPlotProps> = ({ wardsRisk })
           {correlations.map((c, i) => (
             <div
               key={i}
-              className="p-3.5 rounded-[10px] bg-[#2F4A5E]/30 border border-white/6 space-y-2"
+              className="p-3.5 rounded-[10px] bg-[#203A45]/30 border border-white/6 space-y-2"
             >
               <div className="flex items-start justify-between">
                 <span className="text-xs font-semibold text-[#D7E0E7] font-display">

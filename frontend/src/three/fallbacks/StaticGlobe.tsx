@@ -51,7 +51,7 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
 
   return (
     <div
-      className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-b from-[#1F3445]/60 to-[#101820] flex flex-col items-center justify-between p-6 shadow-2xl"
+      className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-b from-[#142630]/60 to-[#0B141B] flex flex-col items-center justify-between p-6 shadow-2xl"
       style={{ minHeight: height }}
     >
       {/* Telemetry Header */}
@@ -81,7 +81,7 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
             cy="200"
             r="170"
             fill="#14232E"
-            stroke="rgba(127, 166, 201, 0.3)"
+            stroke="rgba(143, 179, 217, 0.3)"
             strokeWidth="1.5"
           />
           <circle cx="200" cy="200" r="130" fill="none" stroke="rgba(255, 255, 255, 0.05)" strokeDasharray="3 3" />
@@ -143,7 +143,7 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
                   cy={y}
                   r={radius}
                   fill={color}
-                  stroke="#101820"
+                  stroke="#0B141B"
                   strokeWidth="2"
                   filter={isHovered ? 'drop-shadow(0 0 8px rgba(255,255,255,0.8))' : `drop-shadow(0 0 4px ${color})`}
                 />
@@ -167,7 +167,7 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
       </div>
 
       {/* Hovered / Active City Detail Card */}
-      <div className="w-full bg-[#101820]/90 border border-white/10 rounded-xl p-3 flex items-center justify-between text-xs z-10 min-h-[52px]">
+      <div className="w-full bg-[#0B141B]/90 border border-white/10 rounded-xl p-3 flex items-center justify-between text-xs z-10 min-h-[52px]">
         {hoveredCity ? (
           <>
             <div className="flex items-center gap-2">

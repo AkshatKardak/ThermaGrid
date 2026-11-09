@@ -1,38 +1,43 @@
 /**
  * ThermaGrid Design Tokens
- * Midnight Climate Palette (Single Source of Truth)
+ * Arctic Observatory Palette (Single Source of Truth)
  *
  * LAW OF USAGE:
- * - Steel Blue (#7FA6C9): UI Chrome, buttons, active nav, focus rings, "live" indicators, 3D rim light ONLY.
- *   NEVER used for a risk value.
+ * - Interactive Accent (#8FB3D9): UI Chrome, primary buttons, active nav, focus rings, "live" indicators ONLY.
+ *   NEVER used for a heading, a card, an icon, or a risk value.
  * - Heat scale: Risk values and bands ONLY. Never a headline, a border, or a hover state.
  * - Never pure black (#000000) or pure white (#FFFFFF).
  * - Max one saturated element per viewport region.
  */
 
 export const THEME_COLORS = {
-  // Page canvas & base
-  bg: '#101820', // Midnight
+  // Arctic Observatory surfaces
+  bg: '#0B141B',
+  surface: '#142630',
+  raised: '#203A45',
+  hairline: 'rgba(255,255,255,.075)',
+  hairline2: 'rgba(255,255,255,.14)',
 
-  // Surface tiers (L1 -> L3)
-  surface: '#1F3445', // L1 card
-  surfaceElevated: '#263E50', // L2 raised
-  surfaceRecessed: '#2F4A5E', // L3 recessed / well / input
-  surfaceOverlay: 'rgba(31, 52, 69, 0.82)', // L3 modal/sheet
+  // Legacy surface aliases for compatibility
+  surfaceElevated: '#203A45',
+  surfaceRecessed: '#142630',
+  surfaceOverlay: 'rgba(20, 38, 48, 0.86)',
 
   // Borders & hairlines
-  border: 'rgba(255, 255, 255, 0.08)',
-  borderEmphasized: 'rgba(255, 255, 255, 0.16)',
+  border: 'rgba(255, 255, 255, 0.075)',
+  borderEmphasized: 'rgba(255, 255, 255, 0.14)',
 
-  // Typography shades (never pure white)
-  text: '#D7E0E7', // Primary
-  textDim: '#8B9AA8', // Secondary
-  textFaint: '#5F7183', // Captions, labels, hairlines
+  // Text
+  text: '#D8E8E6',
+  muted: '#6B7C8A',
+  dim: '#93A3B0',
+  textDim: '#6B7C8A',
+  textFaint: '#5F7183',
 
   // Interactive Accent (UI Chrome ONLY)
-  accent: '#7FA6C9', // steel blue — interactive chrome only
-  accentDim: '#5C82A3',
-  accentSoft: 'rgba(127,166,201,0.16)',
+  accent: '#8FB3D9',
+  accentDim: '#6E93B8',
+  accentSoft: 'rgba(143,179,217,.16)',
 
   // Alert indicator
   alert: '#FF704F',
@@ -45,6 +50,14 @@ export const THEME_COLORS = {
     veryhigh: '#FF704F',
     extreme: '#C31D3C',
   },
+} as const;
+
+export const MOTION = {
+  fast:   { duration: 0.18, ease: [0.22, 1, 0.36, 1] },
+  base:   { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
+  reveal: { duration: 0.6,  ease: [0.22, 1, 0.36, 1] },
+  stagger: 0.06,
+  countUp: 0.7,
 } as const;
 
 export const THEME_RADIUS = {

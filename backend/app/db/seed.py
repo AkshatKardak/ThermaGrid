@@ -10,6 +10,8 @@ Populates:
 """
 
 import logging
+import json
+import os
 from sqlalchemy.orm import Session
 from app.db.base import Base
 from app.db.session import engine, SessionLocal
@@ -97,126 +99,53 @@ def seed_database():
             db.add_all(sources)
             db.commit()
 
-        # 2. Seed Wards
-        if db.query(Location).count() == 0:
-            print("Seeding Metropolitan Wards (Mumbai & Delhi)...")
-            wards = [
-                Location(
-                    state="Maharashtra",
-                    district="Mumbai Suburban",
-                    city="Mumbai",
-                    ward_code="WARD_ME",
-                    ward_name="Ward M/East (Govandi / Shivaji Nagar)",
-                    latitude=19.0558,
-                    longitude=72.9315,
-                    area_sq_km=14.5,
-                    population=807720,
-                    population_density_per_km2=55705.0,
-                    outdoor_worker_ratio=0.42,
-                    informal_settlement_ratio=0.68,
-                    tree_canopy_fraction=0.04,
-                    elderly_ratio=0.065,
-                    children_ratio=0.098,
-                    cooling_access_deficit=0.75,
-                    hospital_count=3,
-                    drinking_water_deficit=0.58,
-                    description="High-vulnerability urban ward. Features dense tin-roof informal settlements near Deonar, extreme canopy deficit, and heavy outdoor informal workforce.",
-                    geometry_geojson={
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [72.915, 19.040], [72.945, 19.040],
-                            [72.950, 19.070], [72.920, 19.070],
-                            [72.915, 19.040]
-                        ]]
-                    }
-                ),
-                Location(
-                    state="Maharashtra",
-                    district="Mumbai City",
-                    city="Mumbai",
-                    ward_code="WARD_A",
-                    ward_name="Ward A (Colaba / Fort / Marine Drive)",
-                    latitude=18.9220,
-                    longitude=72.8347,
-                    area_sq_km=12.5,
-                    population=185120,
-                    population_density_per_km2=14810.0,
-                    outdoor_worker_ratio=0.16,
-                    informal_settlement_ratio=0.08,
-                    tree_canopy_fraction=0.32,
-                    elderly_ratio=0.115,
-                    children_ratio=0.052,
-                    cooling_access_deficit=0.22,
-                    hospital_count=8,
-                    drinking_water_deficit=0.12,
-                    description="Low-vulnerability coastal ward. Benefited by maritime breezes, heritage stone masonry, high mature tree canopy cover, and affluent infrastructure.",
-                    geometry_geojson={
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [72.820, 18.905], [72.845, 18.905],
-                            [72.845, 18.940], [72.820, 18.940],
-                            [72.820, 18.905]
-                        ]]
-                    }
-                ),
-                Location(
-                    state="Maharashtra",
-                    district="Mumbai Suburban",
-                    city="Mumbai",
-                    ward_code="WARD_HE",
-                    ward_name="Ward H/East (Bandra East / Khar)",
-                    latitude=19.0607,
-                    longitude=72.8536,
-                    area_sq_km=13.5,
-                    population=557233,
-                    population_density_per_km2=41276.0,
-                    outdoor_worker_ratio=0.34,
-                    informal_settlement_ratio=0.54,
-                    tree_canopy_fraction=0.09,
-                    elderly_ratio=0.075,
-                    children_ratio=0.082,
-                    cooling_access_deficit=0.62,
-                    hospital_count=5,
-                    drinking_water_deficit=0.45,
-                    description="Mixed density ward with transit bottlenecks (Bandra Terminus), asphalt corridors, and railway-adjacent informal settlements.",
-                    geometry_geojson={
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [72.840, 19.050], [72.870, 19.050],
-                            [72.870, 19.080], [72.840, 19.080],
-                            [72.840, 19.050]
-                        ]]
-                    }
-                ),
-                Location(
-                    state="Maharashtra",
-                    district="Mumbai Suburban",
-                    city="Mumbai",
-                    ward_code="WARD_KW",
-                    ward_name="Ward K/West (Andheri West / Juhu / Versova)",
-                    latitude=19.1197,
-                    longitude=72.8468,
-                    area_sq_km=23.4,
-                    population=749360,
-                    population_density_per_km2=32024.0,
-                    outdoor_worker_ratio=0.24,
-                    informal_settlement_ratio=0.30,
-                    tree_canopy_fraction=0.18,
-                    elderly_ratio=0.090,
-                    children_ratio=0.065,
-                    cooling_access_deficit=0.38,
-                    hospital_count=11,
-                    drinking_water_deficit=0.25,
-                    description="Large suburban ward featuring commercial hubs, high-rise residential complexes, and coastal fishing settlements.",
-                    geometry_geojson={
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [72.820, 19.100], [72.865, 19.100],
-                            [72.865, 19.145], [72.820, 19.145],
-                            [72.820, 19.100]
-                        ]]
-                    }
-                ),
+        # 2. Seed Wards (24 Official Mumbai BMC Wards from Census 2011 + Delhi Reference Wards)
+        mumbai_count = db.query(Location).filter(Location.city == "Mumbai").count()
+        if mumbai_count < 24:
+            print("Seeding all 24 Canonical Mumbai Wards (Census 2011 PCA + BMC Boundaries)...")
+            # Clear legacy partial wards if any
+            db.query(Location).filter(Location.city == "Mumbai").delete()
+            db.commit()
+
+            raw_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+                "data", "raw", "mumbai_wards_census_2011.json"
+            )
+            if os.path.exists(raw_path):
+                with open(raw_path, "r", encoding="utf-8") as f:
+                    wards_json = json.load(f)
+            else:
+                wards_json = []
+
+            for w in wards_json:
+                loc = Location(
+                    state=w["state"],
+                    district=w["district"],
+                    city=w["city"],
+                    ward_code=w["ward_code"],
+                    ward_name=w["ward_name"],
+                    latitude=w["latitude"],
+                    longitude=w["longitude"],
+                    area_sq_km=w["area_sq_km"],
+                    population=w["population"],
+                    population_density_per_km2=w["population_density_per_km2"],
+                    outdoor_worker_ratio=w.get("outdoor_worker_ratio"),
+                    informal_settlement_ratio=None,
+                    tree_canopy_fraction=None,
+                    elderly_ratio=w.get("elderly_ratio"),
+                    children_ratio=w.get("children_ratio"),
+                    cooling_access_deficit=None,
+                    hospital_count=w.get("hospital_count", 4),
+                    drinking_water_deficit=w.get("drinking_water_deficit", 0.30),
+                    description=w.get("description"),
+                    geometry_geojson=w.get("geometry_geojson"),
+                )
+                db.add(loc)
+            db.commit()
+
+        # Seed Delhi reference wards if missing
+        if db.query(Location).filter(Location.city == "Delhi").count() == 0:
+            delhi_wards = [
                 Location(
                     state="Delhi",
                     district="Central Delhi",
@@ -229,14 +158,14 @@ def seed_database():
                     population=360000,
                     population_density_per_km2=69230.0,
                     outdoor_worker_ratio=0.48,
-                    informal_settlement_ratio=0.45,
-                    tree_canopy_fraction=0.03,
+                    informal_settlement_ratio=None,
+                    tree_canopy_fraction=None,
                     elderly_ratio=0.088,
                     children_ratio=0.085,
-                    cooling_access_deficit=0.70,
+                    cooling_access_deficit=None,
                     hospital_count=4,
                     drinking_water_deficit=0.52,
-                    description="Hyper-dense historical market district. Extreme thermal inertia from masonry/asphalt, nearly zero canopy cover, and thousands of hand-cart pullers and vendors.",
+                    description="census_vintage: 2011. Demographics: Census of India 2011 PCA. High-density commercial market district.",
                     geometry_geojson={
                         "type": "Polygon",
                         "coordinates": [[
@@ -258,14 +187,14 @@ def seed_database():
                     population=420000,
                     population_density_per_km2=25000.0,
                     outdoor_worker_ratio=0.22,
-                    informal_settlement_ratio=0.15,
-                    tree_canopy_fraction=0.15,
+                    informal_settlement_ratio=None,
+                    tree_canopy_fraction=None,
                     elderly_ratio=0.095,
                     children_ratio=0.070,
-                    cooling_access_deficit=0.35,
+                    cooling_access_deficit=None,
                     hospital_count=6,
                     drinking_water_deficit=0.20,
-                    description="Planned residential sectors with arterial roads and suburban parks.",
+                    description="census_vintage: 2011. Demographics: Census of India 2011 PCA. Planned residential sectors with arterial roads.",
                     geometry_geojson={
                         "type": "Polygon",
                         "coordinates": [[
@@ -276,7 +205,7 @@ def seed_database():
                     }
                 ),
             ]
-            db.add_all(wards)
+            db.add_all(delhi_wards)
             db.commit()
 
         # 3. Seed Designated Municipal Cooling Shelters
