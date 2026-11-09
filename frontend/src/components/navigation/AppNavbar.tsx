@@ -8,7 +8,6 @@ import {
   Building2,
   Activity,
   Sliders,
-  Info,
   MapPin,
   Menu,
   X,
@@ -20,14 +19,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRole } from '../../hooks/useRole';
 import { useAppStore } from '../../store/useAppStore';
 import { env } from '../../config/env';
+import { INDIAN_STATES, getCitiesForState } from '../../config/indiaGeo';
 
 export const AppNavbar: React.FC = () => {
   const location = useLocation();
   const { isAuthority, role } = useRole();
-  const { selectedCity, setSelectedCity } = useAppStore();
+  const { selectedState, setSelectedState, selectedCity, setSelectedCity } = useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // App Nav Items
+  // Cities matching the selected state
+  const availableCities = getCitiesForState(selectedState);
+
+  // App Nav Items (Removed About section per requirements)
   const navItems = [
     { to: '/app', label: 'Overview', icon: LayoutDashboard },
     { to: '/app/heat-risk', label: 'Heat Risk', icon: ShieldAlert },
@@ -37,7 +40,6 @@ export const AppNavbar: React.FC = () => {
       : []),
     { to: '/app/analytics', label: 'Analytics', icon: Activity },
     { to: '/app/simulation', label: 'Simulation', icon: Sliders },
-    { to: '/app/about', label: 'About', icon: Info },
     { to: '/app/account', label: 'Account', icon: BellRing },
   ];
 
@@ -129,19 +131,42 @@ export const AppNavbar: React.FC = () => {
             </Link>
           </nav>
 
-          {/* Right controls */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            {/* City Selector */}
-            <div className="flex items-center gap-1.5 bg-[#142630] px-2.5 py-1.5 rounded-lg border border-white/10 text-xs">
-              <MapPin className="w-3.5 h-3.5 text-[#8B9AA8] shrink-0" />
+          {/* Right controls: State & City Selectors + User */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            {/* Dual State / City Selector */}
+            <div className="flex items-center gap-1.5 bg-[#142630] px-2 sm:px-2.5 py-1.5 rounded-lg border border-white/10 text-xs shadow-sm">
+              <MapPin className="w-3.5 h-3.5 text-[#8FB3D9] shrink-0" />
+              
+              {/* State Select */}
+              <select
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                className="bg-transparent text-[#D7E0E7] font-medium outline-none cursor-pointer text-xs max-w-[90px] sm:max-w-[125px] truncate"
+                aria-label="Select State"
+                title={`State: ${selectedState}`}
+              >
+                {INDIAN_STATES.map((s) => (
+                  <option key={s.name} value={s.name} className="bg-[#142630] text-white">
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+
+              <span className="text-white/20 select-none font-mono">/</span>
+
+              {/* City Select */}
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="bg-transparent text-[#D7E0E7] font-medium outline-none cursor-pointer pr-1 text-xs"
+                className="bg-transparent text-[#8FB3D9] font-medium outline-none cursor-pointer pr-1 text-xs max-w-[90px] sm:max-w-[115px] truncate"
                 aria-label="Select City"
+                title={`City: ${selectedCity}`}
               >
-                <option value="Mumbai" className="bg-[#142630]">Mumbai</option>
-                <option value="Delhi" className="bg-[#142630]">Delhi</option>
+                {availableCities.map((c) => (
+                  <option key={c.name} value={c.name} className="bg-[#142630] text-white">
+                    {c.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -166,7 +191,7 @@ export const AppNavbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer (L3 Overlay with spring-in animation) */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
@@ -182,12 +207,12 @@ export const AppNavbar: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed right-0 top-0 bottom-0 w-72 bg-[#142630] border-l border-white/10 shadow-2xl z-50 p-6 flex flex-col justify-between overflow-y-auto lg:hidden"
+              className="fixed right-0 top-0 bottom-0 w-80 bg-[#142630] border-l border-white/10 shadow-2xl z-50 p-6 flex flex-col justify-between overflow-y-auto lg:hidden"
             >
               <div className="space-y-6">
                 <div className="flex items-center justify-between pb-4 border-b border-white/10">
                   <div className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-[#FF704F]" />
+                    <Flame className="w-4 h-4 text-[#8FB3D9]" />
                     <span className="text-sm font-bold text-white font-display">ThermaGrid App</span>
                   </div>
                   <button
@@ -196,6 +221,43 @@ export const AppNavbar: React.FC = () => {
                   >
                     <X className="w-5 h-5" />
                   </button>
+                </div>
+
+                {/* State & City Controls in Drawer */}
+                <div className="p-3.5 rounded-xl bg-[#203A45]/50 border border-white/10 space-y-3">
+                  <span className="text-[10px] font-mono text-[#8B9AA8] uppercase tracking-wider block">
+                    Telemetry Territory
+                  </span>
+                  <div className="space-y-2">
+                    <div>
+                      <label className="text-[10px] font-mono text-[#93A3B0] block mb-1">State</label>
+                      <select
+                        value={selectedState}
+                        onChange={(e) => setSelectedState(e.target.value)}
+                        className="w-full bg-[#142630] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-[#8FB3D9]"
+                      >
+                        {INDIAN_STATES.map((s) => (
+                          <option key={s.name} value={s.name} className="bg-[#142630] text-white">
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-mono text-[#93A3B0] block mb-1">City / Urban Center</label>
+                      <select
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                        className="w-full bg-[#142630] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-[#8FB3D9] font-medium outline-none focus:border-[#8FB3D9]"
+                      >
+                        {availableCities.map((c) => (
+                          <option key={c.name} value={c.name} className="bg-[#142630] text-white">
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-1">
@@ -228,14 +290,14 @@ export const AppNavbar: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-white/10 space-y-3">
-                <div className="flex items-center justify-between text-xs text-[#8B9AA8]">
-                  <span>Role:</span>
+              <div className="pt-6 border-t border-white/10 space-y-2 text-xs">
+                <div className="flex items-center justify-between text-[#8B9AA8]">
+                  <span>Active Role:</span>
                   <span className="font-mono text-white capitalize">{role}</span>
                 </div>
-                <div className="flex items-center justify-between text-xs text-[#8B9AA8]">
-                  <span>City:</span>
-                  <span className="font-mono text-white">{selectedCity}</span>
+                <div className="flex items-center justify-between text-[#8B9AA8]">
+                  <span>Jurisdiction:</span>
+                  <span className="font-mono text-[#8FB3D9]">{selectedCity}, {selectedState}</span>
                 </div>
               </div>
             </motion.div>

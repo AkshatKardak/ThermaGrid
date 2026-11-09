@@ -17,8 +17,9 @@ const clerkAppearance = {
   },
   elements: {
     card: 'bg-[#142630] border border-white/[0.075] shadow-2xl rounded-[10px]',
-    headerTitle: 'text-white font-bold',
-    headerSubtitle: 'text-[#93A3B0]',
+    // Hide Clerk internal header title and subtitle to eliminate duplicate "ThermaGrid" branding
+    headerTitle: 'hidden',
+    headerSubtitle: 'hidden',
     socialButtonsBlockButton:
       'bg-[#203A45] border-white/[0.075] text-white hover:bg-white/[0.06] transition-colors',
     formFieldLabel: 'text-[#93A3B0] text-xs font-mono',

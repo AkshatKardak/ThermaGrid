@@ -1,13 +1,12 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
-import { ScrollProgressRail } from './components/ui/ScrollProgressRail';
 import { RequireAuth } from './components/common/RequireAuth';
+import { ScrollProgressRail } from './components/ui/ScrollProgressRail';
 
-// Public & Auth Pages
+// Public Pages
 import { Landing } from './pages/Landing';
 import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -20,13 +19,13 @@ import { AuthorityDashboard } from './pages/AuthorityDashboard';
 import { Analytics } from './pages/Analytics';
 import { LocationDetails } from './pages/LocationDetails';
 import { Simulation } from './pages/Simulation';
-import { About } from './pages/About';
 import { Account } from './pages/Account';
 
 function LocationRedirect() {
   const { id } = useParams<{ id: string }>();
   return <Navigate to={`/app/ward/${id}`} replace />;
 }
+
 
 export function App() {
   return (
@@ -70,7 +69,8 @@ export function App() {
                       <Route path="/simulation" element={<Simulation />} />
                       <Route path="/ward/:id" element={<LocationDetails />} />
                       <Route path="/account" element={<Account />} />
-                      <Route path="/about" element={<About />} />
+                      <Route path="/about" element={<Navigate to="/app" replace />} />
+                      <Route path="/docs" element={<Navigate to="/app" replace />} />
                       <Route path="*" element={<Navigate to="/app" replace />} />
                     </Routes>
                   </RequireAuth>
@@ -83,7 +83,8 @@ export function App() {
               <Route path="/authority" element={<Navigate to="/app/authority" replace />} />
               <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
               <Route path="/simulation" element={<Navigate to="/app/simulation" replace />} />
-              <Route path="/about" element={<Navigate to="/app/about" replace />} />
+              <Route path="/about" element={<Navigate to="/app" replace />} />
+              <Route path="/docs" element={<Navigate to="/" replace />} />
               <Route path="/location/:id" element={<LocationRedirect />} />
 
               {/* Catch-all */}

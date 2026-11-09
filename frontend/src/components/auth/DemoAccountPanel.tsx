@@ -42,7 +42,7 @@ export const DemoAccountPanel: React.FC = () => {
       }
     }
 
-    setToastMessage(`Copied ${email} (Password: ThermaGrid#2026)`);
+    setToastMessage(`Copied ${email} credentials to clipboard`);
     setLoadingRole(null);
     setTimeout(() => setToastMessage(null), 4000);
   };
@@ -51,7 +51,7 @@ export const DemoAccountPanel: React.FC = () => {
     <div className="mt-4 pt-3 border-t border-white/[0.075] w-full max-w-sm mx-auto space-y-2">
       <div className="flex items-center justify-between text-[10px] font-mono text-[#6B7C8A] uppercase tracking-wider">
         <span>DEMO ACCESS ACCOUNTS</span>
-        <span className="text-[#93A3B0]">PWD: ThermaGrid#2026</span>
+        <span className="text-[#93A3B0]">PWD: Auto-Authenticated</span>
       </div>
 
       {/* Two ghost buttons with dashed 1px hairline-2 borders */}

@@ -62,15 +62,15 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
           {/* 3 Stat Chips */}
           <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/[0.075]">
             <div className="p-3 rounded-[8px] bg-[#142630]/70 border border-white/[0.075]">
-              <span className="font-mono text-xl font-bold text-white block tabular-nums">24</span>
+              <span className="font-mono text-xl font-bold text-white block tabular-nums">66+</span>
               <span className="text-[10px] font-mono uppercase text-[#6B7C8A] block">
                 Wards Monitored
               </span>
             </div>
             <div className="p-3 rounded-[8px] bg-[#142630]/70 border border-white/[0.075]">
-              <span className="font-mono text-xl font-bold text-white block tabular-nums">2</span>
+              <span className="font-mono text-xl font-bold text-[#8FB3D9] block tabular-nums">36</span>
               <span className="text-[10px] font-mono uppercase text-[#6B7C8A] block">
-                Metros (Mumbai · Delhi)
+                States &amp; UTs
               </span>
             </div>
             <div className="p-3 rounded-[8px] bg-[#142630]/70 border border-white/[0.075]">

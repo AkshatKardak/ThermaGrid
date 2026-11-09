@@ -281,7 +281,7 @@ export const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Section: End-to-End Computational Pipeline (Thin Hairline Architecture) */}
+      {/* 4. Section: End-to-End Computational Pipeline */}
       <section id="how-it-works" className="space-y-6">
         <SectionHeader
           label="END-TO-END COMPUTATIONAL PIPELINE"
@@ -289,52 +289,79 @@ export const Landing: React.FC = () => {
           lead="ThermaGrid bridges numerical weather prediction and urban epidemiology through five validated stages."
         />
 
-        <div className="relative">
-          {/* Thin horizontal pipeline rail connecting cards */}
-          <div className="hidden lg:block absolute top-[28px] left-10 right-10 h-[1px] bg-gradient-to-r from-[#8FB3D9]/50 via-white/10 to-[#8FB3D9]/50 z-0 pointer-events-none" />
+        {/* High-level stage progression ribbon */}
+        <div className="hidden md:flex items-center justify-between p-3 rounded-[12px] bg-[#142630]/60 border border-white/[0.075] text-[11px] font-mono">
+          <div className="flex items-center gap-2 text-[#8FB3D9]">
+            <span className="w-5 h-5 rounded-full bg-[#8FB3D9]/15 border border-[#8FB3D9]/30 flex items-center justify-center text-[10px] font-bold">1</span>
+            <span>Raw Telemetry</span>
+          </div>
+          <span className="text-[#6B7C8A]">→</span>
+          <div className="flex items-center gap-2 text-[#D8E8E6]">
+            <span className="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] font-bold">2</span>
+            <span>Biometeorology</span>
+          </div>
+          <span className="text-[#6B7C8A]">→</span>
+          <div className="flex items-center gap-2 text-[#D8E8E6]">
+            <span className="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] font-bold">3</span>
+            <span>Microclimate Lag</span>
+          </div>
+          <span className="text-[#6B7C8A]">→</span>
+          <div className="flex items-center gap-2 text-[#D8E8E6]">
+            <span className="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] font-bold">4</span>
+            <span>ML Quantile Risk</span>
+          </div>
+          <span className="text-[#6B7C8A]">→</span>
+          <div className="flex items-center gap-2 text-[#8FB3D9]">
+            <span className="w-5 h-5 rounded-full bg-[#8FB3D9]/15 border border-[#8FB3D9]/30 flex items-center justify-center text-[10px] font-bold">5</span>
+            <span>Civil Dispatch</span>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
-            {pipelineStages.map((stage, idx) => (
-              <div
-                key={idx}
-                className="rounded-[14px] bg-[#142630]/60 hover:bg-[#142630] border border-white/8 hover:border-[#8FB3D9]/50 p-5 flex flex-col justify-between space-y-4 transition-all duration-200 group shadow-lg hover:shadow-[#8FB3D9]/5"
-              >
-                {/* Stage Header */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-[#8FB3D9] tracking-wider">
-                      {stage.step} <span className="text-[#5F7183] font-normal">/ {stage.total}</span>
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase bg-white/5 border border-white/8 text-[#8B9AA8] group-hover:border-[#8FB3D9]/30 transition-colors">
-                      {stage.badge}
-                    </span>
-                  </div>
-
-                  {/* Thin Hairline Divider */}
-                  <div className="h-[1px] w-full bg-white/6 group-hover:bg-[#8FB3D9]/25 transition-colors" />
-
-                  <div>
-                    <h4 className="text-sm font-bold text-white font-display group-hover:text-[#8FB3D9] transition-colors">
-                      {stage.name}
-                    </h4>
-                    <p className="text-xs text-[#8B9AA8] leading-relaxed mt-1.5">
-                      {stage.desc}
-                    </p>
-                  </div>
+        {/* Five Stage Cards with generous responsive spacing and zero colliding lines */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-5 items-stretch">
+          {pipelineStages.map((stage, idx) => (
+            <div
+              key={idx}
+              className="rounded-[14px] bg-[#142630]/75 hover:bg-[#142630] border border-white/[0.08] hover:border-[#8FB3D9]/40 p-5 flex flex-col justify-between transition-all duration-200 group shadow-md hover:shadow-xl hover:shadow-[#8FB3D9]/5 h-full"
+            >
+              {/* Stage Header */}
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#203A45] border border-white/[0.08] text-[11px] font-mono font-bold text-[#8FB3D9]">
+                    STAGE {stage.step}
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-[#0B141B]/70 border border-white/[0.08] text-[#93A3B0] tracking-tight shrink-0">
+                    {stage.badge}
+                  </span>
                 </div>
 
-                {/* Thin Stage Specification Footer */}
-                <div className="pt-3 border-t border-white/5 space-y-1">
-                  <span className="text-[10px] font-mono text-[#5F7183] block truncate">
+                <div className="mt-3.5 space-y-1.5">
+                  <h4 className="text-sm sm:text-base font-bold text-white font-display group-hover:text-[#8FB3D9] transition-colors">
+                    {stage.name}
+                  </h4>
+                  <p className="text-xs text-[#93A3B0] leading-relaxed">
+                    {stage.desc}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stage Specification Footer */}
+              <div className="mt-4 pt-3.5 border-t border-white/[0.075] space-y-1.5 text-[11px] font-mono">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-[10px] uppercase text-[#6B7C8A] tracking-wider shrink-0">Method</span>
+                  <span className="text-[#D8E8E6] text-right text-[10px] font-mono break-words line-clamp-2" title={stage.spec}>
                     {stage.spec}
                   </span>
-                  <span className="text-[10px] font-mono text-[#8FB3D9] font-medium block">
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] uppercase text-[#6B7C8A] tracking-wider shrink-0">Target Metric</span>
+                  <span className="text-[#8FB3D9] font-semibold text-right text-[11px] font-mono">
                     {stage.metric}
                   </span>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 

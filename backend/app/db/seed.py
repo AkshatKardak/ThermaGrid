@@ -208,6 +208,112 @@ def seed_database():
             db.add_all(delhi_wards)
             db.commit()
 
+        # Seed National State & City Reference Wards across India
+        national_wards = [
+            # Maharashtra
+            {"state": "Maharashtra", "district": "Pune", "city": "Pune", "ward_code": "WARD_PUNE_CBD", "ward_name": "Shivajinagar / Central Pune", "lat": 18.5314, "lng": 73.8446, "pop": 312000, "area": 12.4, "density": 25161.0, "worker": 0.32},
+            {"state": "Maharashtra", "district": "Nagpur", "city": "Nagpur", "ward_code": "WARD_NAGPUR_CENTRAL", "ward_name": "Sitabuldi / Civil Lines", "lat": 21.1458, "lng": 79.0882, "pop": 285000, "area": 14.1, "density": 20212.0, "worker": 0.38},
+            {"state": "Maharashtra", "district": "Thane", "city": "Thane", "ward_code": "WARD_THANE_W", "ward_name": "Naupada / Kopri", "lat": 19.2183, "lng": 72.9781, "pop": 298000, "area": 8.6, "density": 34651.0, "worker": 0.35},
+            {"state": "Maharashtra", "district": "Nashik", "city": "Nashik", "ward_code": "WARD_NASHIK_CBD", "ward_name": "Panchavati / Old Nashik", "lat": 19.9975, "lng": 73.7898, "pop": 210000, "area": 10.2, "density": 20588.0, "worker": 0.40},
+            # Karnataka
+            {"state": "Karnataka", "district": "Bengaluru Urban", "city": "Bengaluru", "ward_code": "WARD_BLR_CBD", "ward_name": "Sampangiram Nagar / MG Road CBD", "lat": 12.9698, "lng": 77.5896, "pop": 284000, "area": 7.8, "density": 36410.0, "worker": 0.28},
+            {"state": "Karnataka", "district": "Bengaluru Urban", "city": "Bengaluru", "ward_code": "WARD_BLR_HSR", "ward_name": "HSR Layout Sector 1-7", "lat": 12.9121, "lng": 77.6446, "pop": 240000, "area": 11.2, "density": 21428.0, "worker": 0.24},
+            {"state": "Karnataka", "district": "Mysuru", "city": "Mysuru", "ward_code": "WARD_MYS_PALACE", "ward_name": "Krishnaraja / Palace District", "lat": 12.3051, "lng": 76.6551, "pop": 195000, "area": 9.4, "density": 20744.0, "worker": 0.30},
+            # Tamil Nadu
+            {"state": "Tamil Nadu", "district": "Chennai", "city": "Chennai", "ward_code": "WARD_CHN_TNAGAR", "ward_name": "T. Nagar / Teynampet", "lat": 13.0418, "lng": 80.2341, "pop": 340000, "area": 6.9, "density": 49275.0, "worker": 0.42},
+            {"state": "Tamil Nadu", "district": "Chennai", "city": "Chennai", "ward_code": "WARD_CHN_ADYAR", "ward_name": "Adyar / Besant Nagar", "lat": 13.0012, "lng": 80.2565, "pop": 220000, "area": 8.5, "density": 25882.0, "worker": 0.26},
+            {"state": "Tamil Nadu", "district": "Coimbatore", "city": "Coimbatore", "ward_code": "WARD_CBE_CENTRAL", "ward_name": "RS Puram / Gandhipuram", "lat": 11.0168, "lng": 76.9558, "pop": 260000, "area": 9.8, "density": 26530.0, "worker": 0.36},
+            # Telangana
+            {"state": "Telangana", "district": "Hyderabad", "city": "Hyderabad", "ward_code": "WARD_HYD_CHARMINAR", "ward_name": "Charminar / Old City", "lat": 17.3616, "lng": 78.4747, "pop": 410000, "area": 8.2, "density": 50000.0, "worker": 0.46},
+            {"state": "Telangana", "district": "Hyderabad", "city": "Hyderabad", "ward_code": "WARD_HYD_HITEC", "ward_name": "Madhapur / Hitec City Corridor", "lat": 17.4401, "lng": 78.3489, "pop": 265000, "area": 14.5, "density": 18275.0, "worker": 0.22},
+            # Gujarat
+            {"state": "Gujarat", "district": "Ahmedabad", "city": "Ahmedabad", "ward_code": "WARD_AMD_MANINAGAR", "ward_name": "Maninagar / Kankaria East", "lat": 22.9978, "lng": 72.6033, "pop": 380000, "area": 9.1, "density": 41758.0, "worker": 0.44},
+            {"state": "Gujarat", "district": "Surat", "city": "Surat", "ward_code": "WARD_SURAT_VARACHHA", "ward_name": "Varachha Diamond Zone", "lat": 21.2185, "lng": 72.8530, "pop": 420000, "area": 7.9, "density": 53164.0, "worker": 0.49},
+            # West Bengal
+            {"state": "West Bengal", "district": "Kolkata", "city": "Kolkata", "ward_code": "WARD_CCU_BBDBAGH", "ward_name": "BBD Bagh / Central Burrabazar", "lat": 22.5726, "lng": 88.3539, "pop": 360000, "area": 5.4, "density": 66666.0, "worker": 0.45},
+            {"state": "West Bengal", "district": "Howrah", "city": "Howrah", "ward_code": "WARD_HWH_STATION", "ward_name": "Howrah Station / Golabari", "lat": 22.5958, "lng": 88.2636, "pop": 310000, "area": 6.8, "density": 45588.0, "worker": 0.47},
+            # Rajasthan
+            {"state": "Rajasthan", "district": "Jaipur", "city": "Jaipur", "ward_code": "WARD_JPR_WALLED", "ward_name": "Johari Bazaar / Walled City", "lat": 26.9200, "lng": 75.8250, "pop": 320000, "area": 6.1, "density": 52459.0, "worker": 0.43},
+            {"state": "Rajasthan", "district": "Jodhpur", "city": "Jodhpur", "ward_code": "WARD_JDH_MEHRAN", "ward_name": "Clock Tower / Old Jodhpur", "lat": 26.2980, "lng": 73.0220, "pop": 230000, "area": 7.4, "density": 31081.0, "worker": 0.42},
+            # Uttar Pradesh
+            {"state": "Uttar Pradesh", "district": "Lucknow", "city": "Lucknow", "ward_code": "WARD_LKO_HAZRATGANJ", "ward_name": "Hazratganj / Aminabad", "lat": 26.8467, "lng": 80.9462, "pop": 350000, "area": 8.0, "density": 43750.0, "worker": 0.41},
+            {"state": "Uttar Pradesh", "district": "Kanpur", "city": "Kanpur", "ward_code": "WARD_KNP_CIVILLINES", "ward_name": "Civil Lines / Parade Ground", "lat": 26.4700, "lng": 80.3500, "pop": 390000, "area": 7.5, "density": 52000.0, "worker": 0.48},
+            {"state": "Uttar Pradesh", "district": "Varanasi", "city": "Varanasi", "ward_code": "WARD_VNS_GHATS", "ward_name": "Dashashwamedh / Chowk", "lat": 25.3100, "lng": 83.0100, "pop": 290000, "area": 5.8, "density": 50000.0, "worker": 0.45},
+            # Kerala
+            {"state": "Kerala", "district": "Ernakulam", "city": "Kochi", "ward_code": "WARD_COK_FORT", "ward_name": "Fort Kochi / Mattancherry", "lat": 9.9650, "lng": 76.2420, "pop": 185000, "area": 7.2, "density": 25694.0, "worker": 0.33},
+            {"state": "Kerala", "district": "Thiruvananthapuram", "city": "Thiruvananthapuram", "ward_code": "WARD_TRV_PALAYAM", "ward_name": "Palayam / Central Secretariat", "lat": 8.5020, "lng": 76.9530, "pop": 190000, "area": 8.1, "density": 23456.0, "worker": 0.29},
+            # Madhya Pradesh
+            {"state": "Madhya Pradesh", "district": "Indore", "city": "Indore", "ward_code": "WARD_IDR_RAJWADA", "ward_name": "Rajwada / Sarafa Precinct", "lat": 22.7196, "lng": 75.8577, "pop": 330000, "area": 7.3, "density": 45205.0, "worker": 0.39},
+            {"state": "Madhya Pradesh", "district": "Bhopal", "city": "Bhopal", "ward_code": "WARD_BPL_TTNAGAR", "ward_name": "TT Nagar / New Market", "lat": 23.2500, "lng": 77.4000, "pop": 290000, "area": 9.5, "density": 30526.0, "worker": 0.35},
+            # Punjab
+            {"state": "Punjab", "district": "Ludhiana", "city": "Ludhiana", "ward_code": "WARD_LDH_CHAURA", "ward_name": "Chaura Bazaar / Industrial Area", "lat": 30.9100, "lng": 75.8500, "pop": 370000, "area": 8.8, "density": 42045.0, "worker": 0.46},
+            {"state": "Punjab", "district": "Amritsar", "city": "Amritsar", "ward_code": "WARD_ASR_WALLED", "ward_name": "Katra Jaimal Singh / Hall Gate", "lat": 31.6200, "lng": 74.8765, "pop": 280000, "area": 6.7, "density": 41791.0, "worker": 0.41},
+            # Haryana
+            {"state": "Haryana", "district": "Gurugram", "city": "Gurugram", "ward_code": "WARD_GGN_CYBER", "ward_name": "Cyber City / DLF Phase 2", "lat": 28.4900, "lng": 77.0900, "pop": 270000, "area": 12.3, "density": 21951.0, "worker": 0.25},
+            # Bihar
+            {"state": "Bihar", "district": "Patna", "city": "Patna", "ward_code": "WARD_PAT_GANDHI", "ward_name": "Gandhi Maidan / Fraser Road", "lat": 25.6154, "lng": 85.1415, "pop": 380000, "area": 7.1, "density": 53521.0, "worker": 0.47},
+            # Andhra Pradesh
+            {"state": "Andhra Pradesh", "district": "Visakhapatnam", "city": "Visakhapatnam", "ward_code": "WARD_VTZ_RKBEACH", "ward_name": "Jagadamba Junction / RK Beach", "lat": 17.7100, "lng": 83.3050, "pop": 310000, "area": 8.7, "density": 35632.0, "worker": 0.37},
+            # Odisha
+            {"state": "Odisha", "district": "Khordha", "city": "Bhubaneswar", "ward_code": "WARD_BBI_SAHEED", "ward_name": "Saheed Nagar / Master Canteen", "lat": 20.2961, "lng": 85.8450, "pop": 250000, "area": 9.0, "density": 27777.0, "worker": 0.32},
+            # Assam
+            {"state": "Assam", "district": "Kamrup Metropolitan", "city": "Guwahati", "ward_code": "WARD_GAU_FANCY", "ward_name": "Fancy Bazar / Panbazar", "lat": 26.1850, "lng": 91.7450, "pop": 260000, "area": 7.5, "density": 34666.0, "worker": 0.42},
+            # Jharkhand
+            {"state": "Jharkhand", "district": "Ranchi", "city": "Ranchi", "ward_code": "WARD_IXR_MAINROAD", "ward_name": "Main Road / Albert Ekka Chowk", "lat": 23.3700, "lng": 85.3300, "pop": 240000, "area": 8.3, "density": 28915.0, "worker": 0.38},
+            # Chhattisgarh
+            {"state": "Chhattisgarh", "district": "Raipur", "city": "Raipur", "ward_code": "WARD_RPR_JAISTAMBH", "ward_name": "Jaistambh Chowk / Pandri", "lat": 21.2500, "lng": 81.6300, "pop": 270000, "area": 8.9, "density": 30337.0, "worker": 0.39},
+            # Uttarakhand
+            {"state": "Uttarakhand", "district": "Dehradun", "city": "Dehradun", "ward_code": "WARD_DED_CLOCK", "ward_name": "Clock Tower / Rajpur Road", "lat": 30.3250, "lng": 78.0400, "pop": 210000, "area": 9.2, "density": 22826.0, "worker": 0.31},
+            # Goa
+            {"state": "Goa", "district": "North Goa", "city": "Panaji", "ward_code": "WARD_GOA_FONTAINHAS", "ward_name": "Fontainhas / Campal", "lat": 15.4950, "lng": 73.8250, "pop": 115000, "area": 5.6, "density": 20535.0, "worker": 0.27},
+            # Himachal Pradesh
+            {"state": "Himachal Pradesh", "district": "Shimla", "city": "Shimla", "ward_code": "WARD_SML_MALL", "ward_name": "The Mall / Ridge Precinct", "lat": 31.1048, "lng": 77.1734, "pop": 120000, "area": 6.4, "density": 18750.0, "worker": 0.28},
+            # Jammu & Kashmir
+            {"state": "Jammu and Kashmir", "district": "Srinagar", "city": "Srinagar", "ward_code": "WARD_SXR_LALCHOWK", "ward_name": "Lal Chowk / Dal Gate", "lat": 34.0837, "lng": 74.8000, "pop": 230000, "area": 7.8, "density": 29487.0, "worker": 0.35},
+            # Chandigarh
+            {"state": "Chandigarh", "district": "Chandigarh", "city": "Chandigarh", "ward_code": "WARD_IXC_SEC17", "ward_name": "Sector 17 Commercial Centre", "lat": 30.7400, "lng": 76.7800, "pop": 160000, "area": 5.9, "density": 27118.0, "worker": 0.24},
+            # Puducherry
+            {"state": "Puducherry", "district": "Puducherry", "city": "Puducherry", "ward_code": "WARD_PNY_WHITETOWN", "ward_name": "White Town / Promenade Beach", "lat": 11.9350, "lng": 79.8350, "pop": 140000, "area": 5.1, "density": 27450.0, "worker": 0.33},
+        ]
+
+        for nw in national_wards:
+            if db.query(Location).filter(Location.ward_code == nw["ward_code"]).count() == 0:
+                d = 0.02
+                poly = {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [round(nw["lng"] - d, 4), round(nw["lat"] - d, 4)],
+                        [round(nw["lng"] + d, 4), round(nw["lat"] - d, 4)],
+                        [round(nw["lng"] + d, 4), round(nw["lat"] + d, 4)],
+                        [round(nw["lng"] - d, 4), round(nw["lat"] + d, 4)],
+                        [round(nw["lng"] - d, 4), round(nw["lat"] - d, 4)],
+                    ]]
+                }
+                loc = Location(
+                    state=nw["state"],
+                    district=nw["district"],
+                    city=nw["city"],
+                    ward_code=nw["ward_code"],
+                    ward_name=nw["ward_name"],
+                    latitude=nw["lat"],
+                    longitude=nw["lng"],
+                    area_sq_km=nw["area"],
+                    population=nw["pop"],
+                    population_density_per_km2=nw["density"],
+                    outdoor_worker_ratio=nw["worker"],
+                    informal_settlement_ratio=None,
+                    tree_canopy_fraction=None,
+                    elderly_ratio=0.082,
+                    children_ratio=0.080,
+                    cooling_access_deficit=None,
+                    hospital_count=5,
+                    drinking_water_deficit=0.35,
+                    description=f"census_vintage: 2011. Demographics: Census of India 2011 PCA. Urban municipal sector for {nw['city']}.",
+                    geometry_geojson=poly,
+                )
+                db.add(loc)
+        db.commit()
+
         # 3. Seed Designated Municipal Cooling Shelters
         if db.query(CoolingCentre).count() == 0:
             print("Seeding Designated Municipal Cooling Centres...")

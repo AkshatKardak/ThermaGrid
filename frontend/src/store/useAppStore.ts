@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { INDIAN_STATES, getCitiesForState, getStateForCity } from '../config/indiaGeo';
 
 interface LayerState {
   heatField: boolean;
@@ -9,16 +10,19 @@ interface LayerState {
 }
 
 interface AppState {
+  selectedState: string;
   selectedCity: string;
   selectedLocationId: number;
   activeLayers: LayerState;
 
+  setSelectedState: (state: string) => void;
   setSelectedCity: (city: string) => void;
   setSelectedLocationId: (id: number) => void;
   toggleLayer: (layer: keyof LayerState) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set, get) => ({
+  selectedState: 'Maharashtra',
   selectedCity: 'Mumbai',
   selectedLocationId: 1,
   activeLayers: {
@@ -29,8 +33,25 @@ export const useAppStore = create<AppState>((set) => ({
     coolingCentres: true,
   },
 
-  setSelectedCity: (city) => set({ selectedCity: city }),
-  setSelectedLocationId: (id) => set({ selectedLocationId: id }),
+  setSelectedState: (stateName: string) => {
+    const cities = getCitiesForState(stateName);
+    const firstCity = cities[0]?.name || 'Mumbai';
+    set({
+      selectedState: stateName,
+      selectedCity: firstCity,
+    });
+  },
+
+  setSelectedCity: (city: string) => {
+    const matchedState = getStateForCity(city);
+    set({
+      selectedCity: city,
+      ...(matchedState ? { selectedState: matchedState.name } : {}),
+    });
+  },
+
+  setSelectedLocationId: (id: number) => set({ selectedLocationId: id }),
+
   toggleLayer: (layer) =>
     set((state) => ({
       activeLayers: {
