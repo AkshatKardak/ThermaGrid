@@ -14,12 +14,18 @@ dist-ssr/
 .vite/
 .vite-temp/
 
-# Environment files
+# Environment files and credentials
 .env
 *.env
 .env.local
 .env.*.local
 !.env.example
+*demo_account*
+*demo-account*
+*demo_credentials*
+*demo-credentials*
+credentials.json
+secrets/
 
 # Editor directories and files
 .vscode/*

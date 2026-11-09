@@ -16,12 +16,20 @@ build/
 dist/
 *.egg-info/
 
-# Environment files
+# Environment files and credentials
 .env
 *.env
 .env.local
 .env.*.local
 !.env.example
+*demo_account*
+*demo-account*
+*demo_credentials*
+*demo-credentials*
+credentials.json
+secrets/
+*.pem
+*.key
 
 # Local SQLite databases
 *.db

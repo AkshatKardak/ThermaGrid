@@ -1,56 +1,96 @@
 # ThermaGrid
 
-**ThermaGrid** is a hyperlocal human thermal-stress early-warning and municipal decision-support system. While conventional weather apps report city-level ambient temperatures, ThermaGrid computes true physiological heat strain (ISO 7243 WBGT, UTCI, Heat Index) combined with ward-level built-environment vulnerability—identifying who is at risk, where thermal loading concentrates, when diurnal peaks occur, and what automated interventions save lives.
+Hyperlocal human thermal-stress early-warning and municipal decision-support system.
+
+---
+
+## Problem Statement
+
+Urban heatwaves are among the deadliest climate hazards, yet municipal disaster response systems and consumer weather applications suffer from critical blind spots:
+
+1. **Ambient Temperature vs. Physiological Strain:** Standard weather reports show macro-level dry-bulb ambient temperature collected from distant airport weather stations. They ignore the combined physical impact of humidity, solar radiation, wind speed, clothing insulation, and metabolic exertion on the human body.
+2. **Urban Microclimates & Heat Islands (UHI):** Dense asphalt, vehicular traffic, industrial activity, and concrete canyons trap heat, creating microclimates several degrees hotter than regional weather station readings.
+3. **Building Archetype Vulnerabilities:** Socio-economic disparities dictate heat exposure. Low-cost structures with corrugated tin or asbestos roofing absorb extreme radiant energy and retain heat overnight, turning informal housing into heat traps compared to insulated reinforced concrete (RCC) structures.
+4. **Tropical Nights & Diurnal Cooling Deficits:** When nocturnal temperatures remain above $25^\circ\text{C}$, the human cardiovascular system cannot recover from daytime thermal strain, exponentially increasing heat-stroke morbidity and cumulative mortality.
+5. **Occupational Hazards for Outdoor Workers:** Construction laborers, gig delivery workers, sanitation crews, and street vendors operate without standardized work-rest cycles or hydration benchmarks, risking severe heat exhaustion.
+6. **Lack of Ward-Level Spatial Intelligence:** City administrations and municipal authorities lack real-time, hyperlocal spatial data to prioritize emergency interventions such as deploying mobile water tankers, operating cooling centers, or issuing targeted alerts to vulnerable populations.
+
+---
+
+## Proposed Solution
+
+**ThermaGrid** bridges the gap between macro-meteorology, built-environment physics, and human physiology by providing an end-to-end early-warning and municipal decision-support platform:
+
+- **Physiological Thermal Modeling:** Computes validated international biometeorological metrics, including ISO 7243 Wet-Bulb Globe Temperature (WBGT), Universal Thermal Climate Index (UTCI), and NOAA Heat Index.
+- **Hyperlocal Ward Risk Scoring:** Evaluates real-time ward vulnerability using the multidimensional composite risk formulation:
+  $$R = w_h H + w_e E + w_v V - w_a A$$
+  balancing Hazard ($H$), Exposure ($E$), Vulnerability ($V$), and Adaptive Capacity ($A$).
+- **Indoor Thermal Lag Simulation:** Simulates indoor heat escalation and multi-hour thermal lag based on building and roof archetypes (e.g., tin roofs vs. RCC).
+- **Citizen Safety & Actionability:** Equips residents with a Safe-Window planner for outdoor tasks, night-time thermal risk tracking, automated multi-channel alert subscriptions, and a cooling centre locator.
+- **Worker & Family Protection:** Delivers ISO 7243-compliant rest-hydration shift cards and Care Circles to monitor vulnerable dependents across different wards.
+- **Municipal Command Deck:** Empowers city authorities with ward-by-ward risk rankings, live intervention tracking, and emergency broadcast dispatching.
+
+---
+
+## Key Features
+
+- **Safe-Window Planner:** Dynamic sliding window algorithm that scans 24-hour forecasts to identify continuous low-risk time windows for outdoor errands and transit.
+- **Night-Time Risk & Tropical Nights:** Nocturnal biometeorological curve modeling that flags tropical nights ($\ge 25.0^\circ\text{C}$) and provides cumulative heat recovery guidance.
+- **Indoor Heat by Building Archetype:** Models indoor thermal elevation and 2–3 hour thermal lag across roof types (e.g., corrugated tin sheets vs. concrete RCC).
+- **Self-Serve Alert Subscriptions:** User-configured Email (via Resend) and WhatsApp alerts with customizable threshold sliders and quiet-hours suppression.
+- **Care Circle (People You Watch):** Multi-ward dependent monitoring strip allowing citizens to track live thermal stress on elderly relatives and children across different neighborhoods.
+- **Worker Shift Card:** ISO 7243-compliant rest interval and hydration volume generator with printable A5 shift schedules for outdoor workers and supervisors.
+- **Cooling Centre Locator:** Real-time proximity sorting, walking time estimates, live Open/Closed operating status, and one-click Google Maps navigation.
+- **Municipal Command Deck:** Centralized municipal dashboard displaying ward risk rankings, intervention queue management, and broadcast dispatch controls.
+
+---
+
+## Unique Features
+
+- **Hyperlocal Roof Archetype Physics:** Factors building materials and thermal lag into indoor strain predictions rather than assuming uniform ambient indoor temperatures.
+- **Full Physiological Indices Integration:** Implements Liljegren (2008) WBGT, Bröde (2012) UTCI, and Rothfusz (1990) Heat Index rather than raw ambient temperature alone.
+- **Diurnal Cumulative Nocturnal Recovery Tracking:** Quantifies nighttime cooling deficits, directly targeting the primary driver of heatwave mortality.
+- **Field-Ready Worker Equity Focus:** Provides offline-ready printable A5 shift guides and multi-language support (English, Hindi, Marathi, Tamil, Bengali) for vulnerable labor workforces.
+- **Resilient Dual-Engine Data Architecture:** Production-ready PostgreSQL + PostGIS with seamless local SQLite fallback and synthetic telemetry generation to guarantee zero system downtime.
 
 ---
 
 ## Screenshots
 
-| Public Landing | Overview Hub | Municipal Authority Console |
+| Public Landing Page | Citizen Overview Hub | Municipal Authority Console |
 | :---: | :---: | :---: |
-| ![Landing Page](frontend/src/assets/hero.png) | ![Overview Hub](docs/screenshots/overview.png) | ![Authority Console](docs/screenshots/authority.png) |
+| ![Public Landing Page](frontend/src/assets/hero.png) | ![Citizen Overview Hub](docs/screenshots/overview.png) | ![Municipal Authority Console](docs/screenshots/authority.png) |
 
 ---
 
-## Quick Start (Linux Mint)
+## Tech Stack
 
-```bash
-git clone https://github.com/AkshatKardak/ThermaGrid.git && cd ThermaGrid
-docker compose up -d db
-cd backend && python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt && fastapi dev app/main.py
-# new terminal
-cd frontend && npm install && npm run dev
-```
-
----
-
-## Environment Variables
-
-Configure `.env` files in root, `backend/`, and `frontend/` using templates:
-
-| Variable | Scope | Purpose | Reference |
-|---|---|---|---|
-| `DATABASE_URL` | Backend | PostgreSQL + PostGIS connection string *(SQLite dev fallback)* | `backend/.env.example` |
-| `CLERK_SECRET_KEY` | Backend | Server-side Clerk JWT signature verification | `backend/.env.example` |
-| `RESEND_API_KEY` | Backend | Transactional email dispatch for heat alerts | `backend/.env.example` |
-| `WHATSAPP_TOKEN` | Backend | Meta WhatsApp Cloud API alert broadcasts | `backend/.env.example` |
-| `VITE_API_BASE_URL` | Frontend | FastApi API V1 root endpoint | `frontend/.env.example` |
-| `VITE_CLERK_PUBLISHABLE_KEY` | Frontend | Client-side Clerk authentication publishable key | `frontend/.env.example` |
-| `VITE_MAP_STYLE_URL` | Frontend | CartoDB Dark Matter / MapLibre vector style URL | `frontend/.env.example` |
-
----
-
-## Demo Accounts
-
-Pre-configured verified Clerk users for immediate zero-friction evaluation:
-
-| Email | Password | Clerk Role (`publicMetadata.role`) | Unlocked Access |
-|---|---|---|---|
-| `authority@thermagrid.demo` | `ThermaGrid#2026` | `authority` | Municipal Command Deck, Intervention Queue, Broadcasts |
-| `citizen@thermagrid.demo` | `ThermaGrid#2026` | `citizen` | Citizen Heat Risk, Safe Windows, Subscriptions |
-
-> *Note: Roles are cryptographically embedded into Clerk signed session tokens via Clerk Dashboard metadata.*
+- Python
+- FastAPI
+- Pydantic
+- SQLAlchemy
+- Alembic
+- PostgreSQL
+- PostGIS
+- SQLite
+- APScheduler
+- NumPy
+- SciPy
+- Pandas
+- GeoPandas
+- XGBoost
+- Scikit-learn
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Lucide React
+- Three.js
+- Clerk
+- Resend
+- Sentry
+- Docker
+- Open-Meteo API
 
 ---
 
@@ -59,79 +99,178 @@ Pre-configured verified Clerk users for immediate zero-friction evaluation:
 ```mermaid
 flowchart TD
   subgraph Frontend ["Frontend (React 19 + TypeScript + Vite)"]
-    UI["Tailwind v4 UI Chrome & Nav"]
-    GL["Three.js 3D Risk Globe & Mesh"]
-    AuthUI["Clerk Auth & useRole() Hook"]
+    UI["Tailwind CSS UI Chrome & Layout"]
+    GL["Three.js 3D Risk Globe"]
+    AuthUI["Clerk Auth & Role Guard"]
   end
 
   subgraph Backend ["Backend API (FastAPI)"]
     API["FastAPI REST Endpoints (/api/v1)"]
-    AuthCore["RS256 JWT Guard (get_current_user)"]
+    AuthGuard["RS256 JWT Authentication"]
     Sched["APScheduler (Hourly Ingestion & Alerts)"]
   end
 
   subgraph Analytics ["Analytics Engine (analytics/)"]
-    Physics["Thermal Indices (WBGT, UTCI, HI)"]
-    ML["XGBoost / Quantile ML Forecasting"]
-    Spatial["GeoPandas & Spatial Risk Scoring"]
+    Physics["Thermal Indices (WBGT, UTCI, Heat Index)"]
+    ML["XGBoost Forecasting & Temperature Calibration"]
+    Spatial["GeoPandas Spatial Risk Scoring"]
   end
 
   subgraph Storage ["Data Layer"]
-    PG[("PostgreSQL + PostGIS (Docker)")]
+    PG[("PostgreSQL + PostGIS (Production)")]
     SQLite[("SQLite Dev Fallback (heatsense_dev.db)")]
   end
 
-  Frontend -->|Bearer JWT / REST| Backend
+  Frontend -->|Bearer JWT / REST API| Backend
   Backend --> Analytics
   Backend --> Storage
 ```
 
 ---
 
-## Features
+## How to Clone and Run
 
-1. **[P0] Safe-Window Planner:** Slides duration window across 24h forecast to find safe hours below activity threshold (`GET /planner/safe-windows`).
-2. **[P0] Night-Time Risk (Tropical Nights):** Overnight biometeorological curve and guidance flag for tropical nights ($\ge 25.0^\circ\text{C}$).
-3. **[P0] Indoor Heat by Building Type:** Evaluates indoor thermal elevation and 2–3 hour thermal lag across roof archetypes (`tin_roof`, `rcc`).
-4. **[P0] Self-Serve Alert Subscriptions:** User-scoped WhatsApp/Email subscriptions with live threshold slider and quiet hours suppression.
-5. **[P1] Care Circle (People You Watch):** Multi-ward family monitoring strips displaying live thermal strain on dependents.
-6. **[P1] Worker Shift Card:** ISO 7243 compliant rest intervals, hydration targets, and print-optimized A5 schedule generator.
-7. **[P1] Usable Cooling Centres:** Real-time distance sorting, walk time calculation, factual Open/Closed status, and Google Maps directions.
-8. **[P2] Local Language (i18n):** Complete localized UI in `en`, `hi`, `mr`, `ta`, and `bn` with Latin unit preservation.
+### Prerequisites
+- Git
+- Python 3.11+
+- Node.js 18+ and npm
 
 ---
 
-## Methodology & Limitations
-
-- **Normative Thermal Indices:** Liljegren (2008) Wet-Bulb Globe Temperature (WBGT), Bröde et al. (2012) Universal Thermal Climate Index (UTCI), and Rothfusz (1990) National Weather Service Heat Index.
-- **Composite Risk Model:** Normalized composite index $R = w_h H + w_e E + w_v V - w_a A$ parameterized via `analytics/config/weights.yaml`.
-- **Statutory Public Health Advisory:** Outputs constitute environmental decision-support estimates, not individualized clinical diagnoses. For acute heat stroke emergencies, contact emergency medical services (108).
-
----
-
-## Datasets & Licences
-
-| Dataset / Source | Resolution | Update Cadence | Licence | Type |
-|---|---|---|---|---|
-| Open-Meteo NWP & Reanalysis | 1.1 km – 11 km | Hourly | CC BY 4.0 | Real / Observed |
-| IMD Automatic Weather Stations | Surface AWS Points | 15-Minute | GODL India | Ground Truth |
-| Census of India Ward Boundaries | Polygon (Ward-Level) | Decennial | Open Government | Demographic |
-| Synthetic Calibration Telemetry | Ward Simulation | Dynamic | MIT License | `is_synthetic = True` |
-
----
-
-## Testing
+### Linux
 
 ```bash
-# Run backend & analytics pytest suite (23 tests)
-cd backend && .venv/bin/pytest -v
+# 1. Clone repository
+git clone https://github.com/AkshatKardak/ThermaGrid.git
+cd ThermaGrid
 
-# Run frontend production build & type check
-cd frontend && npm run build
+# 2. Setup and run Backend
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+fastapi dev app/main.py
+
+# 3. Setup and run Frontend (in a new terminal)
+cd ../frontend
+npm install
+npm run dev
 ```
+
+---
+
+### macOS
+
+```bash
+# 1. Clone repository
+git clone https://github.com/AkshatKardak/ThermaGrid.git
+cd ThermaGrid
+
+# 2. Setup and run Backend
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+fastapi dev app/main.py
+
+# 3. Setup and run Frontend (in a new terminal)
+cd ../frontend
+npm install
+npm run dev
+```
+
+---
+
+### Windows
+
+```powershell
+# 1. Clone repository
+git clone https://github.com/AkshatKardak/ThermaGrid.git
+cd ThermaGrid
+
+# 2. Setup and run Backend
+cd backend
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+fastapi dev app/main.py
+
+# 3. Setup and run Frontend (in a new terminal)
+cd ..\frontend
+npm install
+npm run dev
+```
+
+---
+
+## Environment Variables (.env)
+
+### Backend (`backend/.env`)
+
+```env
+APP_NAME=
+APP_ENV=
+DEBUG=
+API_V1_PREFIX=
+LOG_LEVEL=
+CORS_ORIGINS=
+DATABASE_URL=
+CLERK_SECRET_KEY=
+CLERK_JWKS_URL=
+CLERK_ISSUER=
+CLERK_AUTHORIZED_PARTIES=
+SENTRY_DSN=
+RESEND_API_KEY=
+ALERT_FROM_EMAIL=
+WHATSAPP_PHONE_ID=
+WHATSAPP_WABA_ID=
+WHATSAPP_TOKEN=
+ALERT_PROVIDER=
+ALERT_THRESHOLD=
+OPEN_METEO_BASE_URL=
+OPEN_METEO_ARCHIVE_URL=
+MODEL_ARTIFACT_PATH=
+```
+
+### Frontend (`frontend/.env`)
+
+```env
+VITE_API_BASE_URL=
+VITE_CLERK_PUBLISHABLE_KEY=
+VITE_SENTRY_DSN=
+VITE_MAP_STYLE_URL=
+VITE_MAPBOX_TOKEN=
+VITE_APP_NAME=
+VITE_ENABLE_3D=
+```
+
+---
+
+## Demo Accounts
+
+Pre-configured verified test accounts for evaluation:
+
+- **Municipal Authority Account:** `authority@thermagrid.demo` (Role: `authority`) — grants access to the Municipal Command Deck, Intervention Queue, and Emergency Broadcasts.
+- **Citizen Account:** `citizen@thermagrid.demo` (Role: `citizen`) — grants access to Citizen Heat Risk, Safe Windows, Care Circles, and Alert Subscriptions.
+
+> Quick evaluation credentials can be copied directly in the web app via the one-click demo login panel. All credential files and local environment files (`.env`, `*demo_account*`, `*demo_credentials*`) are configured in `.gitignore` to prevent secret leakage and security alerts.
+
+---
+
+## Datasets
+
+- **Open-Meteo NWP & Historical Reanalysis:** Hourly meteorological parameters (dry-bulb temperature, relative humidity, direct and diffuse solar irradiance, surface pressure, wind speed at 10m).
+- **India Meteorological Department (IMD) Automatic Weather Stations (AWS):** Ground-truth surface telemetry for calibration and validation.
+- **Census of India Ward Boundaries & Demographics:** Ward polygon geometries, population density metrics, and household vulnerability characteristics.
+- **Copernicus DEM / NASA SRTM:** Topographic elevation models for urban terrain and radiation exposure corrections.
+- **Synthetic Microclimate Calibration Telemetry:** Built-environment simulated heat datasets for extreme heatwave boundary condition testing.
 
 ---
 
 ## License
 
-ThermaGrid is open-source software licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+Akshat Kardak

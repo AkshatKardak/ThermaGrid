@@ -8,6 +8,19 @@
 !.env.example
 !**/.env.example
 
+# Demo accounts, credentials, and secrets
+*demo_account*
+*demo-account*
+*demo_accounts*
+*demo-accounts*
+*demo_credentials*
+*demo-credentials*
+credentials.json
+secrets/
+*.pem
+*.key
+*.cert
+
 # Node.js packages, build output & caches
 node_modules/
 **/node_modules/
