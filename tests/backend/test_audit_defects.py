@@ -342,3 +342,29 @@ def test_response_caching_hit_and_miss_headers():
     resp4 = client.get("/api/v1/weather/forecast?location_id=1")
     assert resp4.status_code == 200
     assert resp4.headers.get("cache") == "hit" or resp4.headers.get("x-cache") == "hit"
+
+
+def test_equity_gap_computation_and_top_underserved_callout():
+    """7.5: Equity gap = hazard_rank - priority_rank with top underserved callout."""
+    resp = client.get("/api/v1/analytics/equity?city=Mumbai")
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert "equity_rankings" in data
+    assert len(data["equity_rankings"]) > 0
+
+    for w in data["equity_rankings"]:
+        assert "hazard_rank" in w
+        assert "priority_rank" in w
+        assert "equity_gap" in w
+        assert "equity_gap_signed" in w
+        # Assert formula equity_gap = hazard_rank - priority_rank
+        assert w["equity_gap"] == w["hazard_rank"] - w["priority_rank"]
+        if w["equity_gap"] > 0:
+            assert w["equity_gap_signed"].startswith("+")
+
+    assert "top_underserved_ward" in data
+    top = data["top_underserved_ward"]
+    assert top is not None
+    assert "callout" in top
+    assert "equity_gap" in top

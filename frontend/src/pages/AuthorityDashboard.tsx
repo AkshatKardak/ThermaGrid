@@ -20,6 +20,7 @@ import { LeafletBaseMap } from '../components/maps/LeafletBaseMap';
 import { useWards } from '../hooks/useWards';
 import { useAllWardsRisk } from '../hooks/useRisk';
 import { useCoolingCentres } from '../hooks/useCoolingCentres';
+import { useEquity } from '../hooks/useEquity';
 import { useAppStore } from '../store/useAppStore';
 import { apiClient } from '../lib/api';
 import { getRiskBand, MOTION } from '../theme/tokens';
@@ -33,6 +34,8 @@ export const AuthorityDashboard: React.FC = () => {
   const { data: wardsData } = useWards(selectedCity);
   const { data: wardsRiskData } = useAllWardsRisk(selectedCity);
   const { data: coolingCentres } = useCoolingCentres(selectedCity);
+  const { data: equityData } = useEquity(selectedCity);
+  const [queueTab, setQueueTab] = useState<'queue' | 'equity'>('queue');
 
   // Fallback data so every panel renders full on first paint without empty reserved space
   const wards: Location[] = useMemo(() => {
@@ -494,53 +497,131 @@ export const AuthorityDashboard: React.FC = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: MOTION.base.duration, delay: MOTION.stagger * 2, ease: MOTION.base.ease }}
-              className="lg:absolute lg:bottom-4 lg:left-4 pointer-events-auto rounded-[10px] bg-[#142630]/90 backdrop-blur-md border border-white/[0.075] p-3 shadow-2xl w-full lg:w-[480px] space-y-1.5"
+              className="lg:absolute lg:bottom-4 lg:left-4 pointer-events-auto rounded-[10px] bg-[#142630]/90 backdrop-blur-md border border-white/[0.075] p-3 shadow-2xl w-full lg:w-[500px] space-y-2"
             >
-              <div className="flex items-center justify-between px-2 pb-1 border-b border-white/[0.075]">
-                <span className="text-[10px] font-mono uppercase text-[#6B7C8A] tracking-wider">
-                  RANKED INTERVENTION QUEUE
-                </span>
+              {/* Dynamic Callout for Top Underserved Ward */}
+              {equityData?.top_underserved_ward && (
+                <div className="p-2 rounded-[6px] bg-[#C31D3C]/15 border border-[#C31D3C]/35 text-xs text-[#D8E8E6] flex items-start gap-2">
+                  <ShieldAlert className="w-4 h-4 text-[#FF704F] shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] uppercase font-bold text-[#FF704F] tracking-wider">
+                        TOP UNDERSERVED WARD
+                      </span>
+                      <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-[#FF704F]/20 text-[#FF704F] font-bold">
+                        GAP {equityData.top_underserved_ward.equity_gap_signed}
+                      </span>
+                    </div>
+                    <p className="text-[11px] leading-tight text-[#D8E8E6]">
+                      {equityData.top_underserved_ward.callout}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Panel Tabs Header */}
+              <div className="flex items-center justify-between px-1 pb-1 border-b border-white/[0.075]">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setQueueTab('queue')}
+                    className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${
+                      queueTab === 'queue'
+                        ? 'bg-[#8FB3D9]/20 text-[#8FB3D9] font-bold'
+                        : 'text-[#6B7C8A] hover:text-[#D8E8E6]'
+                    }`}
+                  >
+                    INTERVENTION QUEUE
+                  </button>
+                  <button
+                    onClick={() => setQueueTab('equity')}
+                    className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded transition-colors ${
+                      queueTab === 'equity'
+                        ? 'bg-[#8FB3D9]/20 text-[#8FB3D9] font-bold'
+                        : 'text-[#6B7C8A] hover:text-[#D8E8E6]'
+                    }`}
+                  >
+                    EQUITY GAP MATRIX
+                  </button>
+                </div>
                 <span className="text-[10px] font-mono text-[#93A3B0]">Automated ISO 7243 Matrix</span>
               </div>
 
-              <div className="divide-y divide-white/[0.075]">
-                {interventions.map((item) => {
-                  const isDone = dispatchedQueue[item.id];
-                  return (
-                    <div
-                      key={item.id}
-                      className="h-[44px] px-2 flex items-center justify-between hover:bg-white/[0.04] transition-colors rounded-[6px]"
-                    >
-                      <div className="flex items-center gap-3 truncate pr-2">
-                        <span className="font-mono text-xs font-bold text-[#8FB3D9] tabular-nums">
-                          {item.id}
-                        </span>
-                        <div className="truncate">
-                          <span className="text-xs font-medium text-white truncate block">
-                            {item.title}
+              {queueTab === 'queue' ? (
+                <div className="divide-y divide-white/[0.075]">
+                  {interventions.map((item) => {
+                    const isDone = dispatchedQueue[item.id];
+                    return (
+                      <div
+                        key={item.id}
+                        className="h-[44px] px-2 flex items-center justify-between hover:bg-white/[0.04] transition-colors rounded-[6px]"
+                      >
+                        <div className="flex items-center gap-3 truncate pr-2">
+                          <span className="font-mono text-xs font-bold text-[#8FB3D9] tabular-nums">
+                            {item.id}
                           </span>
-                          <span className="text-[10px] font-mono text-[#6B7C8A] truncate block">
-                            {item.wards}
-                          </span>
+                          <div className="truncate">
+                            <span className="text-xs font-medium text-white truncate block">
+                              {item.title}
+                            </span>
+                            <span className="text-[10px] font-mono text-[#6B7C8A] truncate block">
+                              {item.wards}
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      <button
-                        type="button"
-                        onClick={() => handleQueueAction(item.id)}
-                        disabled={isDone}
-                        className={`px-2.5 py-1 rounded-[6px] text-xs font-mono transition-all shrink-0 cursor-pointer ${
-                          isDone
-                            ? 'bg-[#2FA37C]/20 text-[#2FA37C] border border-[#2FA37C]/40'
-                            : 'border border-[#8FB3D9] text-[#8FB3D9] hover:bg-[#8FB3D9] hover:text-[#0B141B]'
+                        <button
+                          type="button"
+                          onClick={() => handleQueueAction(item.id)}
+                          disabled={isDone}
+                          className={`px-2.5 py-1 rounded-[6px] text-xs font-mono transition-all shrink-0 cursor-pointer ${
+                            isDone
+                              ? 'bg-[#2FA37C]/20 text-[#2FA37C] border border-[#2FA37C]/40'
+                              : 'border border-[#8FB3D9] text-[#8FB3D9] hover:bg-[#8FB3D9] hover:text-[#0B141B]'
+                          }`}
+                        >
+                          {isDone ? 'Deployed' : item.action}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="max-h-[160px] overflow-y-auto space-y-1 pr-1 font-mono text-xs">
+                  <div className="grid grid-cols-12 text-[10px] uppercase text-[#6B7C8A] px-2 pb-1 border-b border-white/[0.075]">
+                    <span className="col-span-5">Ward</span>
+                    <span className="col-span-2 text-center">Hazard #</span>
+                    <span className="col-span-2 text-center">Priority #</span>
+                    <span className="col-span-3 text-right">Equity Gap</span>
+                  </div>
+                  {(equityData?.equity_rankings || []).slice(0, 8).map((w) => (
+                    <div
+                      key={w.ward_code}
+                      className="grid grid-cols-12 items-center px-2 py-1 hover:bg-white/[0.04] rounded transition-colors text-[11px]"
+                    >
+                      <span className="col-span-5 truncate text-white font-medium" title={w.ward_name}>
+                        {w.ward_name.split('(')[0].trim()}
+                      </span>
+                      <span className="col-span-2 text-center text-[#93A3B0]">
+                        #{w.hazard_rank}
+                      </span>
+                      <span className="col-span-2 text-center text-[#8FB3D9]">
+                        #{w.priority_rank}
+                      </span>
+                      <span
+                        className={`col-span-3 text-right font-bold tabular-nums ${
+                          w.equity_gap > 0
+                            ? 'text-[#FF704F]'
+                            : w.equity_gap < 0
+                            ? 'text-[#2FA37C]'
+                            : 'text-[#8B9AA8]'
                         }`}
                       >
-                        {isDone ? 'Deployed' : item.action}
-                      </button>
+                        {w.equity_gap_signed}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
 
             {/* 4. BOTTOM-RIGHT ANCHOR: Ward Detail Peek Panel */}

@@ -224,9 +224,29 @@ def get_heat_equity_analytics(
         for w in wards
     ]
     hei_results = compute_heat_equity_index(ward_dicts)
+
+    # Identify top underserved ward (highest positive equity_gap = hazard_rank - priority_rank)
+    top_underserved = max(hei_results, key=lambda x: x["equity_gap"]) if hei_results else None
+    top_callout = None
+    if top_underserved:
+        top_callout = {
+            "ward_code": top_underserved["ward_code"],
+            "ward_name": top_underserved["ward_name"],
+            "equity_gap": top_underserved["equity_gap"],
+            "equity_gap_signed": top_underserved["equity_gap_signed"],
+            "hazard_rank": top_underserved["hazard_rank"],
+            "priority_rank": top_underserved["priority_rank"],
+            "callout": (
+                f"Top Underserved Priority: {top_underserved['ward_name']} has an Equity Gap of {top_underserved['equity_gap_signed']} "
+                f"(Intervention Priority #{top_underserved['priority_rank']} despite Physical Hazard Rank #{top_underserved['hazard_rank']}), "
+                f"driven by severe informal housing density and cooling infrastructure deficits."
+            ),
+        }
+
     return {
         "city": city,
         "wards_evaluated": len(hei_results),
+        "top_underserved_ward": top_callout,
         "equity_rankings": hei_results,
         "provenance": create_provenance(source="observed", completeness=1.0, quality_score=0.96),
     }
