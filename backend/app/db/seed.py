@@ -46,6 +46,30 @@ def _compute_geom_area(geom_dict: dict) -> float:
 def upsert_location(db: Session, loc_data: dict) -> Location:
     code = loc_data["ward_code"]
     loc = db.query(Location).filter(Location.ward_code == code).first()
+
+    # Calculate spatial bounding box for index-accelerated point-in-polygon queries
+    min_lat, max_lat, min_lng, max_lng = None, None, None, None
+    geom_dict = loc_data.get("geometry_geojson")
+    if geom_dict:
+        try:
+            s = shape(geom_dict)
+            minx, miny, maxx, maxy = s.bounds
+            min_lng, min_lat, max_lng, max_lat = float(minx), float(miny), float(maxx), float(maxy)
+        except Exception:
+            pass
+    if min_lat is None:
+        lat = float(loc_data["latitude"])
+        lng = float(loc_data["longitude"])
+        min_lat = lat - 0.15
+        max_lat = lat + 0.15
+        min_lng = lng - 0.15
+        max_lng = lng + 0.15
+
+    loc_data["min_lat"] = min_lat
+    loc_data["max_lat"] = max_lat
+    loc_data["min_lng"] = min_lng
+    loc_data["max_lng"] = max_lng
+
     if loc is None:
         loc = Location(**loc_data)
         db.add(loc)

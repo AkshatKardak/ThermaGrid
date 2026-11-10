@@ -15,6 +15,10 @@ class LocationBase(BaseModel):
     latitude: float
     longitude: float
     area_sq_km: Optional[float] = None
+    min_lat: Optional[float] = None
+    max_lat: Optional[float] = None
+    min_lng: Optional[float] = None
+    max_lng: Optional[float] = None
     population: int
     population_density_per_km2: float
     outdoor_worker_ratio: Optional[float] = None

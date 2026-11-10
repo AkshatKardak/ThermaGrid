@@ -4,7 +4,7 @@ and vulnerability attributes.
 """
 
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text, JSON
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, JSON, Index
 from app.db.base import Base
 
 
@@ -17,9 +17,15 @@ class Location(Base):
     city = Column(String(100), nullable=False, index=True)
     ward_code = Column(String(50), unique=True, nullable=False, index=True)
     ward_name = Column(String(255), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
+    latitude = Column(Float, nullable=False, index=True)
+    longitude = Column(Float, nullable=False, index=True)
     area_sq_km = Column(Float, nullable=True)
+
+    # Spatial Bounding Box for Index-Accelerated Point-In-Polygon queries
+    min_lat = Column(Float, nullable=True, index=True)
+    max_lat = Column(Float, nullable=True, index=True)
+    min_lng = Column(Float, nullable=True, index=True)
+    max_lng = Column(Float, nullable=True, index=True)
     
     # Hierarchy Tier: 'state' | 'district' | 'ward'
     level = Column(String(20), nullable=False, default="ward", server_default="ward", index=True)
@@ -41,3 +47,7 @@ class Location(Base):
     geometry_geojson = Column(JSON, nullable=True)
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    __table_args__ = (
+        Index("idx_locations_spatial_bbox", "min_lat", "max_lat", "min_lng", "max_lng"),
+    )

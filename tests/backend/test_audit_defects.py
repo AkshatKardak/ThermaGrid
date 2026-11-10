@@ -298,3 +298,23 @@ async def test_background_jobs_persist_rows():
         # Assert correct column dispatched_at is set
         assert first_alert.dispatched_at is not None
         assert first_alert.is_active is True
+
+
+def test_spatial_index_point_in_polygon_lookup():
+    """7.2: Point-in-polygon queries use spatial bounding box and geometry containment."""
+    # Point inside Ward A (Colaba / Fort)
+    resp = client.get("/api/v1/locations/lookup?lat=18.9220&lng=72.8347")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["ward_code"] == "WARD_A"
+
+    # Point inside Ward M/East (Govandi)
+    resp_me = client.get("/api/v1/locations/lookup?lat=19.0558&lng=72.9315")
+    assert resp_me.status_code == 200
+    data_me = resp_me.json()
+    assert data_me["ward_code"] == "WARD_ME"
+
+    # Verify min_lat, max_lat, min_lng, max_lng exist for spatial pruning
+    assert data["min_lat"] is not None
+    assert data["max_lat"] is not None
+    assert data["min_lat"] <= 18.9220 <= data["max_lat"]
