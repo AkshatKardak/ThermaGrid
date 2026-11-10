@@ -5,7 +5,6 @@ import { useUser } from '@clerk/clerk-react';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
 
 import { TwoWardsComparison } from '../components/dashboard/TwoWardsComparison';
-import { WardHeatCity } from '../three/scenes/WardHeatCity';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { KpiNumeral } from '../components/ui/KpiNumeral';
 import { ProvenanceChip } from '../components/ui/ProvenanceChip';
@@ -14,6 +13,11 @@ import { useAllWardsRisk } from '../hooks/useRisk';
 import { useWards } from '../hooks/useWards';
 import { useRole } from '../hooks/useRole';
 import { getRiskBand } from '../theme/tokens';
+
+// Lazy-load WardHeatCity 3D scene to eliminate Three.js from the landing initial bundle chunk
+const WardHeatCity = React.lazy(() =>
+  import('../three/scenes/WardHeatCity').then((m) => ({ default: m.WardHeatCity }))
+);
 
 export const Landing: React.FC = () => {
   const { isSignedIn, isLoaded, role } = useRole();
@@ -32,38 +36,45 @@ export const Landing: React.FC = () => {
   const { data: wardsRisk } = useAllWardsRisk();
   const { data: wards } = useWards();
 
-  // Top ranked wards from real or fallback observations
-  const rankedWards = React.useMemo(() => {
-    if (wardsRisk && wardsRisk.length > 0) {
-      return [...wardsRisk].sort((a: any, b: any) => (b.risk_score || 0) - (a.risk_score || 0)).slice(0, 5);
-    }
-    return [
-      { ward_name: 'Ward M/East (Govandi)', ward_code: 'WARD_ME', risk_score: 84.2, wbgt_c: 34.6, temperature_c: 38.2 },
-      { ward_name: 'Ward G/North (Dharavi)', ward_code: 'WARD_GN', risk_score: 79.5, wbgt_c: 33.8, temperature_c: 37.9 },
-      { ward_name: 'Ward L (Kurla East)', ward_code: 'WARD_L', risk_score: 73.1, wbgt_c: 33.1, temperature_c: 37.4 },
-      { ward_name: 'Ward H/East (Bandra E)', ward_code: 'WARD_HE', risk_score: 68.4, wbgt_c: 32.5, temperature_c: 36.8 },
-      { ward_name: 'Ward A (Colaba / Fort)', ward_code: 'WARD_A', risk_score: 38.6, wbgt_c: 28.2, temperature_c: 34.1 },
-    ];
-  }, [wardsRisk]);
+  // Explicit source gating: live observations if returned by API, otherwise sample state
+  const isLive = Boolean(wardsRisk && wardsRisk.length > 0);
+  const dataSource = isLive ? 'live' : 'sample';
 
-  // Real statistics derived from live backend observations
+  // Sample state - explicitly gated behind source: 'sample' and badged visibly
+  const sampleWards = React.useMemo(
+    () => [
+      { ward_name: 'Ward M/East (Govandi)', ward_code: 'WARD_ME', risk_score: 84.2, wbgt_c: 34.6, temperature_c: 38.2, latitude: 19.0558, longitude: 72.9315, source: 'sample' },
+      { ward_name: 'Ward G/North (Dharavi)', ward_code: 'WARD_GN', risk_score: 79.5, wbgt_c: 33.8, temperature_c: 37.9, latitude: 19.041, longitude: 72.855, source: 'sample' },
+      { ward_name: 'Ward L (Kurla East)', ward_code: 'WARD_L', risk_score: 73.1, wbgt_c: 33.1, temperature_c: 37.4, latitude: 19.068, longitude: 72.885, source: 'sample' },
+      { ward_name: 'Ward H/East (Bandra E)', ward_code: 'WARD_HE', risk_score: 68.4, wbgt_c: 32.5, temperature_c: 36.8, latitude: 19.058, longitude: 72.848, source: 'sample' },
+      { ward_name: 'Ward A (Colaba / Fort)', ward_code: 'WARD_A', risk_score: 38.6, wbgt_c: 28.2, temperature_c: 34.1, latitude: 18.922, longitude: 72.8347, source: 'sample' },
+    ],
+    []
+  );
+
+  // Both columns derive from the EXACT SAME array (eliminating disagreement between rail and list)
+  const activeWardList = React.useMemo(() => {
+    return isLive ? wardsRisk! : sampleWards;
+  }, [isLive, wardsRisk, sampleWards]);
+
+  const rankedWards = React.useMemo(() => {
+    return [...activeWardList].sort((a: any, b: any) => (b.risk_score || 0) - (a.risk_score || 0)).slice(0, 5);
+  }, [activeWardList]);
+
+  // Statistics derived directly from activeWardList
   const peakRisk = React.useMemo(() => {
-    if (wardsRisk && wardsRisk.length > 0) {
-      return Math.round(Math.max(...wardsRisk.map((w: any) => w.risk_score || 0)));
-    }
-    return 84;
-  }, [wardsRisk]);
+    if (activeWardList.length === 0) return 0;
+    return Math.round(Math.max(...activeWardList.map((w: any) => w.risk_score || 0)));
+  }, [activeWardList]);
 
   const peakWbgt = React.useMemo(() => {
-    if (wardsRisk && wardsRisk.length > 0) {
-      return Number(Math.max(...wardsRisk.map((w: any) => w.wbgt_c || 0)).toFixed(1));
-    }
-    return 34.6;
-  }, [wardsRisk]);
+    if (activeWardList.length === 0) return 0;
+    return Number(Math.max(...activeWardList.map((w: any) => w.wbgt_c || 0)).toFixed(1));
+  }, [activeWardList]);
 
   const wardsCount = React.useMemo(() => {
-    return wards?.length || wardsRisk?.length || 24;
-  }, [wards, wardsRisk]);
+    return isLive ? (wards?.length || activeWardList.length) : activeWardList.length;
+  }, [isLive, wards, activeWardList]);
 
   // Enhanced 5-Stage Computational Pipeline with Thin Hairline Architecture
   const pipelineStages = [
@@ -122,7 +133,7 @@ export const Landing: React.FC = () => {
         className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch"
       >
         {/* Left Column (60% weight): Type + Numbers primary focus */}
-        <div className="lg:col-span-7 bg-[#142630]/60 border border-white/[0.075] rounded-[14px] p-6 sm:p-8 flex flex-col justify-between corner-ticks shadow-2xl relative z-10 min-h-[460px] lg:h-[520px]">
+        <div className="lg:col-span-7 bg-[#142630]/60 border border-white/[0.075] rounded-[14px] p-6 sm:p-8 flex flex-col justify-between corner-ticks shadow-2xl relative z-10 h-full">
           <div className="space-y-5">
             {/* Eyebrow with #8FB3D9 accent */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8FB3D9]/10 border border-[#8FB3D9]/25 text-xs font-mono text-[#D8E8E6] w-fit">
@@ -198,7 +209,7 @@ export const Landing: React.FC = () => {
         </div>
 
         {/* Right Column (40% weight): High-Density Live Ward Risk Telemetry Matrix */}
-        <div className="lg:col-span-5 bg-[#142630]/60 border border-white/[0.075] rounded-[14px] p-5 sm:p-6 flex flex-col justify-between corner-ticks shadow-2xl relative min-h-[460px] lg:h-[520px]">
+        <div className="lg:col-span-5 bg-[#142630]/60 border border-white/[0.075] rounded-[14px] p-5 sm:p-6 flex flex-col justify-between corner-ticks shadow-2xl relative h-full">
           <div className="space-y-3">
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.075]">
               <div>
@@ -209,9 +220,17 @@ export const Landing: React.FC = () => {
                   Live Thermal Stress Rankings
                 </h3>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#8FB3D9]/10 border border-[#8FB3D9]/20 text-[#8FB3D9]">
-                Live Feed
-              </span>
+              {isLive ? (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#2FA37C]/15 border border-[#2FA37C]/30 text-[#2FA37C] flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2FA37C] animate-pulse" />
+                  Live Feed
+                </span>
+              ) : (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#E8C547]/15 border border-[#E8C547]/30 text-[#E8C547] flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E8C547]" />
+                  Sample Simulation
+                </span>
+              )}
             </div>
 
             {/* Ward list table */}
@@ -252,7 +271,11 @@ export const Landing: React.FC = () => {
           </div>
 
           <div className="pt-3 border-t border-white/[0.075] flex items-center justify-between text-xs font-mono">
-            <span className="text-[#6B7C8A] text-[11px]">Provenance: IMD AWS + Open-Meteo</span>
+            <span className="text-[#6B7C8A] text-[11px] font-mono">
+              {isLive
+                ? 'Provenance: IMD AWS + Open-Meteo (Live)'
+                : 'Provenance: Pre-seeded sample calibration model (Sample)'}
+            </span>
             <Link
               to="/app"
               className="text-[#8FB3D9] hover:text-[#A5C4E4] inline-flex items-center gap-1 transition-colors hover:underline text-[11px]"
@@ -274,15 +297,23 @@ export const Landing: React.FC = () => {
         <TwoWardsComparison />
       </section>
 
-      {/* 3. Section: 3D Ward Heat City */}
-      <section className="space-y-6">
+      {/* 3. Section: 3D Ward Heat City (Hidden below 768px, Lazy-loaded with Suspense) */}
+      <section className="space-y-6 hidden md:block">
         <SectionHeader
           label="EXTRUDED URBAN HEAT FIELD"
           title="Ward Heat City 3D Landscape"
           lead="Thousands of instanced volumetric blocks mapping normative human thermal stress. Height and colour encode multi-factorial risk, not mere air temperature."
         />
-        <div className="border border-white/8 rounded-[14px] overflow-hidden">
-          <WardHeatCity height={560} />
+        <div className="border border-white/[0.075] rounded-[14px] overflow-hidden bg-[#0B141B]">
+          <React.Suspense
+            fallback={
+              <div className="h-[560px] flex items-center justify-center font-mono text-xs text-[#6B7C8A]">
+                Initializing 3D Ward Heat Landscape...
+              </div>
+            }
+          >
+            <WardHeatCity wards={activeWardList} height={560} />
+          </React.Suspense>
         </div>
       </section>
 
