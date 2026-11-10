@@ -16,6 +16,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useUser, UserButton } from '@clerk/clerk-react';
+import { useRole } from '../hooks/useRole';
 import { LeafletBaseMap } from '../components/maps/LeafletBaseMap';
 import { useWards } from '../hooks/useWards';
 import { useAllWardsRisk } from '../hooks/useRisk';
@@ -29,6 +30,7 @@ import type { Location } from '../types';
 export const AuthorityDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const { isLoaded: isRoleLoaded, isAuthority, role } = useRole();
   const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
 
   const { data: wardsData } = useWards(selectedCity);
@@ -37,115 +39,9 @@ export const AuthorityDashboard: React.FC = () => {
   const { data: equityData } = useEquity(selectedCity);
   const [queueTab, setQueueTab] = useState<'queue' | 'equity'>('queue');
 
-  // Fallback data so every panel renders full on first paint without empty reserved space
+  // Wards strictly from real API response - zero hardcoded fallback fixtures
   const wards: Location[] = useMemo(() => {
-    if (wardsData && wardsData.length > 0) return wardsData;
-    return [
-      {
-        id: 1,
-        ward_code: 'WARD_ME',
-        ward_name: 'Ward M/East (Govandi)',
-        city: 'Mumbai',
-        district: 'Mumbai Suburban',
-        state: 'Maharashtra',
-        latitude: 19.0558,
-        longitude: 72.9315,
-        area_sq_km: 14.5,
-        population: 807720,
-        population_density_per_km2: 55705,
-        outdoor_worker_ratio: 0.42,
-        informal_settlement_ratio: null,
-        tree_canopy_fraction: null,
-        elderly_ratio: 0.065,
-        children_ratio: 0.098,
-        cooling_access_deficit: null,
-        hospital_count: 3,
-        drinking_water_deficit: 0.58,
-        description: 'census_vintage: 2011. Demographics: Census 2011 PCA.',
-        geometry_geojson: {
-          type: 'Polygon',
-          coordinates: [[[72.915, 19.04], [72.945, 19.04], [72.95, 19.07], [72.92, 19.07], [72.915, 19.04]]],
-        },
-      },
-      {
-        id: 2,
-        ward_code: 'WARD_GN',
-        ward_name: 'Ward G/North (Dharavi)',
-        city: 'Mumbai',
-        district: 'Mumbai City',
-        state: 'Maharashtra',
-        latitude: 19.041,
-        longitude: 72.855,
-        area_sq_km: 9.2,
-        population: 599039,
-        population_density_per_km2: 65112,
-        outdoor_worker_ratio: 0.48,
-        informal_settlement_ratio: null,
-        tree_canopy_fraction: null,
-        elderly_ratio: 0.061,
-        children_ratio: 0.102,
-        cooling_access_deficit: null,
-        hospital_count: 4,
-        drinking_water_deficit: 0.45,
-        description: 'census_vintage: 2011. Demographics: Census 2011 PCA.',
-        geometry_geojson: {
-          type: 'Polygon',
-          coordinates: [[[72.84, 19.03], [72.87, 19.03], [72.87, 19.06], [72.84, 19.06], [72.84, 19.03]]],
-        },
-      },
-      {
-        id: 3,
-        ward_code: 'WARD_L',
-        ward_name: 'Ward L (Kurla East)',
-        city: 'Mumbai',
-        district: 'Mumbai Suburban',
-        state: 'Maharashtra',
-        latitude: 19.068,
-        longitude: 72.885,
-        area_sq_km: 15.8,
-        population: 902226,
-        population_density_per_km2: 57102,
-        outdoor_worker_ratio: 0.38,
-        informal_settlement_ratio: null,
-        tree_canopy_fraction: null,
-        elderly_ratio: 0.07,
-        children_ratio: 0.088,
-        cooling_access_deficit: null,
-        hospital_count: 5,
-        drinking_water_deficit: 0.4,
-        description: 'census_vintage: 2011. Demographics: Census 2011 PCA.',
-        geometry_geojson: {
-          type: 'Polygon',
-          coordinates: [[[72.87, 19.05], [72.91, 19.05], [72.91, 19.09], [72.87, 19.09], [72.87, 19.05]]],
-        },
-      },
-      {
-        id: 4,
-        ward_code: 'WARD_A',
-        ward_name: 'Ward A (Colaba / Fort)',
-        city: 'Mumbai',
-        district: 'Mumbai City',
-        state: 'Maharashtra',
-        latitude: 18.922,
-        longitude: 72.8347,
-        area_sq_km: 12.5,
-        population: 185120,
-        population_density_per_km2: 14810,
-        outdoor_worker_ratio: 0.16,
-        informal_settlement_ratio: null,
-        tree_canopy_fraction: null,
-        elderly_ratio: 0.115,
-        children_ratio: 0.052,
-        cooling_access_deficit: null,
-        hospital_count: 8,
-        drinking_water_deficit: 0.12,
-        description: 'census_vintage: 2011. Demographics: Census 2011 PCA.',
-        geometry_geojson: {
-          type: 'Polygon',
-          coordinates: [[[72.82, 18.9], [72.85, 18.9], [72.85, 18.94], [72.82, 18.94], [72.82, 18.9]]],
-        },
-      },
-    ];
+    return wardsData || [];
   }, [wardsData]);
 
   // Selected ward
@@ -161,7 +57,12 @@ export const AuthorityDashboard: React.FC = () => {
     'Rapid Emergency Alert: WBGT exceeded 35°C threshold. Immediate worker hydration and rest rotations enforced.',
   ];
 
-  const [selectedWardForAlert, setSelectedWardForAlert] = useState<string>(activeWard?.ward_name || 'Ward M/East (Govandi)');
+  const [selectedWardForAlert, setSelectedWardForAlert] = useState<string>('');
+  useEffect(() => {
+    if (activeWard?.ward_name) {
+      setSelectedWardForAlert(activeWard.ward_name);
+    }
+  }, [activeWard]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>(alertTemplates[0]);
   const [isDispatching, setIsDispatching] = useState<boolean>(false);
   const [dispatchConfirmed, setDispatchConfirmed] = useState<boolean>(false);
@@ -181,7 +82,7 @@ export const AuthorityDashboard: React.FC = () => {
       await apiClient.post('/alerts', {
         location_id: activeWard?.id || 1,
         alert_level: 'Very High',
-        title: `MUNICIPAL HEAT DIRECTIVE: ${selectedWardForAlert}`,
+        title: `MUNICIPAL HEAT DIRECTIVE: ${selectedWardForAlert || activeWard?.ward_name || 'Active Ward'}`,
         message: selectedTemplate,
         action_directives: 'Immediate enforcement per City Heat Action Plan.',
         target_audience: 'all',
@@ -195,7 +96,7 @@ export const AuthorityDashboard: React.FC = () => {
     }
   };
 
-  // KPI countUp values
+  // KPI countUp values derived strictly from observed ward risk & cooling infrastructure
   const [kpiCounts, setKpiCounts] = useState({
     veryHigh: 0,
     extreme: 0,
@@ -203,10 +104,20 @@ export const AuthorityDashboard: React.FC = () => {
     acknowledged: 0,
   });
 
+  const kpiTargets = useMemo(() => {
+    if (!wardsRiskData || wardsRiskData.length === 0) {
+      return { veryHigh: 0, extreme: 0, centresOpen: coolingCentres?.length ?? 0, acknowledged: 0 };
+    }
+    const veryHigh = wardsRiskData.filter((w: any) => (w.band === 'Very High' || w.risk_band === 'Very High')).length;
+    const extreme = wardsRiskData.filter((w: any) => (w.band === 'Extreme' || w.risk_band === 'Extreme')).length;
+    const centresOpen = coolingCentres?.length ?? 0;
+    return { veryHigh, extreme, centresOpen, acknowledged: 0 };
+  }, [wardsRiskData, coolingCentres]);
+
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
-      setKpiCounts({ veryHigh: 38, extreme: 11, centresOpen: 7, acknowledged: 78 });
+      setKpiCounts(kpiTargets);
       return;
     }
     const duration = 700;
@@ -215,21 +126,64 @@ export const AuthorityDashboard: React.FC = () => {
       const elapsed = time - startTime;
       const progress = Math.min(1, elapsed / duration);
       setKpiCounts({
-        veryHigh: Math.floor(progress * 38),
-        extreme: Math.floor(progress * 11),
-        centresOpen: Math.floor(progress * 7),
-        acknowledged: Math.floor(progress * 78),
+        veryHigh: Math.floor(progress * kpiTargets.veryHigh),
+        extreme: Math.floor(progress * kpiTargets.extreme),
+        centresOpen: Math.floor(progress * kpiTargets.centresOpen),
+        acknowledged: Math.floor(progress * kpiTargets.acknowledged),
       });
       if (progress < 1) requestAnimationFrame(animate);
     };
     requestAnimationFrame(animate);
-  }, []);
+  }, [kpiTargets]);
 
-  const interventions = [
-    { id: 1, title: 'Open 2 cooling centres', wards: 'Govandi · Dharavi', action: 'Dispatch' },
-    { id: 2, title: 'Suspend outdoor work 13–16', wards: '11 wards · 6 contractors', action: 'Notify' },
-    { id: 3, title: 'Deploy water tankers', wards: 'Dharavi · Kurla East', action: 'Dispatch' },
-  ];
+  const interventions = useMemo(() => {
+    const topWards = (wardsRiskData || [])
+      .slice()
+      .sort((a: any, b: any) => (b.risk_score || b.score || 0) - (a.risk_score || a.score || 0))
+      .slice(0, 3);
+    const topNames = topWards.map((w: any) => w.ward_name || w.location_name || `Ward ${w.ward_code || w.location_id}`).join(' · ');
+    return [
+      { id: 1, title: 'Open emergency cooling centres', wards: topNames || 'Top risk zones', action: 'Dispatch' },
+      { id: 2, title: 'Suspend outdoor work 12:00–16:00', wards: topWards[0]?.ward_name ? `${topWards[0].ward_name} & active zones` : 'Active hazard sectors', action: 'Notify' },
+      { id: 3, title: 'Deploy mobile hydration tankers', wards: topNames || 'Critical exposure corridors', action: 'Dispatch' },
+    ];
+  }, [wardsRiskData]);
+
+  // Polite server-side role guard view for citizen accounts
+  if (isRoleLoaded && !isAuthority) {
+    return (
+      <div className="min-h-screen bg-[#0B141B] flex items-center justify-center p-6 text-[#D8E8E6] font-sans">
+        <div className="w-full max-w-md p-8 rounded-[12px] bg-[#142630] border border-white/[0.075] shadow-2xl text-center space-y-5">
+          <div className="w-12 h-12 mx-auto rounded-full bg-[#203A45] border border-white/[0.075] flex items-center justify-center">
+            <ShieldAlert className="w-6 h-6 text-[#8FB3D9]" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-lg font-bold text-[#D8E8E6] tracking-tight">
+              This console is for municipal officers
+            </h1>
+            <p className="text-xs text-[#93A3B0] leading-relaxed">
+              The Mission Control Authority console is reserved for verified municipal disaster response authorities and ward emergency coordinators.
+            </p>
+          </div>
+          <div className="p-3 rounded-[8px] bg-[#203A45]/50 border border-white/[0.05] text-left">
+            <span className="text-[10px] font-mono text-[#6B7C8A] uppercase tracking-wider block mb-1">
+              Active Session Role
+            </span>
+            <span className="text-xs font-mono text-[#D8E8E6] capitalize">
+              {role || 'Citizen'} Account
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/app')}
+            className="w-full py-2.5 px-4 rounded-[8px] bg-[#8FB3D9] hover:bg-[#A5C4E4] text-[#0B141B] font-mono font-semibold text-xs transition-colors cursor-pointer"
+          >
+            Return to Citizen Overview
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-[#0B141B] flex flex-row overflow-hidden text-[#D8E8E6] font-sans antialiased">

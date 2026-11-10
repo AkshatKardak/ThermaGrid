@@ -11,7 +11,7 @@ export const DemoAccountPanel: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [loadingRole, setLoadingRole] = useState<string | null>(null);
 
-  const handleDemoLogin = async (email: string, roleLabel: string) => {
+  const handleDemoLogin = async (email: string, roleLabel: string, targetRedirect: string) => {
     setLoadingRole(roleLabel);
 
     // Copy to clipboard
@@ -21,7 +21,7 @@ export const DemoAccountPanel: React.FC = () => {
       // ignore
     }
 
-    // 1-Click Clerk login
+    // 1-Click Clerk login with role-specific target redirect
     if (isSignInLoaded && signIn) {
       try {
         const result = await signIn.create({
@@ -31,10 +31,13 @@ export const DemoAccountPanel: React.FC = () => {
 
         if (result.status === 'complete' && result.createdSessionId) {
           if (setActive) {
-            await setActive({ session: result.createdSessionId });
+            await setActive({
+              session: result.createdSessionId,
+              redirectUrl: targetRedirect,
+            });
           }
           setToastMessage(`Signed in as ${roleLabel}. Opening telemetry deck...`);
-          setTimeout(() => navigate('/app'), 300);
+          setTimeout(() => navigate(targetRedirect), 300);
           return;
         }
       } catch (err: any) {
@@ -59,7 +62,7 @@ export const DemoAccountPanel: React.FC = () => {
         <button
           type="button"
           disabled={loadingRole !== null}
-          onClick={() => handleDemoLogin('authority@thermagrid.demo', 'authority')}
+          onClick={() => handleDemoLogin('authority@thermagrid.demo', 'authority', '/app/authority')}
           className="h-10 px-3 rounded-[8px] bg-transparent hover:bg-white/[0.04] active:bg-white/[0.08] border border-dashed border-white/[0.14] hover:border-[#8FB3D9] flex items-center justify-center gap-2 text-xs font-mono text-[#D8E8E6] transition-all cursor-pointer group disabled:opacity-50"
         >
           {loadingRole === 'authority' ? (
@@ -73,7 +76,7 @@ export const DemoAccountPanel: React.FC = () => {
         <button
           type="button"
           disabled={loadingRole !== null}
-          onClick={() => handleDemoLogin('citizen@thermagrid.demo', 'citizen')}
+          onClick={() => handleDemoLogin('citizen@thermagrid.demo', 'citizen', '/app')}
           className="h-10 px-3 rounded-[8px] bg-transparent hover:bg-white/[0.04] active:bg-white/[0.08] border border-dashed border-white/[0.14] hover:border-[#8FB3D9] flex items-center justify-center gap-2 text-xs font-mono text-[#D8E8E6] transition-all cursor-pointer group disabled:opacity-50"
         >
           {loadingRole === 'citizen' ? (

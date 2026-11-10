@@ -165,6 +165,24 @@ def test_role_guard_authority_403_for_citizens():
     assert resp_ok.json()["status"] == "authorized"
 
 
+def test_authority_view_role_guard():
+    # 7.7: Server-side role guard on authority console returning polite card for citizen
+    citizen_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_citizen', 'citizen')}"}
+    resp = client.get("/api/v1/auth/authority-guard", headers=citizen_headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["authorized"] is False
+    assert "card" in data
+    assert "municipal authorities" in data["card"]["title"]
+    assert data["card"]["redirect_to"] == "/app"
+
+    # Authority account is authorized
+    auth_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_authority', 'authority')}"}
+    resp_auth = client.get("/api/v1/auth/authority-guard", headers=auth_headers)
+    assert resp_auth.status_code == 200
+    assert resp_auth.json()["authorized"] is True
+
+
 import asyncio
 
 def test_alert_threshold_dispatch():

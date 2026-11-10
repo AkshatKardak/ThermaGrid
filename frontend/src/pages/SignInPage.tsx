@@ -38,8 +38,22 @@ export const SignInPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get('redirect_url') || '/app';
 
-  if (isLoaded && isSignedIn) {
-    return <Navigate to="/app" replace />;
+  // Wait for Clerk to finish loading before evaluating navigation
+  if (!isLoaded) {
+    return (
+      <AuthLayout
+        title="Municipal & Citizen Telemetry Access"
+        subtitle="Sign in to view real-time ward early warnings and biometeorological matrices."
+      >
+        <div className="w-full flex justify-center py-12 text-[#6B7C8A] font-mono text-xs">
+          Loading authentication state...
+        </div>
+      </AuthLayout>
+    );
+  }
+
+  if (isSignedIn) {
+    return <Navigate to={redirectUrl} replace />;
   }
 
   return (
@@ -53,7 +67,6 @@ export const SignInPage: React.FC = () => {
           path="/sign-in"
           signUpUrl="/sign-up"
           fallbackRedirectUrl={redirectUrl}
-          forceRedirectUrl="/app"
           appearance={clerkAppearance}
         />
         <DemoAccountPanel />

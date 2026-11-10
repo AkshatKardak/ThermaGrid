@@ -12,14 +12,19 @@ import { ProvenanceChip } from '../components/ui/ProvenanceChip';
 import { TYPOGRAPHY } from '../theme/typography';
 import { useAllWardsRisk } from '../hooks/useRisk';
 import { useWards } from '../hooks/useWards';
+import { useRole } from '../hooks/useRole';
 import { getRiskBand } from '../theme/tokens';
 
 export const Landing: React.FC = () => {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, role } = useRole();
   const heroRef = useRef<HTMLDivElement>(null);
 
-  // If user is already authenticated, immediately route to main telemetry hub
+  // If user is already authenticated, route based on role:
+  // authority -> /app/authority, citizen -> /app (Citizen overview)
   if (isLoaded && isSignedIn) {
+    if (role === 'authority' || role === 'admin') {
+      return <Navigate to="/app/authority" replace />;
+    }
     return <Navigate to="/app" replace />;
   }
 
