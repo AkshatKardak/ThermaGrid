@@ -12,9 +12,9 @@ export const LayerControls: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-wrap items-center gap-2 bg-[#142630]/90 backdrop-blur-md p-2 rounded-xl border border-white/10 text-xs">
-      <div className="flex items-center gap-1.5 text-[#8B9AA8] px-2 font-mono text-[11px] uppercase">
-        <Layers className="w-3.5 h-3.5" />
+    <div className="flex flex-wrap items-center gap-2 bg-surface p-2 rounded-[6px] border border-border text-xs">
+      <div className="flex items-center gap-1.5 text-muted px-2 font-mono text-[11px] uppercase">
+        <Layers className="w-3.5 h-3.5 text-muted" />
         <span>Layers:</span>
       </div>
 
@@ -25,10 +25,10 @@ export const LayerControls: React.FC = () => {
           <button
             key={layer.key}
             onClick={() => toggleLayer(layer.key)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] font-mono text-xs font-medium transition-colors cursor-pointer ${
               isActive
-                ? 'bg-[#8FB3D9] text-white shadow-sm'
-                : 'bg-white/5 text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/10'
+                ? 'bg-accent text-on-accent'
+                : 'bg-raised text-muted hover:text-ink border border-border'
             }`}
           >
             <Icon className="w-3.5 h-3.5" />

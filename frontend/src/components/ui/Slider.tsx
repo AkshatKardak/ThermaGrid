@@ -30,10 +30,10 @@ export const Slider: React.FC<SliderProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex items-center justify-between">
-        <label className="text-xs font-mono uppercase tracking-wider text-[#8B9AA8]">
+        <label className="text-xs font-mono uppercase tracking-wider text-muted">
           {label}
         </label>
-        <span className="text-sm font-mono font-bold text-[#D7E0E7] tabular-nums px-2 py-0.5 rounded bg-[#203A45]/40 border border-white/8">
+        <span className="text-sm font-mono font-bold text-ink tabular-nums px-2 py-0.5 rounded-[4px] bg-raised border border-border">
           {displayVal}
         </span>
       </div>
@@ -45,10 +45,10 @@ export const Slider: React.FC<SliderProps> = ({
         step={step}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-1.5 bg-[#203A45] rounded-lg appearance-none cursor-pointer accent-[#8FB3D9]"
+        className="w-full h-1.5 bg-border rounded-lg appearance-none cursor-pointer accent-[var(--accent)]"
       />
 
-      <div className="flex justify-between text-[10px] font-mono text-[#5F7183]">
+      <div className="flex justify-between text-[10px] font-mono text-muted">
         <span>
           {min > 0 ? `+${min}` : min}
           {unit}

@@ -39,51 +39,44 @@ export const ForecastConfidenceChart: React.FC<ForecastConfidenceChartProps> = (
     <div className="w-full h-72">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#CFC8B8" />
           <XAxis
             dataKey="time"
-            stroke="#8B9AA8"
+            stroke="#5E645F"
             fontSize={10}
             tickLine={false}
           />
           <YAxis
-            stroke="#8B9AA8"
+            dataKey="risk"
+            stroke="#5E645F"
             fontSize={11}
             domain={[0, 100]}
             tickLine={false}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#0B141B',
-              borderColor: 'rgba(255,255,255,0.15)',
+              backgroundColor: '#FBF9F4',
+              borderColor: '#CFC8B8',
               borderRadius: '8px',
               fontSize: '11px',
-              color: '#D7E0E7',
+              color: '#1A1E1C',
             }}
           />
           {/* Shaded 80% Confidence Interval Band */}
           <Area
             type="monotone"
-            dataKey="upper"
+            dataKey="confidenceBand"
             stroke="none"
-            fill="#8FB3D9"
+            fill="#FF704F"
             fillOpacity={0.15}
-            name="80% Upper Bound"
-          />
-          <Area
-            type="monotone"
-            dataKey="lower"
-            stroke="none"
-            fill="#0B141B"
-            fillOpacity={1.0}
-            name="80% Lower Bound"
+            name="80% Confidence Band"
           />
           {/* Median Model Trajectory */}
           <Line
             type="monotone"
             dataKey="risk"
             stroke="#FF704F"
-            strokeWidth={2.5}
+            strokeWidth={2}
             dot={false}
             name="Predicted Risk Score"
           />

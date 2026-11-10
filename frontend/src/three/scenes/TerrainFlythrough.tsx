@@ -321,36 +321,36 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-[#0B141B] shadow-2xl"
+      className="relative w-full rounded-[8px] overflow-hidden border border-border bg-panel-dark"
       style={{ minHeight: height }}
     >
       {/* Top Overlay Banner */}
       <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-10 pointer-events-none">
         <div>
           <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-[#8B9AA8]" />
-            <h3 className="text-sm font-semibold text-white tracking-wide font-display">
+            <Compass className="w-4 h-4 text-raised/70" />
+            <h3 className="text-sm font-semibold text-raised tracking-wide font-display">
               Urban Heat Island (UHI) 3D Terrain Flythrough
             </h3>
           </div>
-          <p className="text-[11px] text-[#8B9AA8] font-mono mt-0.5">
+          <p className="text-[11px] text-raised/70 font-mono mt-0.5">
             14s Catmull-Rom Spline Flight across Topological Microclimates
           </p>
         </div>
 
         {/* Flight Transport Controls */}
-        <div className="flex items-center gap-2 pointer-events-auto bg-[#142630]/90 border border-white/10 p-1 rounded-xl backdrop-blur-md">
+        <div className="flex items-center gap-2 pointer-events-auto bg-panel-dark border border-border p-1 rounded-[6px]">
           <button
             onClick={togglePlay}
-            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="p-1.5 rounded-[4px] bg-raised/15 hover:bg-raised/25 text-raised transition-colors"
             title={isPlaying ? 'Pause Flythrough' : 'Play Flythrough'}
             aria-label={isPlaying ? 'Pause Flythrough' : 'Play Flythrough'}
           >
-            {isPlaying ? <Pause className="w-4 h-4 text-[#FF704F]" /> : <Play className="w-4 h-4 text-[#2FA37C]" />}
+            {isPlaying ? <Pause className="w-4 h-4 text-accent" /> : <Play className="w-4 h-4 text-accent" />}
           </button>
           <button
             onClick={restart}
-            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#D7E0E7] transition-colors"
+            className="p-1.5 rounded-[4px] bg-raised/15 hover:bg-raised/25 text-raised transition-colors"
             title="Restart Flight Path"
             aria-label="Restart Flight Path"
           >
@@ -361,9 +361,9 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
 
       {/* Flight Progress Bar */}
       <div className="absolute top-16 left-4 right-4 z-10 pointer-events-none">
-        <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden">
+        <div className="w-full bg-border/30 h-1 rounded-full overflow-hidden">
           <div
-            className="bg-gradient-to-r from-[#FF704F] to-[#8FB3D9] h-full transition-all duration-100"
+            className="bg-accent h-full transition-all duration-100"
             style={{ width: `${(flythroughProgress * 100).toFixed(1)}%` }}
           />
         </div>
@@ -371,16 +371,17 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
 
       {/* Active Hotspot Readout Card */}
       <div className="absolute bottom-4 left-4 right-4 z-10 pointer-events-none">
-        <div className="bg-[#142630]/90 border border-white/15 rounded-xl p-4 shadow-2xl backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs pointer-events-auto">
+        <div className="bg-panel-dark border border-border rounded-[8px] p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs pointer-events-auto text-raised">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#FF704F]" />
-              <span className="font-bold text-white text-sm">{activeHotspot.name}</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FF704F]/20 text-[#FF704F] font-semibold border border-[#FF704F]/30">
+              <MapPin className="w-4 h-4 text-accent" />
+              <span className="font-bold text-raised text-sm">{activeHotspot.name}</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-[4px] bg-raised text-ink font-medium border border-border inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-risk-4" />
                 Risk: {(activeHotspot.risk * 100).toFixed(0)}/100
               </span>
             </div>
-            <p className="text-[11px] text-[#8B9AA8] leading-relaxed max-w-2xl">
+            <p className="text-[11px] text-raised/70 leading-relaxed max-w-2xl">
               {activeHotspot.description}
             </p>
           </div>
@@ -390,10 +391,10 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
               <button
                 key={h.id}
                 onClick={() => setActiveHotspot(h)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] font-mono transition-colors ${
+                className={`px-2.5 py-1 rounded-[4px] text-[10px] font-mono transition-colors ${
                   activeHotspot.id === h.id
-                    ? 'bg-[#8FB3D9] text-white font-semibold'
-                    : 'bg-white/5 text-[#8B9AA8] hover:text-white'
+                    ? 'bg-accent text-on-accent font-semibold'
+                    : 'bg-raised/15 text-raised/70 hover:text-raised'
                 }`}
               >
                 {h.id.toUpperCase()}

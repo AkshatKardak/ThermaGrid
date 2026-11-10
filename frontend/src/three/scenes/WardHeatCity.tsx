@@ -79,10 +79,10 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
     let width = container.clientWidth || 800;
     let heightPx = container.clientHeight || 540;
 
-    // --- 1. Scene & Atmosphere Fog (Palette Midnight #0B141B) ---
+    // --- 1. Scene & Atmosphere Fog (Panel Dark #14181A) ---
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0B141B);
-    scene.fog = new THREE.FogExp2(0x0B141B, 0.035);
+    scene.background = new THREE.Color(0x14181A);
+    scene.fog = new THREE.FogExp2(0x14181A, 0.035);
 
     // --- 2. Camera ---
     const camera = new THREE.PerspectiveCamera(45, width / heightPx, 0.1, 100);
@@ -428,38 +428,38 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full rounded-[14px] overflow-hidden border border-white/[0.075] bg-[#0B141B] shadow-2xl flex flex-col justify-between"
+      className="relative w-full rounded-[8px] overflow-hidden border border-border bg-panel-dark flex flex-col justify-between"
       style={{ minHeight: height }}
       aria-hidden="true"
     >
       {/* Stage Header & Legend Top-Right */}
       <div className="w-full flex items-center justify-between p-5 z-10 pointer-events-none">
         <div className="space-y-0.5">
-          <span className="text-xs font-mono font-medium text-[#D8E8E6] uppercase tracking-[0.10em] block">
+          <span className="text-xs font-mono font-medium text-raised uppercase tracking-[0.10em] block">
             Hyperlocal Ward Heat Landscape
           </span>
-          <span className="text-[11px] font-mono text-[#6B7C8A] block">
+          <span className="text-[11px] font-mono text-raised/70 block">
             Extruded Height &amp; Color Encode Multi-Factorial Human Thermal Stress
           </span>
         </div>
 
         {/* Legend Top-Right */}
-        <div className="flex items-center gap-2 bg-[#142630]/80 backdrop-blur-md px-3 py-1.5 rounded-[8px] border border-white/[0.075] text-[11px] font-mono">
-          <span className="text-[#93A3B0]">Risk:</span>
-          <span className="flex items-center gap-1 text-[#2FA37C]">
-            <span className="w-2 h-2 rounded-full bg-[#2FA37C]" /> Low
+        <div className="flex items-center gap-2 bg-panel-dark px-3 py-1.5 rounded-[6px] border border-border text-[11px] font-mono text-raised">
+          <span className="text-raised/70">Risk:</span>
+          <span className="flex items-center gap-1 text-raised">
+            <span className="w-2 h-2 rounded-full bg-risk-1" /> Low
           </span>
-          <span className="flex items-center gap-1 text-[#E8C547]">
-            <span className="w-2 h-2 rounded-full bg-[#E8C547]" /> Mod
+          <span className="flex items-center gap-1 text-raised">
+            <span className="w-2 h-2 rounded-full bg-risk-2" /> Mod
           </span>
-          <span className="flex items-center gap-1 text-[#F59E0B]">
-            <span className="w-2 h-2 rounded-full bg-[#F59E0B]" /> High
+          <span className="flex items-center gap-1 text-raised">
+            <span className="w-2 h-2 rounded-full bg-risk-3" /> High
           </span>
-          <span className="flex items-center gap-1 text-[#FF704F]">
-            <span className="w-2 h-2 rounded-full bg-[#FF704F]" /> Very High
+          <span className="flex items-center gap-1 text-raised">
+            <span className="w-2 h-2 rounded-full bg-risk-4" /> Very High
           </span>
-          <span className="flex items-center gap-1 text-[#C31D3C]">
-            <span className="w-2 h-2 rounded-full bg-[#C31D3C]" /> Ext
+          <span className="flex items-center gap-1 text-raised">
+            <span className="w-2 h-2 rounded-full bg-risk-5" /> Ext
           </span>
         </div>
       </div>
@@ -467,19 +467,20 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
       {/* Tooltip on Hover */}
       {hoveredWard && tooltipPos && (
         <div
-          className="absolute z-30 pointer-events-none px-3.5 py-2 rounded-[8px] bg-[#0B141B]/95 backdrop-blur-md border border-white/[0.14] shadow-2xl text-xs font-mono space-y-1 transition-transform duration-75"
+          className="absolute z-30 pointer-events-none px-3.5 py-2 rounded-[6px] bg-panel-dark border border-border text-xs font-mono space-y-1 transition-transform duration-75 text-raised"
           style={{
             left: `${Math.min(window.innerWidth - 220, tooltipPos.x + 16)}px`,
             top: `${Math.max(10, tooltipPos.y - 48)}px`,
           }}
         >
-          <div className="font-bold text-white flex items-center justify-between gap-4">
+          <div className="font-bold text-raised flex items-center justify-between gap-4">
             <span>{hoveredWard.name}</span>
-            <span style={{ color: heatColor(hoveredWard.risk) }}>
+            <span className="inline-flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: heatColor(hoveredWard.risk) }} />
               Risk {Math.round(hoveredWard.risk > 1 ? hoveredWard.risk : hoveredWard.risk * 100)}
             </span>
           </div>
-          <div className="text-[10px] text-[#93A3B0] flex items-center gap-3">
+          <div className="text-[10px] text-raised/70 flex items-center gap-3">
             <span>WBGT: {hoveredWard.wbgt ? `${hoveredWard.wbgt}°C` : 'N/A'}</span>
             <span>Pop: {hoveredWard.population ? `${(hoveredWard.population / 1000).toFixed(0)}k` : 'N/A'}</span>
           </div>
@@ -488,25 +489,20 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
 
       {/* Caption Bottom-Left & Selected Ward Card Bottom-Right */}
       <div className="w-full p-4 flex flex-wrap items-end justify-between gap-4 z-10 pointer-events-none">
-        <div className="text-[11px] font-mono text-[#6B7C8A] bg-[#0B141B]/80 px-3 py-1.5 rounded-[6px] border border-white/[0.05]">
+        <div className="text-[11px] font-mono text-raised/70 bg-panel-dark px-3 py-1.5 rounded-[6px] border border-border">
           Left-drag to orbit • Scroll to zoom • Hover column to inspect ward telemetry
         </div>
 
         {activeWard && (
-          <div className="pointer-events-auto bg-[#142630]/90 backdrop-blur-md border border-white/[0.14] rounded-[10px] p-3 text-xs font-mono space-y-1 shadow-2xl">
+          <div className="pointer-events-auto bg-panel-dark border border-border rounded-[6px] p-3 text-xs font-mono space-y-1 text-raised">
             <div className="flex items-center justify-between gap-4">
-              <span className="font-bold text-white">{activeWard.name}</span>
-              <span
-                className="font-bold px-2 py-0.5 rounded text-[10px]"
-                style={{
-                  backgroundColor: `${heatColor(activeWard.risk)}25`,
-                  color: heatColor(activeWard.risk),
-                }}
-              >
+              <span className="font-bold text-raised">{activeWard.name}</span>
+              <span className="font-medium px-2 py-0.5 rounded-[4px] text-[10px] bg-raised text-ink border border-border inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: heatColor(activeWard.risk) }} />
                 Risk {Math.round(activeWard.risk > 1 ? activeWard.risk : activeWard.risk * 100)}
               </span>
             </div>
-            <div className="text-[10px] text-[#93A3B0]">
+            <div className="text-[10px] text-raised/70">
               {activeWard.wbgt ? `Est. WBGT: ${activeWard.wbgt}°C` : ''} {activeWard.temp ? `• Dry-Bulb: ${activeWard.temp}°C` : ''}
             </div>
           </div>

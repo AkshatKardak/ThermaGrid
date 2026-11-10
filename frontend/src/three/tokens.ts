@@ -1,26 +1,27 @@
 /**
  * 3D Scene Design Tokens
- * Re-exports the canonical Midnight Climate palette from theme/tokens.ts.
+ * Re-exports the canonical palette from theme/tokens.ts.
  * Never hardcode hex values in Three.js scenes or materials.
+ * 3D canvases and map canvases use --panel-dark; text on it uses --raised.
  */
 import { THEME_COLORS, RISK_BANDS } from '../theme/tokens';
 
 export const THREE_TOKENS = {
-  bg: THEME_COLORS.bg,                      // #0B141B Midnight
-  panel: THEME_COLORS.surface,              // #142630 Panel
-  panelElevated: THEME_COLORS.surfaceElevated, // #203A45 Raised Panel
-  text: THEME_COLORS.text,                  // #D7E0E7 Text
-  textDim: THEME_COLORS.textDim,            // #8B9AA8 Secondary Text
-  accent: THEME_COLORS.accent,              // #8FB3D9 Steel Blue (UI chrome & rim lighting ONLY)
-  accentDim: THEME_COLORS.accentDim,
+  bg: THEME_COLORS.panelDark,                   // #14181A panelDark
+  panel: THEME_COLORS.panelDark,               // #14181A panelDark
+  panelElevated: THEME_COLORS.surface,         // #EAE5DA
+  text: THEME_COLORS.raised,                   // #FBF9F4
+  textDim: THEME_COLORS.muted,                 // #5E645F
+  accent: THEME_COLORS.accent,                 // #1F3A5F
+  accentDim: THEME_COLORS.accentHover,
   accentSoft: THEME_COLORS.accentSoft,
-  alert: THEME_COLORS.alert,                // #FF704F Alert
+  alert: THEME_COLORS.error,                   // #8A2B22
 
   // Heat Scale (strictly mapped from single source of truth)
   heat: {
     safe: THEME_COLORS.heatScale.safe,           // #2FA37C
     moderate: THEME_COLORS.heatScale.moderate,   // #E8C547
-    high: THEME_COLORS.heatScale.high,           // #F59E0B
+    high: THEME_COLORS.heatScale.high,           // #D97706
     veryhigh: THEME_COLORS.heatScale.veryhigh,   // #FF704F
     extreme: THEME_COLORS.heatScale.extreme,     // #C31D3C
   },

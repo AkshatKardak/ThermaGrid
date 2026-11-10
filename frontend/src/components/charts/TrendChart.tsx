@@ -13,6 +13,7 @@ import {
   ReferenceDot,
 } from 'recharts';
 import type { HourlyThermalItem } from '../../types';
+import { TOKENS, RISK_SCALE } from '../../theme/tokens';
 
 interface TrendChartProps {
   items: HourlyThermalItem[];
@@ -50,50 +51,38 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
     <div className="w-full" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 20, right: 20, left: -16, bottom: 0 }}>
-          <defs>
-            {/* Vertical gradient: 28% -> 0% */}
-            <linearGradient id="wbgtGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FF704F" stopOpacity={0.28} />
-              <stop offset="100%" stopColor="#FF704F" stopOpacity={0.0} />
-            </linearGradient>
-            <linearGradient id="utciGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.18} />
-              <stop offset="100%" stopColor="#F59E0B" stopOpacity={0.0} />
-            </linearGradient>
-          </defs>
-
-          {/* Dotted horizontal grid lines only */}
+          {/* Hairline horizontal grid lines only */}
           <CartesianGrid
-            stroke="rgba(255, 255, 255, 0.08)"
+            stroke={TOKENS.border}
             strokeDasharray="2 4"
             vertical={false}
           />
 
-          {/* Threshold Band: WBGT ≥ 32°C (High Risk) at 8% opacity */}
+          {/* Threshold Band: WBGT ≥ 32°C (High Risk) at 6% opacity */}
           <ReferenceArea
             y1={32}
             y2={34}
-            fill="#FF704F"
-            fillOpacity={0.08}
+            fill={RISK_SCALE.risk4}
+            fillOpacity={0.06}
             strokeOpacity={0}
           />
-          {/* Threshold Band: WBGT ≥ 34°C (Extreme Stress) at 8% opacity */}
+          {/* Threshold Band: WBGT ≥ 34°C (Extreme Stress) at 6% opacity */}
           <ReferenceArea
             y1={34}
-            fill="#C31D3C"
-            fillOpacity={0.08}
+            fill={RISK_SCALE.risk5}
+            fillOpacity={0.06}
             strokeOpacity={0}
           />
 
           <XAxis
             dataKey="time"
-            stroke="#5F7183"
+            stroke={TOKENS.muted}
             fontSize={11}
             tickLine={false}
             tick={{ fontFamily: 'IBM Plex Mono' }}
           />
           <YAxis
-            stroke="#5F7183"
+            stroke={TOKENS.muted}
             fontSize={11}
             unit="°C"
             domain={['dataMin - 1', 'dataMax + 2']}
@@ -107,8 +96,8 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
               x={peakPoint.time}
               y={peakPoint.wbgt}
               r={4}
-              fill="#FF704F"
-              stroke="#0B141B"
+              fill={RISK_SCALE.risk4}
+              stroke={TOKENS.bg}
               strokeWidth={2}
             />
           )}
@@ -117,17 +106,17 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
             content={({ active, payload, label }) => {
               if (!active || !payload || !payload.length) return null;
               return (
-                <div className="rounded-[8px] bg-[#0B141B]/95 backdrop-blur-md border border-white/16 p-3 shadow-2xl font-mono text-xs space-y-1.5">
-                  <div className="text-[10px] uppercase text-[#8B9AA8] tracking-wider border-b border-white/8 pb-1">
+                <div className="rounded-[6px] bg-raised border border-border p-3 font-mono text-xs space-y-1.5 text-ink">
+                  <div className="text-[10px] uppercase text-muted tracking-wider border-b border-border pb-1">
                     Hour: {label}
                   </div>
                   {payload.map((entry, index) => (
                     <div key={index} className="flex items-center justify-between gap-4">
-                      <span className="flex items-center gap-1.5" style={{ color: entry.color }}>
+                      <span className="flex items-center gap-1.5 text-ink">
                         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: entry.color }} />
                         {entry.name}:
                       </span>
-                      <span className="font-bold text-white tabular-nums">
+                      <span className="font-bold text-ink tabular-nums">
                         {Number(entry.value).toFixed(1)}°C
                       </span>
                     </div>
@@ -142,18 +131,19 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
               fontSize: '11px',
               fontFamily: 'IBM Plex Mono',
               paddingTop: '12px',
-              color: '#8B9AA8',
+              color: TOKENS.muted,
             }}
           />
 
-          {/* WBGT Area with gradient fill */}
+          {/* WBGT Area with flat subtle fill */}
           <Area
             type="monotone"
             dataKey="WBGT"
-            stroke="#FF704F"
+            stroke={RISK_SCALE.risk4}
             strokeWidth={2}
             strokeLinecap="round"
-            fill="url(#wbgtGradient)"
+            fill={RISK_SCALE.risk4}
+            fillOpacity={0.08}
             name="WBGT (Work Index)"
           />
 
@@ -161,7 +151,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
           <Line
             type="monotone"
             dataKey="UTCI"
-            stroke="#F59E0B"
+            stroke={RISK_SCALE.risk3}
             strokeWidth={2}
             strokeLinecap="round"
             dot={false}
@@ -172,7 +162,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
           <Line
             type="monotone"
             dataKey="Heat Index"
-            stroke="#E8C547"
+            stroke={RISK_SCALE.risk2}
             strokeWidth={1.5}
             strokeLinecap="round"
             dot={false}
@@ -183,7 +173,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
           <Line
             type="monotone"
             dataKey="Air Temp"
-            stroke="#8B9AA8"
+            stroke={TOKENS.muted}
             strokeWidth={1.5}
             strokeDasharray="2 4"
             dot={false}

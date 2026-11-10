@@ -1,5 +1,5 @@
 import React from 'react';
-import { Thermometer, Wind, Droplets, Sun, AlertTriangle, Users } from 'lucide-react';
+import { Thermometer, Wind, Droplets, Sun, AlertTriangle } from 'lucide-react';
 import type { RiskCurrent, ThermalCurrent } from '../../types';
 
 interface KpiStripProps {
@@ -14,35 +14,35 @@ export const KpiStrip: React.FC<KpiStripProps> = ({ risk, thermal }) => {
       value: risk ? `${risk.temperature_c.toFixed(1)}°C` : '--',
       subtext: 'Surface 2m dry-bulb',
       icon: Thermometer,
-      color: '#D7E0E7',
+      dotColor: 'var(--muted)',
     },
     {
       label: 'Effective WBGT',
       value: thermal ? `${thermal.wbgt_c.toFixed(1)}°C` : (risk ? `${risk.wbgt_c.toFixed(1)}°C` : '--'),
       subtext: thermal ? thermal.wbgt_category : 'Work-rest index',
       icon: Sun,
-      color: '#FF704F',
+      dotColor: 'var(--risk-4)',
     },
     {
       label: 'Universal Climate (UTCI)',
       value: thermal ? `${thermal.utci_c.toFixed(1)}°C` : (risk ? `${risk.utci_c.toFixed(1)}°C` : '--'),
       subtext: thermal ? thermal.utci_category : 'Human strain',
       icon: Wind,
-      color: '#F59E0B',
+      dotColor: 'var(--risk-3)',
     },
     {
       label: 'Heat Index (NWS/HI)',
       value: thermal ? `${thermal.heat_index_c.toFixed(1)}°C` : '--',
       subtext: thermal ? thermal.heat_index_category : 'Apparent temperature',
       icon: Droplets,
-      color: '#E8C547',
+      dotColor: 'var(--risk-2)',
     },
     {
       label: 'Composite Risk Score',
       value: risk ? `${risk.risk_score.toFixed(1)}` : '--',
       subtext: risk ? risk.band_label : 'Hazard × Exp × Vuln',
       icon: AlertTriangle,
-      color: risk ? risk.alert_color : '#8FB3D9',
+      dotColor: 'var(--risk-4)',
     },
   ];
 
@@ -53,20 +53,18 @@ export const KpiStrip: React.FC<KpiStripProps> = ({ risk, thermal }) => {
         return (
           <div
             key={i}
-            className="p-3.5 rounded-xl bg-[#142630]/80 border border-white/10 flex flex-col justify-between"
+            className="p-3.5 rounded-[6px] bg-surface border border-border flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between text-[#8B9AA8] text-xs">
+            <div className="flex items-center justify-between text-muted text-xs">
               <span className="font-medium truncate pr-1">{card.label}</span>
-              <Icon className="w-4 h-4 flex-shrink-0" style={{ color: card.color }} />
+              <Icon className="w-4 h-4 shrink-0 text-muted" />
             </div>
             <div className="mt-2">
-              <div
-                className="text-2xl font-mono font-bold tracking-tight"
-                style={{ color: card.color }}
-              >
-                {card.value}
+              <div className="text-2xl font-mono font-bold tracking-tight text-ink tabular-nums flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: card.dotColor }} />
+                <span>{card.value}</span>
               </div>
-              <div className="text-[11px] text-[#8B9AA8] truncate mt-0.5">
+              <div className="text-[11px] text-muted truncate mt-0.5">
                 {card.subtext}
               </div>
             </div>

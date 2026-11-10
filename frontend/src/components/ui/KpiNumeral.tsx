@@ -10,7 +10,7 @@ interface KpiNumeralProps {
   size?: 'xl' | 'l' | 'm';
   label?: string;
   sublabel?: string;
-  color?: string; // Hex color for value
+  color?: string; // Optional hex or css color override
   delta?: { value: number; label?: string };
   className?: string;
 }
@@ -65,19 +65,19 @@ export const KpiNumeral: React.FC<KpiNumeralProps> = ({
       <div className="flex items-baseline gap-2">
         <span
           className={sizeClass}
-          style={{ color: color || '#D7E0E7' }}
+          style={{ color: color || 'var(--ink)' }}
         >
           {prefix}
           {displayVal}
-          {suffix && <span className="text-[0.6em] font-normal ml-1 opacity-80">{suffix}</span>}
+          {suffix && <span className="text-[0.6em] font-normal ml-1 text-muted">{suffix}</span>}
         </span>
 
         {delta !== undefined && (
           <span
-            className={`text-xs font-mono px-2 py-0.5 rounded ${
+            className={`text-xs font-mono px-2 py-0.5 rounded-[4px] text-ink ${
               delta.value > 0
-                ? 'bg-[#FF704F]/15 text-[#FF704F] border border-[#FF704F]/30'
-                : 'bg-[#2FA37C]/15 text-[#2FA37C] border border-[#2FA37C]/30'
+                ? 'bg-[color-mix(in_srgb,var(--risk-4)_15%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-4)_55%,var(--ink))]'
+                : 'bg-[color-mix(in_srgb,var(--risk-1)_15%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-1)_55%,var(--ink))]'
             }`}
           >
             {delta.value > 0 ? `+${delta.value}` : delta.value}

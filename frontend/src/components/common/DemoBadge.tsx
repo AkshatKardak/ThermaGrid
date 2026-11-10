@@ -1,5 +1,4 @@
 import React from 'react';
-import { AlertCircle } from 'lucide-react';
 
 interface DemoBadgeProps {
   label?: string;
@@ -12,10 +11,10 @@ export const DemoBadge: React.FC<DemoBadgeProps> = ({
 }) => {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold tracking-wider uppercase bg-[#FF704F]/15 text-[#FF704F] border border-[#FF704F]/30 ${className}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] text-xs font-mono font-medium tracking-wider uppercase bg-surface text-ink border border-border ${className}`}
       title="Calibrated simulation model value — not live physical sensor feed"
     >
-      <AlertCircle className="w-3.5 h-3.5 animate-pulse text-[#FF704F]" />
+      <span className="w-1.5 h-1.5 rounded-full bg-accent" />
       {label}
     </span>
   );

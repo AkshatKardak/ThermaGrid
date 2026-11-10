@@ -34,7 +34,7 @@ export const FactorBars: React.FC<FactorBarsProps> = ({ factors, limit = 5 }) =>
 
   if (displayed.length === 0) {
     return (
-      <div className="h-28 flex items-center justify-center text-xs text-[#8B9AA8]">
+      <div className="h-28 flex items-center justify-center text-xs text-muted">
         No factor attribution data available.
       </div>
     );
@@ -51,23 +51,23 @@ export const FactorBars: React.FC<FactorBarsProps> = ({ factors, limit = 5 }) =>
           pctNum > 30
             ? '#FF704F'
             : pctNum > 18
-            ? '#F59E0B'
+            ? '#D97706'
             : '#2FA37C';
 
         return (
           <div key={index} className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-[#D7E0E7] font-medium">{nameStr}</span>
+              <span className="text-ink font-medium">{nameStr}</span>
               <div className="flex items-center gap-2">
-                {unitStr && <span className="font-mono text-[11px] text-[#8B9AA8]">{unitStr}</span>}
-                <span className="font-mono font-semibold text-[#D7E0E7] w-12 text-right tabular-nums">
+                {unitStr && <span className="font-mono text-[11px] text-muted">{unitStr}</span>}
+                <span className="font-mono font-semibold text-ink w-12 text-right tabular-nums">
                   {pctNum.toFixed(1)}%
                 </span>
               </div>
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
+            <div className="w-full h-1.5 rounded-full bg-border overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700 ease-out"
                 style={{

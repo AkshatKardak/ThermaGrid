@@ -10,6 +10,7 @@ import { ScrollProgressRail } from './components/ui/ScrollProgressRail';
 import { Landing } from './pages/Landing';
 import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
+import { DevKit } from './pages/DevKit';
 
 // Authenticated App Workspace Pages
 import { OverviewHub } from './pages/OverviewHub';
@@ -26,23 +27,13 @@ function LocationRedirect() {
   return <Navigate to={`/app/ward/${id}`} replace />;
 }
 
-
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <div className="min-h-screen flex flex-col bg-[#0B141B] text-[#D7E0E7] relative selection:bg-[#8FB3D9]/30 selection:text-white">
-          {/* Scroll progress rail (2px steel blue on right edge) */}
+        <div className="min-h-screen flex flex-col bg-bg text-ink relative">
+          {/* Scroll progress rail (2px accent on right edge) */}
           <ScrollProgressRail />
-
-          {/* Film grain texture (fixed SVG feTurbulence at 2.8% opacity) */}
-          <div className="film-grain" aria-hidden="true" />
-
-          {/* Background grid texture (64px, rgba(255,255,255,.025), masked with radial gradient) */}
-          <div className="fixed inset-0 bg-grid-pattern pointer-events-none z-0" aria-hidden="true" />
-
-          {/* Vignette overlay (transparent center to rgba(0,0,0,.35) at corners) */}
-          <div className="fixed inset-0 vignette-overlay pointer-events-none z-0" aria-hidden="true" />
 
           {/* Global Navbar (switches dynamically between PublicNav and AppNav) */}
           <Navbar />
@@ -54,6 +45,7 @@ export function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/sign-in/*" element={<SignInPage />} />
               <Route path="/sign-up/*" element={<SignUpPage />} />
+              <Route path="/dev/kit" element={<DevKit />} />
 
               {/* Authenticated App Routes */}
               <Route

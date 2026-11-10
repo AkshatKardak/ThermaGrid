@@ -18,7 +18,7 @@ interface EnvConfig {
 const rawEnv = import.meta.env;
 
 export const env: EnvConfig = Object.freeze({
-  API_BASE_URL: rawEnv.VITE_API_BASE_URL || 'http://localhost:8000/api',
+  API_BASE_URL: rawEnv.VITE_API_BASE_URL || 'http://localhost:8000/api/v1',
   APP_NAME: rawEnv.VITE_APP_NAME || 'ThermaGrid',
   CLERK_PUBLISHABLE_KEY: rawEnv.VITE_CLERK_PUBLISHABLE_KEY || '',
   MAP_STYLE_URL: rawEnv.VITE_MAP_STYLE_URL || 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',

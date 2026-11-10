@@ -46,27 +46,27 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
       tier="l2"
     >
       <div className="space-y-6">
-        {/* Timeline Bar showing Work (Amber) / Rest (Teal) blocks */}
+        {/* Timeline Bar showing Work / Rest blocks */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-[#8B9AA8]">60-Minute Cycle Timeline</span>
+            <span className="text-muted">60-Minute Cycle Timeline</span>
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1.5 text-[#F59E0B]">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B]" />
+              <span className="flex items-center gap-1.5 text-ink">
+                <span className="w-2.5 h-2.5 rounded-[2px] bg-risk-3" />
                 Work: {workMin}m ({workPct}%)
               </span>
-              <span className="flex items-center gap-1.5 text-[#2FA37C]">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#2FA37C]" />
+              <span className="flex items-center gap-1.5 text-ink">
+                <span className="w-2.5 h-2.5 rounded-[2px] bg-risk-1" />
                 Rest: {restMin}m ({restPct}%)
               </span>
             </div>
           </div>
 
           {/* Visual block bar */}
-          <div className="w-full h-8 rounded-[8px] overflow-hidden flex bg-[#0B141B] border border-white/8 p-0.5">
+          <div className="w-full h-8 rounded-[6px] overflow-hidden flex bg-raised border border-border p-0.5">
             {workPct > 0 && (
               <div
-                className="h-full bg-[#F59E0B] rounded-l-[6px] flex items-center justify-center text-[11px] font-mono font-bold text-black transition-all duration-300"
+                className="h-full bg-risk-3 rounded-l-[4px] flex items-center justify-center text-[11px] font-mono font-bold text-ink transition-all duration-300"
                 style={{ width: `${workPct}%` }}
               >
                 {workPct >= 20 ? `${workMin}m Work` : ''}
@@ -74,7 +74,7 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
             )}
             {restPct > 0 && (
               <div
-                className="h-full bg-[#2FA37C] rounded-r-[6px] flex items-center justify-center text-[11px] font-mono font-bold text-black transition-all duration-300"
+                className="h-full bg-risk-1 rounded-r-[4px] flex items-center justify-center text-[11px] font-mono font-bold text-ink transition-all duration-300"
                 style={{ width: `${restPct}%` }}
               >
                 {restPct >= 20 ? `${restMin}m Rest` : ''}
@@ -85,47 +85,47 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
 
         {/* Hydration Cadence & WBGT Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#142630]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
-            <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
-              <Timer className="w-4 h-4 text-[#8B9AA8]" />
+          <div className="bg-raised p-4 rounded-[6px] border border-border space-y-1">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted">
+              <Timer className="w-4 h-4 text-muted" />
               <span>Shift Rest Interval</span>
             </div>
-            <div className="text-xl font-mono font-bold text-white tabular-nums">
+            <div className="text-xl font-mono font-bold text-ink tabular-nums">
               Every {60 - restMin} mins
             </div>
-            <p className="text-[11px] text-[#8B9AA8]">
+            <p className="text-[11px] text-muted">
               Move to ventilated shade or cooling tent
             </p>
           </div>
 
-          <div className="bg-[#142630]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
-            <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
-              <Droplets className="w-4 h-4 text-[#2FA37C]" />
+          <div className="bg-raised p-4 rounded-[6px] border border-border space-y-1">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted">
+              <Droplets className="w-4 h-4 text-accent" />
               <span>Hydration Cadence</span>
             </div>
-            <div className="text-xl font-mono font-bold text-[#2FA37C] tabular-nums">
+            <div className="text-xl font-mono font-bold text-ink tabular-nums">
               {hydrationMlPerHour} ml / hr
             </div>
-            <p className="text-[11px] text-[#8B9AA8]">
+            <p className="text-[11px] text-muted">
               Drink 200–250ml cool water / ORS every 15–20m
             </p>
           </div>
 
-          <div className="bg-[#142630]/50 p-4 rounded-[10px] border border-white/6 space-y-1">
-            <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8]">
-              <AlertOctagon className="w-4 h-4 text-[#FF704F]" />
+          <div className="bg-raised p-4 rounded-[6px] border border-border space-y-1">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted">
+              <AlertOctagon className="w-4 h-4 text-risk-4" />
               <span>WBGT Stress Level</span>
             </div>
-            <div className="text-xl font-mono font-bold text-[#FF704F] tabular-nums">
+            <div className="text-xl font-mono font-bold text-ink tabular-nums">
               {wbgt.toFixed(1)}°C
             </div>
-            <p className="text-[11px] text-[#8B9AA8]">{category}</p>
+            <p className="text-[11px] text-muted">{category}</p>
           </div>
         </div>
 
         {/* Advisory Note */}
-        <div className="p-3.5 rounded-[8px] bg-[#0B141B] border border-white/8 text-xs text-[#D7E0E7] leading-relaxed">
-          <span className="font-mono font-bold text-[#FF704F] uppercase tracking-wider block mb-1 text-[11px]">
+        <div className="p-3.5 rounded-[6px] bg-raised border border-border text-xs text-ink leading-relaxed">
+          <span className="font-mono font-bold text-ink uppercase tracking-wider block mb-1 text-[11px]">
             Action Advisory:
           </span>
           {guidance}

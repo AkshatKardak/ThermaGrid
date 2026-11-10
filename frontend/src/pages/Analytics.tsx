@@ -52,13 +52,13 @@ export const Analytics: React.FC = () => {
   return (
     <div className="space-y-12">
       {/* 1. Header with Export CSV & "Data As Of" Stamp */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className={`${TYPOGRAPHY.h1} text-white`}>
+            <h1 className={`${TYPOGRAPHY.h1} text-ink`}>
               Thermal Biometeorology &amp; Analytics
             </h1>
-            <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-[#8FB3D9]/15 text-[#8FB3D9] border border-[#8FB3D9]/30">
+            <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-surface text-ink border border-border">
               Synoptic Telemetry
             </span>
           </div>
@@ -69,30 +69,30 @@ export const Analytics: React.FC = () => {
 
         {/* Action Controls & Data Timestamp Stamp */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="px-3 py-1.5 rounded-[6px] bg-[#0B141B] border border-white/8 text-[11px] font-mono text-[#8B9AA8]">
-            Data as of: <span className="text-white font-semibold">{dataTimestamp} UTC</span>
+          <div className="px-3 py-1.5 rounded-[6px] bg-surface border border-border text-[11px] font-mono text-muted">
+            Data as of: <span className="text-ink font-semibold">{dataTimestamp} UTC</span>
           </div>
 
           <button
             type="button"
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[#203A45] hover:bg-[#203A45] border border-white/12 text-xs font-mono font-semibold text-white transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-accent hover:bg-accent-hover text-on-accent border border-accent text-xs font-mono font-semibold transition-all cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5 text-[#8FB3D9]" />
+            <Download className="w-3.5 h-3.5 text-on-accent" />
             Export CSV
           </button>
         </div>
       </div>
 
       {/* Ward Selector Bar */}
-      <div className="flex items-center justify-between p-3.5 rounded-[10px] bg-[#142630]/60 border border-white/8">
-        <span className="text-xs font-mono text-[#8B9AA8]">
-          Selected Focal Ward: <strong className="text-white">{selectedWard?.ward_name}</strong>
+      <div className="flex items-center justify-between p-3.5 rounded-[10px] bg-surface border border-border">
+        <span className="text-xs font-mono text-muted">
+          Selected Focal Ward: <strong className="text-ink">{selectedWard?.ward_name}</strong>
         </span>
         <select
           value={selectedLocationId}
           onChange={(e) => setSelectedLocationId(Number(e.target.value))}
-          className="bg-[#0B141B] text-white text-xs font-mono px-3 py-1.5 rounded-[6px] border border-white/10 outline-none cursor-pointer"
+          className="bg-raised text-ink text-xs font-mono px-3 py-1.5 rounded-[6px] border border-border outline-none cursor-pointer focus:border-accent"
         >
           {wards?.map((w) => (
             <option key={w.id} value={w.id}>
@@ -113,7 +113,7 @@ export const Analytics: React.FC = () => {
           {history?.items ? (
             <TrendChart items={history.items} height={360} />
           ) : (
-            <div className="h-72 flex items-center justify-center text-xs font-mono text-[#8B9AA8]">
+            <div className="h-72 flex items-center justify-center text-xs font-mono text-muted">
               Loading biometeorological trajectory...
             </div>
           )}
@@ -144,7 +144,7 @@ export const Analytics: React.FC = () => {
             {allRisk ? (
               <DistributionPlot wardsRisk={allRisk} />
             ) : (
-              <div className="h-60 flex items-center justify-center text-xs font-mono text-[#8B9AA8]">
+              <div className="h-60 flex items-center justify-center text-xs font-mono text-muted">
                 Loading cross-ward comparative distribution...
               </div>
             )}
@@ -165,20 +165,21 @@ export const Analytics: React.FC = () => {
                   <div key={w.location_id} className="space-y-1.5 font-mono text-xs">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-[#5F7183] w-4">#{idx + 1}</span>
-                        <span className="font-semibold text-[#D7E0E7] truncate max-w-[180px]">
+                        <span className="text-[10px] text-muted w-4">#{idx + 1}</span>
+                        <span className="font-semibold text-ink truncate max-w-[180px]">
                           {w.ward_name}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[#8B9AA8] text-[11px]">
+                        <span className="text-muted text-[11px]">
                           WBGT {w.wbgt_c.toFixed(1)}°C
                         </span>
                         <span
                           className="font-bold px-1.5 py-0.5 rounded text-[11px] tabular-nums"
                           style={{
-                            backgroundColor: `${band.color}20`,
-                            color: band.color,
+                            backgroundColor: `color-mix(in srgb, ${band.color} 15%, var(--surface))`,
+                            color: band.code === 'extreme' ? 'var(--risk-5)' : 'var(--ink)',
+                            border: `1px solid color-mix(in srgb, ${band.color} ${band.code === 'moderate' ? '60%' : '55%'}, var(--ink))`,
                           }}
                         >
                           {w.risk_score.toFixed(0)}
@@ -187,7 +188,7 @@ export const Analytics: React.FC = () => {
                     </div>
 
                     {/* Horizontal Progress Bar */}
-                    <div className="w-full h-2 rounded-full bg-[#0B141B] overflow-hidden border border-white/5">
+                    <div className="w-full h-2 rounded-full bg-border overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{

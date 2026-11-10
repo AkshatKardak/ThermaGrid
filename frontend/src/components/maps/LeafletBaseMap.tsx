@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Polygon, CircleMarker, Tooltip, useMap } from 'react-leaflet';
 import type { Location, RiskCurrent } from '../../types';
-import { getRiskBand } from '../../theme/tokens';
+import { getRiskBand, TOKENS } from '../../theme/tokens';
 
 interface LeafletBaseMapProps {
   wards: Location[];
@@ -67,17 +67,17 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
     : [19.076, 72.8777];
 
   return (
-    <div className={`relative overflow-hidden ${className}`} style={style}>
+    <div className={`relative overflow-hidden bg-panel-dark border border-border rounded-[8px] ${className}`} style={style}>
       <MapContainer
         center={center}
         zoom={12}
-        style={{ height: '100%', width: '100%', backgroundColor: '#0B141B' }}
+        style={{ height: '100%', width: '100%', backgroundColor: TOKENS.panelDark }}
         attributionControl={false}
         zoomControl={false}
       >
         <MapUpdater center={center} zoom={12} />
 
-        {/* Dark desaturated CartoDB base tiles */}
+        {/* Desaturated CartoDB tiles on panel-dark */}
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           maxZoom={18}
@@ -107,7 +107,7 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
                 pathOptions={{
                   fillColor: band.color,
                   fillOpacity: isSelected ? 0.40 : 0.22,
-                  color: isSelected ? '#FFFFFF' : band.color,
+                  color: isSelected ? TOKENS.accent : band.color,
                   weight: isSelected ? 2 : 1,
                   opacity: isSelected ? 1 : 0.55,
                 }}
@@ -134,15 +134,16 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
                 }}
               >
                 <Tooltip sticky direction="top" opacity={0.96}>
-                  <div className="p-2 font-mono text-xs bg-[#142630] border border-white/10 text-[#D8E8E6] rounded-[6px] shadow-2xl space-y-1">
-                    <div className="font-bold text-white">{ward.ward_name}</div>
+                  <div className="p-2 font-mono text-xs bg-panel-dark border border-border text-raised rounded-[6px] space-y-1">
+                    <div className="font-bold text-raised">{ward.ward_name}</div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold" style={{ color: band.color }}>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: band.color }} />
+                      <span className="font-bold text-raised">
                         Score: {score.toFixed(1)}/100
                       </span>
-                      <span className="text-[#93A3B0]">({band.label})</span>
+                      <span className="text-raised/70">({band.label})</span>
                     </div>
-                    <div className="text-[11px] text-[#6B7C8A] pt-0.5 border-t border-white/5 flex items-center justify-between gap-3">
+                    <div className="text-[11px] text-raised/70 pt-0.5 border-t border-border/40 flex items-center justify-between gap-3">
                       <span>WBGT: {wbgtVal}</span>
                       <span>Workers: {workersVal}</span>
                     </div>

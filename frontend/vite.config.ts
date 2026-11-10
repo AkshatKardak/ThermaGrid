@@ -52,4 +52,15 @@ export default defineConfig({
       '@tanstack/react-query',
     ],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('node_modules/three/')) {
+            return 'three-vendor';
+          }
+        },
+      },
+    },
+  },
 })

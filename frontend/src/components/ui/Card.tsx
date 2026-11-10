@@ -27,41 +27,41 @@ export const Card: React.FC<CardProps> = ({
   let tierStyles = '';
   switch (tier) {
     case 'l2':
-      tierStyles = 'bg-[#203A45] border border-white/16 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.90)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)]';
+      tierStyles = 'bg-raised border border-border';
       break;
     case 'l3':
-      tierStyles = 'bg-[#142630]/85 backdrop-blur-[16px] border border-white/16 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.95)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)]';
+      tierStyles = 'bg-raised border border-border';
       break;
     case 'recessed':
-      tierStyles = 'bg-[#203A45]/40 border border-white/8';
+      tierStyles = 'bg-bg border border-border';
       break;
     case 'l1':
     default:
-      tierStyles = 'bg-[#142630] border border-white/8';
+      tierStyles = 'bg-surface border border-border';
       break;
   }
 
   const hoverStyles = hoverable
-    ? 'hover:-translate-y-[3px] hover:border-white/20 transition-all duration-200'
+    ? 'hover:-translate-y-[1px] hover:border-accent transition-all duration-200'
     : '';
 
   return (
     <div
-      className={`rounded-[14px] p-6 ${tierStyles} ${hoverStyles} ${
+      className={`rounded-[8px] p-6 ${tierStyles} ${hoverStyles} ${
         cornerTicks ? 'corner-ticks' : ''
       } ${className}`}
       {...rest}
     >
       {(title || subtitle || action) && (
-        <div className="flex items-start justify-between gap-4 mb-4 pb-3 border-b border-white/6">
+        <div className="flex items-start justify-between gap-4 mb-4 pb-3 border-b border-border">
           <div className="space-y-0.5">
             {typeof title === 'string' ? (
-              <h3 className={`${TYPOGRAPHY.h3} text-[#D7E0E7]`}>{title}</h3>
+              <h3 className={`${TYPOGRAPHY.h3} text-ink`}>{title}</h3>
             ) : (
               title
             )}
             {subtitle && (
-              <p className={TYPOGRAPHY.micro}>{subtitle}</p>
+              <p className={`${TYPOGRAPHY.micro} text-muted`}>{subtitle}</p>
             )}
           </div>
           {action && <div className="shrink-0">{action}</div>}

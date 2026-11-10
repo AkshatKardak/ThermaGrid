@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, ShieldAlert, AlertTriangle, ChevronDown, ChevronUp, CheckCircle, Info } from 'lucide-react';
-import { useSafeWindows, SafeWindow } from '../../hooks/usePlanner';
+import { AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import { useSafeWindows } from '../../hooks/usePlanner';
 import { Card } from '../ui/Card';
-import { getRiskBand, THEME_COLORS } from '../../theme/tokens';
+import { getRiskBand } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
 
 interface SafeWindowCardProps {
@@ -30,28 +30,28 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
 
   return (
     <Card className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#8B9AA8] block mb-1">
+          <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-muted block mb-1">
             Activity Safe-Window Planner
           </span>
-          <h3 className={`${TYPOGRAPHY.h3} text-white`}>When Can I Go Out?</h3>
-          <p className="text-xs text-[#8B9AA8] mt-0.5">
+          <h3 className={`${TYPOGRAPHY.h3} text-ink`}>When Can I Go Out?</h3>
+          <p className="text-xs text-muted mt-0.5">
             Sliding diurnal risk analysis calibrated to your activity's thermal threshold.
           </p>
         </div>
 
         {/* Activity Segmented Control */}
-        <div className="flex items-center p-1 bg-[#0B141B] rounded-[8px] border border-white/10 self-start sm:self-auto">
+        <div className="flex items-center p-1 bg-surface rounded-[6px] border border-border self-start sm:self-auto">
           {ACTIVITIES.map((act) => (
             <button
               key={act.id}
               type="button"
               onClick={() => setActivity(act.id)}
-              className={`px-3 py-1.5 rounded-[6px] text-xs font-mono font-medium transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-[4px] text-xs font-mono font-medium transition-colors cursor-pointer ${
                 activity === act.id
-                  ? 'bg-[#8FB3D9] text-white shadow-sm font-semibold'
-                  : 'text-[#8B9AA8] hover:text-[#D7E0E7]'
+                  ? 'bg-raised text-ink border border-border font-semibold'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               {act.label}
@@ -63,10 +63,10 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
       {/* Duration Slider */}
       <div className="space-y-2">
         <div className="flex justify-between items-center text-xs">
-          <span className="font-mono text-[#8B9AA8] uppercase text-[11px] tracking-wider">
+          <span className="font-mono text-muted uppercase text-[11px] tracking-wider">
             Planned Duration
           </span>
-          <span className="font-mono text-white font-bold bg-[#0B141B] px-2 py-0.5 rounded border border-white/10">
+          <span className="font-mono text-ink font-bold bg-raised px-2 py-0.5 rounded-[4px] border border-border">
             {durationMin} minutes
           </span>
         </div>
@@ -77,9 +77,9 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
           step={15}
           value={durationMin}
           onChange={(e) => setDurationMin(Number(e.target.value))}
-          className="w-full accent-[#8FB3D9] h-1.5 bg-[#0B141B] rounded-lg appearance-none cursor-pointer"
+          className="w-full accent-[var(--accent)] h-1.5 bg-border rounded-lg appearance-none cursor-pointer"
         />
-        <div className="flex justify-between text-[10px] font-mono text-[#5F7183]">
+        <div className="flex justify-between text-[10px] font-mono text-muted">
           <span>15 min</span>
           <span>45 min</span>
           <span>90 min</span>
@@ -90,19 +90,19 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
       {/* Results Section */}
       {isLoading ? (
         <div className="space-y-3 py-4">
-          <div className="h-14 bg-white/5 rounded-xl animate-pulse" />
-          <div className="h-14 bg-white/5 rounded-xl animate-pulse" />
+          <div className="h-14 bg-border/40 rounded-[6px] animate-pulse" />
+          <div className="h-14 bg-border/40 rounded-[6px] animate-pulse" />
         </div>
       ) : (
         <div className="space-y-4">
           {/* Zero-State Warning if no safe window exists */}
           {data?.no_safe_window_message && (
-            <div className="p-3.5 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-xs text-[#D7E0E7] space-y-1">
-              <div className="flex items-center gap-2 text-[#F59E0B] font-semibold">
-                <AlertTriangle className="w-4 h-4 shrink-0" />
+            <div className="p-3.5 rounded-[6px] bg-[color-mix(in_srgb,var(--risk-3)_12%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-3)_55%,var(--ink))] text-xs text-ink space-y-1">
+              <div className="flex items-center gap-2 font-semibold">
+                <AlertTriangle className="w-4 h-4 text-risk-3 shrink-0" />
                 <span>No Safe Window Available Today</span>
               </div>
-              <p className="text-[11px] text-[#8B9AA8] leading-relaxed">
+              <p className="text-[11px] text-muted leading-relaxed">
                 {data.no_safe_window_message}
               </p>
             </div>
@@ -110,7 +110,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
 
           {/* Safe Window Chips */}
           <div className="space-y-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#8B9AA8] block">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-muted block">
               Recommended Safe Windows (Threshold: {data?.threshold}/100)
             </span>
 
@@ -128,16 +128,12 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.96 }}
                         transition={{ duration: 0.25, delay: idx * 0.07 }}
-                        className="rounded-xl border transition-all overflow-hidden"
-                        style={{
-                          backgroundColor: '#0B141B',
-                          borderColor: 'rgba(255, 255, 255, 0.1)',
-                        }}
+                        className="rounded-[6px] border border-border bg-raised transition-colors overflow-hidden"
                       >
                         <button
                           type="button"
                           onClick={() => toggleExpand(idx)}
-                          className="w-full flex items-center justify-between p-3.5 text-left hover:bg-white/[0.02] cursor-pointer"
+                          className="w-full flex items-center justify-between p-3.5 text-left hover:bg-surface cursor-pointer"
                         >
                           <div className="flex items-center gap-3">
                             <div
@@ -145,36 +141,31 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
                               style={{ backgroundColor: bandDef.color }}
                             />
                             <div>
-                              <span className="text-sm font-mono font-bold text-white tracking-wide">
+                              <span className="text-sm font-mono font-bold text-ink tracking-wide">
                                 {win.start} – {win.end}
                               </span>
-                              <span className="text-xs text-[#8B9AA8] ml-2">
+                              <span className="text-xs text-muted ml-2">
                                 · Peak Risk {win.peak_risk} ({bandDef.label})
                               </span>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span
-                              className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-semibold"
-                              style={{
-                                color: bandDef.color,
-                                backgroundColor: `${bandDef.color}20`,
-                              }}
-                            >
+                            <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono uppercase font-semibold bg-surface text-ink border border-border inline-flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: bandDef.color }} />
                               Optimal #{idx + 1}
                             </span>
                             {isExpanded ? (
-                              <ChevronUp className="w-4 h-4 text-[#8B9AA8]" />
+                              <ChevronUp className="w-4 h-4 text-muted" />
                             ) : (
-                              <ChevronDown className="w-4 h-4 text-[#8B9AA8]" />
+                              <ChevronDown className="w-4 h-4 text-muted" />
                             )}
                           </div>
                         </button>
 
                         {isExpanded && (
-                          <div className="px-4 pb-3.5 pt-1 text-xs text-[#8B9AA8] border-t border-white/5 bg-white/[0.01] space-y-1 animate-in fade-in duration-150">
-                            <p className="text-white font-medium">{win.why}</p>
-                            <p className="text-[11px] text-[#5F7183]">
+                          <div className="px-4 pb-3.5 pt-1 text-xs text-muted border-t border-border bg-surface space-y-1">
+                            <p className="text-ink font-medium">{win.why}</p>
+                            <p className="text-[11px] text-muted">
                               Mean thermal loading: {win.mean_risk}/100 across the {durationMin} min duration.
                             </p>
                           </div>
@@ -183,7 +174,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
                     );
                   })
                 ) : (
-                  <div className="p-3.5 rounded-xl bg-[#0B141B] border border-white/10 text-xs text-[#8B9AA8]">
+                  <div className="p-3.5 rounded-[6px] bg-raised border border-border text-xs text-muted">
                     No window satisfies the strict thermal limit for {activity}.
                   </div>
                 )}
@@ -191,29 +182,29 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
             </div>
           </div>
 
-          {/* Avoid Block (Worst diurnal window) */}
+          {/* Avoid Block */}
           {data?.avoid && data.avoid.length > 0 && (
             <div className="pt-2">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-[#FF704F] block mb-2">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-error block mb-2 font-semibold">
                 Dangerous Window To Avoid
               </span>
               {data.avoid.map((avoidBlock, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 rounded-xl bg-[#C31D3C]/10 border border-[#C31D3C]/30 flex items-center justify-between animate-pulse-once"
+                  className="p-3.5 rounded-[6px] bg-[color-mix(in_srgb,var(--risk-5)_12%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-5)_55%,var(--ink))] flex items-center justify-between"
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-mono font-bold text-[#FF704F]">
+                      <span className="text-sm font-mono font-bold text-ink">
                         Avoid {avoidBlock.start} – {avoidBlock.end}
                       </span>
-                      <span className="text-xs text-[#8B9AA8]">
+                      <span className="text-xs text-muted">
                         · Peak Risk {avoidBlock.peak_risk}/100
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#D7E0E7]">{avoidBlock.why}</p>
+                    <p className="text-[11px] text-muted">{avoidBlock.why}</p>
                   </div>
-                  <span className="px-2 py-1 rounded text-[10px] font-mono uppercase font-bold bg-[#C31D3C]/20 text-[#FF704F] shrink-0 ml-3">
+                  <span className="px-2 py-1 rounded-[4px] text-[10px] font-mono uppercase font-bold bg-raised text-error border border-border shrink-0 ml-3">
                     High Danger
                   </span>
                 </div>

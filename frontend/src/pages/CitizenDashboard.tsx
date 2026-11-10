@@ -61,20 +61,20 @@ export const CitizenDashboard: React.FC = () => {
   return (
     <div className="space-y-12">
       {/* 1. Location Bar: Search + Geolocate + Recent Chips */}
-      <div className="p-4 rounded-[14px] bg-[#142630] border border-white/8 space-y-3">
+      <div className="p-4 rounded-[14px] bg-surface border border-border space-y-3">
         <div className="flex flex-col md:flex-row items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-[#8B9AA8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search municipal ward, pincode, or landmark..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-[8px] bg-[#0B141B] border border-white/10 text-xs font-mono text-white placeholder-[#5F7183] focus:border-[#8FB3D9] outline-none"
+              className="w-full pl-10 pr-4 py-2.5 rounded-[8px] bg-raised border border-border text-xs font-mono text-ink placeholder-muted focus:border-accent outline-none"
             />
             {searchQuery && filteredWards && filteredWards.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-[8px] bg-[#142630] border border-white/16 shadow-2xl z-40">
+              <div className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-[8px] bg-raised border border-border z-40">
                 {filteredWards.map((w) => (
                   <button
                     key={w.id}
@@ -82,10 +82,10 @@ export const CitizenDashboard: React.FC = () => {
                       setSelectedLocationId(w.id);
                       setSearchQuery('');
                     }}
-                    className="w-full px-3.5 py-2 text-left text-xs font-mono hover:bg-[#203A45] text-[#D7E0E7] flex items-center justify-between cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left text-xs font-mono hover:bg-surface text-ink flex items-center justify-between cursor-pointer"
                   >
                     <span>{w.ward_name}</span>
-                    <span className="text-[10px] text-[#8B9AA8]">{w.ward_code}</span>
+                    <span className="text-[10px] text-muted">{w.ward_code}</span>
                   </button>
                 ))}
               </div>
@@ -98,16 +98,16 @@ export const CitizenDashboard: React.FC = () => {
             onClick={() => {
               if (wards && wards.length > 0) setSelectedLocationId(wards[0].id);
             }}
-            className="w-full md:w-auto px-4 py-2.5 rounded-[8px] bg-[#203A45]/50 hover:bg-[#203A45] border border-white/8 text-xs font-mono text-[#D7E0E7] flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="w-full md:w-auto px-4 py-2.5 rounded-[8px] bg-raised hover:bg-surface border border-border text-xs font-mono text-ink flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
-            <Crosshair className="w-3.5 h-3.5 text-[#8FB3D9]" />
+            <Crosshair className="w-3.5 h-3.5 text-accent" />
             <span>Use My Location</span>
           </button>
         </div>
 
         {/* Recent Ward Chips */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-[11px] font-mono uppercase tracking-[0.10em] text-[#5F7183]">
+          <span className="text-[11px] font-mono uppercase tracking-[0.10em] text-muted">
             Recent Wards:
           </span>
           {recentWards.map((w) => (
@@ -116,8 +116,8 @@ export const CitizenDashboard: React.FC = () => {
               onClick={() => setSelectedLocationId(w.id)}
               className={`px-2.5 py-1 rounded-[6px] text-xs font-mono transition-all cursor-pointer ${
                 w.id === selectedLocationId
-                  ? 'bg-[#8FB3D9]/20 border border-[#8FB3D9]/40 text-white'
-                  : 'bg-[#0B141B]/60 border border-white/6 text-[#8B9AA8] hover:text-white'
+                  ? 'bg-accent text-on-accent border border-accent font-semibold'
+                  : 'bg-raised border border-border text-muted hover:text-ink'
               }`}
             >
               {w.ward_name}
@@ -130,24 +130,24 @@ export const CitizenDashboard: React.FC = () => {
       {alerts && alerts.length > 0 && <AlertBanner alerts={alerts} />}
 
       {/* 2. Hero Risk Block */}
-      <div className="rounded-[14px] bg-[#142630] border border-white/8 p-6 sm:p-8 space-y-6 corner-ticks relative">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/8">
+      <div className="rounded-[14px] bg-surface border border-border p-6 sm:p-8 space-y-6 corner-ticks relative">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-border">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-[#8B9AA8] uppercase tracking-[0.10em]">
+              <span className="text-xs font-mono text-muted uppercase tracking-[0.10em]">
                 {selectedWard?.ward_name || 'Municipal Ward Evaluation'}
               </span>
               {risk?.is_demo && <DemoBadge label={risk.demo_label} />}
             </div>
-            <h1 className={`${TYPOGRAPHY.h1} text-white mt-1`}>
+            <h1 className={`${TYPOGRAPHY.h1} text-ink mt-1`}>
               Citizen Heat Risk Overview
             </h1>
           </div>
 
           <div className="flex items-center gap-3">
             <RiskBadge score={riskScore} size="lg" />
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#FF704F]/10 border border-[#FF704F]/30 text-xs font-mono font-bold text-[#FF704F]">
-              <Clock className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[color-mix(in_srgb,var(--risk-4)_15%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-4)_55%,var(--ink))] text-xs font-mono font-bold text-ink">
+              <Clock className="w-3.5 h-3.5 text-risk-4" />
               <span>Peak: 13:00 – 16:00</span>
             </div>
           </div>
@@ -164,38 +164,38 @@ export const CitizenDashboard: React.FC = () => {
                 suffix="/100"
               />
             </div>
-            <p className="text-xs font-mono text-[#8B9AA8]">
+            <p className="text-xs font-mono text-muted">
               Normalized Human Thermal Strain Index (HTSI)
             </p>
           </div>
 
-          <div className="md:col-span-7 grid grid-cols-3 gap-4 border-l border-white/8 pl-0 md:pl-6">
+          <div className="md:col-span-7 grid grid-cols-3 gap-4 border-l border-border pl-0 md:pl-6">
             <div>
-              <span className="text-[11px] font-mono text-[#8B9AA8] uppercase block">
+              <span className="text-[11px] font-mono text-muted uppercase block">
                 ISO WBGT
               </span>
-              <span className="text-2xl font-mono font-bold text-white tabular-nums">
+              <span className="text-2xl font-mono font-bold text-ink tabular-nums">
                 {thermal ? `${thermal.wbgt_c.toFixed(1)}°C` : '34.8°C'}
               </span>
-              <span className="text-[10px] text-[#5F7183] block">Wet-Bulb Globe</span>
+              <span className="text-[10px] text-muted block">Wet-Bulb Globe</span>
             </div>
             <div>
-              <span className="text-[11px] font-mono text-[#8B9AA8] uppercase block">
+              <span className="text-[11px] font-mono text-muted uppercase block">
                 UTCI Stress
               </span>
-              <span className="text-2xl font-mono font-bold text-white tabular-nums">
+              <span className="text-2xl font-mono font-bold text-ink tabular-nums">
                 {thermal ? `${thermal.utci_c.toFixed(1)}°C` : '41.6°C'}
               </span>
-              <span className="text-[10px] text-[#5F7183] block">Universal Thermal</span>
+              <span className="text-[10px] text-muted block">Universal Thermal</span>
             </div>
             <div>
-              <span className="text-[11px] font-mono text-[#8B9AA8] uppercase block">
+              <span className="text-[11px] font-mono text-muted uppercase block">
                 Air Temp
               </span>
-              <span className="text-2xl font-mono font-bold text-white tabular-nums">
+              <span className="text-2xl font-mono font-bold text-ink tabular-nums">
                 {risk ? `${risk.temperature_c.toFixed(1)}°C` : '37.4°C'}
               </span>
-              <span className="text-[10px] text-[#5F7183] block">Ambient Dry-Bulb</span>
+              <span className="text-[10px] text-muted block">Ambient Dry-Bulb</span>
             </div>
           </div>
         </div>
@@ -227,7 +227,7 @@ export const CitizenDashboard: React.FC = () => {
           {forecast?.items ? (
             <HourlyStrip items={forecast.items} />
           ) : (
-            <div className="h-28 flex items-center justify-center text-xs text-[#8B9AA8]">
+            <div className="h-28 flex items-center justify-center text-xs text-muted">
               Loading hourly telemetry...
             </div>
           )}
@@ -244,47 +244,47 @@ export const CitizenDashboard: React.FC = () => {
             className="h-full flex flex-col justify-between"
           >
             <div className="space-y-4">
-              <div className="text-base sm:text-lg text-[#D7E0E7] font-sans font-medium leading-relaxed">
+              <div className="text-base sm:text-lg text-ink font-sans font-medium leading-relaxed">
                 {risk?.explanation ||
                   'High thermal risk detected. Suspend non-essential afternoon outdoor exertion. Rapid indoor heat accumulation likely under non-insulated roofs.'}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <div className="p-3.5 rounded-[8px] bg-[#0B141B]/60 border border-white/6 flex items-start gap-3">
-                  <Droplets className="w-5 h-5 text-[#2FA37C] shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-[8px] bg-raised border border-border flex items-start gap-3">
+                  <Droplets className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-xs font-bold text-white block">Hydration Target</span>
-                    <span className="text-xs text-[#8B9AA8] leading-normal">
+                    <span className="text-xs font-bold text-ink block">Hydration Target</span>
+                    <span className="text-xs text-muted leading-normal">
                       Drink 250ml cool water / ORS solution every 30 minutes.
                     </span>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-[8px] bg-[#0B141B]/60 border border-white/6 flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-[8px] bg-raised border border-border flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-xs font-bold text-white block">Peak Shelter</span>
-                    <span className="text-xs text-[#8B9AA8] leading-normal">
+                    <span className="text-xs font-bold text-ink block">Peak Shelter</span>
+                    <span className="text-xs text-muted leading-normal">
                       Avoid direct solar exposure between 12:00 PM and 4:30 PM.
                     </span>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-[8px] bg-[#0B141B]/60 border border-white/6 flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 text-[#8FB3D9] shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-[8px] bg-raised border border-border flex items-start gap-3">
+                  <ShieldCheck className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-xs font-bold text-white block">Vulnerable Cohorts</span>
-                    <span className="text-xs text-[#8B9AA8] leading-normal">
+                    <span className="text-xs font-bold text-ink block">Vulnerable Cohorts</span>
+                    <span className="text-xs text-muted leading-normal">
                       Check on seniors, infants, and chronic respiratory patients twice daily.
                     </span>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-[8px] bg-[#0B141B]/60 border border-white/6 flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-[#FF704F] shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-[8px] bg-raised border border-border flex items-start gap-3">
+                  <Phone className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-xs font-bold text-white block">Emergency Helpline</span>
-                    <span className="text-xs text-[#8B9AA8] leading-normal">
+                    <span className="text-xs font-bold text-ink block">Emergency Helpline</span>
+                    <span className="text-xs text-muted leading-normal">
                       Dial 108 for ambulances or 1916 for BMC Disaster Control.
                     </span>
                   </div>
@@ -304,7 +304,7 @@ export const CitizenDashboard: React.FC = () => {
             {risk?.factor_breakdown ? (
               <FactorBars factors={risk.factor_breakdown} limit={4} />
             ) : (
-              <div className="h-44 flex items-center justify-center text-xs text-[#8B9AA8]">
+              <div className="h-44 flex items-center justify-center text-xs text-muted">
                 Loading factor attribution...
               </div>
             )}

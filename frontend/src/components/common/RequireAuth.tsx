@@ -9,11 +9,6 @@ export interface RequireAuthProps {
 }
 
 export function RequireAuth({ children }: RequireAuthProps) {
-  // Graceful fallback if clerk key is absent in test/offline setup
-  if (!env.CLERK_PUBLISHABLE_KEY) {
-    return <>{children}</>;
-  }
-
   const { isLoaded, isSignedIn } = useAuth();
   const location = useLocation();
 
@@ -26,5 +21,5 @@ export function RequireAuth({ children }: RequireAuthProps) {
     return <Navigate to={`/sign-in?redirect_url=${redirectUrl}`} replace />;
   }
 
-  return <>{children}</>;
+  return children as React.ReactElement;
 }

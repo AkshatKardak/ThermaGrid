@@ -19,8 +19,8 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   sticky = false,
 }) => {
   return (
-    <div className={`space-y-4 mb-8 ${sticky ? 'sticky top-20 z-20 py-2 backdrop-blur-md bg-[#0B141B]/90' : ''} ${className}`}>
-      {/* Scaffold: mono uppercase label + hairline with 24px amethyst tick */}
+    <div className={`space-y-4 mb-8 ${sticky ? 'sticky top-20 z-20 py-2 bg-bg/95 border-b border-border' : ''} ${className}`}>
+      {/* Scaffold: mono uppercase label + hairline with 24px accent tick */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className={TYPOGRAPHY.label}>{label}</span>
@@ -31,7 +31,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
 
       {/* Title & Lead paragraph */}
       <div className="space-y-2">
-        <h2 className={`${TYPOGRAPHY.h2} text-[#D7E0E7]`}>{title}</h2>
+        <h2 className={`${TYPOGRAPHY.h2} text-ink`}>{title}</h2>
         {lead && <p className={TYPOGRAPHY.bodyL}>{lead}</p>}
       </div>
     </div>

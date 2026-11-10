@@ -22,16 +22,17 @@ export const HeatCalendar: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+        <span className="text-xs font-mono uppercase tracking-[0.10em] text-muted">
           Synoptic Heat Stress Matrix (Monthly Average HTSI)
         </span>
         {hoveredCell && (
-          <div className="text-xs font-mono text-[#D7E0E7] bg-[#0B141B] px-2.5 py-1 rounded border border-white/10">
-            {hoveredCell.month} {hoveredCell.year}:{' '}
+          <div className="text-xs font-mono text-ink bg-raised px-2.5 py-1 rounded-[4px] border border-border flex items-center gap-1.5">
+            <span>{hoveredCell.month} {hoveredCell.year}:</span>
             <span
-              className="font-bold"
-              style={{ color: getRiskBand(hoveredCell.score).color }}
-            >
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: getRiskBand(hoveredCell.score).color }}
+            />
+            <span className="font-bold">
               HTSI {hoveredCell.score} ({getRiskBand(hoveredCell.score).label})
             </span>
           </div>
@@ -42,13 +43,13 @@ export const HeatCalendar: React.FC = () => {
         <table className="w-full border-collapse font-mono text-xs">
           <thead>
             <tr>
-              <th className="p-2 text-left text-[11px] font-medium text-[#5F7183] w-16">
+              <th className="p-2 text-left text-[11px] font-medium text-muted w-16">
                 Year
               </th>
               {MONTHS.map((m) => (
                 <th
                   key={m}
-                  className="p-2 text-center text-[11px] font-medium text-[#8B9AA8]"
+                  className="p-2 text-center text-[11px] font-medium text-muted"
                 >
                   {m}
                 </th>
@@ -57,22 +58,25 @@ export const HeatCalendar: React.FC = () => {
           </thead>
           <tbody>
             {YEARS.map((year) => (
-              <tr key={year} className="border-t border-white/5">
-                <td className="p-2 text-left text-[#8B9AA8] font-bold">{year}</td>
+              <tr key={year} className="border-t border-border">
+                <td className="p-2 text-left text-muted font-bold">{year}</td>
                 {MONTHS.map((month, mIdx) => {
                   const score = getHistoricalRisk(year, mIdx);
                   const band = getRiskBand(score);
+                  const isModerate = band.code === 'moderate';
+                  const isExtreme = band.code === 'extreme';
 
                   return (
                     <td key={month} className="p-1 text-center">
                       <div
                         onMouseEnter={() => setHoveredCell({ year, month, score })}
                         onMouseLeave={() => setHoveredCell(null)}
-                        className="w-full h-8 rounded-[4px] flex items-center justify-center font-bold text-[11px] tabular-nums transition-transform duration-100 hover:scale-110 cursor-pointer border border-black/20"
+                        className={`w-full h-8 rounded-[4px] flex items-center justify-center font-bold text-[11px] tabular-nums transition-transform duration-100 hover:scale-105 cursor-pointer border ${
+                          isExtreme ? 'text-risk-5' : 'text-ink'
+                        }`}
                         style={{
-                          backgroundColor: `${band.color}25`,
-                          color: band.color,
-                          borderColor: `${band.color}40`,
+                          backgroundColor: `color-mix(in srgb, ${band.color} ${isModerate ? '20%' : '15%'}, var(--surface))`,
+                          borderColor: `color-mix(in srgb, ${band.color} ${isModerate ? '60%' : '55%'}, var(--ink))`,
                         }}
                       >
                         {score}
@@ -86,17 +90,27 @@ export const HeatCalendar: React.FC = () => {
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-3 text-[11px] font-mono text-[#8B9AA8] pt-1">
-        <span>Low (&lt;25)</span>
-        <span className="w-3 h-3 rounded bg-[#2FA37C]/40 border border-[#2FA37C]" />
-        <span>Moderate (25-50)</span>
-        <span className="w-3 h-3 rounded bg-[#E8C547]/40 border border-[#E8C547]" />
-        <span>High (50-70)</span>
-        <span className="w-3 h-3 rounded bg-[#F59E0B]/40 border border-[#F59E0B]" />
-        <span>Very High (70-85)</span>
-        <span className="w-3 h-3 rounded bg-[#FF704F]/40 border border-[#FF704F]" />
-        <span>Extreme (85+)</span>
-        <span className="w-3 h-3 rounded bg-[#C31D3C]/40 border border-[#C31D3C]" />
+      <div className="flex flex-wrap items-center justify-end gap-3 text-[11px] font-mono text-muted pt-1">
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-[3px] bg-[color-mix(in_srgb,var(--risk-1)_20%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-1)_55%,var(--ink))]" />
+          Low (&lt;25)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-[3px] bg-[color-mix(in_srgb,var(--risk-2)_25%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-2)_60%,var(--ink))]" />
+          Moderate (25-50)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-[3px] bg-[color-mix(in_srgb,var(--risk-3)_20%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-3)_55%,var(--ink))]" />
+          High (50-70)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-[3px] bg-[color-mix(in_srgb,var(--risk-4)_20%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-4)_55%,var(--ink))]" />
+          Very High (70-85)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-[3px] bg-[color-mix(in_srgb,var(--risk-5)_20%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-5)_55%,var(--ink))]" />
+          Extreme (85+)
+        </span>
       </div>
     </div>
   );

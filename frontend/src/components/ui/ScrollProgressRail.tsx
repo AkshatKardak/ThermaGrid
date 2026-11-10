@@ -24,11 +24,11 @@ export const ScrollProgressRail: React.FC = () => {
 
   return (
     <div
-      className="fixed right-0 top-0 bottom-0 w-[2px] bg-white/5 z-50 pointer-events-none"
+      className="fixed right-0 top-0 bottom-0 w-[2px] bg-border z-50 pointer-events-none"
       aria-hidden="true"
     >
       <div
-        className="w-full bg-[#8FB3D9] transition-all duration-75"
+        className="w-full bg-accent transition-all duration-75"
         style={{ height: `${progress}%` }}
       />
     </div>

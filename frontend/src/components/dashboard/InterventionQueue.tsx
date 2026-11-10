@@ -1,5 +1,5 @@
 import React from 'react';
-import { Truck, Home, Shield, Bell, CheckCircle2 } from 'lucide-react';
+import { Truck, Home, Shield, Bell } from 'lucide-react';
 import { Card } from '../common/Card';
 
 export const InterventionQueue: React.FC = () => {
@@ -11,7 +11,7 @@ export const InterventionQueue: React.FC = () => {
       status: 'Dispatched',
       priority: 'High',
       icon: Truck,
-      color: '#FF704F',
+      dotColor: 'var(--risk-4)',
       time: '12:30 PM Today',
     },
     {
@@ -21,7 +21,7 @@ export const InterventionQueue: React.FC = () => {
       status: 'Active (24x7 Standby)',
       priority: 'Urgent',
       icon: Home,
-      color: '#2FA37C',
+      dotColor: 'var(--risk-1)',
       time: 'Immediate',
     },
     {
@@ -31,7 +31,7 @@ export const InterventionQueue: React.FC = () => {
       status: 'Enforced',
       priority: 'Mandatory',
       icon: Shield,
-      color: '#F59E0B',
+      dotColor: 'var(--risk-3)',
       time: 'Cease 12:00 - 16:00',
     },
     {
@@ -41,7 +41,7 @@ export const InterventionQueue: React.FC = () => {
       status: 'Scheduled',
       priority: 'Medium',
       icon: Bell,
-      color: '#8FB3D9',
+      dotColor: 'var(--accent)',
       time: 'Every 2 Hours',
     },
   ];
@@ -57,35 +57,26 @@ export const InterventionQueue: React.FC = () => {
           return (
             <div
               key={item.id}
-              className="p-3.5 rounded-xl bg-[#0B141B]/60 border border-white/5 flex items-center justify-between gap-3"
+              className="p-3.5 rounded-[6px] bg-raised border border-border flex items-center justify-between gap-3"
             >
               <div className="flex items-center gap-3">
-                <div
-                  className="p-2.5 rounded-lg flex-shrink-0"
-                  style={{ backgroundColor: `${item.color}18` }}
-                >
-                  <Icon className="w-4 h-4" style={{ color: item.color }} />
+                <div className="p-2.5 rounded-[6px] shrink-0 bg-surface border border-border text-accent">
+                  <Icon className="w-4 h-4" />
                 </div>
                 <div>
-                  <h5 className="text-xs font-bold text-white font-display">
+                  <h5 className="text-xs font-bold text-ink font-display">
                     {item.type}
                   </h5>
-                  <p className="text-[11px] text-[#8B9AA8]">{item.target}</p>
+                  <p className="text-[11px] text-muted">{item.target}</p>
                 </div>
               </div>
 
-              <div className="text-right flex-shrink-0">
-                <span
-                  className="inline-block text-[10px] font-mono px-2 py-0.5 rounded border"
-                  style={{
-                    backgroundColor: `${item.color}15`,
-                    color: item.color,
-                    borderColor: `${item.color}30`,
-                  }}
-                >
+              <div className="text-right shrink-0">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded-[4px] border border-border bg-surface text-ink">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.dotColor }} />
                   {item.status}
                 </span>
-                <p className="text-[10px] font-mono text-[#8B9AA8] mt-1">{item.time}</p>
+                <p className="text-[10px] font-mono text-muted mt-1">{item.time}</p>
               </div>
             </div>
           );

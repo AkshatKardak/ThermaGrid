@@ -51,18 +51,18 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
 
   return (
     <div
-      className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-b from-[#142630]/60 to-[#0B141B] flex flex-col items-center justify-between p-6 shadow-2xl"
+      className="relative w-full rounded-[8px] overflow-hidden border border-border bg-panel-dark flex flex-col items-center justify-between p-6"
       style={{ minHeight: height }}
     >
       {/* Telemetry Header */}
       <div className="w-full flex items-center justify-between z-10">
         <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#E8C547]" />
-          <span className="text-xs font-mono font-semibold text-[#D7E0E7] uppercase tracking-wider">
+          <div className="w-2.5 h-2.5 rounded-full bg-accent" />
+          <span className="text-xs font-mono font-semibold text-raised uppercase tracking-wider">
             National Thermal Surveillance (Static 2D Mode)
           </span>
         </div>
-        <div className="text-[11px] font-mono text-[#8B9AA8]">
+        <div className="text-[11px] font-mono text-raised/70">
           Accessible Low-Power Mode
         </div>
       </div>
@@ -80,22 +80,23 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
             cx="200"
             cy="200"
             r="170"
-            fill="#14232E"
-            stroke="rgba(143, 179, 217, 0.3)"
+            fill="#14181A"
+            stroke="#CFC8B8"
             strokeWidth="1.5"
           />
-          <circle cx="200" cy="200" r="130" fill="none" stroke="rgba(255, 255, 255, 0.05)" strokeDasharray="3 3" />
-          <circle cx="200" cy="200" r="90" fill="none" stroke="rgba(255, 255, 255, 0.05)" strokeDasharray="3 3" />
+          <circle cx="200" cy="200" r="130" fill="none" stroke="#CFC8B8" strokeOpacity="0.2" strokeDasharray="3 3" />
+          <circle cx="200" cy="200" r="90" fill="none" stroke="#CFC8B8" strokeOpacity="0.2" strokeDasharray="3 3" />
 
           {/* Graticule Crosshairs */}
-          <line x1="30" y1="200" x2="370" y2="200" stroke="rgba(255, 255, 255, 0.08)" />
-          <line x1="200" y1="30" x2="200" y2="370" stroke="rgba(255, 255, 255, 0.08)" />
+          <line x1="30" y1="200" x2="370" y2="200" stroke="#CFC8B8" strokeOpacity="0.3" />
+          <line x1="200" y1="30" x2="200" y2="370" stroke="#CFC8B8" strokeOpacity="0.3" />
 
           {/* India Continental Approximate Outline Path */}
           <path
             d="M 120 150 Q 150 110 200 90 Q 230 110 260 140 Q 270 190 240 230 Q 220 270 200 320 Q 180 270 160 230 Q 130 190 120 150 Z"
             fill="none"
-            stroke="rgba(60, 86, 106, 0.6)"
+            stroke="#CFC8B8"
+            strokeOpacity="0.5"
             strokeWidth="2"
             strokeDasharray="4 2"
           />
@@ -143,16 +144,15 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
                   cy={y}
                   r={radius}
                   fill={color}
-                  stroke="#0B141B"
+                  stroke="#14181A"
                   strokeWidth="2"
-                  filter={isHovered ? 'drop-shadow(0 0 8px rgba(255,255,255,0.8))' : `drop-shadow(0 0 4px ${color})`}
                 />
                 {/* City name text */}
                 <text
                   x={x}
                   y={y - radius - 4}
                   textAnchor="middle"
-                  fill="#D7E0E7"
+                  fill="#FBF9F4"
                   fontSize="9"
                   fontFamily="IBM Plex Mono, monospace"
                   fontWeight="600"
@@ -167,7 +167,7 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
       </div>
 
       {/* Hovered / Active City Detail Card */}
-      <div className="w-full bg-[#0B141B]/90 border border-white/10 rounded-xl p-3 flex items-center justify-between text-xs z-10 min-h-[52px]">
+      <div className="w-full bg-panel-dark border border-border rounded-[6px] p-3 flex items-center justify-between text-xs z-10 min-h-[52px] text-raised">
         {hoveredCity ? (
           <>
             <div className="flex items-center gap-2">
@@ -175,19 +175,21 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: heatColor(hoveredCity.risk) }}
               />
-              <span className="font-semibold text-white">{hoveredCity.name}</span>
-              <span className="text-[#8B9AA8] font-mono">
+              <span className="font-semibold text-raised">{hoveredCity.name}</span>
+              <span className="text-raised/70 font-mono">
                 {hoveredCity.lat.toFixed(2)}°N, {hoveredCity.lng.toFixed(2)}°E
               </span>
             </div>
             <div className="flex items-center gap-3 font-mono">
-              <span>Risk: <strong style={{ color: heatColor(hoveredCity.risk) }}>{(hoveredCity.risk * 100).toFixed(1)}</strong></span>
-              {hoveredCity.temp && <span>T: <strong>{hoveredCity.temp}°C</strong></span>}
-              {hoveredCity.wbgt && <span>WBGT: <strong>{hoveredCity.wbgt}°C</strong></span>}
+              <span className="inline-flex items-center gap-1">
+                Risk: <strong className="text-raised font-bold">{(hoveredCity.risk * 100).toFixed(1)}</strong>
+              </span>
+              {hoveredCity.temp && <span>T: <strong className="text-raised font-bold">{hoveredCity.temp}°C</strong></span>}
+              {hoveredCity.wbgt && <span>WBGT: <strong className="text-raised font-bold">{hoveredCity.wbgt}°C</strong></span>}
             </div>
           </>
         ) : (
-          <span className="text-[#8B9AA8] text-[11px] font-mono italic">
+          <span className="text-raised/70 text-[11px] font-mono italic">
             Hover over or tap a city pin to inspect local thermal stress indices.
           </span>
         )}

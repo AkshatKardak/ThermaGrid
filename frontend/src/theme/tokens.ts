@@ -1,54 +1,83 @@
 /**
  * ThermaGrid Design Tokens
- * Arctic Observatory Palette (Single Source of Truth)
+ * Light Editorial / Technical Scientific Instrument Palette (Single Source of Truth)
  *
  * LAW OF USAGE:
- * - Interactive Accent (#8FB3D9): UI Chrome, primary buttons, active nav, focus rings, "live" indicators ONLY.
- *   NEVER used for a heading, a card, an icon, or a risk value.
- * - Heat scale: Risk values and bands ONLY. Never a headline, a border, or a hover state.
- * - Never pure black (#000000) or pure white (#FFFFFF).
- * - Max one saturated element per viewport region.
+ * - Interactive Accent (#1F3A5F): UI Chrome, primary buttons, active nav, focus rings, "live" indicators ONLY.
+ *   NEVER used for risk values.
+ * - Risk scale: Risk values and bands ONLY. Never for UI chrome, headings, or branding.
+ * - Risk-as-text rule: --risk-1 through --risk-4 may NEVER be used as text color.
+ *   Numbers/labels render in --ink with a dot/bar/chip fill.
+ * - Never pure #000 or #FFF.
  */
 
+export const TOKENS = {
+  bg: '#F3EFE7',
+  surface: '#EAE5DA',
+  raised: '#FBF9F4',
+  border: '#CFC8B8',
+  ink: '#1A1E1C',
+  muted: '#5E645F',
+  accent: '#1F3A5F',
+  accentHover: '#2C4F80',
+  onAccent: '#FBF9F4',
+  error: '#8A2B22',
+  panelDark: '#14181A',
+} as const;
+
+export const RISK_SCALE = {
+  risk1: '#2FA37C',
+  risk2: '#E8C547',
+  risk3: '#D97706',
+  risk4: '#FF704F',
+  risk5: '#C31D3C',
+} as const;
+
+export const RISK_THRESHOLDS = {
+  SAFE: 25,
+  MODERATE: 50,
+  HIGH: 70,
+  VERY_HIGH: 85,
+} as const;
+
+// Backward compatibility mappings
 export const THEME_COLORS = {
-  // Arctic Observatory surfaces
-  bg: '#0B141B',
-  surface: '#142630',
-  raised: '#203A45',
-  hairline: 'rgba(255,255,255,.075)',
-  hairline2: 'rgba(255,255,255,.14)',
+  bg: TOKENS.bg,
+  surface: TOKENS.surface,
+  raised: TOKENS.raised,
+  hairline: TOKENS.border,
+  hairline2: TOKENS.border,
 
-  // Legacy surface aliases for compatibility
-  surfaceElevated: '#203A45',
-  surfaceRecessed: '#142630',
-  surfaceOverlay: 'rgba(20, 38, 48, 0.86)',
+  surfaceElevated: TOKENS.raised,
+  surfaceRecessed: TOKENS.surface,
+  surfaceOverlay: 'color-mix(in srgb, var(--surface) 92%, transparent)',
 
-  // Borders & hairlines
-  border: 'rgba(255, 255, 255, 0.075)',
-  borderEmphasized: 'rgba(255, 255, 255, 0.14)',
+  border: TOKENS.border,
+  borderEmphasized: TOKENS.border,
 
-  // Text
-  text: '#D8E8E6',
-  muted: '#6B7C8A',
-  dim: '#93A3B0',
-  textDim: '#6B7C8A',
-  textFaint: '#5F7183',
+  text: TOKENS.ink,
+  ink: TOKENS.ink,
+  muted: TOKENS.muted,
+  dim: TOKENS.muted,
+  textDim: TOKENS.muted,
+  textFaint: TOKENS.muted,
 
-  // Interactive Accent (UI Chrome ONLY)
-  accent: '#8FB3D9',
-  accentDim: '#6E93B8',
-  accentSoft: 'rgba(143,179,217,.16)',
+  accent: TOKENS.accent,
+  accentHover: TOKENS.accentHover,
+  accentDim: TOKENS.accentHover,
+  accentSoft: 'color-mix(in srgb, var(--accent) 8%, var(--bg))',
+  onAccent: TOKENS.onAccent,
 
-  // Alert indicator
-  alert: '#FF704F',
+  error: TOKENS.error,
+  alert: TOKENS.error,
+  panelDark: TOKENS.panelDark,
 
-  // Heat Scale (Normative thermal bands - RISK ONLY)
   heatScale: {
-    safe: '#2FA37C',
-    moderate: '#E8C547',
-    high: '#F59E0B',
-    veryhigh: '#FF704F',
-    extreme: '#C31D3C',
+    safe: RISK_SCALE.risk1,
+    moderate: RISK_SCALE.risk2,
+    high: RISK_SCALE.risk3,
+    veryhigh: RISK_SCALE.risk4,
+    extreme: RISK_SCALE.risk5,
   },
 } as const;
 
@@ -61,19 +90,19 @@ export const MOTION = {
 } as const;
 
 export const THEME_RADIUS = {
-  chips: '6px',
-  inputs: '8px',
-  buttons: '8px',
-  cards: '14px',
-  overlays: '22px',
+  chips: '4px',
+  inputs: '6px',
+  buttons: '6px',
+  cards: '8px',
+  overlays: '8px',
   pills: '9999px',
 } as const;
 
 export const THEME_SHADOWS = {
   l1: 'none',
-  l2: '0 20px 60px -30px rgba(0, 0, 0, 0.90)',
-  l3: '0 30px 80px -40px rgba(0, 0, 0, 0.95)',
-  highlight: 'inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+  l2: 'none',
+  l3: 'none',
+  highlight: 'none',
 } as const;
 
 export type RiskBand = 'safe' | 'moderate' | 'high' | 'veryhigh' | 'extreme';
@@ -91,7 +120,7 @@ export const RISK_BANDS: Record<RiskBand, RiskBandDefinition> = {
   safe: {
     code: 'safe',
     label: 'Low / Safe',
-    color: THEME_COLORS.heatScale.safe,
+    color: RISK_SCALE.risk1,
     minScore: 0,
     maxScore: 24.9,
     description: 'Minimal thermal strain. Normal outdoor physical activity tolerable.',
@@ -99,7 +128,7 @@ export const RISK_BANDS: Record<RiskBand, RiskBandDefinition> = {
   moderate: {
     code: 'moderate',
     label: 'Moderate',
-    color: THEME_COLORS.heatScale.moderate,
+    color: RISK_SCALE.risk2,
     minScore: 25,
     maxScore: 49.9,
     description: 'Elevated discomfort. Regular hydration and shaded rest advised.',
@@ -107,7 +136,7 @@ export const RISK_BANDS: Record<RiskBand, RiskBandDefinition> = {
   high: {
     code: 'high',
     label: 'High Risk',
-    color: THEME_COLORS.heatScale.high,
+    color: RISK_SCALE.risk3,
     minScore: 50,
     maxScore: 69.9,
     description: 'Heat cramps or exhaustion likely. Implement 30m work-rest cycles.',
@@ -115,7 +144,7 @@ export const RISK_BANDS: Record<RiskBand, RiskBandDefinition> = {
   veryhigh: {
     code: 'veryhigh',
     label: 'Very High Risk',
-    color: THEME_COLORS.heatScale.veryhigh,
+    color: RISK_SCALE.risk4,
     minScore: 70,
     maxScore: 84.9,
     description: 'Dangerous thermal stress. Suspend non-essential afternoon outdoor manual labor.',
@@ -123,17 +152,23 @@ export const RISK_BANDS: Record<RiskBand, RiskBandDefinition> = {
   extreme: {
     code: 'extreme',
     label: 'Extreme / Emergency',
-    color: THEME_COLORS.heatScale.extreme,
+    color: RISK_SCALE.risk5,
     minScore: 85,
     maxScore: 100,
     description: 'Acute heat stroke emergency. Cease outdoor heavy labor; activate emergency cooling shelters.',
   },
 };
 
-export function getRiskBand(score: number): RiskBandDefinition {
-  if (score < 25) return RISK_BANDS.safe;
-  if (score < 50) return RISK_BANDS.moderate;
-  if (score < 70) return RISK_BANDS.high;
-  if (score < 85) return RISK_BANDS.veryhigh;
+export function riskBand(score: number): RiskBandDefinition {
+  if (score < RISK_THRESHOLDS.SAFE) return RISK_BANDS.safe;
+  if (score < RISK_THRESHOLDS.MODERATE) return RISK_BANDS.moderate;
+  if (score < RISK_THRESHOLDS.HIGH) return RISK_BANDS.high;
+  if (score < RISK_THRESHOLDS.VERY_HIGH) return RISK_BANDS.veryhigh;
   return RISK_BANDS.extreme;
+}
+
+export const getRiskBand = riskBand;
+
+export function riskColor(score: number): string {
+  return riskBand(score).color;
 }

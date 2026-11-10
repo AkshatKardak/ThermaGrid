@@ -10,7 +10,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import type { RiskCurrent } from '../../types';
-import { RISK_BANDS, getRiskBand } from '../../theme/tokens';
+import { RISK_BANDS, TOKENS } from '../../theme/tokens';
 
 interface DistributionPlotProps {
   wardsRisk: RiskCurrent[];
@@ -79,7 +79,7 @@ export const DistributionPlot: React.FC<DistributionPlotProps> = ({ wardsRisk })
     <div className="space-y-6">
       {/* Risk Histogram */}
       <div>
-        <div className="flex items-center justify-between text-xs font-mono text-[#8B9AA8] mb-3">
+        <div className="flex items-center justify-between text-xs font-mono text-muted mb-3">
           <span>Ward Vulnerability Count by Risk Band</span>
           <span>Sample Size: {wardsRisk.length} Municipal Wards</span>
         </div>
@@ -88,19 +88,19 @@ export const DistributionPlot: React.FC<DistributionPlotProps> = ({ wardsRisk })
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={histogramData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid
-                stroke="rgba(255, 255, 255, 0.08)"
+                stroke={TOKENS.border}
                 strokeDasharray="2 4"
                 vertical={false}
               />
               <XAxis
                 dataKey="bin"
-                stroke="#5F7183"
+                stroke={TOKENS.muted}
                 fontSize={11}
                 tickLine={false}
                 tick={{ fontFamily: 'IBM Plex Mono' }}
               />
               <YAxis
-                stroke="#5F7183"
+                stroke={TOKENS.muted}
                 fontSize={11}
                 tickLine={false}
                 allowDecimals={false}
@@ -111,10 +111,11 @@ export const DistributionPlot: React.FC<DistributionPlotProps> = ({ wardsRisk })
                   if (!active || !payload || !payload.length) return null;
                   const item = payload[0].payload;
                   return (
-                    <div className="rounded-[8px] bg-[#0B141B]/95 backdrop-blur-md border border-white/16 p-2.5 font-mono text-xs space-y-1 shadow-2xl">
-                      <div className="font-bold text-white">Score Bin: {item.bin}</div>
-                      <div className="text-[#8B9AA8]">Band: {item.band}</div>
-                      <div className="text-white font-bold" style={{ color: item.color }}>
+                    <div className="rounded-[6px] bg-raised border border-border p-2.5 font-mono text-xs space-y-1 text-ink">
+                      <div className="font-bold text-ink">Score Bin: {item.bin}</div>
+                      <div className="text-muted">Band: {item.band}</div>
+                      <div className="font-bold text-ink flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
                         Wards: {item.count}
                       </div>
                     </div>
@@ -132,28 +133,28 @@ export const DistributionPlot: React.FC<DistributionPlotProps> = ({ wardsRisk })
       </div>
 
       {/* Small Multiples: Biophysical Correlation Matrix */}
-      <div className="space-y-2 pt-2 border-t border-white/8">
-        <span className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8] block">
+      <div className="space-y-2 pt-2 border-t border-border">
+        <span className="text-xs font-mono uppercase tracking-[0.10em] text-muted block">
           Biophysical Factor Cross-Correlation (Small Multiples)
         </span>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {correlations.map((c, i) => (
             <div
               key={i}
-              className="p-3.5 rounded-[10px] bg-[#203A45]/30 border border-white/6 space-y-2"
+              className="p-3.5 rounded-[6px] bg-surface border border-border space-y-2"
             >
               <div className="flex items-start justify-between">
-                <span className="text-xs font-semibold text-[#D7E0E7] font-display">
+                <span className="text-xs font-semibold text-ink font-display">
                   {c.factor}
                 </span>
-                <span className="text-xs font-mono font-bold text-[#FF704F] bg-[#FF704F]/10 px-1.5 py-0.5 rounded border border-[#FF704F]/20">
+                <span className="text-xs font-mono font-medium text-ink bg-raised px-1.5 py-0.5 rounded-[4px] border border-border">
                   r = {c.correlation}
                 </span>
               </div>
-              <div className="text-[11px] font-mono text-[#D7E0E7]">
-                Mean Impact: <span className="text-[#FF704F] font-bold">{c.avgRiskDelta}</span>
+              <div className="text-[11px] font-mono text-ink">
+                Mean Impact: <span className="font-bold text-ink">{c.avgRiskDelta}</span>
               </div>
-              <p className="text-[11px] text-[#8B9AA8] leading-relaxed">{c.impact}</p>
+              <p className="text-[11px] text-muted leading-relaxed">{c.impact}</p>
             </div>
           ))}
         </div>

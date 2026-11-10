@@ -7,46 +7,43 @@ import { env } from '../../config/env';
 export const PublicNavbar: React.FC = () => {
   const location = useLocation();
   const { isSignedIn } = useAuth();
-  const isAuthPage = location.pathname.startsWith('/sign-in') || location.pathname.startsWith('/sign-up');
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0B141B]/90 backdrop-blur-md border-b border-white/10 transition-colors">
+    <header className="sticky top-0 z-50 bg-surface border-b border-border transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-gradient-to-br from-[#8FB3D9] to-[#6E93B8] p-0.5 flex items-center justify-center shadow-lg shadow-[#8FB3D9]/20 shrink-0 transition-transform group-hover:scale-105">
-              <div className="w-full h-full bg-[#0B141B] rounded-[8px] flex items-center justify-center">
-                <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-[#8FB3D9] transition-colors" />
-              </div>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] bg-accent flex items-center justify-center shrink-0 transition-transform">
+              <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-on-accent transition-colors" />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-extrabold tracking-tight text-[#D7E0E7] font-display">
-                Therma<span className="bg-gradient-to-r from-[#8FB3D9] to-[#D7E0E7] bg-clip-text text-transparent">Grid</span>
+              <span className="text-base sm:text-lg font-bold tracking-tight text-ink font-display">
+                Therma<span className="text-accent">Grid</span>
               </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold uppercase bg-white/10 text-[#8B9AA8]">
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-[4px] text-[9px] font-mono font-semibold uppercase bg-raised text-muted border border-border">
                 Public
               </span>
             </div>
           </Link>
 
           {/* Center Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-[#8B9AA8]">
+          <nav className="hidden md:flex items-center gap-6 text-xs font-mono text-muted">
             <a
               href="/#how-it-works"
-              className="hover:text-[#D7E0E7] transition-colors"
+              className="hover:text-ink transition-colors"
             >
               How it works
             </a>
             <a
               href="/#two-wards"
-              className="hover:text-[#D7E0E7] transition-colors"
+              className="hover:text-ink transition-colors"
             >
               Ward Comparison
             </a>
             <a
               href="/#methodology"
-              className="hover:text-[#D7E0E7] transition-colors"
+              className="hover:text-ink transition-colors"
             >
               Methodology
             </a>
@@ -58,7 +55,7 @@ export const PublicNavbar: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Link
                   to="/app"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8FB3D9] hover:bg-[#6E93B8] text-white text-xs font-semibold shadow-sm transition-all"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-accent hover:bg-accent-hover text-on-accent text-xs font-semibold transition-colors"
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" />
                   <span>Open App</span>
@@ -69,17 +66,17 @@ export const PublicNavbar: React.FC = () => {
               <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   to="/sign-in"
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-[6px] text-xs font-mono font-medium transition-colors ${
                     location.pathname.startsWith('/sign-in')
-                      ? 'text-white bg-white/10'
-                      : 'text-[#8B9AA8] hover:text-[#D7E0E7] hover:bg-white/5'
+                      ? 'text-ink bg-raised border border-border'
+                      : 'text-muted hover:text-ink hover:bg-raised'
                   }`}
                 >
                   Sign in
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#8FB3D9] to-[#6E93B8] hover:opacity-95 text-[#0B141B] text-xs font-semibold shadow-md shadow-[#8FB3D9]/20 transition-all group"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-accent hover:bg-accent-hover text-on-accent text-xs font-semibold transition-colors group"
                 >
                   <span>Get started</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

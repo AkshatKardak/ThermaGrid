@@ -4,43 +4,48 @@
   --font-sans: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+
+  --color-bg: #F3EFE7;
+  --color-surface: #EAE5DA;
+  --color-raised: #FBF9F4;
+  --color-border: #CFC8B8;
+  --color-ink: #1A1E1C;
+  --color-muted: #5E645F;
+  --color-accent: #1F3A5F;
+  --color-accent-hover: #2C4F80;
+  --color-on-accent: #FBF9F4;
+  --color-error: #8A2B22;
+  --color-panel-dark: #14181A;
+
+  --color-risk-1: #2FA37C;
+  --color-risk-2: #E8C547;
+  --color-risk-3: #D97706;
+  --color-risk-4: #FF704F;
+  --color-risk-5: #C31D3C;
 }
 
 :root {
-  /* Arctic Observatory surfaces */
-  --bg: #0B141B;
-  --surface: #142630;
-  --raised: #203A45;
-  --hairline: rgba(255,255,255,.075);
-  --hairline-2: rgba(255,255,255,.14);
+  --bg: #F3EFE7;
+  --surface: #EAE5DA;
+  --raised: #FBF9F4;
+  --border: #CFC8B8;
+  --ink: #1A1E1C;
+  --muted: #5E645F;
+  --accent: #1F3A5F;
+  --accent-hover: #2C4F80;
+  --on-accent: #FBF9F4;
+  --error: #8A2B22;
+  --panel-dark: #14181A;
 
-  /* Legacy aliases */
-  --surface-2: #203A45;
-  --surface-3: #142630;
-  --border: rgba(255, 255, 255, 0.075);
-  --border-2: rgba(255, 255, 255, 0.14);
+  --risk-1: #2FA37C;
+  --risk-2: #E8C547;
+  --risk-3: #D97706;
+  --risk-4: #FF704F;
+  --risk-5: #C31D3C;
 
-  /* text */
-  --text: #D8E8E6;
-  --muted: #6B7C8A;
-  --dim: #93A3B0;
-  --text-dim: #6B7C8A;
-  --text-faint: #5F7183;
-
-  /* interactive accent — chrome only */
-  --accent: #8FB3D9;
-  --accent-dim: #6E93B8;
-  --accent-soft: rgba(143,179,217,.16);
-
-  /* alert */
-  --alert: #FF704F;
-
-  /* RISK SCALE — semantically fixed, never used for chrome */
-  --safe: #2FA37C;
-  --moderate: #E8C547;
-  --high: #F59E0B;
-  --veryhigh: #FF704F;
-  --extreme: #C31D3C;
+  /* Derived additions */
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, var(--bg));
+  --focus-ring: 2px solid var(--accent);
 
   /* Motion tokens */
   --dur-fast: 180ms;
@@ -53,47 +58,23 @@
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-body {
+html, body {
   margin: 0;
   background-color: var(--bg);
-  color: var(--text);
+  color: var(--ink);
+  color-scheme: light;
   font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle background grid (64px, rgba(255,255,255,.025), masked with radial gradient) */
-.bg-grid-pattern {
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 85%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 85%);
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
 }
 
-/* Vignette overlay: radial gradient transparent centre to rgba(0,0,0,.35) at corners */
-.vignette-overlay {
-  background: radial-gradient(circle at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.35) 100%);
-  pointer-events: none;
-}
-
-/* Full-screen Film Grain: fixed SVG feTurbulence overlay at 2.8% opacity */
-.film-grain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.028;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-/* Section divider with 24px amethyst tick */
+/* Hairline divider with accent tick */
 .section-hairline {
   position: relative;
   width: 100%;
@@ -110,10 +91,10 @@ body {
   background: var(--accent);
 }
 
-/* Focus rings: 2px amethyst ring, outline-offset 3px */
+/* Focus rings: 2px accent ring, 2px offset */
 :focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
 h1, h2, h3, h4, .font-display {
@@ -136,14 +117,14 @@ code, pre, .font-mono, .data-readout {
   background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-2);
+  background: var(--border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-dim);
+  background: var(--muted);
 }
 
-/* Table row interactive amethyst hover indicator */
+/* Table row interactive accent hover indicator */
 .table-row-hover {
   position: relative;
   transition: background-color var(--dur-base) var(--ease-out);
@@ -180,14 +161,14 @@ code, pre, .font-mono, .data-readout {
 .corner-ticks::before {
   top: -1px;
   left: -1px;
-  border-top: 2px solid var(--accent-dim);
-  border-left: 2px solid var(--accent-dim);
+  border-top: 2px solid var(--border);
+  border-left: 2px solid var(--border);
 }
 .corner-ticks::after {
   bottom: -1px;
   right: -1px;
-  border-bottom: 2px solid var(--accent-dim);
-  border-right: 2px solid var(--accent-dim);
+  border-bottom: 2px solid var(--border);
+  border-right: 2px solid var(--border);
 }
 
 /* Reduced motion overrides */
@@ -201,23 +182,13 @@ code, pre, .font-mono, .data-readout {
   }
 }
 
-/* Single pulse animation for dangerous avoid window */
-@keyframes pulseOnce {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(195, 29, 60, 0.4); }
-  50% { transform: scale(1.01); box-shadow: 0 0 0 8px rgba(195, 29, 60, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(195, 29, 60, 0); }
-}
-.animate-pulse-once {
-  animation: pulseOnce 700ms cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
-}
-
-/* Print CSS for single clean page shift card */
+/* Print CSS */
 @media print {
   body {
-    background: #ffffff !important;
-    color: #0B141B !important;
+    background: var(--bg) !important;
+    color: var(--ink) !important;
   }
-  header, footer, nav, .no-print, .film-grain, .vignette-overlay, .bg-grid-pattern {
+  header, footer, nav, .no-print {
     display: none !important;
   }
   main {
@@ -226,16 +197,15 @@ code, pre, .font-mono, .data-readout {
     max-width: 100% !important;
   }
   .shift-card-print {
-    background: #ffffff !important;
-    color: #0B141B !important;
-    border: 1.5px solid #0B141B !important;
+    background: var(--raised) !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--border) !important;
     box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     padding: 20px !important;
   }
   .shift-card-print * {
-    color: #0B141B !important;
-    text-shadow: none !important;
+    color: var(--ink) !important;
   }
 }

@@ -34,7 +34,7 @@ export const RiskGauge: React.FC<RiskGaugeProps> = ({
             cy={size / 2}
             r={radius}
             fill="transparent"
-            stroke="rgba(255, 255, 255, 0.08)"
+            stroke="#CFC8B8"
             strokeWidth={strokeWidth}
             strokeDasharray={`${arcLength} ${circumference}`}
             strokeLinecap="round"
@@ -56,10 +56,10 @@ export const RiskGauge: React.FC<RiskGaugeProps> = ({
 
         {/* Center Readout */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className="text-4xl font-extrabold font-mono tracking-tight" style={{ color: band.color }}>
+          <span className="text-4xl font-extrabold font-mono tracking-tight text-ink tabular-nums">
             {score.toFixed(1)}
           </span>
-          <span className="text-[11px] font-mono uppercase tracking-wider text-[#8B9AA8] -mt-1">
+          <span className="text-[11px] font-mono uppercase tracking-wider text-muted -mt-1">
             out of 100
           </span>
         </div>
@@ -68,16 +68,16 @@ export const RiskGauge: React.FC<RiskGaugeProps> = ({
       {showLabel && (
         <div className="mt-2 text-center">
           <span
-            className="inline-block px-3 py-1 rounded-full text-xs font-bold font-display uppercase tracking-wider border"
+            className="inline-block px-3 py-1 rounded-full text-xs font-bold font-mono uppercase tracking-wider border"
             style={{
-              backgroundColor: `${band.color}20`,
-              color: band.color,
-              borderColor: `${band.color}40`,
+              backgroundColor: `color-mix(in srgb, ${band.color} 15%, var(--surface))`,
+              color: band.code === 'extreme' ? 'var(--risk-5)' : 'var(--ink)',
+              borderColor: `color-mix(in srgb, ${band.color} ${band.code === 'moderate' ? '60%' : '55%'}, var(--ink))`,
             }}
           >
             {band.label}
           </span>
-          <p className="text-xs text-[#8B9AA8] mt-1.5 max-w-xs">{band.description}</p>
+          <p className="text-xs text-muted mt-1.5 max-w-xs">{band.description}</p>
         </div>
       )}
     </div>

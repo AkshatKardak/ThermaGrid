@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Moon, AlertCircle, CheckCircle, Info, Wind } from 'lucide-react';
+import { Moon } from 'lucide-react';
 import { useNightRisk } from '../../hooks/useNightRisk';
 import { Card } from '../ui/Card';
-import { getRiskBand, THEME_COLORS } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
+import { RISK_SCALE } from '../../theme/tokens';
 
 interface TonightCardProps {
   locationId: number;
@@ -16,8 +16,8 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
   if (isLoading) {
     return (
       <Card className="p-6 space-y-4">
-        <div className="h-6 w-1/3 bg-white/5 rounded animate-pulse" />
-        <div className="h-28 bg-white/5 rounded-xl animate-pulse" />
+        <div className="h-6 w-1/3 bg-border/40 rounded animate-pulse" />
+        <div className="h-28 bg-border/40 rounded-[6px] animate-pulse" />
       </Card>
     );
   }
@@ -25,19 +25,18 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
   if (!data?.available || data.night_min_c === null) {
     return (
       <Card className="p-6 space-y-3">
-        <div className="flex items-center gap-2 text-xs font-mono text-[#8B9AA8] uppercase tracking-wider">
-          <Moon className="w-4 h-4 text-[#8B9AA8]" />
+        <div className="flex items-center gap-2 text-xs font-mono text-muted uppercase tracking-wider">
+          <Moon className="w-4 h-4 text-muted" />
           <span>Overnight Thermal Recovery</span>
         </div>
-        <h3 className={`${TYPOGRAPHY.h3} text-white`}>Tonight</h3>
-        <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-[#8B9AA8]">
+        <h3 className={`${TYPOGRAPHY.h3} text-ink`}>Tonight</h3>
+        <div className="p-4 rounded-[6px] bg-raised border border-border text-xs text-muted">
           {data?.message || "Tonight's data not yet available — updates every model cycle."}
         </div>
       </Card>
     );
   }
 
-  const bandDef = getRiskBand(data.tropical_night ? 75 : 30);
   const hourly = data.hourly_overnight || [];
 
   // Compute SVG curve points for 20:00 to 06:00
@@ -65,7 +64,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
         data.tropical_night ? 'border-l-4' : ''
       }`}
       style={{
-        borderLeftColor: data.tropical_night ? THEME_COLORS.heatScale.veryhigh : undefined,
+        borderLeftColor: data.tropical_night ? RISK_SCALE.risk4 : undefined,
       }}
     >
       <div className="space-y-5">
@@ -73,19 +72,21 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Moon className="w-4 h-4 text-[#8B9AA8]" />
-              <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-[#8B9AA8]">
+              <Moon className="w-4 h-4 text-muted" />
+              <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-muted">
                 Overnight Biometeorology
               </span>
             </div>
-            <h3 className={`${TYPOGRAPHY.h3} text-white flex items-center gap-2`}>
+            <h3 className={`${TYPOGRAPHY.h3} text-ink flex items-center gap-2`}>
               <span>Tonight's Heat Recovery</span>
               {data.tropical_night ? (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-semibold bg-[#FF704F]/20 text-[#FF704F] border border-[#FF704F]/40">
+                <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono uppercase font-semibold bg-[color-mix(in_srgb,var(--risk-4)_15%,var(--surface))] text-ink border border-[color-mix(in_srgb,var(--risk-4)_55%,var(--ink))] inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-risk-4" />
                   Tropical Night
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-semibold bg-[#2FA37C]/20 text-[#2FA37C] border border-[#2FA37C]/40">
+                <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono uppercase font-semibold bg-[color-mix(in_srgb,var(--risk-1)_15%,var(--surface))] text-ink border border-[color-mix(in_srgb,var(--risk-1)_55%,var(--ink))] inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-risk-1" />
                   Adequate Cooling
                 </span>
               )}
@@ -93,23 +94,18 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
           </div>
 
           <div className="text-right">
-            <span className="text-[10px] font-mono text-[#8B9AA8] uppercase block">Night Minimum</span>
-            <span
-              className="text-2xl font-mono font-bold"
-              style={{
-                color: data.night_min_c >= 25.0 ? THEME_COLORS.heatScale.veryhigh : THEME_COLORS.heatScale.safe,
-              }}
-            >
+            <span className="text-[10px] font-mono text-muted uppercase block">Night Minimum</span>
+            <span className="text-2xl font-mono font-bold text-ink tabular-nums">
               {data.night_min_c.toFixed(1)}°C
             </span>
           </div>
         </div>
 
         {/* SVG Overnight Curve (20:00 -> 06:00) */}
-        <div className="bg-[#0B141B] p-3 rounded-xl border border-white/10 space-y-1">
-          <div className="flex justify-between items-center text-[10px] font-mono text-[#8B9AA8] px-1">
+        <div className="bg-raised p-3 rounded-[6px] border border-border space-y-1">
+          <div className="flex justify-between items-center text-[10px] font-mono text-muted px-1">
             <span>20:00 (Sunset)</span>
-            <span className="text-[#F59E0B]">25°C Tropical Night Baseline</span>
+            <span className="text-muted">25°C Tropical Night Baseline</span>
             <span>06:00 (Dawn)</span>
           </div>
 
@@ -125,7 +121,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
                   y1={y25}
                   x2={svgWidth - 10}
                   y2={y25}
-                  stroke="#F59E0B"
+                  stroke={RISK_SCALE.risk3}
                   strokeWidth="1.2"
                   strokeDasharray="4 4"
                   opacity="0.6"
@@ -133,7 +129,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
                 <text
                   x={svgWidth - 36}
                   y={y25 - 4}
-                  fill="#F59E0B"
+                  fill={RISK_SCALE.risk3}
                   fontSize="9"
                   fontFamily="monospace"
                   opacity="0.8"
@@ -147,7 +143,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
             <motion.path
               d={pathD}
               fill="none"
-              stroke={data.tropical_night ? '#FF704F' : '#2FA37C'}
+              stroke={data.tropical_night ? RISK_SCALE.risk4 : RISK_SCALE.risk1}
               strokeWidth="2.5"
               strokeLinecap="round"
               initial={{ pathLength: 0 }}
@@ -162,8 +158,8 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
                   cx={p.x}
                   cy={p.y}
                   r="3"
-                  fill="#0B141B"
-                  stroke={data.tropical_night ? '#FF704F' : '#2FA37C'}
+                  fill="#FBF9F4"
+                  stroke={data.tropical_night ? RISK_SCALE.risk4 : RISK_SCALE.risk1}
                   strokeWidth="2"
                 />
                 {idx % 2 === 0 && (
@@ -171,7 +167,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
                     x={p.x}
                     y={svgHeight - 2}
                     textAnchor="middle"
-                    fill="#5F7183"
+                    fill="var(--muted)"
                     fontSize="8"
                     fontFamily="monospace"
                   >
@@ -185,16 +181,16 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
 
         {/* Guidance Checklist */}
         <div className="space-y-2">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-[#8B9AA8] block">
+          <span className="text-[11px] font-mono uppercase tracking-wider text-muted block">
             Night Sleep & Protection Guidance
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {data.guidance.map((item, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-2 p-2.5 rounded-lg bg-white/[0.02] border border-white/5 text-xs text-[#D7E0E7]"
+                className="flex items-start gap-2 p-2.5 rounded-[6px] bg-raised border border-border text-xs text-ink"
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-[#8FB3D9] mt-1.5 shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
                 <span className="leading-snug">{item}</span>
               </div>
             ))}

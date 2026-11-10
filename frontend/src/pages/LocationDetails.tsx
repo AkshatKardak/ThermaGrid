@@ -81,10 +81,10 @@ export const LocationDetails: React.FC = () => {
   return (
     <div className="space-y-12">
       {/* Back button & Header */}
-      <div className="space-y-3 pb-4 border-b border-white/8">
+      <div className="space-y-3 pb-4 border-b border-border">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-xs font-mono text-[#8B9AA8] hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-mono text-muted hover:text-ink transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Overview
@@ -93,16 +93,16 @@ export const LocationDetails: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <span className="text-xs font-mono text-[#8FB3D9] font-bold px-2 py-0.5 rounded bg-[#8FB3D9]/15 border border-[#8FB3D9]/30">
+              <span className="text-xs font-mono text-ink font-bold px-2 py-0.5 rounded bg-surface border border-border">
                 {ward?.ward_code || 'WARD M/E'}
               </span>
-              <h1 className={`${TYPOGRAPHY.h1} text-white`}>
+              <h1 className={`${TYPOGRAPHY.h1} text-ink`}>
                 {ward?.ward_name || 'Ward M/East (Govandi)'}
               </h1>
               {risk?.is_demo && <DemoBadge label={risk.demo_label} />}
             </div>
-            <p className="text-xs font-mono text-[#8B9AA8] mt-1 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-[#5F7183]" />
+            <p className="text-xs font-mono text-muted mt-1 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-muted" />
               {ward?.district || 'Mumbai Suburban'}, {ward?.city || 'Mumbai'}, {ward?.state || 'Maharashtra'}
             </p>
           </div>
@@ -117,7 +117,7 @@ export const LocationDetails: React.FC = () => {
                 color={band.color}
                 suffix="/100"
               />
-              <span className="text-[10px] font-mono text-[#8B9AA8] block">
+              <span className="text-[10px] font-mono text-muted block">
                 Composite HTSI
               </span>
             </div>
@@ -127,22 +127,22 @@ export const LocationDetails: React.FC = () => {
 
       {/* 1. Heat Fingerprint: 6 Mono Stats */}
       <section className="space-y-3">
-        <div className="text-[11px] font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+        <div className="text-[11px] font-mono uppercase tracking-[0.10em] text-muted">
           Microclimate Heat Fingerprint
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {fingerprintStats.map((stat, i) => (
             <div
               key={i}
-              className="p-3.5 rounded-[10px] bg-[#142630] border border-white/8 space-y-1 font-mono"
+              className="p-3.5 rounded-[10px] bg-surface border border-border space-y-1 font-mono"
             >
-              <span className="text-[10px] uppercase text-[#5F7183] block truncate">
+              <span className="text-[10px] uppercase text-muted block truncate">
                 {stat.label}
               </span>
-              <span className="text-sm font-bold text-white block tabular-nums">
+              <span className="text-sm font-bold text-ink block tabular-nums">
                 {stat.value}
               </span>
-              <span className="text-[10px] text-[#8B9AA8] block truncate">{stat.sub}</span>
+              <span className="text-[10px] text-muted block truncate">{stat.sub}</span>
             </div>
           ))}
         </div>
@@ -167,7 +167,7 @@ export const LocationDetails: React.FC = () => {
               {history?.items ? (
                 <TrendChart items={history.items} height={320} />
               ) : (
-                <div className="h-72 flex items-center justify-center text-xs font-mono text-[#8B9AA8]">
+                <div className="h-72 flex items-center justify-center text-xs font-mono text-muted">
                   Loading thermal history...
                 </div>
               )}
@@ -184,7 +184,7 @@ export const LocationDetails: React.FC = () => {
               {forecast?.items ? (
                 <ForecastConfidenceChart items={forecast.items} />
               ) : (
-                <div className="h-72 flex items-center justify-center text-xs font-mono text-[#8B9AA8]">
+                <div className="h-72 flex items-center justify-center text-xs font-mono text-muted">
                   Loading forecast cone...
                 </div>
               )}
@@ -205,15 +205,15 @@ export const LocationDetails: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowTerrain(!showTerrain)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-[#203A45]/40 hover:bg-[#203A45] border border-white/8 text-xs font-mono text-white transition-all shrink-0"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-raised hover:bg-surface border border-border text-xs font-mono text-ink transition-all shrink-0 cursor-pointer"
           >
-            <Compass className="w-3.5 h-3.5 text-[#8B9AA8]" />
+            <Compass className="w-3.5 h-3.5 text-accent" />
             <span>{showTerrain ? 'Hide 3D Shader' : 'Load 3D Shader'}</span>
           </button>
         </div>
 
         {showTerrain && (
-          <div className="rounded-[14px] border border-white/8 overflow-hidden">
+          <div className="rounded-[14px] border border-border overflow-hidden">
             <TerrainFlythrough height={440} />
           </div>
         )}
@@ -229,24 +229,24 @@ export const LocationDetails: React.FC = () => {
           {scopedInterventions.map((item) => (
             <div
               key={item.id}
-              className="p-5 rounded-[12px] bg-[#142630] border border-white/8 space-y-3 flex flex-col justify-between"
+              className="p-5 rounded-[12px] bg-surface border border-border space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-[10px] uppercase font-bold text-[#8FB3D9]">
+                  <span className="text-[10px] uppercase font-bold text-accent">
                     {item.type}
                   </span>
-                  <span className="text-[10px] text-[#2FA37C] bg-[#2FA37C]/15 border border-[#2FA37C]/30 px-2 py-0.5 rounded-full font-bold">
+                  <span className="text-[10px] text-ink bg-[color-mix(in_srgb,var(--risk-1)_15%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-1)_55%,var(--ink))] px-2 py-0.5 rounded-full font-bold">
                     {item.status}
                   </span>
                 </div>
-                <h4 className="text-sm font-bold text-white font-display">{item.title}</h4>
-                <p className="text-xs text-[#8B9AA8]">{item.impact}</p>
+                <h4 className="text-sm font-bold text-ink font-display">{item.title}</h4>
+                <p className="text-xs text-muted">{item.impact}</p>
               </div>
 
-              <div className="pt-2 border-t border-white/6 flex items-center justify-between text-xs font-mono text-[#5F7183]">
+              <div className="pt-2 border-t border-border flex items-center justify-between text-xs font-mono text-muted">
                 <span>Est. Budget:</span>
-                <span className="text-white font-semibold">{item.cost}</span>
+                <span className="text-ink font-semibold">{item.cost}</span>
               </div>
             </div>
           ))}

@@ -52,10 +52,10 @@ export const WorkerRisk: React.FC = () => {
   return (
     <div className="space-y-12">
       {/* Header & Ward Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className={`${TYPOGRAPHY.h1} text-white`}>
+            <h1 className={`${TYPOGRAPHY.h1} text-ink`}>
               Occupational Heat Strain & Work-Rest Protocols
             </h1>
             {thermal?.is_demo && <DemoBadge label={thermal.demo_label} />}
@@ -67,14 +67,14 @@ export const WorkerRisk: React.FC = () => {
 
         {/* Ward Selector */}
         <div className="flex items-center gap-2">
-          <label htmlFor="worker-ward" className="text-xs font-mono text-[#8B9AA8]">
+          <label htmlFor="worker-ward" className="text-xs font-mono text-muted">
             Ward:
           </label>
           <select
             id="worker-ward"
             value={selectedLocationId}
             onChange={(e) => setSelectedLocationId(Number(e.target.value))}
-            className="bg-[#142630] text-white text-xs font-mono px-3 py-2 rounded-[8px] border border-white/10 outline-none cursor-pointer"
+            className="bg-surface text-ink text-xs font-mono px-3 py-2 rounded-[8px] border border-border outline-none cursor-pointer focus:border-accent"
           >
             {wards?.map((w) => (
               <option key={w.id} value={w.id}>
@@ -95,8 +95,8 @@ export const WorkerRisk: React.FC = () => {
         <div className="space-y-6">
           {/* Step 1: Occupation */}
           <div className="space-y-2">
-            <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8] flex items-center gap-2">
-              <HardHat className="w-4 h-4 text-[#8B9AA8]" />
+            <label className="text-xs font-mono uppercase tracking-[0.10em] text-muted flex items-center gap-2">
+              <HardHat className="w-4 h-4 text-muted" />
               Step 1: Trade / Occupation
             </label>
             <div className="flex flex-wrap gap-2">
@@ -113,21 +113,21 @@ export const WorkerRisk: React.FC = () => {
                   onClick={() => setOccupation(opt.id as Occupation)}
                   className={`px-3.5 py-2 rounded-[8px] text-xs font-mono text-left transition-all ${
                     occupation === opt.id
-                      ? 'bg-[#0B141B] text-white border border-[#8FB3D9] [box-shadow:inset_0_1px_0_rgba(143, 179, 217,0.4)]'
-                      : 'bg-[#203A45]/30 text-[#8B9AA8] border border-white/6 hover:text-white'
+                      ? 'bg-surface text-ink border border-accent font-semibold'
+                      : 'bg-raised text-muted border border-border hover:text-ink'
                   }`}
                 >
                   <div className="font-semibold">{opt.label}</div>
-                  <div className="text-[10px] text-[#5F7183] mt-0.5">{opt.sub}</div>
+                  <div className="text-[10px] text-muted mt-0.5">{opt.sub}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 border-t border-white/6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 border-t border-border">
             {/* Step 2: Intensity MET 3-6 */}
             <div className="space-y-2">
-              <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+              <label className="text-xs font-mono uppercase tracking-[0.10em] text-muted">
                 Step 2: Exertion Intensity
               </label>
               <SegmentedControl<Intensity>
@@ -145,7 +145,7 @@ export const WorkerRisk: React.FC = () => {
 
             {/* Step 3: Exposure Sun / Shade */}
             <div className="space-y-2">
-              <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+              <label className="text-xs font-mono uppercase tracking-[0.10em] text-muted">
                 Step 3: Direct Solar Exposure
               </label>
               <SegmentedControl<Exposure>
@@ -162,7 +162,7 @@ export const WorkerRisk: React.FC = () => {
 
             {/* Step 4: Shift Duration */}
             <div className="space-y-2">
-              <label className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+              <label className="text-xs font-mono uppercase tracking-[0.10em] text-muted">
                 Step 4: Shift Window
               </label>
               <SegmentedControl<ShiftDuration>
@@ -183,16 +183,17 @@ export const WorkerRisk: React.FC = () => {
       {/* 2. Output: Work-Adjusted Score vs General Score as 2 Large Numerals with Delta Chip */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         {/* General Population Score */}
-        <div className="p-6 rounded-[14px] bg-[#142630] border border-white/8 space-y-4">
+        <div className="p-6 rounded-[14px] bg-surface border border-border space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
+            <span className="text-xs font-mono uppercase tracking-[0.10em] text-muted">
               Baseline General Exposure
             </span>
             <span
               className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full"
               style={{
-                backgroundColor: `${generalBand.color}20`,
-                color: generalBand.color,
+                backgroundColor: `color-mix(in srgb, ${generalBand.color} 15%, var(--surface))`,
+                color: generalBand.code === 'extreme' ? 'var(--risk-5)' : 'var(--ink)',
+                border: `1px solid color-mix(in srgb, ${generalBand.color} ${generalBand.code === 'moderate' ? '60%' : '55%'}, var(--ink))`,
               }}
             >
               {generalBand.label}
@@ -207,23 +208,24 @@ export const WorkerRisk: React.FC = () => {
             sublabel="Standard resting ambient population strain"
           />
 
-          <div className="text-xs font-mono text-[#8B9AA8] border-t border-white/6 pt-3 flex justify-between">
+          <div className="text-xs font-mono text-muted border-t border-border pt-3 flex justify-between">
             <span>Ambient Dry-Bulb: {risk?.temperature_c?.toFixed(1) || '37.0'}°C</span>
             <span>WBGT: {baseWbgt.toFixed(1)}°C</span>
           </div>
         </div>
 
         {/* Work-Adjusted Score with Delta Chip */}
-        <div className="p-6 rounded-[14px] bg-[#203A45] border border-white/16 space-y-4 [box-shadow:inset_0_1px_0_rgba(255,255,255,0.06)] relative corner-ticks">
+        <div className="p-6 rounded-[14px] bg-raised border border-border space-y-4 relative corner-ticks">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase tracking-[0.10em] text-white font-semibold">
+            <span className="text-xs font-mono uppercase tracking-[0.10em] text-ink font-semibold">
               Work-Adjusted Thermal Strain
             </span>
             <span
               className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full"
               style={{
-                backgroundColor: `${workBand.color}25`,
-                color: workBand.color,
+                backgroundColor: `color-mix(in srgb, ${workBand.color} 15%, var(--surface))`,
+                color: workBand.code === 'extreme' ? 'var(--risk-5)' : 'var(--ink)',
+                border: `1px solid color-mix(in srgb, ${workBand.color} ${workBand.code === 'moderate' ? '60%' : '55%'}, var(--ink))`,
               }}
             >
               {workBand.label}
@@ -240,9 +242,9 @@ export const WorkerRisk: React.FC = () => {
             />
           </div>
 
-          <div className="text-xs font-mono text-[#D7E0E7] border-t border-white/8 pt-3 flex justify-between">
+          <div className="text-xs font-mono text-ink border-t border-border pt-3 flex justify-between">
             <span>Effective Metabolic WBGT: {effectiveWbgt}°C</span>
-            <span className="text-[#FF704F] font-bold">Delta: +{totalDelta} HTSI</span>
+            <span className="font-bold">Delta: +{totalDelta} HTSI</span>
           </div>
         </div>
       </div>
@@ -266,10 +268,10 @@ export const WorkerRisk: React.FC = () => {
       </section>
 
       {/* 4. Prominent Legal & Medical Disclaimer */}
-      <div className="p-5 rounded-[12px] bg-[#0B141B] border border-white/8 flex items-start gap-4">
-        <AlertTriangle className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
-        <div className="text-xs text-[#8B9AA8] space-y-1">
-          <span className="font-mono font-bold text-white uppercase tracking-wider block">
+      <div className="p-5 rounded-[12px] bg-surface border border-border flex items-start gap-4">
+        <AlertTriangle className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+        <div className="text-xs text-muted space-y-1">
+          <span className="font-mono font-bold text-ink uppercase tracking-wider block">
             Occupational Health & Safety Disclaimer (ISO 7243:2017)
           </span>
           <p className="leading-relaxed">

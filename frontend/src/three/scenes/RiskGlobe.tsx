@@ -369,12 +369,12 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       {/* Top Status Readout */}
       <div className="w-full flex items-center justify-between p-4 sm:p-5 z-10 pointer-events-none">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#8FB3D9] animate-ping" />
-          <span className="text-xs font-mono font-medium text-[#D7E0E7] uppercase tracking-[0.10em]">
+          <div className="w-2 h-2 rounded-full bg-accent animate-ping" />
+          <span className="text-xs font-mono font-medium text-raised uppercase tracking-[0.10em]">
             National Synoptic Thermal Field
           </span>
         </div>
-        <div className="text-[11px] font-mono text-[#8B9AA8] bg-[#0B141B]/90 px-2.5 py-1 rounded-[6px] border border-white/10 backdrop-blur-sm">
+        <div className="text-[11px] font-mono text-raised/70 bg-panel-dark px-2.5 py-1 rounded-[6px] border border-border">
           Live Synoptic Feed
         </div>
       </div>
@@ -382,19 +382,20 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
       {/* Hover Tooltip */}
       {hoveredCity && tooltipPos && (
         <div
-          className="absolute z-30 pointer-events-none px-3 py-1.5 rounded-[6px] bg-[#0B141B]/95 backdrop-blur-md border border-[#8FB3D9]/40 shadow-xl text-xs font-mono"
+          className="absolute z-30 pointer-events-none px-3 py-1.5 rounded-[6px] bg-panel-dark border border-border text-xs font-mono text-raised"
           style={{
             left: `${Math.min(window.innerWidth - 220, tooltipPos.x - 20)}px`,
             top: `${Math.max(10, tooltipPos.y - 45)}px`,
           }}
         >
-          <div className="font-bold text-white flex items-center gap-2">
+          <div className="font-bold text-raised flex items-center gap-2">
             <span>{hoveredCity.name}</span>
-            <span style={{ color: heatColor(hoveredCity.risk) }}>
+            <span className="inline-flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: heatColor(hoveredCity.risk) }} />
               {(hoveredCity.risk * 100).toFixed(0)} / 100
             </span>
           </div>
-          <div className="text-[10px] text-[#8B9AA8]">
+          <div className="text-[10px] text-raised/70">
             WBGT {hoveredCity.wbgt || 26.4}°C • Temp {hoveredCity.temp || 28.3}°C
           </div>
         </div>
@@ -402,7 +403,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
 
       {/* Bottom Telemetry Card for Selected City */}
       <div className="w-full p-4 sm:p-5 z-10 pointer-events-auto">
-        <div className="bg-[#0B141B]/90 border border-white/10 rounded-[10px] p-3 sm:p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs backdrop-blur-md shadow-xl">
+        <div className="bg-panel-dark border border-border rounded-[8px] p-3 sm:p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs text-raised">
           <div className="flex items-center gap-2.5">
             <div
               className="w-3 h-3 rounded-full shrink-0"
@@ -411,8 +412,8 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
               }}
             />
             <div>
-              <span className="font-semibold text-white tracking-wide">{selectedCity.name}</span>
-              <span className="text-[10px] text-[#8B9AA8] font-mono ml-2">
+              <span className="font-semibold text-raised tracking-wide">{selectedCity.name}</span>
+              <span className="text-[10px] text-raised/70 font-mono ml-2">
                 {selectedCity.lat.toFixed(2)}°N, {selectedCity.lng.toFixed(2)}°E
               </span>
             </div>
@@ -420,21 +421,22 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
 
           <div className="flex items-center gap-4 font-mono text-xs">
             <div>
-              <span className="text-[#8B9AA8] text-[10px] uppercase block">Thermal Risk</span>
-              <strong style={{ color: heatColor(selectedCity.risk) }}>
+              <span className="text-raised/70 text-[10px] uppercase block">Thermal Risk</span>
+              <strong className="text-raised inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: heatColor(selectedCity.risk) }} />
                 {(selectedCity.risk * 100).toFixed(1)} / 100
               </strong>
             </div>
             {selectedCity.temp !== undefined && (
               <div>
-                <span className="text-[#8B9AA8] text-[10px] uppercase block">Dry-Bulb</span>
-                <span className="text-white font-semibold">{selectedCity.temp}°C</span>
+                <span className="text-raised/70 text-[10px] uppercase block">Dry-Bulb</span>
+                <span className="text-raised font-semibold">{selectedCity.temp}°C</span>
               </div>
             )}
             {selectedCity.wbgt !== undefined && (
               <div>
-                <span className="text-[#8B9AA8] text-[10px] uppercase block">ISO WBGT</span>
-                <span className="text-[#FF704F] font-semibold">{selectedCity.wbgt}°C</span>
+                <span className="text-raised/70 text-[10px] uppercase block">ISO WBGT</span>
+                <span className="text-raised font-semibold">{selectedCity.wbgt}°C</span>
               </div>
             )}
           </div>

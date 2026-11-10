@@ -76,14 +76,14 @@ export const Simulation: React.FC = () => {
   return (
     <div className="space-y-12">
       {/* Simulation Header & Prominent Sandbox Badge */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className={`${TYPOGRAPHY.h1} text-white`}>
+            <h1 className={`${TYPOGRAPHY.h1} text-ink`}>
               Microclimate Sensitivity & What-If Simulation Sandbox
             </h1>
-            <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-[#FF704F]/15 text-[#FF704F] border border-[#FF704F]/40 flex items-center gap-1.5">
-              <AlertOctagon className="w-3.5 h-3.5" />
+            <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-[color-mix(in_srgb,var(--risk-4)_15%,var(--surface))] text-ink border border-[color-mix(in_srgb,var(--risk-4)_55%,var(--ink))] flex items-center gap-1.5">
+              <AlertOctagon className="w-3.5 h-3.5 text-risk-4" />
               SIMULATION — NOT A FORECAST
             </span>
           </div>
@@ -96,9 +96,9 @@ export const Simulation: React.FC = () => {
         <button
           type="button"
           onClick={handleReset}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] bg-[#203A45]/40 hover:bg-[#203A45] border border-white/8 text-xs font-mono text-[#D7E0E7] transition-all shrink-0 cursor-pointer"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[8px] bg-raised hover:bg-surface border border-border text-xs font-mono text-ink transition-all shrink-0 cursor-pointer"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-[#8FB3D9]" />
+          <RefreshCw className="w-3.5 h-3.5 text-accent" />
           Reset to Baseline
         </button>
       </div>
@@ -169,9 +169,9 @@ export const Simulation: React.FC = () => {
             title={`Simulated Ward Outcome (${selectedWard?.ward_name})`}
             subtitle="Comparing baseline observation against simulated biophysical response"
           >
-            <div className="grid grid-cols-2 gap-6 p-4 rounded-[10px] bg-[#0B141B]/80 border border-white/6 mb-4">
+            <div className="grid grid-cols-2 gap-6 p-4 rounded-[10px] bg-raised border border-border mb-4">
               <div className="space-y-1">
-                <span className="text-[11px] font-mono uppercase text-[#8B9AA8] block">
+                <span className="text-[11px] font-mono uppercase text-muted block">
                   Current Observed
                 </span>
                 <KpiNumeral
@@ -180,13 +180,13 @@ export const Simulation: React.FC = () => {
                   color={currentBand.color}
                   suffix="/100"
                 />
-                <span className="text-[11px] font-mono text-[#8B9AA8] block">
+                <span className="text-[11px] font-mono text-muted block">
                   {currentBand.label}
                 </span>
               </div>
 
-              <div className="space-y-1 border-l border-white/8 pl-6">
-                <span className="text-[11px] font-mono uppercase text-[#D7E0E7] block font-semibold">
+              <div className="space-y-1 border-l border-border pl-6">
+                <span className="text-[11px] font-mono uppercase text-ink block font-semibold">
                   Projected Under Anomaly
                 </span>
                 <KpiNumeral
@@ -199,19 +199,19 @@ export const Simulation: React.FC = () => {
                     label: 'Net Impact',
                   }}
                 />
-                <span className="text-[11px] font-mono text-white font-bold block">
+                <span className="text-[11px] font-mono text-ink font-bold block">
                   {projectedBand.label}
                 </span>
               </div>
             </div>
 
             {/* Additional Wards Crossing Extreme Threshold */}
-            <div className="p-4 rounded-[10px] bg-[#FF704F]/10 border border-[#FF704F]/30 flex items-center justify-between">
+            <div className="p-4 rounded-[10px] bg-[color-mix(in_srgb,var(--risk-4)_12%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-4)_55%,var(--ink))] flex items-center justify-between">
               <div>
-                <span className="text-xs font-mono font-bold text-[#FF704F] uppercase tracking-wider block">
+                <span className="text-xs font-mono font-bold text-ink uppercase tracking-wider block">
                   Catastrophic Threshold Crossings
                 </span>
-                <span className="text-xs text-[#D7E0E7]">
+                <span className="text-xs text-muted">
                   Wards projected to breach Extreme Hazard (&ge; 85 HTSI)
                 </span>
               </div>
@@ -219,7 +219,7 @@ export const Simulation: React.FC = () => {
                 <KpiNumeral
                   value={additionalExtremeWards}
                   size="m"
-                  color="#FF704F"
+                  color="var(--ink)"
                   prefix="+"
                   suffix=" Wards"
                 />
@@ -240,7 +240,7 @@ export const Simulation: React.FC = () => {
         <Card tier="l1">
           <div className="overflow-x-auto max-h-[460px] overflow-y-auto">
             <table className="w-full border-collapse font-mono text-xs text-left">
-              <thead className="sticky top-0 bg-[#142630] z-10 border-b border-white/8 text-[11px] uppercase tracking-[0.10em] text-[#8B9AA8]">
+              <thead className="sticky top-0 bg-surface z-10 border-b border-border text-[11px] uppercase tracking-[0.10em] text-muted">
                 <tr>
                   <th className="py-2.5 px-3">Ward Name</th>
                   <th className="py-2.5 px-3 text-center">Baseline Score</th>
@@ -249,7 +249,7 @@ export const Simulation: React.FC = () => {
                   <th className="py-2.5 px-3 text-right">Escalation Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-border">
                 {beforeAfterWards.map((w) => {
                   const isChanged = w.isEscalated;
                   return (
@@ -257,46 +257,46 @@ export const Simulation: React.FC = () => {
                       key={w.location_id}
                       className={`transition-colors ${
                         isChanged
-                          ? 'bg-[#FF704F]/10 border-l-2 border-l-[#FF704F]'
-                          : 'hover:bg-white/5'
+                          ? 'bg-[color-mix(in_srgb,var(--risk-4)_10%,var(--surface))] border-l-2 border-l-risk-4'
+                          : 'hover:bg-raised'
                       }`}
                     >
                       <td className="py-3 px-3">
-                        <div className="font-sans font-semibold text-white">{w.ward_name}</div>
-                        <div className="text-[10px] text-[#8B9AA8]">{w.ward_code}</div>
+                        <div className="font-sans font-semibold text-ink">{w.ward_name}</div>
+                        <div className="text-[10px] text-muted">{w.ward_code}</div>
                       </td>
 
                       <td className="py-3 px-3 text-center">
-                        <span className="font-bold tabular-nums" style={{ color: w.bandBefore.color }}>
+                        <span className="font-bold tabular-nums text-ink">
                           {w.risk_score.toFixed(0)}/100
                         </span>
-                        <span className="text-[10px] text-[#8B9AA8] block">
+                        <span className="text-[10px] text-muted block">
                           {w.bandBefore.label}
                         </span>
                       </td>
 
                       <td className="py-3 px-3 text-center">
-                        <span className="font-bold tabular-nums" style={{ color: w.bandAfter.color }}>
+                        <span className="font-bold tabular-nums text-ink">
                           {w.projectedScore.toFixed(0)}/100
                         </span>
-                        <span className="text-[10px] text-white block">
+                        <span className="text-[10px] text-muted block">
                           {w.bandAfter.label}
                         </span>
                       </td>
 
                       <td className="py-3 px-3 text-center font-bold">
-                        <span className={deltaPoints > 0 ? 'text-[#FF704F]' : 'text-[#2FA37C]'}>
+                        <span className="text-ink">
                           {deltaPoints > 0 ? `+${deltaPoints}` : deltaPoints}
                         </span>
                       </td>
 
                       <td className="py-3 px-3 text-right">
                         {isChanged ? (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FF704F]/20 text-[#FF704F] border border-[#FF704F]/30">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[color-mix(in_srgb,var(--risk-4)_15%,var(--surface))] text-ink border border-[color-mix(in_srgb,var(--risk-4)_55%,var(--ink))]">
                             Escalated Band
                           </span>
                         ) : (
-                          <span className="text-[10px] text-[#5F7183]">Stable</span>
+                          <span className="text-[10px] text-muted">Stable</span>
                         )}
                       </td>
                     </tr>
