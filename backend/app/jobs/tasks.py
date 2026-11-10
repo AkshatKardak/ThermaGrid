@@ -13,7 +13,7 @@ from app.db.session import SessionLocal
 from app.models.location import Location
 from app.models.weather import WeatherObservation
 from app.models.thermal import ThermalIndex
-from app.models.risk import RiskScore
+from app.models.risk import RiskScore, WardRiskCurrent
 from app.models.alert import Alert
 from app.core.config import get_settings
 from app.services.alert_service import maybe_alert
@@ -104,6 +104,40 @@ async def compute_thermal() -> None:
                         is_demo=r.get("is_demo", False),
                     )
                     db.add(risk_row)
+
+                    # Maintain precomputed ward_risk_current snapshot for dashboard
+                    w_curr = db.query(WardRiskCurrent).filter(WardRiskCurrent.location_id == loc.id).first()
+                    if not w_curr:
+                        w_curr = WardRiskCurrent(location_id=loc.id)
+                        db.add(w_curr)
+                    w_curr.city = loc.city
+                    w_curr.ward_code = loc.ward_code
+                    w_curr.ward_name = loc.ward_name
+                    w_curr.level = loc.level or "ward"
+                    w_curr.parent_code = loc.parent_code
+                    w_curr.latitude = loc.latitude
+                    w_curr.longitude = loc.longitude
+                    w_curr.population = loc.population
+                    w_curr.risk_score = r["risk_score"]
+                    w_curr.band = r["band"]
+                    w_curr.band_label = r["band_label"]
+                    w_curr.alert_color = r["alert_color"]
+                    w_curr.hazard_score = r["hazard_score"]
+                    w_curr.exposure_index = r["exposure_index"]
+                    w_curr.vulnerability_index = r["vulnerability_index"]
+                    w_curr.temperature_c = r["temperature_c"]
+                    w_curr.wbgt_c = r["wbgt_c"]
+                    w_curr.utci_c = r["utci_c"]
+                    w_curr.confidence = r.get("confidence", 0.92)
+                    w_curr.factor_breakdown_json = r["factor_breakdown"]
+                    w_curr.sub_scores_json = r.get("sub_scores")
+                    w_curr.diagnostics_json = r.get("diagnostics")
+                    w_curr.explanation = r["explanation"]
+                    w_curr.is_demo = r.get("is_demo", False)
+                    w_curr.demo_label = r.get("demo_label")
+                    w_curr.calculated_for = r.get("calculated_for", datetime.now(timezone.utc))
+                    w_curr.updated_at = datetime.now(timezone.utc)
+
                     db.commit()
                 except Exception as ex:
                     log.warning(f"[JOB:compute_thermal] Calculation warning for {loc.ward_name}: {ex}")

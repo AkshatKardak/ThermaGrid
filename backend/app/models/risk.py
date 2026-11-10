@@ -61,3 +61,40 @@ class RiskConfig(Base):
     heatwave_temp_threshold_c = Column(Float, default=40.0)
     wbgt_work_stop_threshold_c = Column(Float, default=32.2)
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+
+class WardRiskCurrent(Base):
+    """
+    Precomputed aggregate snapshot table for dashboard and map queries.
+    Refreshed each model cycle to avoid executing loops over hundreds of locations at request time.
+    """
+    __tablename__ = "ward_risk_current"
+
+    location_id = Column(Integer, ForeignKey("locations.id"), primary_key=True, index=True)
+    city = Column(String(100), index=True, nullable=False)
+    ward_code = Column(String(50), index=True, nullable=False)
+    ward_name = Column(String(255), nullable=False)
+    level = Column(String(20), index=True, default="ward", nullable=False)
+    parent_code = Column(String(50), index=True, nullable=True)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    population = Column(Integer, default=100000)
+    risk_score = Column(Float, index=True, nullable=False)
+    band = Column(String(50), nullable=False)
+    band_label = Column(String(100), nullable=False)
+    alert_color = Column(String(20), nullable=False)
+    hazard_score = Column(Float, nullable=False)
+    exposure_index = Column(Float, nullable=False)
+    vulnerability_index = Column(Float, nullable=False)
+    temperature_c = Column(Float, nullable=False)
+    wbgt_c = Column(Float, nullable=False)
+    utci_c = Column(Float, nullable=False)
+    confidence = Column(Float, default=0.92)
+    factor_breakdown_json = Column(JSON, nullable=False)
+    sub_scores_json = Column(JSON, nullable=True)
+    diagnostics_json = Column(JSON, nullable=True)
+    explanation = Column(Text, nullable=False)
+    is_demo = Column(Boolean, default=False)
+    demo_label = Column(String(255), nullable=True)
+    calculated_for = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

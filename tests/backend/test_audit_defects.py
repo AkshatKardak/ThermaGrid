@@ -250,7 +250,7 @@ async def test_background_jobs_persist_rows():
     from app.jobs.tasks import ingest_weather, compute_thermal, evaluate_alerts
     from app.models.weather import WeatherObservation
     from app.models.thermal import ThermalIndex
-    from app.models.risk import RiskScore
+    from app.models.risk import RiskScore, WardRiskCurrent
     from app.models.alert import Alert
     from datetime import datetime, timezone
 
@@ -267,6 +267,8 @@ async def test_background_jobs_persist_rows():
         assert th_count > 0, "compute_thermal did not persist any ThermalIndex rows"
         risk_count = db.query(RiskScore).count()
         assert risk_count > 0, "compute_thermal did not persist any RiskScore rows"
+        w_curr_count = db.query(WardRiskCurrent).count()
+        assert w_curr_count > 0, "compute_thermal did not persist any WardRiskCurrent rows"
 
     # 3. Insert a high risk score to trigger alert evaluation and verify Alert persistence
     with SessionLocal() as db:

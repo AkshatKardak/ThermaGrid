@@ -15,6 +15,7 @@ from app.services.forecast_service import ForecastService
 from app.services.weather_service import WeatherService
 from app.services.thermal_service import ThermalService
 from app.schemas.risk import RiskCurrentOut, RiskForecastOut
+from app.models.risk import WardRiskCurrent
 
 router = APIRouter(prefix="/risk", tags=["Thermal Risk"])
 
@@ -296,8 +297,55 @@ def get_all_wards_risk(
 ):
     """
     Returns current risk score ranking across all locations for authority prioritization.
+    Reads from the precomputed ward_risk_current snapshot table for optimal performance.
     Never mixes hierarchy tiers in a single aggregate.
     """
+    query = db.query(WardRiskCurrent)
+    if level:
+        query = query.filter(WardRiskCurrent.level == level)
+    elif city:
+        query = query.filter(WardRiskCurrent.city.ilike(city))
+        first_row = query.first()
+        if first_row:
+            query = query.filter(WardRiskCurrent.level == first_row.level)
+    else:
+        query = query.filter(WardRiskCurrent.level == "ward")
+
+    rows = query.order_by(WardRiskCurrent.risk_score.desc()).all()
+    if rows:
+        results = []
+        for r in rows:
+            results.append({
+                "location_id": r.location_id,
+                "city": r.city,
+                "ward_name": r.ward_name,
+                "ward_code": r.ward_code,
+                "level": r.level,
+                "parent_code": r.parent_code,
+                "calculated_for": r.calculated_for,
+                "risk_score": r.risk_score,
+                "band": r.band,
+                "band_label": r.band_label,
+                "alert_color": r.alert_color,
+                "hazard_score": r.hazard_score,
+                "exposure_index": r.exposure_index,
+                "vulnerability_index": r.vulnerability_index,
+                "factor_breakdown": r.factor_breakdown_json,
+                "explanation": r.explanation,
+                "temperature_c": r.temperature_c,
+                "wbgt_c": r.wbgt_c,
+                "utci_c": r.utci_c,
+                "confidence": r.confidence,
+                "sub_scores": r.sub_scores_json,
+                "diagnostics": r.diagnostics_json,
+                "is_demo": r.is_demo,
+                "demo_label": r.demo_label,
+                "latitude": r.latitude,
+                "longitude": r.longitude,
+                "population": r.population,
+            })
+        return results
+
     return RiskService.get_all_wards_risk(db, city=city, level=level)
 
 
