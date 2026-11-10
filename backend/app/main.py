@@ -92,6 +92,66 @@ def create_application() -> FastAPI:
         logger.info(f"{request.method} {request.url.path} completed in {process_time:.4f}s [status {response.status_code}]")
         return response
 
+    # Response caching middleware (TTL: 10m for observations, 1h for forecasts)
+    from app.core.cache import response_cache, get_cache_ttl
+    from starlette.responses import Response as StarletteResponse
+
+    @app.middleware("http")
+    async def cache_middleware(request: Request, call_next):
+        if request.method != "GET":
+            return await call_next(request)
+
+        ttl = get_cache_ttl(request.url.path)
+        if ttl is None:
+            return await call_next(request)
+
+        query_str = "&".join(sorted(f"{k}={v}" for k, v in request.query_params.multi_items()))
+        cache_key = f"{request.url.path}?{query_str}"
+
+        cached = response_cache.get(cache_key)
+        if cached is not None:
+            body, status_code, headers, media_type = cached
+            res = StarletteResponse(content=body, status_code=status_code, media_type=media_type)
+            for h_name, h_val in headers:
+                if h_name.lower() not in ["content-length", "content-type", "cache", "x-cache"]:
+                    res.headers[h_name] = h_val
+            res.headers["cache"] = "hit"
+            res.headers["X-Cache"] = "hit"
+            return res
+
+        response = await call_next(request)
+        if response.status_code == 200:
+            body = [chunk async for chunk in response.body_iterator]
+            full_body = b"".join(body)
+
+            headers_to_cache = [
+                (k, v) for k, v in response.headers.items()
+                if k.lower() not in ["cache", "x-cache", "x-process-time-seconds"]
+            ]
+            response_cache.set(
+                cache_key,
+                full_body,
+                response.status_code,
+                headers_to_cache,
+                response.media_type,
+                ttl,
+            )
+
+            res = StarletteResponse(
+                content=full_body,
+                status_code=response.status_code,
+                media_type=response.media_type,
+            )
+            for k, v in response.headers.items():
+                res.headers[k] = v
+            res.headers["cache"] = "miss"
+            res.headers["X-Cache"] = "miss"
+            return res
+
+        response.headers["cache"] = "miss"
+        response.headers["X-Cache"] = "miss"
+        return response
+
     # Upstream data / weather outage exception handler
     from app.core.errors import DataSourceUnavailable
     @app.exception_handler(DataSourceUnavailable)

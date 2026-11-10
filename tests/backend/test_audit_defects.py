@@ -318,3 +318,27 @@ def test_spatial_index_point_in_polygon_lookup():
     assert data["min_lat"] is not None
     assert data["max_lat"] is not None
     assert data["min_lat"] <= 18.9220 <= data["max_lat"]
+
+
+def test_response_caching_hit_and_miss_headers():
+    """7.3: Cached endpoints return cache: 'hit' | 'miss' headers with TTL caching."""
+    from app.core.cache import response_cache
+    response_cache.clear()
+
+    # 1. Observation endpoint: /weather/current
+    resp1 = client.get("/api/v1/weather/current?location_id=1")
+    assert resp1.status_code == 200
+    assert resp1.headers.get("cache") == "miss" or resp1.headers.get("x-cache") == "miss"
+
+    resp2 = client.get("/api/v1/weather/current?location_id=1")
+    assert resp2.status_code == 200
+    assert resp2.headers.get("cache") == "hit" or resp2.headers.get("x-cache") == "hit"
+
+    # 2. Forecast endpoint: /weather/forecast
+    resp3 = client.get("/api/v1/weather/forecast?location_id=1")
+    assert resp3.status_code == 200
+    assert resp3.headers.get("cache") == "miss" or resp3.headers.get("x-cache") == "miss"
+
+    resp4 = client.get("/api/v1/weather/forecast?location_id=1")
+    assert resp4.status_code == 200
+    assert resp4.headers.get("cache") == "hit" or resp4.headers.get("x-cache") == "hit"
