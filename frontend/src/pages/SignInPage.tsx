@@ -16,7 +16,7 @@ const clerkAppearance = {
     fontFamily: 'IBM Plex Sans, sans-serif',
   },
   elements: {
-    card: 'bg-[#142630] border border-white/[0.075] shadow-2xl rounded-[10px]',
+    card: 'bg-[#142630] border border-white/[0.075] rounded-[10px]',
     // Hide Clerk internal header title and subtitle to eliminate duplicate "ThermaGrid" branding
     headerTitle: 'hidden',
     headerSubtitle: 'hidden',

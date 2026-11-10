@@ -16,7 +16,7 @@ const clerkAppearance = {
     fontFamily: 'IBM Plex Sans, sans-serif',
   },
   elements: {
-    card: 'bg-[#142630] border border-white/[0.075] shadow-2xl rounded-[10px]',
+    card: 'bg-[#142630] border border-white/[0.075] rounded-[10px]',
     // Hide Clerk internal header title and subtitle to eliminate duplicate "ThermaGrid" branding
     headerTitle: 'hidden',
     headerSubtitle: 'hidden',
@@ -38,8 +38,21 @@ export const SignUpPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get('redirect_url') || '/app';
 
-  if (isLoaded && isSignedIn) {
-    return <Navigate to="/app" replace />;
+  if (!isLoaded) {
+    return (
+      <AuthLayout
+        title="Create Workspace Account"
+        subtitle="Register to configure personal heat stress alerts and dependent care monitoring."
+      >
+        <div className="w-full flex justify-center py-12 text-[#6B7C8A] font-mono text-xs">
+          Loading authentication state...
+        </div>
+      </AuthLayout>
+    );
+  }
+
+  if (isSignedIn) {
+    return <Navigate to={redirectUrl} replace />;
   }
 
   return (
@@ -53,7 +66,6 @@ export const SignUpPage: React.FC = () => {
           path="/sign-up"
           signInUrl="/sign-in"
           fallbackRedirectUrl={redirectUrl}
-          forceRedirectUrl="/app"
           appearance={clerkAppearance}
         />
         <DemoAccountPanel />

@@ -46,9 +46,19 @@ export const AuthorityDashboard: React.FC = () => {
 
   // Selected ward
   const activeWard = useMemo(() => {
+    if (!wards || wards.length === 0) return null;
     if (!selectedLocationId) return wards[0] || null;
     return wards.find((w) => w.id === selectedLocationId) || wards[0];
   }, [selectedLocationId, wards]);
+
+  const activeWardRisk = useMemo(() => {
+    if (!activeWard || !wardsRiskData) return null;
+    return (
+      wardsRiskData.find(
+        (r: any) => r.location_id === activeWard.id || r.ward_code === activeWard.ward_code
+      ) || null
+    );
+  }, [activeWard, wardsRiskData]);
 
   // Pre-approved alert templates
   const alertTemplates = [
@@ -153,7 +163,7 @@ export const AuthorityDashboard: React.FC = () => {
   if (isRoleLoaded && !isAuthority) {
     return (
       <div className="min-h-screen bg-[#0B141B] flex items-center justify-center p-6 text-[#D8E8E6] font-sans">
-        <div className="w-full max-w-md p-8 rounded-[12px] bg-[#142630] border border-white/[0.075] shadow-2xl text-center space-y-5">
+        <div className="w-full max-w-md p-8 rounded-[12px] bg-[#142630] border border-white/[0.075] text-center space-y-5">
           <div className="w-12 h-12 mx-auto rounded-full bg-[#203A45] border border-white/[0.075] flex items-center justify-center">
             <ShieldAlert className="w-6 h-6 text-[#8FB3D9]" />
           </div>
@@ -332,7 +342,7 @@ export const AuthorityDashboard: React.FC = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: MOTION.base.duration, ease: MOTION.base.ease }}
-              className="lg:absolute lg:top-4 lg:left-4 pointer-events-auto rounded-[10px] bg-[#142630]/90 backdrop-blur-md border border-white/[0.075] p-3 sm:p-4 shadow-2xl w-full lg:w-auto"
+              className="lg:absolute lg:top-4 lg:left-4 pointer-events-auto rounded-[10px] bg-[#142630]/95 backdrop-blur-md border border-white/[0.075] p-3 sm:p-4 w-full lg:w-auto"
             >
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-white/[0.075]">
                 {/* 1. Wards Very High */}
@@ -382,7 +392,7 @@ export const AuthorityDashboard: React.FC = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: MOTION.base.duration, delay: MOTION.stagger, ease: MOTION.base.ease }}
-              className="lg:absolute lg:top-4 lg:right-4 pointer-events-auto rounded-[10px] bg-[#142630]/90 backdrop-blur-md border border-white/[0.075] p-3.5 shadow-2xl w-full lg:w-[380px] max-h-[238px] flex flex-col justify-between space-y-2.5"
+              className="lg:absolute lg:top-4 lg:right-4 pointer-events-auto rounded-[10px] bg-[#142630]/95 backdrop-blur-md border border-white/[0.075] p-3.5 w-full lg:w-[380px] max-h-[238px] flex flex-col justify-between space-y-2.5"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase text-[#6B7C8A] tracking-wider">
@@ -451,7 +461,7 @@ export const AuthorityDashboard: React.FC = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: MOTION.base.duration, delay: MOTION.stagger * 2, ease: MOTION.base.ease }}
-              className="lg:absolute lg:bottom-4 lg:left-4 pointer-events-auto rounded-[10px] bg-[#142630]/90 backdrop-blur-md border border-white/[0.075] p-3 shadow-2xl w-full lg:w-[500px] space-y-2"
+              className="lg:absolute lg:bottom-4 lg:left-4 pointer-events-auto rounded-[10px] bg-[#142630]/95 backdrop-blur-md border border-white/[0.075] p-3 w-full lg:w-[500px] space-y-2"
             >
               {/* Dynamic Callout for Top Underserved Ward */}
               {equityData?.top_underserved_ward && (
@@ -584,7 +594,7 @@ export const AuthorityDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: MOTION.base.duration, delay: MOTION.stagger * 3, ease: MOTION.base.ease }}
-                className="lg:absolute lg:bottom-4 lg:right-4 pointer-events-auto rounded-[10px] bg-[#142630]/90 backdrop-blur-md border border-white/[0.075] p-3.5 shadow-2xl w-full lg:w-[360px] space-y-2.5"
+                className="lg:absolute lg:bottom-4 lg:right-4 pointer-events-auto rounded-[10px] bg-[#142630]/95 backdrop-blur-md border border-white/[0.075] p-3.5 w-full lg:w-[360px] space-y-2.5"
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -610,7 +620,10 @@ export const AuthorityDashboard: React.FC = () => {
                       RISK SCORE
                     </span>
                     <span className="font-mono text-base font-bold text-[#FF704F] tabular-nums block">
-                      78.4 <span className="text-xs text-[#93A3B0] font-normal">/ 100</span>
+                      {activeWardRisk?.risk_score != null
+                        ? Number(activeWardRisk.risk_score).toFixed(1)
+                        : 'unavailable'}{' '}
+                      <span className="text-xs text-[#93A3B0] font-normal">/ 100</span>
                     </span>
                   </div>
 
@@ -619,7 +632,9 @@ export const AuthorityDashboard: React.FC = () => {
                       PEAK WBGT
                     </span>
                     <span className="font-mono text-base font-bold text-white tabular-nums block">
-                      33.8°C
+                      {activeWardRisk?.wbgt_c != null
+                        ? `${Number(activeWardRisk.wbgt_c).toFixed(1)}°C`
+                        : 'unavailable'}
                     </span>
                   </div>
                 </div>

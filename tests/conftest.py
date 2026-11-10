@@ -28,6 +28,15 @@ auth_module._jwks = _MockJWKSClient()
 from app.core.config import get_settings
 get_settings().allow_synthetic_risk = True
 
+from app.core.cache import response_cache
+import pytest
+
+@pytest.fixture(autouse=True)
+def clear_response_cache_fixture():
+    response_cache.clear()
+    yield
+    response_cache.clear()
+
 
 def mint_test_jwt(sub: str, role: str) -> str:
     payload = {
