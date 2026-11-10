@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { RiskGlobe } from '../../three/scenes/RiskGlobe';
 import { MOTION } from '../../theme/tokens';
+
+const LazyRiskGlobe = React.lazy(() =>
+  import('../../three/scenes/RiskGlobe').then((mod) => ({ default: mod.RiskGlobe }))
+);
 
 export interface AuthLayoutProps {
   title: string;
@@ -98,7 +101,9 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
             transition={{ duration: 0.9 }}
             className="w-full h-full pointer-events-none opacity-45"
           >
-            <RiskGlobe height="100%" interactive={false} />
+            <Suspense fallback={<div className="w-full h-full bg-[#142630]" />}>
+              <LazyRiskGlobe height="100%" interactive={false} />
+            </Suspense>
           </motion.div>
         </div>
 
