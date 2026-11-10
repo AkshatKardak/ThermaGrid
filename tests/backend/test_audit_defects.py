@@ -241,3 +241,58 @@ def test_risk_all_does_not_mix_levels():
     assert len(districts_data) > 0
     for d in districts_data:
         assert d.get("level") == "district"
+
+
+@pytest.mark.anyio
+async def test_background_jobs_persist_rows():
+    """4.0: Scheduled jobs must persist rows to DB with correct column names (score, dispatched_at)."""
+    from app.db.session import SessionLocal
+    from app.jobs.tasks import ingest_weather, compute_thermal, evaluate_alerts
+    from app.models.weather import WeatherObservation
+    from app.models.thermal import ThermalIndex
+    from app.models.risk import RiskScore
+    from app.models.alert import Alert
+    from datetime import datetime, timezone
+
+    # 1. Test ingest_weather persists at least one row
+    await ingest_weather()
+    with SessionLocal() as db:
+        obs_count = db.query(WeatherObservation).count()
+        assert obs_count > 0, "ingest_weather did not persist any WeatherObservation rows"
+
+    # 2. Test compute_thermal persists ThermalIndex and RiskScore rows
+    await compute_thermal()
+    with SessionLocal() as db:
+        th_count = db.query(ThermalIndex).count()
+        assert th_count > 0, "compute_thermal did not persist any ThermalIndex rows"
+        risk_count = db.query(RiskScore).count()
+        assert risk_count > 0, "compute_thermal did not persist any RiskScore rows"
+
+    # 3. Insert a high risk score to trigger alert evaluation and verify Alert persistence
+    with SessionLocal() as db:
+        high_risk = RiskScore(
+            location_id=1,
+            calculated_for=datetime.now(timezone.utc),
+            score=88.5,  # >= 80.0 alert threshold
+            band="extreme",
+            band_label="Extreme Emergency",
+            alert_color="#C31D3C",
+            hazard_score=90.0,
+            exposure_index=0.85,
+            vulnerability_index=0.80,
+            factor_breakdown_json=[{"name": "Thermal Stress", "share_pct": 80.0, "value_unit": "WBGT 34°C"}],
+            explanation="Extreme emergency heat risk test.",
+            confidence=0.95,
+            is_demo=False,
+        )
+        db.add(high_risk)
+        db.commit()
+
+    await evaluate_alerts()
+    with SessionLocal() as db:
+        alerts = db.query(Alert).filter(Alert.location_id == 1).all()
+        assert len(alerts) > 0, "evaluate_alerts did not persist any Alert rows"
+        first_alert = alerts[0]
+        # Assert correct column dispatched_at is set
+        assert first_alert.dispatched_at is not None
+        assert first_alert.is_active is True
