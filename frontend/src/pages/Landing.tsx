@@ -76,52 +76,37 @@ export const Landing: React.FC = () => {
     return isLive ? (wards?.length || activeWardList.length) : activeWardList.length;
   }, [isLive, wards, activeWardList]);
 
-  // Enhanced 5-Stage Computational Pipeline with Thin Hairline Architecture
+  // 5-Stage Computational Pipeline Flow Rail Stops
   const pipelineStages = [
     {
       step: '01',
-      total: '05',
-      name: 'Synoptic Ingestion',
-      badge: '15-min Cadence',
-      desc: 'Ingests real-time observations from IMD AWS network, ERA5 reanalysis, and decennial census polygons.',
-      spec: 'IMD AWS + ERA5 + Census',
-      metric: '1.1km Join',
+      name: 'Synoptic ingestion',
+      desc: 'Hourly surface weather from Open-Meteo & ERA5 reanalysis joined to ward census polygons.',
+      metric: '1.1km grid join',
     },
     {
       step: '02',
-      total: '05',
-      name: 'Physiological Physics',
-      badge: 'ISO 7243 WBGT',
-      desc: 'Computes Liljegren wet-bulb globe temperature, 6th-order UTCI biometeorological polynomial, and NOAA heat index.',
-      spec: 'Liljegren (2008) · Rothfusz',
-      metric: 'Normative Phys.',
+      name: 'Physiological physics',
+      desc: 'Liljegren wet-bulb globe temperature, 6th-order UTCI polynomial, and NOAA heat index.',
+      metric: 'ISO 7243 WBGT',
     },
     {
       step: '03',
-      total: '05',
-      name: 'Microclimate Lag',
-      badge: 'Building Lag',
-      desc: 'Simulates envelope thermal retention and 2–3 hour indoor phase lag across tin roofs vs concrete RCC structures.',
-      spec: 'Q = U·A·ΔT + Solar Mass',
-      metric: '2–3h Delay',
+      name: 'Microclimate lag',
+      desc: 'Envelope thermal inertia and 2–3 hour indoor phase lag across tin vs RCC concrete roofs.',
+      metric: '2–3h thermal delay',
     },
     {
       step: '04',
-      total: '05',
-      name: 'ML Risk Engine',
-      badge: 'XGBoost 72h',
-      desc: 'Gradient boosted quantile forecasting evaluating Hazard, Exposure, Vulnerability, and Adaptive Capacity.',
-      spec: 'R = w_h·H + w_e·E + w_v·V - w_a·A',
-      metric: '90% Conf. Cone',
+      name: 'Composite risk scoring',
+      desc: 'Hazard × Exposure × Vulnerability deterministic scoring across population and cooling access.',
+      metric: '0–100 composite',
     },
     {
       step: '05',
-      total: '05',
-      name: 'Automated Dispatch',
-      badge: '<45ms SLA',
-      desc: 'Dispatches targeted WhatsApp/Email alerts, opens proximity-sorted cooling centres, and generates worker shift cards.',
-      spec: 'WhatsApp Cloud · A5 Shift Print',
-      metric: 'Municipal Direct',
+      name: 'Automated dispatch',
+      desc: 'Targeted municipal advisories, worker rest shift schedules, and cooling centre routes.',
+      metric: '< 45ms query latency',
     },
   ];
 
@@ -317,113 +302,83 @@ export const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Section: End-to-End Computational Pipeline */}
-      <section id="how-it-works" className="space-y-6">
+      {/* 4. Section: Computational Pipeline */}
+      <section id="how-it-works" className="py-10 lg:py-16">
         <SectionHeader
-          label="END-TO-END COMPUTATIONAL PIPELINE"
-          title="From Raw Satellite Telemetry to Targeted Life-Saving Intervention"
+          label="Computational pipeline"
+          title="From raw satellite telemetry to targeted municipal intervention"
           lead="ThermaGrid bridges numerical weather prediction and urban epidemiology through five validated stages."
+          className="mb-8"
         />
 
-        {/* High-level stage progression ribbon */}
-        <div className="hidden md:flex items-center justify-between p-3 rounded-[12px] bg-[#142630]/60 border border-white/[0.075] text-[11px] font-mono">
-          <div className="flex items-center gap-2 text-[#8FB3D9]">
-            <span className="w-5 h-5 rounded-full bg-[#8FB3D9]/15 border border-[#8FB3D9]/30 flex items-center justify-center text-[10px] font-bold">1</span>
-            <span>Raw Telemetry</span>
-          </div>
-          <span className="text-[#6B7C8A]">→</span>
-          <div className="flex items-center gap-2 text-[#D8E8E6]">
-            <span className="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] font-bold">2</span>
-            <span>Biometeorology</span>
-          </div>
-          <span className="text-[#6B7C8A]">→</span>
-          <div className="flex items-center gap-2 text-[#D8E8E6]">
-            <span className="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] font-bold">3</span>
-            <span>Microclimate Lag</span>
-          </div>
-          <span className="text-[#6B7C8A]">→</span>
-          <div className="flex items-center gap-2 text-[#D8E8E6]">
-            <span className="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[10px] font-bold">4</span>
-            <span>ML Quantile Risk</span>
-          </div>
-          <span className="text-[#6B7C8A]">→</span>
-          <div className="flex items-center gap-2 text-[#8FB3D9]">
-            <span className="w-5 h-5 rounded-full bg-[#8FB3D9]/15 border border-[#8FB3D9]/30 flex items-center justify-center text-[10px] font-bold">5</span>
-            <span>Civil Dispatch</span>
-          </div>
-        </div>
+        {/* Continuous Flow Rail (Horizontal on desktop, vertical on mobile) */}
+        <div className="relative">
+          {/* Connecting track hairline (Desktop horizontal: connects stop 1 to stop 5 through center of markers) */}
+          <div
+            className="hidden lg:block absolute top-4 left-4 right-4 h-[1px] bg-white/[0.08]"
+            aria-hidden="true"
+          />
 
-        {/* Five Stage Cards with generous responsive spacing and zero colliding lines */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-5 items-stretch">
-          {pipelineStages.map((stage, idx) => (
-            <div
-              key={idx}
-              className="rounded-[14px] bg-[#142630]/75 hover:bg-[#142630] border border-white/[0.08] hover:border-[#8FB3D9]/40 p-5 flex flex-col justify-between transition-all duration-200 group shadow-md hover:shadow-xl hover:shadow-[#8FB3D9]/5 h-full"
-            >
-              {/* Stage Header */}
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#203A45] border border-white/[0.08] text-[11px] font-mono font-bold text-[#8FB3D9]">
-                    STAGE {stage.step}
-                  </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-[#0B141B]/70 border border-white/[0.08] text-[#93A3B0] tracking-tight shrink-0">
-                    {stage.badge}
-                  </span>
+          {/* Flow rail stops: 5 columns on desktop, vertical sequence on mobile */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-6 relative">
+            {pipelineStages.map((stage, idx) => (
+              <div key={idx} className="relative flex flex-col items-start pl-12 lg:pl-0">
+                {/* Mobile vertical connecting hairline */}
+                {idx < pipelineStages.length - 1 && (
+                  <div
+                    className="lg:hidden absolute left-[15px] top-8 bottom-[-32px] w-[1px] bg-white/[0.08]"
+                    aria-hidden="true"
+                  />
+                )}
+
+                {/* Stage Stop Marker */}
+                <div className="absolute left-0 top-0 lg:static flex items-center justify-center w-8 h-8 rounded-full bg-[#142630] border border-white/[0.14] text-xs font-mono font-medium text-[#8FB3D9] tabular-nums z-10 shrink-0">
+                  {stage.step}
                 </div>
 
-                <div className="mt-3.5 space-y-1.5">
-                  <h4 className="text-sm sm:text-base font-bold text-white font-display group-hover:text-[#8FB3D9] transition-colors">
+                {/* Stop Content */}
+                <div className="lg:mt-4 flex flex-col">
+                  <h4 className="text-base font-medium text-[#D8E8E6] font-display">
                     {stage.name}
                   </h4>
-                  <p className="text-xs text-[#93A3B0] leading-relaxed">
+                  <p className="text-sm leading-[22px] text-[#93A3B0] mt-2">
                     {stage.desc}
                   </p>
+                  <div className="mt-3">
+                    <span className="text-xs font-mono text-[#8FB3D9] tabular-nums">
+                      {stage.metric}
+                    </span>
+                  </div>
                 </div>
               </div>
-
-              {/* Stage Specification Footer */}
-              <div className="mt-4 pt-3.5 border-t border-white/[0.075] space-y-1.5 text-[11px] font-mono">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-[10px] uppercase text-[#6B7C8A] tracking-wider shrink-0">Method</span>
-                  <span className="text-[#D8E8E6] text-right text-[10px] font-mono break-words line-clamp-2" title={stage.spec}>
-                    {stage.spec}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] uppercase text-[#6B7C8A] tracking-wider shrink-0">Target Metric</span>
-                  <span className="text-[#8FB3D9] font-semibold text-right text-[11px] font-mono">
-                    {stage.metric}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* 5. Section: Provenance Strip */}
-      <section id="methodology" className="p-6 rounded-[14px] bg-[#142630]/40 border border-white/8 space-y-4">
-        <div className="text-[11px] font-mono uppercase tracking-[0.10em] text-[#8B9AA8]">
-          Data Provenance &amp; Model Auditability
+      <section id="methodology" className="mt-12 p-6 rounded-[14px] bg-[#142630]/60 border border-white/[0.075] space-y-4">
+        <div className="text-xs font-mono text-[#6B7C8A]">
+          Data provenance &amp; model auditability
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <ProvenanceChip
-            label="Primary Observation Source"
-            value="IMD Synoptic AWS Network"
-            sub="Hourly dry-bulb, dewpoint, wind"
+            label="Observation source"
+            value="Open-Meteo &amp; ERA5 Reanalysis"
+            sub="Hourly dry-bulb, dewpoint, solar radiation"
           />
           <ProvenanceChip
-            label="Spatial Resolution"
+            label="Spatial resolution"
             value="Ward-Level (0.01° / ~1.1km)"
             sub="Polygon boundary joins"
           />
           <ProvenanceChip
-            label="Licensing &amp; Open Code"
+            label="Licensing &amp; open code"
             value="MIT Open Science Standard"
             sub="National Climate Telemetry"
           />
           <ProvenanceChip
-            label="Inference Latency"
+            label="Inference latency"
             value="< 45ms per Ward Query"
             sub="Validated on live telemetry"
           />

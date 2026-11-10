@@ -2,7 +2,6 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { MOTION } from '../../theme/tokens';
 
 const LazyRiskGlobe = React.lazy(() =>
   import('../../three/scenes/RiskGlobe').then((mod) => ({ default: mod.RiskGlobe }))
@@ -23,122 +22,117 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
   }, []);
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#0B141B] text-[#D8E8E6] lg:h-screen lg:overflow-hidden font-sans selection:bg-[#8FB3D9]/25">
-      {/* LEFT COLUMN: 55% width on desktop */}
-      <div className="w-full lg:w-[55%] h-full flex flex-col justify-between p-6 sm:p-10 lg:p-16 relative bg-[#0B141B] z-10 shrink-0">
-        {/* Subtle vertical hairline grid at 4% opacity */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage:
-              'linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px)',
-            backgroundSize: '48px 100%',
-          }}
-          aria-hidden="true"
-        />
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#0B141B] text-[#D8E8E6] lg:h-screen lg:overflow-hidden font-sans selection:bg-[#8FB3D9]/25 selection:text-white">
+      {/* LEFT COLUMN: 52% width on desktop — Observatory Deck & Narrative */}
+      <div className="w-full lg:w-[52%] h-full flex flex-col justify-between p-6 sm:p-10 lg:p-14 relative bg-[#0B141B] z-10 shrink-0 overflow-hidden">
+        {/* Designated Observatory 3D Globe Viewport */}
+        <div className="hidden lg:block absolute inset-0 w-full h-full pointer-events-none z-0">
+          <div
+            className="w-full h-full opacity-35"
+            style={{
+              maskImage: 'radial-gradient(circle at 75% 50%, black 25%, transparent 72%)',
+              WebkitMaskImage: 'radial-gradient(circle at 75% 50%, black 25%, transparent 72%)',
+            }}
+          >
+            <Suspense fallback={<div className="w-full h-full bg-[#0B141B]" />}>
+              <LazyRiskGlobe height="100%" interactive={false} />
+            </Suspense>
+          </div>
+        </div>
 
         {/* Brand Logo Header */}
         <div className="relative z-10">
           <Link to="/" className="inline-flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-[8px] bg-[#203A45] border border-white/[0.075] flex items-center justify-center transition-colors group-hover:border-[#8FB3D9]">
-              <Flame className="w-4 h-4 text-[#8FB3D9]" />
+            <div className="w-8 h-8 rounded-[8px] bg-[#203A45] border border-white/[0.075] flex items-center justify-center transition-colors group-hover:border-white/[0.15]">
+              <Flame className="w-4 h-4 text-[#8FB3D9]" strokeWidth={1.5} />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white font-display">
-              ThermaGrid
-            </span>
+            <div className="flex flex-col">
+              <span className="text-lg font-medium tracking-tight text-white font-display">
+                ThermaGrid
+              </span>
+            </div>
           </Link>
         </div>
 
-        {/* Core Editorial Narrative */}
+        {/* Core Narrative */}
         <div className="relative z-10 my-8 lg:my-auto max-w-lg space-y-6">
           <div className="space-y-2">
-            <h1 className="font-display text-[40px] leading-[44px] sm:text-5xl font-black tracking-tight text-white">
-              Understand heat.
+            <h1 className="font-display text-4xl sm:text-[44px] sm:leading-[48px] font-medium tracking-tight text-[#D8E8E6]">
+              Understand heat,
               <br />
-              <span className="text-[#8FB3D9]">Protect lives.</span>
+              protect lives
             </h1>
-            <p className="text-sm sm:text-base text-[#93A3B0] leading-relaxed pt-2">
-              Hyperlocal thermal intelligence for resilient cities. Calibrating biometeorological physics, urban microclimates, and municipal early warnings down to the urban ward.
+            <p className="text-sm text-[#93A3B0] leading-relaxed pt-1">
+              Ward-level thermal risk telemetry, biometeorological physics, and municipal early warnings across India.
             </p>
           </div>
 
           {/* 3 Stat Chips */}
           <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/[0.075]">
-            <div className="p-3 rounded-[8px] bg-[#142630]/70 border border-white/[0.075]">
-              <span className="font-mono text-xl font-bold text-white block tabular-nums">66+</span>
-              <span className="text-[10px] font-mono uppercase text-[#6B7C8A] block">
-                Wards Monitored
+            <div className="p-3.5 rounded-[8px] bg-[#142630]/80 border border-white/[0.075]">
+              <span className="font-mono text-xl font-medium text-[#D8E8E6] block tabular-nums">
+                66+
+              </span>
+              <span className="text-xs text-[#6B7C8A] block pt-1">
+                Wards monitored
               </span>
             </div>
-            <div className="p-3 rounded-[8px] bg-[#142630]/70 border border-white/[0.075]">
-              <span className="font-mono text-xl font-bold text-[#8FB3D9] block tabular-nums">36</span>
-              <span className="text-[10px] font-mono uppercase text-[#6B7C8A] block">
+            <div className="p-3.5 rounded-[8px] bg-[#142630]/80 border border-white/[0.075]">
+              <span className="font-mono text-xl font-medium text-[#D8E8E6] block tabular-nums">
+                36
+              </span>
+              <span className="text-xs text-[#6B7C8A] block pt-1">
                 States &amp; UTs
               </span>
             </div>
-            <div className="p-3 rounded-[8px] bg-[#142630]/70 border border-white/[0.075]">
-              <span className="font-mono text-xl font-bold text-white block tabular-nums">3</span>
-              <span className="text-[10px] font-mono uppercase text-[#6B7C8A] block">
-                Indices (WBGT · UTCI · HI)
+            <div className="p-3.5 rounded-[8px] bg-[#142630]/80 border border-white/[0.075]">
+              <span className="font-mono text-xl font-medium text-[#D8E8E6] block tabular-nums">
+                3
+              </span>
+              <span className="text-xs text-[#6B7C8A] block pt-1">
+                Thermal indices
               </span>
             </div>
           </div>
         </div>
 
-        {/* Left Footer Reference */}
-        <div className="relative z-10 text-xs font-mono text-[#5F7183] hidden sm:block">
-          ISO 7243 · Liljegren (2008) · IMD AWS · Open-Meteo
+        {/* Left Footer Reference with Signature Live Indicator */}
+        <div className="relative z-10 text-xs font-mono text-[#6B7C8A] hidden sm:flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#2FA37C]" />
+          <span>IMD AWS · Liljegren ISO 7243 · Open-Meteo</span>
         </div>
       </div>
 
-      {/* RIGHT COLUMN: 45% width on desktop with 3D Globe + Floating Auth Card */}
-      <div className="w-full lg:w-[45%] h-full relative bg-[#142630] flex items-center justify-center p-4 sm:p-8 lg:p-12 overflow-y-auto lg:overflow-hidden border-t lg:border-t-0 lg:border-l border-white/[0.075]">
-        {/* 3D Globe Background (Desktop only, 45% width, height 100%, pointer-events: none, slow rotate 0.02 rad/s) */}
-        <div className="hidden lg:block absolute inset-0 w-full h-full pointer-events-none z-0">
-          <motion.div
-            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9 }}
-            className="w-full h-full pointer-events-none opacity-45"
-          >
-            <Suspense fallback={<div className="w-full h-full bg-[#142630]" />}>
-              <LazyRiskGlobe height="100%" interactive={false} />
-            </Suspense>
-          </motion.div>
-        </div>
-
-        {/* Floating Auth Card with Mask Entrance Reveal */}
+      {/* RIGHT COLUMN: 48% width on desktop — Calm Authentication Chamber */}
+      <div className="w-full lg:w-[48%] h-full relative bg-[#142630] flex items-center justify-center p-4 sm:p-8 lg:p-12 overflow-y-auto lg:overflow-hidden border-t lg:border-t-0 lg:border-l border-white/[0.075]">
+        {/* Centered Auth Card */}
         <motion.div
           initial={
             prefersReducedMotion
               ? { opacity: 1 }
-              : {
-                  opacity: 0,
-                  clipPath: 'inset(0 0 100% 0)',
-                }
+              : { opacity: 0, y: 8 }
           }
           animate={{
             opacity: 1,
-            clipPath: 'inset(0 0 0 0)',
+            y: 0,
           }}
           transition={
             prefersReducedMotion
               ? { duration: 0 }
               : {
-                  duration: 0.6,
-                  delay: 0.2,
+                  duration: 0.32,
                   ease: [0.22, 1, 0.36, 1],
                 }
           }
-          className="w-full max-w-md mx-auto relative z-10 flex flex-col items-center my-auto"
+          className="w-full max-w-sm mx-auto relative z-10 flex flex-col items-center my-auto"
         >
           {/* Card Header */}
-          <div className="text-center space-y-1 mb-4">
-            <h2 className="text-lg font-bold text-white font-display">{title}</h2>
+          <div className="text-center space-y-1 mb-5 w-full">
+            <h2 className="text-lg font-medium text-white font-display">{title}</h2>
             <p className="text-xs text-[#93A3B0]">{subtitle}</p>
           </div>
 
-          {/* Children: Clerk form + DemoAccountPanel */}
+          {/* Form + Demo Panel */}
           <div className="w-full flex flex-col items-center">
             {children}
           </div>

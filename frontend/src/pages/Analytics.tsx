@@ -56,7 +56,7 @@ export const Analytics: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className={`${TYPOGRAPHY.h1} text-white`}>
-              Thermal Biometeorology & ML Analytics
+              Thermal Biometeorology &amp; Analytics
             </h1>
             <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-[#8FB3D9]/15 text-[#8FB3D9] border border-[#8FB3D9]/30">
               Synoptic Telemetry

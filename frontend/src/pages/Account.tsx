@@ -150,7 +150,7 @@ export const Account: React.FC = () => {
                 {user?.fullName || user?.firstName || 'Citizen User'}
               </h3>
               <p className="text-xs font-mono text-[#8B9AA8]">
-                {user?.primaryEmailAddress?.emailAddress || 'citizen@thermagrid.demo'}
+                {user?.primaryEmailAddress?.emailAddress || 'user@thermagrid.org'}
               </p>
             </div>
           </div>

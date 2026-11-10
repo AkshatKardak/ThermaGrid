@@ -151,9 +151,9 @@ export const LocationDetails: React.FC = () => {
       {/* 2. Side-by-Side 7/5 Split: History Diurnal Chart vs Forecast Uncertainty Chart */}
       <section className="space-y-4">
         <SectionHeader
-          label="TEMPORAL DIVERGENCE & PREDICTIVE UNCERTAINTY"
-          title="Microclimate Trajectory & ML Risk Cone"
-          lead="Historical 72-hour biometeorological divergence alongside future gradient boosting probability envelope."
+          label="Temporal divergence & predictive uncertainty"
+          title="Microclimate Trajectory & Risk Forecast Cone"
+          lead="Historical 72-hour biometeorological divergence alongside future risk probability envelope."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -179,7 +179,7 @@ export const LocationDetails: React.FC = () => {
             <Card
               tier="l1"
               title="Predictive Risk Horizon"
-              subtitle="ML forecast with 80% empirical confidence bounds"
+              subtitle="Forecast with 80% empirical confidence bounds"
             >
               {forecast?.items ? (
                 <ForecastConfidenceChart items={forecast.items} />

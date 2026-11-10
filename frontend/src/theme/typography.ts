@@ -33,8 +33,8 @@ export const TYPOGRAPHY = {
   // Default body
   body: 'font-sans text-[15px] leading-[24px] font-normal tracking-normal text-[#D7E0E7] max-w-[68ch]',
 
-  // Section labels (mono uppercase)
-  label: 'font-mono text-[12px] leading-[16px] font-medium tracking-[0.10em] uppercase text-[#8B9AA8]',
+  // Section labels (mono sentence case)
+  label: 'font-mono text-xs leading-4 font-medium text-[#6B7C8A]',
 
   // Captions & telemetry data (mono)
   micro: 'font-mono text-[11px] leading-[14px] font-medium tracking-[0.06em] text-[#5F7183]',

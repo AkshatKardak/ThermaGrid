@@ -12,24 +12,24 @@ const clerkAppearance = {
     colorTextSecondary: '#93A3B0',
     colorInputBackground: '#203A45',
     colorInputText: '#D8E8E6',
-    borderRadius: '10px',
+    borderRadius: '8px',
     fontFamily: 'IBM Plex Sans, sans-serif',
   },
   elements: {
-    card: 'bg-[#142630] border border-white/[0.075] rounded-[10px]',
-    // Hide Clerk internal header title and subtitle to eliminate duplicate "ThermaGrid" branding
+    card: 'bg-[#142630] border border-white/[0.075] rounded-[14px] shadow-none p-6 sm:p-7 w-full',
     headerTitle: 'hidden',
     headerSubtitle: 'hidden',
     socialButtonsBlockButton:
-      'bg-[#203A45] border-white/[0.075] text-white hover:bg-white/[0.06] transition-colors',
-    formFieldLabel: 'text-[#93A3B0] text-xs font-mono',
+      'bg-[#203A45] border border-white/[0.075] text-[#D8E8E6] hover:bg-white/[0.06] transition-colors rounded-[8px] text-xs font-sans font-medium h-9',
+    formFieldLabel: 'text-[#93A3B0] text-xs font-sans font-normal',
     formFieldInput:
-      'bg-[#203A45] border-white/[0.075] text-[#D8E8E6] focus:border-[#8FB3D9] focus:ring-2 focus:ring-[#8FB3D9]/20 transition-all text-xs font-mono',
-    footerActionLink: 'text-[#8FB3D9] hover:text-[#A5C4E4] transition-colors',
+      'bg-[#203A45] border border-white/[0.075] text-[#D8E8E6] focus:border-[#8FB3D9] focus:ring-1 focus:ring-[#8FB3D9] transition-colors text-xs font-sans rounded-[8px] h-9',
+    footerActionLink: 'text-[#8FB3D9] hover:text-[#A5C4E4] transition-colors font-sans text-xs',
     formButtonPrimary:
-      'bg-[#8FB3D9] hover:bg-[#A5C4E4] active:scale-[0.985] text-[#0B141B] font-bold font-mono transition-all',
+      'bg-[#8FB3D9] hover:bg-[#A5C4E4] active:scale-[0.98] text-[#0B141B] font-medium font-sans text-xs transition-colors rounded-[8px] h-9',
     dividerLine: 'bg-white/[0.075]',
-    dividerText: 'text-[#6B7C8A] text-xs font-mono',
+    dividerText: 'text-[#6B7C8A] text-xs font-sans',
+    footerAction: 'text-xs text-[#93A3B0]',
   },
 };
 
@@ -42,10 +42,10 @@ export const SignInPage: React.FC = () => {
   if (!isLoaded) {
     return (
       <AuthLayout
-        title="Municipal & Citizen Telemetry Access"
-        subtitle="Sign in to view real-time ward early warnings and biometeorological matrices."
+        title="Sign in"
+        subtitle="Access municipal heat intelligence and live ward advisories"
       >
-        <div className="w-full flex justify-center py-12 text-[#6B7C8A] font-mono text-xs">
+        <div className="w-full flex justify-center py-12 text-[#6B7C8A] text-xs">
           Loading authentication state...
         </div>
       </AuthLayout>
@@ -58,8 +58,8 @@ export const SignInPage: React.FC = () => {
 
   return (
     <AuthLayout
-      title="Municipal & Citizen Telemetry Access"
-      subtitle="Sign in to view real-time ward early warnings and biometeorological matrices."
+      title="Sign in"
+      subtitle="Access municipal heat intelligence and live ward advisories"
     >
       <div className="w-full flex flex-col items-center">
         <SignIn
