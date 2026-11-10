@@ -112,9 +112,16 @@ def get_night_risk(
         }
 
     # Extract hours between 20:00 tonight and 06:00 tomorrow morning
+    try:
+        from src.thermal_indices.wbgt import calculate_wbgt
+    except ImportError:
+        from analytics.src.thermal_indices.wbgt import calculate_wbgt
+
     overnight_samples = []
     for it in hourly[:36]:
-        ts = it.get("timestamp", "")
+        ts = it.get("time") or it.get("timestamp")
+        if not ts:
+            raise KeyError("Forecast hourly record missing 'time' field")
         h = None
         try:
             if "T" in ts:
@@ -126,12 +133,31 @@ def get_night_risk(
 
         if h is not None and (h >= 20 or h <= 6):
             time_label = f"{h:02d}:00"
-            temp = it.get("temperature_c", 28.0)
+            temp_val = it.get("temperature_c")
+            if temp_val is None:
+                raise KeyError("Forecast hourly record missing 'temperature_c' field")
+            temp = float(temp_val)
+            wbgt_val = it.get("wbgt_c")
+            if wbgt_val is None:
+                rh = it.get("rel_humidity_pct")
+                ws = it.get("wind_speed_ms", 1.0)
+                sol = it.get("solar_radiation_wm2", 0.0)
+                if rh is not None:
+                    wbgt_res = calculate_wbgt(
+                        temp_c=temp,
+                        rel_humidity_pct=float(rh),
+                        wind_speed_ms=float(ws),
+                        solar_radiation_wm2=float(sol),
+                    )
+                    wbgt_val = wbgt_res["wbgt"]
+                else:
+                    wbgt_val = None
+
             overnight_samples.append({
                 "time": time_label,
                 "hour": h,
                 "temp_c": round(float(temp), 1),
-                "wbgt_c": round(float(it.get("wbgt_c", temp * 0.82)), 1),
+                "wbgt_c": round(float(wbgt_val), 1) if wbgt_val is not None else None,
                 "timestamp": ts,
             })
 

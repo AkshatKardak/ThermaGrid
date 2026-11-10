@@ -16,6 +16,7 @@ router = APIRouter(prefix="/worker", tags=["Worker Safety"])
 
 
 @router.get("/shift-card")
+@router.get("/shift-plan")
 def get_worker_shift_card(
     location_id: int = Query(1, description="Ward Location ID"),
     met: float = Query(6.0, ge=1.0, le=12.0, description="Metabolic work rate in MET"),
@@ -49,7 +50,9 @@ def get_worker_shift_card(
 
     shift_items = []
     for it in items[:24]:
-        ts = it.get("timestamp", "")
+        ts = it.get("time") or it.get("timestamp")
+        if not ts:
+            continue
         h = None
         try:
             if "T" in ts:
@@ -60,22 +63,52 @@ def get_worker_shift_card(
             continue
 
         if h is not None and start_h <= h <= end_h:
-            wbgt = it.get("wbgt_c", 28.0)
+            wbgt = it.get("predicted_wbgt")
+            if wbgt is None:
+                wbgt = it.get("wbgt_c")
+            if wbgt is None:
+                temp_val = it.get("temperature_c")
+                rh_val = it.get("rel_humidity_pct", 50.0)
+                if temp_val is not None:
+                    try:
+                        from src.thermal_indices.wbgt import calculate_wbgt
+                    except ImportError:
+                        from analytics.src.thermal_indices.wbgt import calculate_wbgt
+                    wbgt = calculate_wbgt(
+                        temp_c=float(temp_val),
+                        rel_humidity_pct=float(rh_val),
+                        wind_speed_ms=1.0,
+                        solar_radiation_wm2=0.0,
+                    )["wbgt"]
+                else:
+                    raise KeyError("Forecast item missing WBGT and temperature")
+            wbgt = float(wbgt)
             # Direct sun adds ~1.5°C effective thermal load if exposed
             eff_wbgt = wbgt + (1.5 if exposure.lower() == "sun" else 0.0)
+
+            temp_val = it.get("temperature_c")
+            if temp_val is None:
+                raise KeyError("Forecast item missing 'temperature_c'")
+
+            risk_val = it.get("predicted_risk_score")
+            if risk_val is None:
+                risk_val = it.get("risk_score")
+            if risk_val is None:
+                raise KeyError("Forecast item missing risk score")
+
             shift_items.append({
                 "hour": h,
                 "time": f"{h:02d}:00",
                 "wbgt_c": round(eff_wbgt, 1),
-                "temperature_c": round(it.get("temperature_c", 30.0), 1),
-                "risk_score": round(it.get("risk_score", 50.0), 1),
+                "temperature_c": round(float(temp_val), 1),
+                "risk_score": round(float(risk_val), 1),
             })
 
     if not shift_items:
-        shift_items = [
-            {"hour": h, "time": f"{h:02d}:00", "wbgt_c": 29.5, "temperature_c": 33.0, "risk_score": 62.0}
-            for h in range(start_h, min(end_h + 1, start_h + 9))
-        ]
+        raise HTTPException(
+            status_code=404,
+            detail="No hourly forecast telemetry found for the requested shift hours",
+        )
 
     max_shift_wbgt = max(s["wbgt_c"] for s in shift_items)
 
@@ -96,31 +129,36 @@ def get_worker_shift_card(
             heavy_work_after = s["time"]
             break
 
-    # Build ISO 7243 rest schedule intervals
+    # Build ISO 7243 rest schedule intervals adjusted for metabolic rate and radiant exposure
     breaks: List[Dict[str, str]] = []
     # Morning break
     m_hour = min(start_h + 2, 11)
+    m_dur = 30 if (met >= 7.0 or max_shift_wbgt >= 30.0) else 20
     breaks.append({
         "start": f"{m_hour:02d}:00",
-        "end": f"{m_hour:02d}:20",
-        "duration": "20 min",
-        "reason": "Mid-morning hydration & physiological recovery",
+        "end": f"{m_hour:02d}:{m_dur:02d}",
+        "duration": f"{m_dur} min",
+        "reason": "Mid-morning hydration & physiological recovery" + (" (extended for heavy exertion)" if met >= 7.0 else ""),
     })
 
     # Peak afternoon break
+    p_dur = 90 if (met >= 7.0 or exposure.lower() == "sun" or max_shift_wbgt >= 32.0) else 75
+    p_end_min = (15 + (p_dur - 75)) % 60
+    p_end_hr = 14 + ((15 + (p_dur - 75)) // 60)
     breaks.append({
         "start": "13:00",
-        "end": "14:15",
-        "duration": "75 min",
-        "reason": "Peak diurnal solar irradiance suspension",
+        "end": f"{p_end_hr:02d}:{p_end_min:02d}",
+        "duration": f"{p_dur} min",
+        "reason": "Peak diurnal solar irradiance suspension" + (" (extended for sun exposure / heavy exertion)" if (met >= 7.0 or exposure.lower() == "sun") else ""),
     })
 
     # Late afternoon break
     if end_h >= 16:
+        a_dur = 30 if (met >= 7.0 or max_shift_wbgt >= 30.0) else 20
         breaks.append({
             "start": "15:45",
-            "end": "16:05",
-            "duration": "20 min",
+            "end": f"16:{5 + (a_dur - 20):02d}",
+            "duration": f"{a_dur} min",
             "reason": "Afternoon electrolytic replenishment",
         })
 

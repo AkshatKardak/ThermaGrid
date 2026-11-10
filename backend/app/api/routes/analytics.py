@@ -97,16 +97,30 @@ def get_vulnerability_analytics(
     wards = db.query(Location).filter(Location.city.ilike(f"%{city}%")).all()
     records = []
     for w in wards:
+        reasons = {}
+        if w.informal_settlement_ratio is None:
+            reasons["informal_settlement_pct"] = "unavailable: no ward-level informal settlement dataset"
+        if w.tree_canopy_fraction is None:
+            reasons["tree_canopy_pct"] = "unavailable: no high-resolution canopy dataset"
+            reasons["canopy_deficit_pct"] = "unavailable: requires tree canopy fraction"
+        if w.elderly_ratio is None or w.children_ratio is None:
+            reasons["elderly_children_pct"] = "unavailable: age group data incomplete in ward PCA"
+        if w.cooling_access_deficit is None:
+            reasons["cooling_deficit_pct"] = "unavailable: cooling access survey unavailable"
+        if w.hospital_count is None:
+            reasons["hospitals_count"] = "unavailable: facility registry not linked"
+
         records.append({
             "ward_id": w.id,
             "ward_name": w.ward_name,
             "ward_code": w.ward_code,
-            "informal_settlement_pct": round(w.informal_settlement_ratio * 100, 1),
-            "tree_canopy_pct": round(w.tree_canopy_fraction * 100, 1),
-            "canopy_deficit_pct": round((1.0 - w.tree_canopy_fraction) * 100, 1),
-            "elderly_children_pct": round((w.elderly_ratio + w.children_ratio) * 100, 1),
-            "cooling_deficit_pct": round(w.cooling_access_deficit * 100, 1),
+            "informal_settlement_pct": round(w.informal_settlement_ratio * 100, 1) if w.informal_settlement_ratio is not None else None,
+            "tree_canopy_pct": round(w.tree_canopy_fraction * 100, 1) if w.tree_canopy_fraction is not None else None,
+            "canopy_deficit_pct": round((1.0 - w.tree_canopy_fraction) * 100, 1) if w.tree_canopy_fraction is not None else None,
+            "elderly_children_pct": round(((w.elderly_ratio or 0.0) + (w.children_ratio or 0.0)) * 100, 1) if (w.elderly_ratio is not None and w.children_ratio is not None) else None,
+            "cooling_deficit_pct": round(w.cooling_access_deficit * 100, 1) if w.cooling_access_deficit is not None else None,
             "hospitals_count": w.hospital_count,
+            "unavailable_reasons": reasons if reasons else None,
         })
 
     return {

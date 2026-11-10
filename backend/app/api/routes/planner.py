@@ -107,11 +107,20 @@ def get_safe_windows(
             break
         window_slice = horizon[i:end_idx]
 
-        # max risk across every hourly sample in the window
-        peak_risk = max(float(w.get("risk_score", 0.0)) for w in window_slice)
-        mean_risk = sum(float(w.get("risk_score", 0.0)) for w in window_slice) / len(window_slice)
+        def _get_item_risk(item: dict) -> float:
+            if "predicted_risk_score" in item and item["predicted_risk_score"] is not None:
+                return float(item["predicted_risk_score"])
+            if "risk_score" in item and item["risk_score"] is not None:
+                return float(item["risk_score"])
+            raise KeyError("Missing required risk score key ('predicted_risk_score') in forecast item")
 
-        start_ts = window_slice[0].get("timestamp", "")
+        # max risk across every hourly sample in the window
+        peak_risk = max(_get_item_risk(w) for w in window_slice)
+        mean_risk = sum(_get_item_risk(w) for w in window_slice) / len(window_slice)
+
+        start_ts = window_slice[0].get("time") or window_slice[0].get("timestamp")
+        if not start_ts:
+            raise KeyError("Missing required time key ('time') in forecast item")
         # Compute nice formatted hour string or ISO
         start_hour = i
         start_str = f"{i:02d}:00"

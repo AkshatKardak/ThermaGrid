@@ -113,7 +113,7 @@ def create_application() -> FastAPI:
 
     # Mount API Routers
     api_prefix = settings.api_v1_prefix
-    for prefix in set([api_prefix, "/api"]):
+    for prefix in set([api_prefix, "/api", ""]):
         app.include_router(auth_router, prefix=prefix)
         app.include_router(locations_router, prefix=prefix)
         app.include_router(weather_router, prefix=prefix)
