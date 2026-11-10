@@ -142,3 +142,13 @@ def test_vulnerability_analytics_no_500():
         "hospitals_count",
     ]:
         assert key in first_ward
+
+
+def test_auth_test_token_backdoor_eliminated():
+    """2.1: Literal test_authority_jwt_token must be rejected with 401 even when TESTING=true."""
+    headers = {"Authorization": "Bearer test_authority_jwt_token"}
+    resp = client.get("/api/v1/auth/me", headers=headers)
+    assert resp.status_code == 401
+
+    resp_auth_only = client.get("/api/v1/auth/authority-only", headers=headers)
+    assert resp_auth_only.status_code == 401

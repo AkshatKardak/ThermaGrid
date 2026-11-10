@@ -15,6 +15,32 @@ sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 from app.main import app
 from app.db.seed import seed_database
 from app.services.alert_service import maybe_alert
+import app.core.auth as auth_module
+import jwt
+from cryptography.hazmat.primitives.asymmetric import rsa
+
+# Setup real RS256 token signer for integration tests
+_TEST_PRIVATE_KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+_TEST_PUBLIC_KEY = _TEST_PRIVATE_KEY.public_key()
+
+class _MockSigningKey:
+    def __init__(self, key):
+        self.key = key
+
+class _MockJWKSClient:
+    def get_signing_key_from_jwt(self, token: str):
+        return _MockSigningKey(_TEST_PUBLIC_KEY)
+
+auth_module._jwks = _MockJWKSClient()
+
+def mint_test_jwt(sub: str, role: str) -> str:
+    payload = {
+        "sub": sub,
+        "role": role,
+        "public_metadata": {"role": role},
+        "is_demo": True,
+    }
+    return jwt.encode(payload, _TEST_PRIVATE_KEY, algorithm="RS256")
 
 # Ensure database is seeded for test runs
 seed_database()
@@ -118,7 +144,7 @@ def test_clerk_auth_me():
     assert resp_unauth.status_code == 401
 
     # Calling with valid bearer token returns user profile
-    headers = {"Authorization": "Bearer test_authority_jwt_token"}
+    headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_authority', 'authority')}"}
     resp_auth = client.get("/api/v1/auth/me", headers=headers)
     assert resp_auth.status_code == 200
     data = resp_auth.json()
@@ -128,12 +154,12 @@ def test_clerk_auth_me():
 
 def test_role_guard_authority_403_for_citizens():
     # Citizen token accessing authority endpoint gets 403 Forbidden
-    citizen_headers = {"Authorization": "Bearer test_citizen_jwt_token"}
+    citizen_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_citizen', 'citizen')}"}
     resp = client.get("/api/v1/auth/authority-only", headers=citizen_headers)
     assert resp.status_code == 403
 
     # Authority token gets 200 OK
-    auth_headers = {"Authorization": "Bearer test_authority_jwt_token"}
+    auth_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_authority', 'authority')}"}
     resp_ok = client.get("/api/v1/auth/authority-only", headers=auth_headers)
     assert resp_ok.status_code == 200
     assert resp_ok.json()["status"] == "authorized"
@@ -198,8 +224,8 @@ def test_indoor_heat_archetype():
 
 
 def test_subscriptions_user_scoping_and_validation():
-    user1_headers = {"Authorization": "Bearer test_authority_jwt_token"}
-    user2_headers = {"Authorization": "Bearer test_citizen_jwt_token"}
+    user1_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_authority', 'authority')}"}
+    user2_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_citizen', 'citizen')}"}
 
     # Validation: missing destination must return 422
     invalid_res = client.post(
@@ -242,8 +268,8 @@ def test_subscriptions_user_scoping_and_validation():
 
 
 def test_dependents_care_circle_scoping():
-    user1_headers = {"Authorization": "Bearer test_authority_jwt_token"}
-    user2_headers = {"Authorization": "Bearer test_citizen_jwt_token"}
+    user1_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_authority', 'authority')}"}
+    user2_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_citizen', 'citizen')}"}
 
     # User 1 adds a dependent
     dep_res = client.post(
