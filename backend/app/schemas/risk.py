@@ -19,6 +19,8 @@ class RiskCurrentOut(BaseModel):
     city: str
     ward_name: str
     ward_code: str
+    level: Optional[str] = "ward"
+    parent_code: Optional[str] = None
     calculated_for: datetime
     risk_score: float
     band: str
@@ -33,7 +35,7 @@ class RiskCurrentOut(BaseModel):
     wbgt_c: float
     utci_c: float
     confidence: float
-    sub_scores: Optional[Dict[str, float]] = None
+    sub_scores: Optional[Dict[str, Optional[float]]] = None
     diagnostics: Optional[Dict[str, float]] = None
     is_demo: bool = False
     demo_label: Optional[str] = None

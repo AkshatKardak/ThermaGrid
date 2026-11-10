@@ -17,7 +17,7 @@ from src.ingestion.open_meteo import OpenMeteoClient
 from app.models.location import Location
 from app.models.weather import WeatherObservation
 from app.core.config import get_settings
-from app.core.errors import DataSourceUnavailable
+from app.core.errors import DataSourceUnavailable, WeatherUnavailableError
 
 settings = get_settings()
 open_meteo_client = OpenMeteoClient(base_url=settings.OPEN_METEO_BASE_URL)
@@ -43,43 +43,76 @@ class WeatherService:
         if not location:
             raise ValueError(f"Location ID {location_id} not found.")
 
-        # Query Open-Meteo
-        weather_data = open_meteo_client.fetch_current_and_forecast(
-            latitude=location.latitude,
-            longitude=location.longitude,
-            forecast_days=1,
-        )
+        allow_synth = bool(
+            getattr(settings, "allow_synthetic_risk", False)
+            or settings.app_env in ["development", "testing"]
+        ) if not for_risk else bool(getattr(settings, "allow_synthetic_risk", False))
+
+        try:
+            weather_data = open_meteo_client.fetch_current_and_forecast(
+                latitude=location.latitude,
+                longitude=location.longitude,
+                forecast_days=1,
+                allow_synthetic=allow_synth,
+            )
+        except Exception as e:
+            # Check if DB has a recent cached observation
+            last_obs = (
+                db.query(WeatherObservation)
+                .filter(WeatherObservation.location_id == location_id)
+                .order_by(WeatherObservation.recorded_at.desc())
+                .first()
+            )
+            if last_obs and last_obs.recorded_at:
+                rec_at = last_obs.recorded_at
+                if rec_at.tzinfo is None:
+                    rec_at = rec_at.replace(tzinfo=timezone.utc)
+                age_minutes = int((datetime.now(timezone.utc) - rec_at).total_seconds() / 60)
+                if age_minutes <= getattr(settings, "max_observation_age_min", 180):
+                    return {
+                        "location_id": location.id,
+                        "city": location.city,
+                        "ward_name": location.ward_name,
+                        "latitude": location.latitude,
+                        "longitude": location.longitude,
+                        "recorded_at": rec_at,
+                        "temperature_c": float(last_obs.temperature_c),
+                        "rel_humidity_pct": float(last_obs.rel_humidity_pct),
+                        "wind_speed_ms": float(last_obs.wind_speed_ms),
+                        "solar_radiation_wm2": float(last_obs.solar_radiation_wm2),
+                        "apparent_temperature_c": (
+                            float(last_obs.apparent_temperature_c)
+                            if last_obs.apparent_temperature_c is not None
+                            else None
+                        ),
+                        "source_name": "cached_observation",
+                        "is_demo": False,
+                        "is_synthetic": False,
+                        "demo_label": None,
+                        "stale": True,
+                        "age_minutes": age_minutes,
+                        "completeness": 1.0,
+                    }
+            raise WeatherUnavailableError(f"Upstream weather service unavailable: {e}") from e
 
         curr = weather_data.get("current_weather", {})
         temp = curr.get("temperature")
         wind = curr.get("windspeed")
-        
+
         # Hourly slice for humidity & solar radiation
         hourly = weather_data.get("hourly", {})
         rhs = hourly.get("relative_humidity_2m", [])
         sols = hourly.get("shortwave_radiation_instant", [])
         apps = hourly.get("apparent_temperature", [])
 
-        if for_risk:
-            if temp is None:
-                raise DataSourceUnavailable("Missing temperature in upstream observation")
-            if wind is None:
-                raise DataSourceUnavailable("Missing wind speed in upstream observation")
-            if not rhs or rhs[0] is None:
-                raise DataSourceUnavailable("Missing relative humidity in upstream observation")
-            if not sols or sols[0] is None:
-                raise DataSourceUnavailable("Missing solar radiation in upstream observation")
-            rh = rhs[0]
-            sol = sols[0]
-            app_t = apps[0] if (apps and apps[0] is not None) else (temp + 4.0)
-        else:
-            if temp is None:
-                temp = 34.5
-            if wind is None:
-                wind = 2.2
-            rh = rhs[0] if (rhs and rhs[0] is not None) else 55.0
-            sol = sols[0] if (sols and sols[0] is not None) else 650.0
-            app_t = apps[0] if (apps and apps[0] is not None) else (temp + 4.0)
+        rh = rhs[0] if (rhs and rhs[0] is not None) else None
+        sol = sols[0] if (sols and sols[0] is not None) else None
+        app_t = apps[0] if (apps and apps[0] is not None) else None
+
+        if temp is None or wind is None or rh is None or sol is None:
+            raise WeatherUnavailableError(
+                "Upstream observation incomplete: missing required meteorological fields"
+            )
 
         is_demo = weather_data.get("is_demo", False)
         demo_label = weather_data.get("demo_label", None) if is_demo else None
@@ -96,11 +129,12 @@ class WeatherService:
             "rel_humidity_pct": float(rh),
             "wind_speed_ms": float(wind),
             "solar_radiation_wm2": float(sol),
-            "apparent_temperature_c": float(app_t),
+            "apparent_temperature_c": float(app_t) if app_t is not None else None,
             "source_name": source_name,
             "is_demo": is_demo,
             "is_synthetic": is_demo,
             "demo_label": demo_label,
+            "stale": False,
             "age_minutes": weather_data.get("age_minutes", 0),
             "completeness": weather_data.get("completeness", 1.0),
         }
@@ -119,11 +153,20 @@ class WeatherService:
         if not location:
             raise ValueError(f"Location ID {location_id} not found.")
 
-        data = open_meteo_client.fetch_current_and_forecast(
-            latitude=location.latitude,
-            longitude=location.longitude,
-            forecast_days=days,
+        allow_synth = bool(
+            getattr(settings, "allow_synthetic_risk", False)
+            or settings.app_env in ["development", "testing"]
         )
+
+        try:
+            data = open_meteo_client.fetch_current_and_forecast(
+                latitude=location.latitude,
+                longitude=location.longitude,
+                forecast_days=days,
+                allow_synthetic=allow_synth,
+            )
+        except Exception as e:
+            raise WeatherUnavailableError(f"Upstream forecast service unavailable: {e}") from e
 
         hourly = data.get("hourly", {})
         times = hourly.get("time", [])
@@ -132,14 +175,19 @@ class WeatherService:
         winds = hourly.get("wind_speed_10m", [])
         sols = hourly.get("shortwave_radiation_instant", [])
 
+        if not times or not temps:
+            raise WeatherUnavailableError(
+                "Upstream forecast incomplete: missing hourly time-series"
+            )
+
         items = []
         for i in range(len(times)):
             items.append({
                 "time": times[i],
                 "temperature_c": float(temps[i]),
-                "rel_humidity_pct": float(rhs[i]),
-                "wind_speed_ms": float(winds[i]),
-                "solar_radiation_wm2": float(sols[i]),
+                "rel_humidity_pct": float(rhs[i]) if (rhs and i < len(rhs) and rhs[i] is not None) else None,
+                "wind_speed_ms": float(winds[i]) if (winds and i < len(winds) and winds[i] is not None) else None,
+                "solar_radiation_wm2": float(sols[i]) if (sols and i < len(sols) and sols[i] is not None) else None,
             })
 
         is_demo = data.get("is_demo", False)

@@ -18,8 +18,13 @@ from app.services.forecast_service import ForecastService
 
 router = APIRouter(prefix="/planner", tags=["Planner"])
 
+PROJECT_ROOT = os.path.dirname(
+    os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    )
+)
 CONFIG_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+    PROJECT_ROOT,
     "analytics",
     "config",
     "weights.yaml",
@@ -27,20 +32,14 @@ CONFIG_PATH = os.path.join(
 
 
 def _load_thresholds() -> Dict[str, Any]:
-    default_thresholds = {
-        "exercise": {"threshold": 45, "description": "High metabolic load"},
-        "work": {"threshold": 50, "description": "Occupational labor"},
-        "walk": {"threshold": 60, "description": "Low-intensity errands"},
-        "commute": {"threshold": 65, "description": "Transit with shade"},
-    }
-    if os.path.exists(CONFIG_PATH):
-        try:
-            with open(CONFIG_PATH, "r") as f:
-                cfg = yaml.safe_load(f)
-                return cfg.get("planner", {}).get("activity_thresholds", default_thresholds)
-        except Exception:
-            return default_thresholds
-    return default_thresholds
+    if not os.path.exists(CONFIG_PATH):
+        raise FileNotFoundError(f"Configuration file not found at {CONFIG_PATH}")
+    with open(CONFIG_PATH, "r") as f:
+        cfg = yaml.safe_load(f)
+        thresholds = cfg.get("planner", {}).get("activity_thresholds")
+        if not thresholds:
+            raise ValueError(f"Missing activity_thresholds in {CONFIG_PATH}")
+        return thresholds
 
 
 def _band_from_score(score: float) -> str:

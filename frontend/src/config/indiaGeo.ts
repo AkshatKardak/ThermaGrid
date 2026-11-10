@@ -239,6 +239,86 @@ export const INDIAN_STATES: StateGeo[] = [
       { name: 'Puducherry', lat: 11.9416, lng: 79.8083 },
     ],
   },
+  {
+    name: 'Andaman and Nicobar Islands',
+    code: 'AN',
+    cities: [
+      { name: 'Port Blair', lat: 11.6234, lng: 92.7265 },
+    ],
+  },
+  {
+    name: 'Arunachal Pradesh',
+    code: 'AR',
+    cities: [
+      { name: 'Itanagar', lat: 27.0844, lng: 93.6053 },
+    ],
+  },
+  {
+    name: 'Dadra and Nagar Haveli and Daman and Diu',
+    code: 'DNHDD',
+    cities: [
+      { name: 'Daman', lat: 20.3974, lng: 72.8328 },
+      { name: 'Silvassa', lat: 20.2763, lng: 73.0083 },
+    ],
+  },
+  {
+    name: 'Ladakh',
+    code: 'LA',
+    cities: [
+      { name: 'Leh', lat: 34.1526, lng: 77.5771 },
+      { name: 'Kargil', lat: 34.5539, lng: 76.1349 },
+    ],
+  },
+  {
+    name: 'Lakshadweep',
+    code: 'LD',
+    cities: [
+      { name: 'Kavaratti', lat: 10.5667, lng: 72.6417 },
+    ],
+  },
+  {
+    name: 'Manipur',
+    code: 'MN',
+    cities: [
+      { name: 'Imphal', lat: 24.8170, lng: 93.9368 },
+    ],
+  },
+  {
+    name: 'Meghalaya',
+    code: 'ML',
+    cities: [
+      { name: 'Shillong', lat: 25.5788, lng: 91.8933 },
+    ],
+  },
+  {
+    name: 'Mizoram',
+    code: 'MZ',
+    cities: [
+      { name: 'Aizawl', lat: 23.7271, lng: 92.7176 },
+    ],
+  },
+  {
+    name: 'Nagaland',
+    code: 'NL',
+    cities: [
+      { name: 'Kohima', lat: 25.6751, lng: 94.1086 },
+      { name: 'Dimapur', lat: 25.9094, lng: 93.7266 },
+    ],
+  },
+  {
+    name: 'Sikkim',
+    code: 'SK',
+    cities: [
+      { name: 'Gangtok', lat: 27.3314, lng: 88.6138 },
+    ],
+  },
+  {
+    name: 'Tripura',
+    code: 'TR',
+    cities: [
+      { name: 'Agartala', lat: 23.8315, lng: 91.2868 },
+    ],
+  },
 ];
 
 export function getCitiesForState(stateName: string): CityGeo[] {

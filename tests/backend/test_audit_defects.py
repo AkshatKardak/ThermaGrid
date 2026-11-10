@@ -152,3 +152,92 @@ def test_auth_test_token_backdoor_eliminated():
 
     resp_auth_only = client.get("/api/v1/auth/authority-only", headers=headers)
     assert resp_auth_only.status_code == 401
+
+
+def test_weather_outage_returns_503():
+    """3.5a: Upstream weather outage returns 503 with retry_after header, not 500."""
+    from app.services.weather_service import WeatherService
+    from app.core.errors import WeatherUnavailableError
+
+    with patch.object(WeatherService, "get_current_weather", side_effect=WeatherUnavailableError("Open-Meteo API unreachable")):
+        resp = client.get("/api/v1/weather/current?location_id=1")
+        assert resp.status_code == 503
+        data = resp.json()
+        assert data.get("upstream_outage") is True
+        assert "retry_after" in data
+        assert resp.headers.get("retry-after") == "300"
+
+
+def test_national_coverage_all_36_states_and_uts():
+    """3.6: All 28 states and 8 union territories are represented at district tier."""
+    resp = client.get("/api/v1/locations")
+    assert resp.status_code == 200
+    locations = resp.json()
+
+    states = {loc["state"] for loc in locations}
+    # 28 states + 8 UTs = 36 entities
+    assert len(states) >= 36
+
+    # Verify every state has at least one district
+    district_locs = [loc for loc in locations if loc.get("level") == "district"]
+    assert len(district_locs) >= 36
+
+
+def test_no_location_claims_ward_level_without_polygon():
+    """3.6: No location claims level='ward' without a real polygon."""
+    resp = client.get("/api/v1/locations")
+    assert resp.status_code == 200
+    locations = resp.json()
+
+    for loc in locations:
+        if loc.get("level") == "ward":
+            geom = loc.get("geometry_geojson")
+            assert geom is not None, f"Ward {loc['ward_code']} missing geometry"
+            assert geom.get("type") in ["Polygon", "MultiPolygon"], f"Ward {loc['ward_code']} invalid geometry type"
+            assert len(geom.get("coordinates", [])) > 0
+
+
+def test_synthetic_data_rejected_when_not_allowed_in_dev():
+    """3.2: Synthetic data must be rejected for live risk unless explicitly allowed."""
+    from app.core.config import get_settings
+    settings = get_settings()
+    orig = settings.allow_synthetic_risk
+    try:
+        settings.allow_synthetic_risk = False
+        resp = client.get("/api/v1/risk/current?location_id=1")
+        assert resp.status_code == 503
+        data = resp.json()
+        assert "Synthetic observations cannot drive a live risk score" in data.get("detail", "")
+    finally:
+        settings.allow_synthetic_risk = orig
+
+
+def test_hospital_and_water_deficit_null_when_unsourced():
+    """3.5b: hospital_count and drinking_water_deficit must be null rather than fabricated numbers."""
+    resp = client.get("/api/v1/locations")
+    assert resp.status_code == 200
+    locations = resp.json()
+
+    # Mumbai wards have un-sourced hospital_count and drinking_water_deficit
+    mumbai_wards = [l for l in locations if l.get("city") == "Mumbai" and l.get("level") == "ward"]
+    assert len(mumbai_wards) > 0
+    for w in mumbai_wards:
+        assert w.get("hospital_count") is None
+        assert w.get("drinking_water_deficit") is None
+
+
+def test_risk_all_does_not_mix_levels():
+    """3.6: /risk/all never mixes levels in a single aggregate."""
+    resp_wards = client.get("/api/v1/risk/all?level=ward")
+    assert resp_wards.status_code == 200
+    wards_data = resp_wards.json()
+    assert len(wards_data) > 0
+    for w in wards_data:
+        assert w.get("level") == "ward"
+
+    resp_districts = client.get("/api/v1/risk/all?level=district")
+    assert resp_districts.status_code == 200
+    districts_data = resp_districts.json()
+    assert len(districts_data) > 0
+    for d in districts_data:
+        assert d.get("level") == "district"

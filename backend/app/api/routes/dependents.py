@@ -31,8 +31,8 @@ def _enrich_dependent(dep: Dependent, db: Session) -> Dict[str, Any]:
                 risk_score = curr_risk.get("risk_score")
                 band = curr_risk.get("band", "moderate")
             except Exception:
-                risk_score = 52.0
-                band = "moderate"
+                risk_score = None
+                band = "unavailable"
 
     return {
         "id": dep.id,

@@ -18,8 +18,13 @@ from app.schemas.risk import RiskCurrentOut, RiskForecastOut
 
 router = APIRouter(prefix="/risk", tags=["Thermal Risk"])
 
+PROJECT_ROOT = os.path.dirname(
+    os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    )
+)
 ARCHETYPES_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+    PROJECT_ROOT,
     "analytics",
     "config",
     "building_archetypes.yaml",
@@ -58,19 +63,13 @@ NIGHT_GUIDANCE_TEMPLATES = {
 
 
 def _load_archetypes() -> Dict[str, Any]:
-    defaults = {
-        "tin_roof_top_floor": {"indoor_delta_c": 6.0, "lag_hours": 2.5, "basis": "assumption — calibrate with field data"},
-        "rcc_top_floor": {"indoor_delta_c": 4.0, "lag_hours": 2.0, "basis": "assumption"},
-        "rcc_ground_floor": {"indoor_delta_c": 1.5, "lag_hours": 3.0, "basis": "assumption"},
-        "with_ac": {"indoor_delta_c": -3.0, "lag_hours": 1.0, "basis": "assumption"},
-    }
-    if os.path.exists(ARCHETYPES_PATH):
-        try:
-            with open(ARCHETYPES_PATH, "r") as f:
-                return yaml.safe_load(f) or defaults
-        except Exception:
-            return defaults
-    return defaults
+    if not os.path.exists(ARCHETYPES_PATH):
+        raise FileNotFoundError(f"Archetypes configuration file not found at {ARCHETYPES_PATH}")
+    with open(ARCHETYPES_PATH, "r") as f:
+        archetypes = yaml.safe_load(f)
+        if not archetypes:
+            raise ValueError(f"Missing building archetypes in {ARCHETYPES_PATH}")
+        return archetypes
 
 
 @router.get("/current", response_model=RiskCurrentOut)
@@ -292,12 +291,14 @@ def get_risk_forecast(
 @router.get("/all", response_model=List[RiskCurrentOut])
 def get_all_wards_risk(
     city: Optional[str] = Query(None, description="Filter by city, e.g. Mumbai"),
+    level: Optional[str] = Query(None, description="Filter by hierarchy level ('ward' | 'district' | 'state')"),
     db: Session = Depends(get_db),
 ):
     """
-    Returns current risk score ranking across all wards in a city for authority prioritization.
+    Returns current risk score ranking across all locations for authority prioritization.
+    Never mixes hierarchy tiers in a single aggregate.
     """
-    return RiskService.get_all_wards_risk(db, city=city)
+    return RiskService.get_all_wards_risk(db, city=city, level=level)
 
 
 @router.get("/{location_id}", response_model=RiskCurrentOut)

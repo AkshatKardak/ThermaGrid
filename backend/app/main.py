@@ -92,6 +92,22 @@ def create_application() -> FastAPI:
         logger.info(f"{request.method} {request.url.path} completed in {process_time:.4f}s [status {response.status_code}]")
         return response
 
+    # Upstream data / weather outage exception handler
+    from app.core.errors import DataSourceUnavailable
+    @app.exception_handler(DataSourceUnavailable)
+    async def weather_unavailable_handler(request: Request, exc: DataSourceUnavailable):
+        logger.warning(f"Upstream outage at {request.url.path}: {exc}")
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "detail": str(exc),
+                "retry_after": 300,
+                "stale": False,
+                "upstream_outage": True,
+            },
+            headers={"Retry-After": "300"},
+        )
+
     # Global Exception Handler
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):

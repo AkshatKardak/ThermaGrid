@@ -25,6 +25,9 @@ class _MockJWKSClient:
 
 auth_module._jwks = _MockJWKSClient()
 
+from app.core.config import get_settings
+get_settings().allow_synthetic_risk = True
+
 
 def mint_test_jwt(sub: str, role: str) -> str:
     payload = {

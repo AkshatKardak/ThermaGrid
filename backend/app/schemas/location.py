@@ -23,8 +23,10 @@ class LocationBase(BaseModel):
     elderly_ratio: Optional[float] = None
     children_ratio: Optional[float] = None
     cooling_access_deficit: Optional[float] = None
-    hospital_count: int
-    drinking_water_deficit: float
+    hospital_count: Optional[int] = None
+    drinking_water_deficit: Optional[float] = None
+    level: str = "ward"
+    parent_code: Optional[str] = None
     description: Optional[str] = None
 
 

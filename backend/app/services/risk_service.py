@@ -66,11 +66,37 @@ class RiskService:
             is_demo=weather["is_demo"],
         )
 
+        # Dynamic confidence based on observation provenance and data completeness
+        is_demo = weather.get("is_demo", False)
+        if is_demo:
+            confidence = 0.50
+        else:
+            completeness = float(weather.get("completeness", 1.0))
+            age_min = weather.get("age_minutes", 0)
+            freshness = max(0.5, 1.0 - (age_min / 360.0))
+            confidence = round(0.95 * completeness * freshness, 2)
+
+        # Adaptive capacity derived honestly from cooling access deficit if available
+        adaptive_cap = (
+            round(100.0 * (1.0 - location.cooling_access_deficit), 1)
+            if location.cooling_access_deficit is not None
+            else None
+        )
+
+        sub_scores = {
+            "thermal_hazard": risk_calc["hazard_score"],
+            "population_exposure": round(risk_calc["exposure_index"] * 100.0, 1),
+            "social_vulnerability": round(risk_calc["vulnerability_index"] * 100.0, 1),
+            "adaptive_capacity": adaptive_cap,
+        }
+
         return {
             "location_id": location.id,
             "city": location.city,
             "ward_name": location.ward_name,
             "ward_code": location.ward_code,
+            "level": location.level or "ward",
+            "parent_code": location.parent_code,
             "calculated_for": datetime.now(timezone.utc),
             "risk_score": risk_calc["risk_score"],
             "band": risk_calc["band"],
@@ -84,13 +110,8 @@ class RiskService:
             "temperature_c": weather["temperature_c"],
             "wbgt_c": thermal["wbgt_c"],
             "utci_c": thermal["utci_c"],
-            "confidence": 0.94,
-            "sub_scores": risk_calc.get("sub_scores", {
-                "thermal_hazard": risk_calc["hazard_score"],
-                "population_exposure": round(risk_calc["exposure_index"] * 100.0, 1),
-                "social_vulnerability": round(risk_calc["vulnerability_index"] * 100.0, 1),
-                "adaptive_capacity": 60.0,
-            }),
+            "confidence": confidence,
+            "sub_scores": sub_scores,
             "diagnostics": risk_calc.get("diagnostics", {
                 "utci_c": thermal["utci_c"],
                 "heat_index_c": thermal.get("heat_index_c", 0.0),
@@ -102,28 +123,40 @@ class RiskService:
                 source="synthetic" if risk_calc["is_demo"] else "observed",
                 is_synthetic=risk_calc["is_demo"],
                 is_model_backed=True,
-                completeness=0.98,
-                quality_score=0.96,
+                completeness=0.98 if not is_demo else 0.50,
+                quality_score=0.96 if not is_demo else 0.50,
             ),
         }
 
     @staticmethod
-    def get_all_wards_risk(db: Session, city: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_all_wards_risk(
+        db: Session, city: Optional[str] = None, level: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         """
-        Retrieves current risk ranking across all wards in a city.
+        Retrieves current risk ranking across locations.
+        Never mixes levels inside one aggregate.
         """
         query = db.query(Location)
-        if city:
+        if level:
+            query = query.filter(Location.level == level)
+        elif city:
             query = query.filter(Location.city.ilike(city))
-        wards = query.all()
+            first_loc = query.first()
+            if first_loc:
+                query = query.filter(Location.level == first_loc.level)
+        else:
+            query = query.filter(Location.level == "ward")
+
+        locations = query.all()
 
         results = []
-        for w in wards:
+        for w in locations:
             try:
                 r = RiskService.get_current_risk(db, w.id)
                 r["latitude"] = w.latitude
                 r["longitude"] = w.longitude
                 r["population"] = w.population
+                r["level"] = w.level
                 results.append(r)
             except Exception:
                 continue

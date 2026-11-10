@@ -21,6 +21,10 @@ class Location(Base):
     longitude = Column(Float, nullable=False)
     area_sq_km = Column(Float, nullable=True)
     
+    # Hierarchy Tier: 'state' | 'district' | 'ward'
+    level = Column(String(20), nullable=False, default="ward", server_default="ward", index=True)
+    parent_code = Column(String(50), nullable=True, index=True)
+
     # Demographics & Vulnerability (Census & Municipal data)
     population = Column(Integer, default=100000)
     population_density_per_km2 = Column(Float, default=15000.0)
@@ -30,8 +34,8 @@ class Location(Base):
     elderly_ratio = Column(Float, nullable=True, default=0.08)
     children_ratio = Column(Float, nullable=True, default=0.07)
     cooling_access_deficit = Column(Float, nullable=True, default=None)
-    hospital_count = Column(Integer, default=3)
-    drinking_water_deficit = Column(Float, default=0.30)
+    hospital_count = Column(Integer, nullable=True, default=None)
+    drinking_water_deficit = Column(Float, nullable=True, default=None)
 
     # GeoJSON Boundary (Polygon or MultiPolygon)
     geometry_geojson = Column(JSON, nullable=True)

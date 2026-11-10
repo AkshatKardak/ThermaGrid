@@ -112,15 +112,19 @@ def get_worker_shift_card(
 
     max_shift_wbgt = max(s["wbgt_c"] for s in shift_items)
 
-    # Calculate hydration target (ml per hour)
-    if max_shift_wbgt >= 32.0 or met >= 7.0:
-        water_ml_per_hour = 1000
+    # Calculate hydration target (ml per hour) scaled with WBGT, metabolic exertion (MET), and solar exposure
+    if max_shift_wbgt >= 32.0:
+        base_water = 750
     elif max_shift_wbgt >= 29.0:
-        water_ml_per_hour = 750
+        base_water = 550
     elif max_shift_wbgt >= 26.0:
-        water_ml_per_hour = 500
+        base_water = 450
     else:
-        water_ml_per_hour = 350
+        base_water = 350
+
+    met_bonus = int(max(0.0, met - 2.0) * 40)
+    sun_bonus = 150 if exposure.lower() == "sun" else 0
+    water_ml_per_hour = min(1500, base_water + met_bonus + sun_bonus)
 
     # Determine recommended heavy work window
     heavy_work_after = "17:00"
