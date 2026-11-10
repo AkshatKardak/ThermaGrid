@@ -66,6 +66,18 @@ thermagrid/
 - Endpoints for auth, locations, weather, thermal indices, risk scores, forecasts, simulation, cooling centres, and alerts.
 - Configurable risk thresholds stored in database (`risk_config`).
 
+#### Database Migrations & Baseline Hygiene
+For an existing database initially built with `Base.metadata.create_all()`:
+1. Baseline the schema state by stamping the initial migration revision:
+   ```bash
+   alembic stamp d634376abde2
+   ```
+2. Apply subsequent additive schema migrations:
+   ```bash
+   alembic upgrade head
+   ```
+This guarantees migration history integrity without attempting to duplicate tables already present in the database.
+
 ### 4.3 Frontend UI (`frontend/`)
 - Design system: "Midnight Climate" palette locked in tokens.
 - Single `config/env.ts` reading `import.meta.env`.

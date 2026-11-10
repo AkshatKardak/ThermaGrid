@@ -278,6 +278,14 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
+# Run migrations (for existing databases created with create_all, baseline with stamp first):
+# alembic stamp d634376abde2
+alembic upgrade head
+
+# Seed database with canonical Census 2011 + BMC Mumbai wards and 36 States/UTs:
+python3 ../scripts/seed_database.py
+
 fastapi dev app/main.py
 
 # 3. Setup and run Frontend (in a new terminal)
@@ -300,6 +308,14 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
+# Run migrations (for existing databases created with create_all, baseline with stamp first):
+# alembic stamp d634376abde2
+alembic upgrade head
+
+# Seed database with canonical Census 2011 + BMC Mumbai wards and 36 States/UTs:
+python3 ../scripts/seed_database.py
+
 fastapi dev app/main.py
 
 # 3. Setup and run Frontend (in a new terminal)
