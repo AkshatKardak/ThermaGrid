@@ -23,7 +23,7 @@ flowchart TD
 1. **Meteorological Ingestion:**
    Hourly multi-variable numerical weather prediction (NWP) parameters (dry-bulb temperature, relative humidity, wind speed, direct normal irradiance, shortwave radiation) downscaled to ward centroids.
 2. **Thermal Physics Computation:**
-   Calculation of natural wet bulb ($T_{nw}$), black globe ($T_g$), WBGT, UTCI, and NWS Heat Index following ISO and COST Action 730 standards.
+   Calculation of natural wet bulb ($T_{nw}$), black globe ($T_g$), WBGT, UTCI, and NWS Heat Index following ISO 7243 and COST Action 730 standards. Thermal hazard is driven strictly by WBGT (occupational standard); UTCI and Heat Index are exposed as secondary diagnostics to prevent multi-metric double-counting.
 3. **Spatial joins and UHI modeling:**
    Point-in-polygon association to administrative wards. Estimation of localized Urban Heat Island delta ($\Delta T_{\text{UHI}}$) driven by building height, asphalt cover, and vegetative canopy deficits.
 4. **Machine Learning Forecasting:**
