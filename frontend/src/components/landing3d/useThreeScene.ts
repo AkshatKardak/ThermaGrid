@@ -70,6 +70,9 @@ export function useThreeScene({
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     renderer.setPixelRatio(dpr);
     renderer.setSize(initialWidth, initialHeight, false);
+    THREE.ColorManagement.enabled = true;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping;
     renderer.shadowMap.enabled = false; // Matte & flat aesthetic, no heavy shadows
     if (clearColor !== undefined) {
       renderer.setClearColor(clearColor, clearAlpha);

@@ -19,7 +19,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   sticky = false,
 }) => {
   return (
-    <div className={`space-y-4 mb-8 ${sticky ? 'sticky top-20 z-20 py-2 bg-bg/95 border-b border-border' : ''} ${className}`}>
+    <div data-section-header="true" className={`space-y-4 mb-8 ${sticky ? 'sticky top-20 z-20 py-2 bg-bg/95 border-b border-border' : ''} ${className}`}>
       {/* Scaffold: mono uppercase label + hairline with 24px accent tick */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">

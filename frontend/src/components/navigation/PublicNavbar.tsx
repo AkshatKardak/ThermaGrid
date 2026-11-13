@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Flame, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { useAuth, UserButton } from '@clerk/clerk-react';
 import { env } from '../../config/env';
+import { Container } from '../common/Container';
 
 export const PublicNavbar: React.FC = () => {
   const location = useLocation();
@@ -10,10 +11,10 @@ export const PublicNavbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-surface border-b border-border transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Container id="header-container">
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
-          <Link to="/" className="flex items-center gap-2.5 group">
+          <Link to="/" id="header-logo" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] bg-accent flex items-center justify-center shrink-0 transition-transform">
               <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-on-accent transition-colors" />
             </div>
@@ -85,7 +86,7 @@ export const PublicNavbar: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
+      </Container>
     </header>
   );
 };

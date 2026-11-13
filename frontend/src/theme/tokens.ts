@@ -89,7 +89,26 @@ export const MOTION = {
   countUp: 0.7,
 } as const;
 
+export const SPACING_SCALE = {
+  1: '4px',
+  2: '8px',
+  3: '12px',
+  4: '16px',
+  6: '24px',
+  8: '32px',
+  12: '48px',
+  16: '64px',
+  24: '96px',
+} as const;
+
+export const RADIUS = {
+  sm: '6px',
+  md: '8px',
+} as const;
+
 export const THEME_RADIUS = {
+  sm: '6px',
+  md: '8px',
   chips: '4px',
   inputs: '6px',
   buttons: '6px',

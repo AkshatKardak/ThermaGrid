@@ -5,6 +5,7 @@
 
 export interface Location {
   id: number;
+  level?: string;
   state: string;
   district: string;
   city: string;

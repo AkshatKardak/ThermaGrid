@@ -44,9 +44,10 @@ export const DemoAccountPanel: React.FC = () => {
         setToastMessage(`Signed in as ${roleLabel}. Opening telemetry deck...`);
         setTimeout(() => navigate(targetRedirect), 300);
         return;
-      } catch (err: any) {
-        const msg = err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message
-                  || err?.message || 'Demo sign-in failed';
+      } catch (err: unknown) {
+        const anyErr = err as { errors?: Array<{ longMessage?: string; message?: string }>; message?: string };
+        const msg = anyErr?.errors?.[0]?.longMessage || anyErr?.errors?.[0]?.message
+                  || anyErr?.message || 'Demo sign-in failed';
         setToastMessage(msg);
         setLoadingRole(null);
         return; // do NOT fall through to the clipboard toast
@@ -59,7 +60,7 @@ export const DemoAccountPanel: React.FC = () => {
   };
 
   return (
-    <div className="mt-4 pt-4 border-t border-border w-full max-w-sm mx-auto space-y-2.5">
+    <div id="demo-account-block" className="mt-4 pt-4 border-t border-border w-full space-y-2.5">
       <div className="flex items-center justify-between text-xs text-muted">
         <span className="font-sans">Demo access</span>
         <span className="text-muted text-xs font-mono">Pre-authenticated</span>
@@ -70,7 +71,7 @@ export const DemoAccountPanel: React.FC = () => {
         type="button"
         disabled={loadingRole !== null}
         onClick={() => handleDemoLogin('authority@thermagrid.demo', 'authority', '/app/authority')}
-        className="w-full h-9 px-3 rounded-[6px] bg-raised hover:bg-surface border border-border flex items-center justify-center gap-2 text-xs font-sans font-medium text-ink transition-colors cursor-pointer group disabled:opacity-50"
+        className="w-full h-9 px-3 rounded-[6px] bg-raised hover:bg-surface border border-border flex items-center justify-center gap-2 text-xs font-sans font-medium text-ink transition-colors cursor-pointer group disabled:opacity-50 shadow-none"
       >
         {loadingRole === 'authority' ? (
           <Loader2 className="w-4 h-4 animate-spin text-accent" strokeWidth={1.5} />
@@ -81,9 +82,18 @@ export const DemoAccountPanel: React.FC = () => {
       </button>
 
       {/* Role Provisioning Explanatory Notice */}
-      <p className="text-[11px] leading-relaxed text-muted pt-0.5">
-        Municipal console access requires verified authorization: officers become authority users when an administrator sets <span className="font-mono text-accent">publicMetadata.role = &quot;authority&quot;</span> in Clerk after verification — not by choosing it at sign-up.
+      <p className="text-xs leading-relaxed text-muted pt-0.5">
+        Authority access is granted by an administrator after verification.
       </p>
+
+      <details className="text-[11px] text-muted pt-1 cursor-pointer">
+        <summary className="font-sans hover:text-ink transition-colors select-none font-medium">
+          How authority access works
+        </summary>
+        <p className="mt-1.5 p-2.5 rounded-[6px] bg-raised border border-border text-muted leading-relaxed font-sans shadow-none">
+          Municipal console access requires verified authorization: officers become authority users when an administrator sets <span className="font-mono text-accent">publicMetadata.role = &quot;authority&quot;</span> in Clerk after verification — not by choosing it at sign-up.
+        </p>
+      </details>
 
       <AnimatePresence>
         {toastMessage && (
@@ -92,7 +102,7 @@ export const DemoAccountPanel: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="p-2.5 rounded-[6px] bg-raised border border-border text-ink text-xs font-sans text-center"
+            className="p-2.5 rounded-[6px] bg-raised border border-border text-ink text-xs font-sans text-center shadow-none"
           >
             {toastMessage}
           </motion.div>

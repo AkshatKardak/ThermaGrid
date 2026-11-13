@@ -33,14 +33,16 @@ export const SignInPage: React.FC = () => {
       title="Sign in"
       subtitle="Access municipal heat intelligence and live ward advisories"
     >
-      <div className="w-full flex flex-col items-center">
-        <SignIn
-          routing="path"
-          path="/sign-in"
-          signUpUrl="/sign-up"
-          fallbackRedirectUrl={redirectUrl}
-          appearance={clerkAppearance}
-        />
+      <div id="auth-form-stack" className="w-full flex flex-col items-center">
+        <div id="clerk-card-wrapper" className="w-full flex justify-center">
+          <SignIn
+            routing="path"
+            path="/sign-in"
+            signUpUrl="/sign-up"
+            fallbackRedirectUrl={redirectUrl}
+            appearance={clerkAppearance}
+          />
+        </div>
         <DemoAccountPanel />
       </div>
     </AuthLayout>

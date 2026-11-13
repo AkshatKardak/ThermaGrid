@@ -1,13 +1,14 @@
 import React from 'react';
 import { ShieldCheck, ExternalLink } from 'lucide-react';
+import { Container } from './Container';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="mt-32 pt-8 pb-12 bg-surface border-t border-border">
+    <footer className="mt-24 pt-8 pb-12 bg-surface border-t border-border">
       {/* 1px hairline with 24px accent tick at left */}
       <div className="section-hairline mb-10" />
 
-      <div className="max-w-[1320px] mx-auto px-6 lg:px-10">
+      <Container>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
           {/* Col 1: Platform Overview & Mandate */}
           <div className="space-y-3">
@@ -83,7 +84,7 @@ export const Footer: React.FC = () => {
             Pipeline: Data → Thermal Stress → Analytics → Forecast → Risk → Action
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 };

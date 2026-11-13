@@ -43,6 +43,9 @@
   --risk-4: #FF704F;
   --risk-5: #C31D3C;
 
+  --radius-sm: 6px;
+  --radius-md: 8px;
+
   /* Derived additions */
   --accent-soft: color-mix(in srgb, var(--accent) 8%, var(--bg));
   --focus-ring: 2px solid var(--accent);
@@ -80,6 +83,26 @@ html, body {
   width: 100%;
   height: 1px;
   background: var(--border);
+}
+
+/* Zero shadow, flat matte overrides for Clerk auth elements */
+[class*="cl-"],
+[class*="cl-"] *,
+[class*="cl-"] *::before,
+[class*="cl-"] *::after,
+.cl-rootBox,
+.cl-rootBox *,
+.cl-card,
+.cl-cardBox,
+.cl-signIn-root,
+.cl-signIn-root .cl-card,
+.cl-formButtonPrimary,
+.cl-formFieldInput,
+.cl-input,
+.cl-button,
+.cl-socialButtonsBlockButton {
+  box-shadow: none !important;
+  background-image: none !important;
 }
 .section-hairline::before {
   content: '';

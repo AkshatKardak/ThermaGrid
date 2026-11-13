@@ -2,7 +2,7 @@ import React, { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { useThreeScene } from './useThreeScene';
 import { useScrollProgress } from './useScrollProgress';
-import { evaluateThermalLag, getOutdoorTemp, getAlertGrade } from '../../lib/thermalLag';
+import { evaluateThermalLag } from '../../lib/thermalLag';
 import { getRiskColor, getRiskHex } from './palette';
 import { THEME_COLORS } from '../../theme/tokens';
 
