@@ -88,3 +88,8 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Agents & tooling caches
+.agents/
+.ruff_cache/
+backend/heatsense_dev.db
