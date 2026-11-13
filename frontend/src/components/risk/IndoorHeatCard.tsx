@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Home, Clock, HelpCircle, Sun, Thermometer, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { useIndoorHeat } from '../../hooks/useIndoorHeat';
 import { Card } from '../ui/Card';
+import { formatNumber } from '../../utils/format';
 
 interface IndoorHeatCardProps {
   locationId: number;
@@ -125,7 +126,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
 
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl sm:text-3xl font-mono font-bold text-ink tabular-nums tracking-tight">
-                  {data?.outdoor_now_c.toFixed(1)}°C
+                  {formatNumber(data?.outdoor_now_c, 1)}°C
                 </span>
                 <span className="text-xs font-mono text-muted">Dry Bulb</span>
               </div>
@@ -149,13 +150,13 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
                       : 'bg-[color-mix(in_srgb,var(--risk-1)_15%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-1)_55%,var(--ink))]'
                   }`}
                 >
-                  {delta > 0 ? `+${delta.toFixed(1)}°C` : `${delta.toFixed(1)}°C`} vs Outdoor
+                  {delta > 0 ? `+${formatNumber(delta, 1)}°C` : `${formatNumber(delta, 1)}°C`} vs Outdoor
                 </span>
               </div>
 
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl sm:text-3xl font-mono font-bold text-ink tabular-nums tracking-tight">
-                  {data?.indoor_now_c.toFixed(1)}°C
+                  {formatNumber(data?.indoor_now_c, 1)}°C
                 </span>
                 <span className="text-xs font-mono text-muted">Effective</span>
               </div>

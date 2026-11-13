@@ -10,6 +10,7 @@ import { latLngToVec3, getFacingYRotation } from '../geo';
 import { atmosphereVertexShader, atmosphereFragmentShader } from '../shaders/atmosphere.glsl';
 import { isWebGLAvailable, disposeThreeHierarchy } from '../useRenderLoop';
 import { StaticGlobe, DEFAULT_CITIES } from '../fallbacks/StaticGlobe';
+import { formatNumber } from '../../utils/format';
 
 export interface CityRisk {
   name: string;
@@ -392,7 +393,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
             <span>{hoveredCity.name}</span>
             <span className="inline-flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: heatColor(hoveredCity.risk) }} />
-              {(hoveredCity.risk * 100).toFixed(0)} / 100
+              {formatNumber(hoveredCity.risk * 100, 0)} / 100
             </span>
           </div>
           <div className="text-[10px] text-raised/70">
@@ -414,7 +415,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
             <div>
               <span className="font-semibold text-raised tracking-wide">{selectedCity.name}</span>
               <span className="text-[10px] text-raised/70 font-mono ml-2">
-                {selectedCity.lat.toFixed(2)}°N, {selectedCity.lng.toFixed(2)}°E
+                {formatNumber(selectedCity.lat, 2)}°N, {formatNumber(selectedCity.lng, 2)}°E
               </span>
             </div>
           </div>
@@ -424,7 +425,7 @@ export const RiskGlobe: React.FC<RiskGlobeProps> = ({
               <span className="text-raised/70 text-[10px] uppercase block">Thermal Risk</span>
               <strong className="text-raised inline-flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: heatColor(selectedCity.risk) }} />
-                {(selectedCity.risk * 100).toFixed(1)} / 100
+                {formatNumber(selectedCity.risk * 100, 1)} / 100
               </strong>
             </div>
             {selectedCity.temp !== undefined && (

@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { heatColor } from '../heat';
 import { isWebGLAvailable, disposeThreeHierarchy } from '../useRenderLoop';
 import { TOKENS, RISK_SCALE } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 export interface WardColumnData {
   id?: number | string;
@@ -659,7 +660,7 @@ export const WardHeatCity: React.FC<WardHeatCityProps> = ({
           </div>
           <div className="text-[10px] text-raised/70 flex items-center gap-3">
             <span>WBGT: {hoveredWard.wbgt ? `${hoveredWard.wbgt}°C` : 'N/A'}</span>
-            <span>Pop: {hoveredWard.population ? `${(hoveredWard.population / 1000).toFixed(0)}k` : 'N/A'}</span>
+            <span>Pop: {hoveredWard.population ? `${formatNumber(hoveredWard.population / 1000, 0)}k` : 'N/A'}</span>
           </div>
         </div>
       )}

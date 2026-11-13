@@ -1,3 +1,5 @@
+import { roundNumber } from '../utils/format.ts';
+
 /**
  * First-order biometeorological indoor thermal lag model.
  * Simulates indoor temperature response to outdoor daily cycle across roof types:
@@ -41,7 +43,7 @@ export function getOutdoorTemp(t: number, config: ThermalConfig = THERMAL_CONFIG
   const omega = (2 * Math.PI) / 24;
   // Sinusoid that peaks at t = config.peakHour: sin(omega * (t - peakHour) + pi/2) = cos(omega * (t - peakHour))
   const temp = config.tMean + config.tAmp * Math.cos(omega * (t - config.peakHour));
-  return Number(temp.toFixed(2));
+  return roundNumber(temp, 2);
 }
 
 /**
@@ -75,7 +77,7 @@ function computeBuildingIndoorTemp(
     config.tAmp * attenuation * Math.cos(omega * (t - config.peakHour - phaseLagHours));
 
   const solar = getSolarGain(t, solarGainMax);
-  return Number((baseResponse + solar).toFixed(2));
+  return roundNumber(baseResponse + solar, 2);
 }
 
 export interface ThermalState {

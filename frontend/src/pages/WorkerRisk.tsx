@@ -13,6 +13,7 @@ import { useWards } from '../hooks/useWards';
 import { useAppStore } from '../store/useAppStore';
 import { getRiskBand } from '../theme/tokens';
 import { TYPOGRAPHY } from '../theme/typography';
+import { formatNumber, roundNumber } from '../utils/format';
 
 type Occupation = 'construction' | 'delivery' | 'vendor' | 'traffic' | 'agriculture';
 type Intensity = 'met3' | 'met4' | 'met5' | 'met6';
@@ -44,7 +45,7 @@ export const WorkerRisk: React.FC = () => {
 
   const totalDelta = metBonus + sunBonus + shiftBonus;
   const workAdjustedScore = Math.min(100, Math.round(generalScore + totalDelta));
-  const effectiveWbgt = +(baseWbgt + (exposure === 'sun' ? 2.5 : exposure === 'partial' ? 1.0 : 0.0) + (intensity === 'met6' ? 2.0 : 1.0)).toFixed(1);
+  const effectiveWbgt = roundNumber(baseWbgt + (exposure === 'sun' ? 2.5 : exposure === 'partial' ? 1.0 : 0.0) + (intensity === 'met6' ? 2.0 : 1.0), 1);
 
   const generalBand = getRiskBand(generalScore);
   const workBand = getRiskBand(workAdjustedScore);
@@ -209,8 +210,8 @@ export const WorkerRisk: React.FC = () => {
           />
 
           <div className="text-xs font-mono text-muted border-t border-border pt-3 flex justify-between">
-            <span>Ambient Dry-Bulb: {risk?.temperature_c?.toFixed(1) || '37.0'}°C</span>
-            <span>WBGT: {baseWbgt.toFixed(1)}°C</span>
+            <span>Ambient Dry-Bulb: {formatNumber(risk?.temperature_c, 1, '37.0')}°C</span>
+            <span>WBGT: {formatNumber(baseWbgt, 1)}°C</span>
           </div>
         </div>
 

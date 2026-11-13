@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FactorContribution } from '../../types';
+import { formatNumber } from '../../utils/format';
 
 interface FactorBarsProps {
   factors?: FactorContribution[] | Record<string, any> | null;
@@ -61,7 +62,7 @@ export const FactorBars: React.FC<FactorBarsProps> = ({ factors, limit = 5 }) =>
               <div className="flex items-center gap-2">
                 {unitStr && <span className="font-mono text-[11px] text-muted">{unitStr}</span>}
                 <span className="font-mono font-semibold text-ink w-12 text-right tabular-nums">
-                  {pctNum.toFixed(1)}%
+                  {formatNumber(pctNum, 1)}%
                 </span>
               </div>
             </div>

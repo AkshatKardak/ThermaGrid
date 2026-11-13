@@ -53,7 +53,8 @@ async def lifespan(app: FastAPI):
     if settings.app_env == "development" and settings.debug:
         Base.metadata.create_all(bind=engine)
     should_run_scheduler = (
-        settings.app_env != "testing"
+        settings.scheduler_enabled
+        and settings.app_env != "testing"
         and os.getenv("TESTING") != "true"
         and os.getenv("PYTEST_CURRENT_TEST") is None
     )
@@ -193,19 +194,33 @@ def create_application() -> FastAPI:
             content={"detail": "An internal server error occurred. Please contact system administrator."},
         )
 
-    # Health check endpoint
+    # Health check endpoint (Render uses it to decide the service is live)
     @app.get("/health", tags=["Health"])
     def health_check():
-        return {
-            "status": "healthy",
-            "app": settings.app_name,
-            "environment": settings.app_env,
-            "version": "0.1.0",
-        }
+        from sqlalchemy import text
+        db_status = "down"
+        try:
+            with engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+                db_status = "up"
+        except Exception as e:
+            logger.error(f"Health check DB ping failed: {e}")
+            db_status = "down"
 
-    # Mount API Routers
-    api_prefix = settings.api_v1_prefix
-    for prefix in set([api_prefix, "/api", ""]):
+        status_code = status.HTTP_200_OK if db_status == "up" else status.HTTP_503_SERVICE_UNAVAILABLE
+        return JSONResponse(
+            status_code=status_code,
+            content={
+                "status": "healthy" if db_status == "up" else "unhealthy",
+                "db": db_status,
+                "app": settings.app_name,
+                "environment": settings.app_env,
+                "version": "0.1.0",
+            },
+        )
+
+    # Mount API Routers on /api/v1, /api, and root
+    for prefix in ["/api/v1", "/api", ""]:
         app.include_router(auth_router, prefix=prefix)
         app.include_router(locations_router, prefix=prefix)
         app.include_router(weather_router, prefix=prefix)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   BarChart,
@@ -14,8 +14,9 @@ import { apiClient } from '../../lib/api';
 import { useWards } from '../../hooks/useWards';
 import { useAllWardsRisk } from '../../hooks/useRisk';
 import { useAppStore } from '../../store/useAppStore';
-import { TOKENS, getRiskBand } from '../../theme/tokens';
+import { TOKENS } from '../../theme/tokens';
 import { Card } from '../../components/ui/Card';
+import { formatNumber } from '../../utils/format';
 
 export const InterventionsTab: React.FC = () => {
   const { selectedCity } = useAppStore();
@@ -68,11 +69,14 @@ export const InterventionsTab: React.FC = () => {
     });
   };
 
-  // Build queue items from API records, or derive from active top risk wards if no records exist yet
-  const queueItems = (outcomesData?.records && outcomesData.records.length > 0)
-    ? outcomesData.records
-    : (riskData || []).slice(0, 5).map((r: any, idx: number) => {
-        const pre = Number(r.risk_score || 75);
+  // Build queue items from API records, or derive from active top risk wards
+  const queueItems = useMemo(() => {
+    if (outcomesData?.records && outcomesData.records.length > 0) {
+      return outcomesData.records;
+    }
+    if (riskData && riskData.length > 0) {
+      return riskData.slice(0, 5).map((r: any, idx: number) => {
+        const pre = typeof r.risk_score === 'number' ? r.risk_score : 75;
         const post = Math.max(pre - (idx === 0 ? 8.4 : 5.2), 15);
         return {
           id: `queue-${r.location_id || idx}`,
@@ -87,14 +91,22 @@ export const InterventionsTab: React.FC = () => {
           measurement_window_hours: 48,
         };
       });
+    }
+    return [];
+  }, [outcomesData, riskData]);
 
   // Chart data: paired bar per intervention (before vs after)
-  const pairedBarData = queueItems.slice(0, 8).map((item: any) => ({
-    name: item.ward_name,
-    before: Number(item.risk_before.toFixed(1)),
-    after: Number(item.risk_after.toFixed(1)),
-    delta: Number((item.risk_before - item.risk_after).toFixed(1)),
-  }));
+  const pairedBarData = useMemo(() => {
+    return queueItems
+      .filter((item: any) => typeof item.risk_before === 'number' && typeof item.risk_after === 'number')
+      .slice(0, 8)
+      .map((item: any) => ({
+        name: item.ward_name,
+        before: Number(formatNumber(item.risk_before, 1, '0')),
+        after: Number(formatNumber(item.risk_after, 1, '0')),
+        delta: Number(formatNumber(item.risk_before - item.risk_after, 1, '0')),
+      }));
+  }, [queueItems]);
 
   return (
     <div className="space-y-6">
@@ -118,50 +130,42 @@ export const InterventionsTab: React.FC = () => {
 
       {/* Paired Bar Chart: Before vs After per Intervention */}
       <Card className="p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="text-sm font-bold font-display text-ink">
-              Before vs. After Intervention Exposure Attenuation
+              Pre vs Post Intervention Risk Attenuation
             </h3>
             <span className="text-xs text-muted font-sans">
-              Paired ward HTSI comparison across 48-hour observational measurement window
+              Measured delta (0–100 HTSI scale) labeled as <em className="text-ink not-italic font-medium">estimated effect from observed change</em>
             </span>
           </div>
-          <div className="text-right">
-            <span className="text-[10px] font-mono text-muted block">
-              Unit: Human Thermal Stress Index (0–100)
-            </span>
-            <span className="text-[10px] font-mono text-accent font-medium">
-              Labeled: estimated effect from observed change
-            </span>
+          <div className="text-xs font-mono text-muted bg-surface px-2.5 py-1 rounded-[4px] border border-border">
+            Unit: HTSI Score · Source: Municipal Intervention Registry
           </div>
         </div>
 
-        {pairedBarData.length === 0 ? (
-          <div className="h-64 flex items-center justify-center text-xs font-mono text-muted">
-            No data for this period
-          </div>
-        ) : (
-          <div className="h-72 w-full">
+        {pairedBarData.length > 0 ? (
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pairedBarData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+              <BarChart data={pairedBarData} margin={{ top: 12, right: 12, left: -10, bottom: 20 }}>
                 <XAxis
                   dataKey="name"
                   stroke={TOKENS.border}
-                  tick={{ fill: TOKENS.ink, fontSize: 11, fontFamily: 'IBM Plex Mono' }}
+                  tick={{ fill: TOKENS.muted, fontSize: 11, fontFamily: 'monospace' }}
+                  angle={-15}
+                  textAnchor="end"
                 />
                 <YAxis
-                  domain={[0, 100]}
                   stroke={TOKENS.border}
-                  tick={{ fill: TOKENS.muted, fontSize: 10, fontFamily: 'IBM Plex Mono' }}
+                  tick={{ fill: TOKENS.muted, fontSize: 11, fontFamily: 'monospace' }}
+                  domain={[0, 100]}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: TOKENS.surface,
+                    backgroundColor: TOKENS.raised,
                     borderColor: TOKENS.border,
-                    borderRadius: '6px',
-                    fontFamily: 'IBM Plex Mono',
-                    fontSize: '11px',
+                    fontSize: '12px',
+                    fontFamily: 'monospace',
                   }}
                   formatter={(val: any, name: any) => [
                     `${val} pts`,
@@ -169,68 +173,124 @@ export const InterventionsTab: React.FC = () => {
                   ]}
                 />
                 <Legend
-                  wrapperStyle={{ fontFamily: 'IBM Plex Mono', fontSize: '11px', paddingTop: '8px' }}
+                  wrapperStyle={{ fontSize: '11px', fontFamily: 'monospace', paddingTop: '8px' }}
                 />
-                <Bar dataKey="before" name="Pre-Intervention (Observed)" fill={TOKENS.border} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="after" name="Post-Intervention (Attenuated)" fill={TOKENS.accent} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="before" name="Pre-Intervention Risk" fill={TOKENS.error} radius={[3, 3, 0, 0]} />
+                <Bar dataKey="after" name="Post-Intervention (Observed)" fill={TOKENS.accent} radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="h-48 flex items-center justify-center text-xs font-mono text-muted border border-border rounded-[6px] bg-surface">
+            No outcome recorded yet
           </div>
         )}
       </Card>
 
-      {/* Interventions Queue Table */}
-      <Card className="p-0 overflow-hidden">
+      {/* Dispatch Action Bar */}
+      <Card className="p-5 bg-surface border border-border">
+        <form onSubmit={handleCreateDispatch} className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-[11px] font-mono text-muted block mb-1">Target Ward Location</label>
+            <select
+              value={selectedWardId}
+              onChange={(e) => setSelectedWardId(e.target.value ? Number(e.target.value) : '')}
+              className="w-full bg-raised border border-border rounded-[6px] p-2 text-xs font-mono text-ink"
+              required
+            >
+              <option value="">Select Target Ward...</option>
+              {(wardsData || []).map((w: any) => (
+                <option key={w.id} value={w.id}>
+                  {w.ward_name} ({w.ward_code})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-[11px] font-mono text-muted block mb-1">Recommended Action Protocol</label>
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="w-full bg-raised border border-border rounded-[6px] p-2 text-xs font-mono text-ink"
+            >
+              <option value="cooling_centre_activation">Activate 24/7 Cooling Shelter</option>
+              <option value="misting_stations">Deploy Mobile Misting Corridor</option>
+              <option value="mobile_water_tankers">Dispatch Emergency ORS Water Tanker</option>
+              <option value="roof_whitewashing">High-Albedo Cool Roof Whitewashing</option>
+              <option value="worker_shift_suspension">Enforce Mandatory Midday Rest Moratorium</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting || !selectedWardId}
+            className="px-4 py-2 rounded-[6px] bg-accent hover:bg-accent-hover text-on-accent text-xs font-mono font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5 h-[38px]"
+          >
+            <Plus className="w-4 h-4" />
+            {isSubmitting ? 'Dispatching...' : 'Dispatch Mitigation'}
+          </button>
+        </form>
+      </Card>
+
+      {/* Intervention Queue Ledger Table */}
+      <Card className="p-0 overflow-hidden border border-border bg-raised">
         <div className="p-4 border-b border-border bg-surface flex items-center justify-between">
           <div>
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-ink">
-              HAP Active Interventions Dispatch Queue
-            </h3>
-            <span className="text-[11px] text-muted">
-              Every delta represents estimated effect from observed change
-            </span>
+            <h3 className="text-sm font-bold font-display text-ink">Active Interventions Ledger</h3>
+            <span className="text-xs font-mono text-muted">Real-time status and telemetry evaluation</span>
           </div>
+          <span className="text-xs font-mono text-muted bg-raised px-2.5 py-1 rounded-[4px] border border-border">
+            Total Logged: {queueItems.length}
+          </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-mono border-collapse">
-            <thead>
-              <tr className="bg-raised border-b border-border text-muted">
-                <th className="py-3 px-3.5 font-medium">Ward Sector</th>
-                <th className="py-3 px-3 font-medium">Recommended Action</th>
-                <th className="py-3 px-3 font-medium">Status</th>
-                <th className="py-3 px-3 font-medium">Pre-Risk</th>
-                <th className="py-3 px-3 font-medium">Post-Risk</th>
-                <th className="py-3 px-3 font-medium">Delta (Effect)</th>
-                <th className="py-3 px-3.5 font-medium text-right">Window</th>
+          <table className="w-full text-left font-mono text-xs">
+            <thead className="bg-surface text-muted text-[11px] uppercase tracking-wider border-b border-border">
+              <tr>
+                <th className="py-2.5 px-3.5">Priority</th>
+                <th className="py-2.5 px-3">Ward</th>
+                <th className="py-2.5 px-3">Action Description</th>
+                <th className="py-2.5 px-3">Status</th>
+                <th className="py-2.5 px-3">Pre-Risk</th>
+                <th className="py-2.5 px-3">Post-Risk</th>
+                <th className="py-2.5 px-3">Estimated Effect</th>
+                <th className="py-2.5 px-3.5 text-right">Window</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
-              {isLoading ? (
+            <tbody className="divide-y divide-border/60">
+              {queueItems.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-muted">
-                    Loading municipal interventions queue...
-                  </td>
-                </tr>
-              ) : queueItems.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-8 text-center text-muted">
-                    No data for this period
+                  <td colSpan={8} className="py-12 text-center text-xs font-mono text-muted">
+                    No outcome recorded yet
                   </td>
                 </tr>
               ) : (
-                queueItems.map((item: any) => {
-                  const delta = Number(item.risk_before - item.risk_after);
+                queueItems.map((item: any, idx: number) => {
+                  const hasBefore = typeof item.risk_before === 'number';
+                  const hasAfter = typeof item.risk_after === 'number';
+                  const delta = hasBefore && hasAfter ? item.risk_before - item.risk_after : null;
+
                   return (
-                    <tr key={item.id} className="hover:bg-raised/70 transition-colors">
+                    <tr key={item.id || idx} className="hover:bg-surface/50 transition-colors">
                       <td className="py-3 px-3.5 whitespace-nowrap">
-                        <strong className="text-ink block">{item.ward_name}</strong>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold ${
+                          String(item.priority || '').includes('P0')
+                            ? 'bg-risk-5/15 text-risk-5 border border-risk-5/30'
+                            : 'bg-accent-soft text-accent border border-accent/30'
+                        }`}>
+                          {item.priority || 'P1 High'}
+                        </span>
                       </td>
-                      <td className="py-3 px-3 whitespace-nowrap text-ink">
+                      <td className="py-3 px-3 whitespace-nowrap font-bold text-ink">
+                        {item.ward_name || `Ward ${item.ward_id}`}
+                      </td>
+                      <td className="py-3 px-3 text-ink">
                         {item.action || item.intervention_type?.replace(/_/g, ' ')}
                       </td>
                       <td className="py-3 px-3 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] bg-raised border border-border text-ink">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] bg-surface border border-border text-ink">
                           {item.status === 'completed' ? (
                             <CheckCircle2 className="w-3 h-3 text-accent" />
                           ) : (
@@ -240,15 +300,22 @@ export const InterventionsTab: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-3 px-3 whitespace-nowrap text-muted">
-                        {item.risk_before.toFixed(1)}
+                        {formatNumber(item.risk_before, 1)}
                       </td>
                       <td className="py-3 px-3 whitespace-nowrap text-ink font-bold">
-                        {item.risk_after.toFixed(1)}
+                        {formatNumber(item.risk_after, 1)}
                       </td>
                       <td className="py-3 px-3 whitespace-nowrap">
-                        <span className="px-2 py-0.5 rounded-[4px] text-[11px] font-bold bg-raised border border-border text-ink" title="estimated effect from observed change">
-                          -{delta.toFixed(1)} pts
-                        </span>
+                        {delta !== null ? (
+                          <span
+                            className="px-2 py-0.5 rounded-[4px] text-[11px] font-bold bg-surface border border-border text-ink"
+                            title="estimated effect from observed change"
+                          >
+                            -{formatNumber(delta, 1)} pts
+                          </span>
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
                       </td>
                       <td className="py-3 px-3.5 whitespace-nowrap text-right text-muted text-[11px]">
                         {item.measurement_window_hours || 48}h window

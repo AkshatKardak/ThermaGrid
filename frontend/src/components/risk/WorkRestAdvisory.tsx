@@ -1,6 +1,7 @@
 import React from 'react';
 import { Droplets, Timer, AlertOctagon } from 'lucide-react';
 import { Card } from '../ui/Card';
+import { formatNumber } from '../../utils/format';
 
 interface WorkRestAdvisoryProps {
   wbgt: number;
@@ -119,7 +120,7 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
             <div className="text-xl font-mono font-bold text-ink tabular-nums">
               {category}
             </div>
-            <p className="text-[11px] text-muted">WBGT {wbgt.toFixed(1)}°C · ISO 7243</p>
+            <p className="text-[11px] text-muted">WBGT {formatNumber(wbgt, 1)}°C · ISO 7243</p>
           </div>
         </div>
 

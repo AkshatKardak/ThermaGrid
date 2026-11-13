@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { evaluateThermalLag, getOutdoorTemp } from './thermalLag.ts';
+import { formatNumber } from '../utils/format.ts';
 
 test('thermalLag model is deterministic', () => {
   const s1 = evaluateThermalLag(14.5);
@@ -44,7 +45,7 @@ test('tin roof peaks before RCC roof, with peak lag between 1.5h and 3.5h', () =
   const lagHours = rccPeakHour - tinPeakHour;
   assert.ok(
     lagHours >= 1.5 && lagHours <= 3.5,
-    `RCC peak lag (${lagHours.toFixed(2)}h) must be between 1.5h and 3.5h`
+    `RCC peak lag (${formatNumber(lagHours, 2)}h) must be between 1.5h and 3.5h`
   );
 });
 

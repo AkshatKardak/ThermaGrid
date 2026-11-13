@@ -10,6 +10,7 @@ import { TonightCard } from '../components/risk/TonightCard';
 import { IndoorHeatCard } from '../components/risk/IndoorHeatCard';
 import { CareCircleStrip } from '../components/care/CareCircleStrip';
 import { getRiskBand } from '../theme/tokens';
+import { formatNumber } from '../utils/format';
 
 export const OverviewHub: React.FC = () => {
   const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
@@ -228,7 +229,7 @@ export const OverviewHub: React.FC = () => {
                         : 'Safe'}
                     </td>
                     <td className="text-right pr-6 font-mono tabular-nums text-ink">
-                      {w.wbgt.toFixed(1)}°C
+                      {formatNumber(w.wbgt, 1)}°C
                     </td>
                     <td className="text-right pr-2 font-mono tabular-nums text-muted">
                       {w.workers.toLocaleString()}

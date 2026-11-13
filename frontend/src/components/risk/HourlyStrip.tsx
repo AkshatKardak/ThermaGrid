@@ -1,6 +1,7 @@
 import React from 'react';
 import type { HourlyRiskForecastItem } from '../../types';
 import { getRiskBand } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 interface HourlyStripProps {
   items: HourlyRiskForecastItem[];
@@ -38,7 +39,7 @@ export const HourlyStrip: React.FC<HourlyStripProps> = ({ items }) => {
           <span className="text-[11px] text-muted">Peak stress expected:</span>
           <span className="font-mono font-bold text-ink bg-raised px-2 py-0.5 rounded-[4px] border border-border inline-flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-risk-4" />
-            {formatHour(peakItem.time)} ({peakItem.predicted_risk_score.toFixed(0)}/100)
+            {formatHour(peakItem.time)} ({formatNumber(peakItem.predicted_risk_score, 0)}/100)
           </span>
         </div>
       </div>
@@ -58,7 +59,7 @@ export const HourlyStrip: React.FC<HourlyStripProps> = ({ items }) => {
             >
               {/* Temperature */}
               <span className="text-[10px] font-mono text-muted mb-1 tabular-nums">
-                {h.temperature_c.toFixed(0)}°
+                {formatNumber(h.temperature_c, 0)}°
               </span>
 
               {/* Bar indicator */}
@@ -73,8 +74,8 @@ export const HourlyStrip: React.FC<HourlyStripProps> = ({ items }) => {
                 {/* Tooltip */}
                 <div className="opacity-0 group-hover:opacity-100 absolute bottom-full mb-2 left-1/2 -translate-x-1/2 pointer-events-none z-20 bg-raised text-ink text-[10px] p-1.5 rounded-[4px] border border-border whitespace-nowrap">
                   <div className="font-bold text-ink">{formatHour(h.time)}</div>
-                  <div className="text-muted">Risk: {h.predicted_risk_score.toFixed(1)} ({band.label})</div>
-                  <div className="text-muted">WBGT: {h.predicted_wbgt.toFixed(1)}°C</div>
+                  <div className="text-muted">Risk: {formatNumber(h.predicted_risk_score, 1)} ({band.label})</div>
+                  <div className="text-muted">WBGT: {formatNumber(h.predicted_wbgt, 1)}°C</div>
                 </div>
               </div>
 

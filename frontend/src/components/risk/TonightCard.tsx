@@ -5,6 +5,7 @@ import { useNightRisk } from '../../hooks/useNightRisk';
 import { Card } from '../ui/Card';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { RISK_SCALE } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 interface TonightCardProps {
   locationId: number;
@@ -53,7 +54,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
     return { x, y, ...h };
   });
 
-  const pathD = points.reduce((acc, p, i) => `${acc} ${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`, '');
+  const pathD = points.reduce((acc, p, i) => `${acc} ${i === 0 ? 'M' : 'L'} ${formatNumber(p.x, 1)} ${formatNumber(p.y, 1)}`, '');
 
   // 25C threshold line Y position
   const y25 = svgHeight - 20 - ((25.0 - minT) / tRange) * (svgHeight - 35);
@@ -96,7 +97,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
           <div className="text-right">
             <span className="text-[10px] font-mono text-muted uppercase block">Night Minimum</span>
             <span className="text-2xl font-mono font-bold text-ink tabular-nums">
-              {data.night_min_c.toFixed(1)}°C
+              {formatNumber(data.night_min_c, 1)}°C
             </span>
           </div>
         </div>

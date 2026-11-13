@@ -19,6 +19,7 @@ import { useSubscriptions } from '../../hooks/useSubscriptions';
 import { useAppStore } from '../../store/useAppStore';
 import { TOKENS, RISK_SCALE } from '../../theme/tokens';
 import { Card } from '../../components/ui/Card';
+import { formatNumber } from '../../utils/format';
 
 const PRE_APPROVED_TEMPLATES = [
   {
@@ -270,7 +271,7 @@ export const AlertsTab: React.FC = () => {
             {/* Submit Action */}
             <div className="flex items-center justify-between pt-1">
               <span className="text-[11px] font-mono text-muted">
-                Estimated Reach: ~{(liveSubscriberCount * (selectedWards.length ? selectedWards.length / 10 : 1)).toFixed(0)} endpoints
+                Estimated Reach: ~{formatNumber(liveSubscriberCount * (selectedWards.length ? selectedWards.length / 10 : 1), 0)} endpoints
               </span>
               <button
                 type="submit"

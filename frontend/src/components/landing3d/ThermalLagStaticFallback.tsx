@@ -1,6 +1,7 @@
 import React from 'react';
 import { evaluateThermalLag } from '../../lib/thermalLag';
 import { getRiskHex } from './palette';
+import { formatNumber } from '../../utils/format';
 
 export const ThermalLagStaticFallback: React.FC = () => {
   const dayState = evaluateThermalLag(15.0); // 15:00 Day Peak
@@ -18,7 +19,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
               <span className="text-xs font-mono font-medium text-ink">15:00 DAILY PEAK</span>
             </div>
             <span className="text-xs font-mono text-muted">
-              Outdoor Ambient: <strong className="text-ink">{dayState.outdoorTemp.toFixed(1)}°C</strong>
+              Outdoor Ambient: <strong className="text-ink">{formatNumber(dayState.outdoorTemp, 1)}°C</strong>
             </span>
           </div>
 
@@ -35,7 +36,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
               </div>
               <div className="text-right">
                 <span className="text-lg font-bold text-ink tabular-nums block">
-                  {dayState.tinIndoorTemp.toFixed(1)}°C
+                  {formatNumber(dayState.tinIndoorTemp, 1)}°C
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] uppercase font-mono text-ink">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getRiskHex(80) }} />
@@ -56,7 +57,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
               </div>
               <div className="text-right">
                 <span className="text-lg font-bold text-ink tabular-nums block">
-                  {dayState.rccIndoorTemp.toFixed(1)}°C
+                  {formatNumber(dayState.rccIndoorTemp, 1)}°C
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] uppercase font-mono text-ink">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getRiskHex(45) }} />
@@ -79,7 +80,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
               <span className="text-xs font-mono font-medium text-ink">03:00 NOCTURNAL RETENTION</span>
             </div>
             <span className="text-xs font-mono text-muted">
-              Outdoor Ambient: <strong className="text-ink">{nightState.outdoorTemp.toFixed(1)}°C</strong>
+              Outdoor Ambient: <strong className="text-ink">{formatNumber(nightState.outdoorTemp, 1)}°C</strong>
             </span>
           </div>
 
@@ -96,7 +97,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
               </div>
               <div className="text-right">
                 <span className="text-lg font-bold text-ink tabular-nums block">
-                  {nightState.tinIndoorTemp.toFixed(1)}°C
+                  {formatNumber(nightState.tinIndoorTemp, 1)}°C
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] uppercase font-mono text-ink">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getRiskHex(20) }} />
@@ -117,7 +118,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
               </div>
               <div className="text-right">
                 <span className="text-lg font-bold text-ink tabular-nums block">
-                  {nightState.rccIndoorTemp.toFixed(1)}°C
+                  {formatNumber(nightState.rccIndoorTemp, 1)}°C
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] uppercase font-mono text-ink">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getRiskHex(65) }} />

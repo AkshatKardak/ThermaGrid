@@ -1,6 +1,7 @@
 import React from 'react';
 import { Thermometer, Wind, Droplets, Sun, AlertTriangle } from 'lucide-react';
 import type { RiskCurrent, ThermalCurrent } from '../../types';
+import { formatNumber } from '../../utils/format';
 
 interface KpiStripProps {
   risk?: RiskCurrent;
@@ -11,35 +12,35 @@ export const KpiStrip: React.FC<KpiStripProps> = ({ risk, thermal }) => {
   const cards = [
     {
       label: 'Ambient Air Temp',
-      value: risk ? `${risk.temperature_c.toFixed(1)}°C` : '--',
+      value: risk?.temperature_c != null ? `${formatNumber(risk.temperature_c, 1)}°C` : '--',
       subtext: 'Surface 2m dry-bulb',
       icon: Thermometer,
       dotColor: 'var(--muted)',
     },
     {
       label: 'Effective WBGT',
-      value: thermal ? `${thermal.wbgt_c.toFixed(1)}°C` : (risk ? `${risk.wbgt_c.toFixed(1)}°C` : '--'),
+      value: thermal?.wbgt_c != null ? `${formatNumber(thermal.wbgt_c, 1)}°C` : (risk?.wbgt_c != null ? `${formatNumber(risk.wbgt_c, 1)}°C` : '--'),
       subtext: thermal ? thermal.wbgt_category : 'Work-rest index',
       icon: Sun,
       dotColor: 'var(--risk-4)',
     },
     {
       label: 'Universal Climate (UTCI)',
-      value: thermal ? `${thermal.utci_c.toFixed(1)}°C` : (risk ? `${risk.utci_c.toFixed(1)}°C` : '--'),
+      value: thermal?.utci_c != null ? `${formatNumber(thermal.utci_c, 1)}°C` : (risk?.utci_c != null ? `${formatNumber(risk.utci_c, 1)}°C` : '--'),
       subtext: thermal ? thermal.utci_category : 'Human strain',
       icon: Wind,
       dotColor: 'var(--risk-3)',
     },
     {
       label: 'Heat Index (NWS/HI)',
-      value: thermal ? `${thermal.heat_index_c.toFixed(1)}°C` : '--',
+      value: thermal?.heat_index_c != null ? `${formatNumber(thermal.heat_index_c, 1)}°C` : '--',
       subtext: thermal ? thermal.heat_index_category : 'Apparent temperature',
       icon: Droplets,
       dotColor: 'var(--risk-2)',
     },
     {
       label: 'Composite Risk Score',
-      value: risk ? `${risk.risk_score.toFixed(1)}` : '--',
+      value: risk?.risk_score != null ? formatNumber(risk.risk_score, 1) : '--',
       subtext: risk ? risk.band_label : 'Hazard × Exp × Vuln',
       icon: AlertTriangle,
       dotColor: 'var(--risk-4)',

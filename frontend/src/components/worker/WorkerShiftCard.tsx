@@ -24,6 +24,7 @@ import { useWorkerShiftCard, ShiftBreak } from '../../hooks/useWorkerShiftCard';
 import { Card } from '../ui/Card';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { getRiskBand } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 interface WorkerShiftCardProps {
   locationId: number;
@@ -403,7 +404,7 @@ EMERGENCY: Call 108 immediately for symptoms of heat stroke.
               Hottest part of the shift
             </span>
             <span className="text-3xl font-mono font-bold text-ink tabular-nums block">
-              {data?.max_wbgt_c.toFixed(1)}°C
+              {formatNumber(data?.max_wbgt_c, 1)}°C
             </span>
             <span className="text-[11px] font-mono text-muted block">WBGT · ISO 7243 Peak</span>
           </div>
@@ -431,7 +432,7 @@ EMERGENCY: Call 108 immediately for symptoms of heat stroke.
               </div>
 
               <span className="text-xs font-mono text-muted bg-surface px-2.5 py-1 rounded-[4px] border border-border shrink-0">
-                Shift Target: {(totalWaterTarget / 1000).toFixed(1)}L
+                Shift Target: {formatNumber(totalWaterTarget / 1000, 1)}L
               </span>
             </div>
 

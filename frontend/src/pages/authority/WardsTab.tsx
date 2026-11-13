@@ -17,6 +17,7 @@ import { useEquity } from '../../hooks/useEquity';
 import { useAppStore } from '../../store/useAppStore';
 import { getRiskBand, TOKENS, RISK_SCALE } from '../../theme/tokens';
 import { Card } from '../../components/ui/Card';
+import { formatNumber, roundNumber } from '../../utils/format';
 
 type SortField =
   | 'ward_name'
@@ -59,7 +60,7 @@ export const WardsTab: React.FC = () => {
       const utci = Number(risk?.utci_c ?? (wbgt + 4.2));
       const heatIndex = Number(risk?.temperature_c ? risk.temperature_c + 3.5 : 36.5);
       const population = Number(ward.population || 0);
-      const outdoorWorkersPct = ward.outdoor_worker_ratio ? Number((ward.outdoor_worker_ratio * 100).toFixed(1)) : null;
+      const outdoorWorkersPct = ward.outdoor_worker_ratio ? roundNumber(ward.outdoor_worker_ratio * 100, 1) : null;
 
       const hazard = Number(risk?.hazard_score ?? Math.round(riskScore * 0.9));
       const exposure = Number(risk?.exposure_index ?? Math.round(riskScore * 0.85));
@@ -242,7 +243,7 @@ export const WardsTab: React.FC = () => {
                       fontFamily: 'IBM Plex Mono',
                       fontSize: '11px',
                     }}
-                    formatter={(val: any) => [`${Number(val).toFixed(1)} / 100`, 'HTSI Score']}
+                    formatter={(val: any) => [`${formatNumber(val, 1)} / 100`, 'HTSI Score']}
                   />
                   <Bar dataKey="risk" radius={[0, 4, 4, 0]}>
                     {top10Wards.map((entry, index) => (
@@ -444,15 +445,15 @@ export const WardsTab: React.FC = () => {
                     <td className="py-2.5 px-3 whitespace-nowrap">
                       <span className="flex items-center gap-1.5 font-bold">
                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: r.band.color }} />
-                        <span className="text-ink">{r.risk_score.toFixed(1)}</span>
+                        <span className="text-ink">{formatNumber(r.risk_score, 1)}</span>
                         <span className="text-[10px] text-muted font-normal">({r.band.label})</span>
                       </span>
                     </td>
                     <td className="py-2.5 px-3 whitespace-nowrap text-ink">
-                      {r.wbgt_c.toFixed(1)}°C
+                      {formatNumber(r.wbgt_c, 1)}°C
                     </td>
                     <td className="py-2.5 px-3 whitespace-nowrap text-ink">
-                      {r.utci_c.toFixed(1)}°C
+                      {formatNumber(r.utci_c, 1)}°C
                     </td>
                     <td className="py-2.5 px-3 whitespace-nowrap text-ink">
                       {r.population ? r.population.toLocaleString() : 'unavailable'}

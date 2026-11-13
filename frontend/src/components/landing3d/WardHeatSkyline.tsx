@@ -5,6 +5,7 @@ import { useScrollProgress } from './useScrollProgress';
 import { getRiskColor, getRiskHex } from './palette';
 import { TOKENS } from '../../theme/tokens';
 import type { Location, RiskCurrent } from '../../types';
+import { formatNumber } from '../../utils/format';
 
 export interface WardHeatSkylineProps {
   locations?: Location[];
@@ -426,10 +427,10 @@ export const WardHeatSkyline: React.FC<WardHeatSkylineProps> = ({
           </div>
           <div className="flex items-center justify-between gap-4 pt-1 font-mono text-[11px] text-raised/75">
             <span>
-              Risk <strong className="text-raised tabular-nums">{tooltip.riskScore.toFixed(1)}</strong>/100
+              Risk <strong className="text-raised tabular-nums">{formatNumber(tooltip.riskScore, 1)}</strong>/100
             </span>
             <span>
-              WBGT <strong className="text-raised tabular-nums">{tooltip.wbgt.toFixed(1)}°C</strong>
+              WBGT <strong className="text-raised tabular-nums">{formatNumber(tooltip.wbgt, 1)}°C</strong>
             </span>
           </div>
           <div className="text-[10px] font-mono text-raised/50 pt-0.5 capitalize">

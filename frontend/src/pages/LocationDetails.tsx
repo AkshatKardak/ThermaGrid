@@ -25,6 +25,7 @@ import { useRiskForecast } from '../hooks/useForecast';
 import { useThermalHistory } from '../hooks/useThermal';
 import { getRiskBand } from '../theme/tokens';
 import { TYPOGRAPHY } from '../theme/typography';
+import { formatNumber } from '../utils/format';
 
 export const LocationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +43,7 @@ export const LocationDetails: React.FC = () => {
 
   // 6 Mono Stats for Heat Fingerprint
   const fingerprintStats = [
-    { label: 'Avg Thermal Stress', value: `${(riskScore * 0.88).toFixed(1)} HTSI`, sub: 'Seasonal Baseline' },
+    { label: 'Avg Thermal Stress', value: `${formatNumber(riskScore * 0.88, 1)} HTSI`, sub: 'Seasonal Baseline' },
     { label: 'Extreme Days / Year', value: '38 Days', sub: 'WBGT ≥ 32.2°C' },
     { label: 'Peak Stress Month', value: 'May', sub: 'Pre-Monsoon Solar' },
     { label: 'Peak Stress Hours', value: '13:00 – 16:30', sub: 'Maximum Daily Cycle' },

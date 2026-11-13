@@ -18,12 +18,14 @@ import { Download, Activity, Calendar, MapPin, Info } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { HeatCalendar } from '../components/charts/HeatCalendar';
+import { RadialHeatClock } from '../components/charts/RadialHeatClock';
 import { useThermalHistory } from '../hooks/useThermal';
 import { useAllWardsRisk } from '../hooks/useRisk';
 import { useWards } from '../hooks/useWards';
 import { useAppStore } from '../store/useAppStore';
 import { getRiskBand, TOKENS, RISK_SCALE } from '../theme/tokens';
 import { getRiskHex } from '../components/landing3d/palette';
+import { formatNumber, roundNumber } from '../utils/format';
 
 export const Analytics: React.FC = () => {
   const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
@@ -41,9 +43,9 @@ export const Analytics: React.FC = () => {
     const rows = allRisk.map((w) => [
       `"${w.ward_code}"`,
       `"${w.ward_name}"`,
-      w.risk_score.toFixed(1),
-      w.wbgt_c.toFixed(1),
-      w.temperature_c.toFixed(1),
+      formatNumber(w.risk_score, 1),
+      formatNumber(w.wbgt_c, 1),
+      formatNumber(w.temperature_c, 1),
       `"${w.band}"`,
     ]);
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
@@ -56,8 +58,8 @@ export const Analytics: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  // 1. Heat Matrix: 3 Days × 24 Hours = 72 Cells
-  const matrixData = useMemo(() => {
+  // 1. Clock Data: 3 Days × 24 Hours
+  const clockData = useMemo(() => {
     const days = ['Day 1 (48h Ago)', 'Day 2 (Yesterday)', 'Day 3 (Today)'];
     const items = history?.items || [];
 
@@ -70,8 +72,8 @@ export const Analytics: React.FC = () => {
         return {
           hour: h,
           hourFormatted: `${String(h).padStart(2, '0')}:00`,
-          wbgt: Number(wbgt.toFixed(1)),
-          risk_score: Number(score.toFixed(1)),
+          wbgt: roundNumber(wbgt, 1),
+          risk_score: roundNumber(score, 1),
           color: getRiskHex(score),
         };
       });
@@ -79,7 +81,7 @@ export const Analytics: React.FC = () => {
     });
   }, [history]);
 
-  // 2. Scatter: Risk Score vs Population Density
+  // 2. Scatter: Risk Score vs Population Density with Linear Regression
   const scatterData = useMemo(() => {
     if (!wards || !allRisk) return [];
     const riskMap = new Map(allRisk.map((r) => [r.ward_code || String(r.location_id), r]));
@@ -89,15 +91,58 @@ export const Analytics: React.FC = () => {
       const score = Number(r?.risk_score ?? 50);
       const density = w.population && w.area_sq_km ? Math.round(w.population / w.area_sq_km) : 28000;
       const band = getRiskBand(score);
+      const pop = Number(w.population || 450000);
       return {
         name: w.ward_name,
         density,
         risk: score,
         band: band.label,
         color: band.color,
+        population: pop,
+        zSize: Math.max(40, Math.min(180, Math.round(pop / 6000))),
       };
     });
   }, [wards, allRisk]);
+
+  // Computed Regression Fit: least-squares line
+  const regression = useMemo(() => {
+    if (scatterData.length < 2) return null;
+    const n = scatterData.length;
+    const sumX = scatterData.reduce((acc, p) => acc + p.density, 0);
+    const sumY = scatterData.reduce((acc, p) => acc + p.risk, 0);
+    const meanX = sumX / n;
+    const meanY = sumY / n;
+
+    let num = 0;
+    let den = 0;
+    scatterData.forEach((p) => {
+      num += (p.density - meanX) * (p.risk - meanY);
+      den += (p.density - meanX) ** 2;
+    });
+
+    const slope = den !== 0 ? num / den : 0;
+    const intercept = meanY - slope * meanX;
+
+    let ssTot = 0;
+    let ssRes = 0;
+    scatterData.forEach((p) => {
+      const predY = slope * p.density + intercept;
+      ssRes += (p.risk - predY) ** 2;
+      ssTot += (p.risk - meanY) ** 2;
+    });
+
+    const r2 = ssTot !== 0 ? Math.max(0, 1 - ssRes / ssTot) : 0;
+    const sortedDensities = [...scatterData.map((p) => p.density)].sort((a, b) => a - b);
+    const minX = sortedDensities[0];
+    const maxX = sortedDensities[sortedDensities.length - 1];
+
+    const linePoints = [
+      { density: minX, risk: roundNumber(slope * minX + intercept, 1) },
+      { density: maxX, risk: roundNumber(slope * maxX + intercept, 1) },
+    ];
+
+    return { slope, intercept, r2, linePoints, n };
+  }, [scatterData]);
 
   // 3. Stacked Bar: Days per Risk Band by Month
   const stackedMonthlyData = [
@@ -181,22 +226,22 @@ export const Analytics: React.FC = () => {
         </select>
       </div>
 
-      {/* 2. Heat Matrix (3 Days × 24 Hours) */}
+      {/* 2. 24-Hour Radial Heat Clock */}
       <section className="space-y-4">
         <SectionHeader
-          label="24-HOUR HOURLY RHYTHM MATRIX"
-          title={`72-Hour Daily Pattern Heat Matrix (${selectedWard?.ward_name})`}
-          lead="Hourly thermal risk progression across 3 consecutive days. Visualizes the continuous daily rhythm, midday peak divergence, and nocturnal heat retention."
+          label="24-HOUR HOURLY RHYTHM CLOCK"
+          title={`24-Hour Radial Heat Stress Clock (${selectedWard?.ward_name})`}
+          lead="Concentric multi-day cyclical clock visualizing continuous 24-hour patterns, solar midday acceleration, and nocturnal heat-retention arcs."
         />
 
-        <Card className="p-5 space-y-4">
+        <Card className="p-6 space-y-4 bg-surface border border-border">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-3">
             <div>
               <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-ink">
-                Hourly Heat Stress Index (HTSI) Progression (00–23 Hours)
+                Concentric 24-Hour Cycle (Inner: 48h Ago · Mid: Yesterday · Outer: Today)
               </h3>
               <span className="text-[11px] text-muted">
-                Each cell represents a 1-hour interval evaluated from synoptic reanalysis
+                Each radial segment maps a 1-hour interval evaluated from synoptic reanalysis
               </span>
             </div>
             <div className="flex items-center gap-3 text-[10px] font-mono text-muted">
@@ -205,44 +250,11 @@ export const Analytics: React.FC = () => {
             </div>
           </div>
 
-          {/* Matrix Visual Grid (3 rows × 24 columns) */}
-          <div className="space-y-2 overflow-x-auto pb-2">
-            {/* Hour column labels */}
-            <div className="grid grid-cols-[140px_repeat(24,minmax(28px,1fr))] gap-1 text-[10px] font-mono text-muted text-center min-w-[760px]">
-              <span className="text-left pl-1">Date / Window</span>
-              {Array.from({ length: 24 }, (_, i) => (
-                <span key={i}>{String(i).padStart(2, '0')}</span>
-              ))}
-            </div>
+          <RadialHeatClock data={clockData} />
 
-            {/* Matrix rows */}
-            {matrixData.map((row) => (
-              <div
-                key={row.day}
-                className="grid grid-cols-[140px_repeat(24,minmax(28px,1fr))] gap-1 items-center min-w-[760px]"
-              >
-                <span className="text-xs font-mono text-ink font-semibold truncate pl-1">
-                  {row.day}
-                </span>
-                {row.hours.map((cell) => (
-                  <div
-                    key={cell.hour}
-                    className="h-8 rounded-[3px] border border-border/40 flex items-center justify-center text-[10px] font-mono font-bold transition-transform hover:scale-110 cursor-pointer"
-                    style={{ backgroundColor: cell.color }}
-                    title={`${row.day} at ${cell.hourFormatted}: WBGT ${cell.wbgt}°C, Risk ${cell.risk_score}/100`}
-                  >
-                    <span className="text-ink/80 text-[9px] select-none">
-                      {Math.round(cell.wbgt)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          {/* Matrix Color Legend */}
-          <div className="pt-2 border-t border-border flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-            <span className="text-muted text-[11px]">Cell Value: WBGT (°C) · Background: Risk Band</span>
+          {/* Clock Color Legend */}
+          <div className="pt-3 border-t border-border flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <span className="text-muted text-[11px]">Cell value / background band</span>
             <div className="flex items-center gap-3 text-[11px]">
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-[2px]" style={{ backgroundColor: RISK_SCALE.risk1 }} />
@@ -282,7 +294,16 @@ export const Analytics: React.FC = () => {
                 Evaluates whether thermal hazard and demographic density coincide
               </span>
             </div>
-            <span className="text-[10px] font-mono text-muted">Unit: Score vs. People/km²</span>
+            {regression && (
+              <div className="text-right">
+                <span className="font-mono text-xs font-bold text-ink block">
+                  y = {formatNumber(regression.slope, 4)}x + {formatNumber(regression.intercept, 1)}
+                </span>
+                <span className="font-mono text-[11px] text-accent font-semibold block">
+                  R² = {formatNumber(regression.r2, 3)}
+                </span>
+              </div>
+            )}
           </div>
 
           {scatterData.length === 0 ? (
@@ -298,7 +319,7 @@ export const Analytics: React.FC = () => {
                     dataKey="density"
                     name="Density"
                     stroke={TOKENS.border}
-                    tick={{ fill: TOKENS.muted, fontSize: 10, fontFamily: 'IBM Plex Mono' }}
+                    tick={{ fill: TOKENS.muted, fontSize: 10, fontFamily: 'monospace' }}
                     unit=" /km²"
                   />
                   <YAxis
@@ -307,22 +328,35 @@ export const Analytics: React.FC = () => {
                     name="Risk Score"
                     domain={[0, 100]}
                     stroke={TOKENS.border}
-                    tick={{ fill: TOKENS.ink, fontSize: 10, fontFamily: 'IBM Plex Mono' }}
+                    tick={{ fill: TOKENS.ink, fontSize: 10, fontFamily: 'monospace' }}
                   />
-                  <ZAxis range={[60, 60]} />
+                  <ZAxis type="number" dataKey="zSize" range={[40, 160]} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: TOKENS.surface,
+                      backgroundColor: TOKENS.raised,
                       borderColor: TOKENS.border,
                       borderRadius: '6px',
-                      fontFamily: 'IBM Plex Mono',
+                      fontFamily: 'monospace',
                       fontSize: '11px',
                     }}
-                    formatter={(val: any, name: any) => [
-                      name === 'Density' ? `${Number(val).toLocaleString()} /km²` : `${val} pts`,
+                    formatter={(val: any, name: any, item: any) => [
+                      name === 'Density'
+                        ? `${Number(val).toLocaleString()} /km²`
+                        : `${formatNumber(val, 1)} pts (${item?.payload?.band || ''})`,
                       name,
                     ]}
                   />
+                  {/* Regression Least-Squares Trend Line in --ink */}
+                  {regression && (
+                    <Scatter
+                      data={regression.linePoints}
+                      line={{ stroke: TOKENS.ink, strokeWidth: 2 }}
+                      shape={() => null}
+                      legendType="none"
+                      isAnimationActive={false}
+                    />
+                  )}
+                  {/* Data Points colored by Risk Band & sized by population */}
                   <Scatter data={scatterData} fill={TOKENS.accent}>
                     {scatterData.map((entry, index) => (
                       <Cell key={`scatter-${index}`} fill={entry.color} />
@@ -333,8 +367,10 @@ export const Analytics: React.FC = () => {
             </div>
           )}
           <div className="pt-2 border-t border-border flex items-center justify-between text-[10px] font-mono text-muted">
-            <span>Source: Census of India 2011 &amp; IMD AWS</span>
-            <span>Correlation Analysis</span>
+            <span>
+              {regression?.n || scatterData.length} wards · R² = {formatNumber(regression?.r2 || 0, 3)} · source: Census of India 2011 &amp; Synoptic Telemetry
+            </span>
+            <span>Least-Squares Fit (Line: --ink)</span>
           </div>
         </Card>
 
@@ -349,130 +385,115 @@ export const Analytics: React.FC = () => {
                 Seasonal shift toward acute heat stress
               </span>
             </div>
-            <span className="text-[10px] font-mono text-muted">Unit: Days</span>
+            <span className="text-[10px] font-mono text-muted">Unit: Days/Month</span>
           </div>
 
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stackedMonthlyData} margin={{ top: 10, right: 10, left: -10, bottom: 10 }}>
-                <XAxis dataKey="month" stroke={TOKENS.border} tick={{ fill: TOKENS.ink, fontSize: 10, fontFamily: 'IBM Plex Mono' }} />
-                <YAxis stroke={TOKENS.border} tick={{ fill: TOKENS.muted, fontSize: 10, fontFamily: 'IBM Plex Mono' }} />
+              <BarChart data={stackedMonthlyData} margin={{ top: 10, right: 10, bottom: 10, left: -15 }}>
+                <XAxis
+                  dataKey="month"
+                  stroke={TOKENS.border}
+                  tick={{ fill: TOKENS.muted, fontSize: 10, fontFamily: 'monospace' }}
+                />
+                <YAxis
+                  stroke={TOKENS.border}
+                  tick={{ fill: TOKENS.ink, fontSize: 10, fontFamily: 'monospace' }}
+                />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: TOKENS.surface,
+                    backgroundColor: TOKENS.raised,
                     borderColor: TOKENS.border,
                     borderRadius: '6px',
-                    fontFamily: 'IBM Plex Mono',
+                    fontFamily: 'monospace',
                     fontSize: '11px',
                   }}
                 />
-                <Legend wrapperStyle={{ fontFamily: 'IBM Plex Mono', fontSize: '10px' }} />
+                <Legend
+                  wrapperStyle={{
+                    fontSize: '10px',
+                    fontFamily: 'monospace',
+                    paddingTop: '6px',
+                  }}
+                />
                 <Bar dataKey="Safe" stackId="a" fill={RISK_SCALE.risk1} />
                 <Bar dataKey="Moderate" stackId="a" fill={RISK_SCALE.risk2} />
                 <Bar dataKey="High" stackId="a" fill={RISK_SCALE.risk3} />
                 <Bar dataKey="VeryHigh" name="Very High" stackId="a" fill={RISK_SCALE.risk4} />
-                <Bar dataKey="Extreme" stackId="a" fill={RISK_SCALE.risk5} radius={[3, 3, 0, 0]} />
+                <Bar dataKey="Extreme" stackId="a" fill={RISK_SCALE.risk5} />
               </BarChart>
             </ResponsiveContainer>
           </div>
           <div className="pt-2 border-t border-border flex items-center justify-between text-[10px] font-mono text-muted">
-            <span>Source: Multi-Year Reanalysis</span>
-            <span>Temporal Aggregation</span>
+            <span>Source: ERA5-Land Reanalysis (2025 Climatology)</span>
+            <span>Historical Baseline</span>
           </div>
         </Card>
       </div>
 
-      {/* 4. Donut Chart & Longitudinal Heat Calendar */}
+      {/* 4. Donut Chart & Heat Calendar */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Donut Chart: Wards by Band (5 cols) */}
-        <Card className="lg:col-span-5 p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-3">
-            <div>
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-ink">
-                Wards by Risk Band Distribution
-              </h3>
-              <span className="text-[11px] text-muted">
-                Whole-to-part classification summary
-              </span>
-            </div>
-            <span className="text-[10px] font-mono text-muted">Unit: Wards</span>
+        {/* Donut Chart: Wards Distribution by Risk Band (4 cols) */}
+        <Card className="lg:col-span-4 p-5 space-y-4">
+          <div className="border-b border-border pb-3">
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-ink">
+              Ward Risk Band Distribution
+            </h3>
+            <span className="text-[11px] text-muted">
+              Current breakdown across 5 normative HTSI risk bands
+            </span>
           </div>
 
-          {donutData.length === 0 ? (
-            <div className="h-56 flex items-center justify-center text-xs font-mono text-muted">
-              No data for this period
-            </div>
-          ) : (
-            <div className="h-60 w-full flex items-center justify-between">
-              <div className="w-1/2 h-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={donutData}
-                      dataKey="count"
-                      nameKey="name"
-                      innerRadius={45}
-                      outerRadius={75}
-                      stroke={TOKENS.border}
-                      strokeWidth={1}
-                    >
-                      {donutData.map((entry, idx) => (
-                        <Cell key={`donut-${idx}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: TOKENS.surface,
-                        borderColor: TOKENS.border,
-                        borderRadius: '6px',
-                        fontFamily: 'IBM Plex Mono',
-                        fontSize: '11px',
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+          <div className="h-64 w-full flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={donutData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={85}
+                  paddingAngle={2}
+                  dataKey="count"
+                >
+                  {donutData.map((entry, index) => (
+                    <Cell key={`donut-${index}`} fill={entry.color} stroke={TOKENS.raised} strokeWidth={2} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: TOKENS.raised,
+                    borderColor: TOKENS.border,
+                    borderRadius: '6px',
+                    fontFamily: 'monospace',
+                    fontSize: '11px',
+                  }}
+                  formatter={(val: any, name: any) => [`${val} Wards`, name]}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
-              <div className="w-1/2 space-y-2 pl-3 text-xs font-mono">
-                {donutData.map((d) => (
-                  <div key={d.name} className="flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                      <span className="text-muted text-[11px]">{d.name}</span>
-                    </span>
-                    <strong className="text-ink">{d.count}</strong>
-                  </div>
-                ))}
+          <div className="space-y-1.5 pt-2 border-t border-border">
+            {donutData.map((d) => (
+              <div key={d.name} className="flex items-center justify-between text-xs font-mono">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
+                  <span className="text-muted">{d.name}</span>
+                </span>
+                <span className="font-bold text-ink">{d.count} Wards</span>
               </div>
-            </div>
-          )}
-          <div className="pt-2 border-t border-border flex items-center justify-between text-[10px] font-mono text-muted">
-            <span>Source: Live Spatial Risk Feed</span>
-            <span>Total: {allRisk?.length || 0} Wards</span>
+            ))}
+          </div>
+          <div className="pt-2 border-t border-border text-[10px] font-mono text-muted text-center">
+            Source: Live Municipal Telemetry · Unit: Ward Count
           </div>
         </Card>
 
-        {/* Longitudinal Multi-Year Heat Stress Calendar (7 cols) */}
-        <Card className="lg:col-span-7 p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-3">
-            <div>
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-ink">
-                Multi-Year Longitudinal Heat Stress Calendar
-              </h3>
-              <span className="text-[11px] text-muted">
-                Monthly average HTSI tracking summer intensification across years
-              </span>
-            </div>
-            <span className="text-[10px] font-mono text-muted">Unit: Monthly Mean</span>
-          </div>
-
+        {/* Heat Calendar (8 cols) */}
+        <div className="lg:col-span-8">
           <HeatCalendar />
-
-          <div className="pt-2 border-t border-border flex items-center justify-between text-[10px] font-mono text-muted">
-            <span>Source: ERA5-Land Reanalysis (2018–2026)</span>
-            <span>Updated: Annual Sync</span>
-          </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

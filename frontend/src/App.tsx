@@ -6,6 +6,7 @@ import { Footer } from './components/common/Footer';
 import { Container } from './components/common/Container';
 import { RequireAuth } from './components/common/RequireAuth';
 import { RequireAuthority } from './components/common/RequireAuthority';
+import { RouteErrorBoundary } from './components/common/RouteErrorBoundary';
 import { ScrollProgressRail } from './components/ui/ScrollProgressRail';
 
 // Public Pages
@@ -83,7 +84,9 @@ function AppShell() {
                       path="/interventions"
                       element={
                         <RequireAuthority>
-                          <InterventionsTab />
+                          <RouteErrorBoundary title="Interventions Enforcement">
+                            <InterventionsTab />
+                          </RouteErrorBoundary>
                         </RequireAuthority>
                       }
                     />

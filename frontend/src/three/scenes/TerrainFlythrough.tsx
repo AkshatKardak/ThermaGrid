@@ -6,6 +6,7 @@ import { Play, Pause, RotateCcw, Compass, MapPin } from 'lucide-react';
 import { THREE_TOKENS } from '../tokens';
 import { heatFieldVertexShader, heatFieldFragmentShader } from '../shaders/heatField.glsl';
 import { isWebGLAvailable, disposeThreeHierarchy } from '../useRenderLoop';
+import { formatNumber } from '../../utils/format';
 
 export interface Hotspot {
   id: string;
@@ -364,7 +365,7 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
         <div className="w-full bg-border/30 h-1 rounded-full overflow-hidden">
           <div
             className="bg-accent h-full transition-all duration-100"
-            style={{ width: `${(flythroughProgress * 100).toFixed(1)}%` }}
+            style={{ width: `${formatNumber(flythroughProgress * 100, 1)}%` }}
           />
         </div>
       </div>
@@ -378,7 +379,7 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
               <span className="font-bold text-raised text-sm">{activeHotspot.name}</span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-[4px] bg-raised text-ink font-medium border border-border inline-flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-risk-4" />
-                Risk: {(activeHotspot.risk * 100).toFixed(0)}/100
+                Risk: {formatNumber(activeHotspot.risk * 100, 0)}/100
               </span>
             </div>
             <p className="text-[11px] text-raised/70 leading-relaxed max-w-2xl">

@@ -31,8 +31,8 @@ export const SignUpPage: React.FC = () => {
       title="Create an account"
       subtitle="Configure personal heat stress alerts and dependent care monitoring"
     >
-      <div id="auth-form-stack" className="w-full flex flex-col items-center">
-        <div id="clerk-card-wrapper" className="w-full flex justify-center">
+      <div id="auth-form-stack" className="w-full max-w-[420px] flex flex-col items-center mx-auto">
+        <div id="clerk-card-wrapper" className="w-full max-w-[420px] flex justify-center">
           <SignUp
             routing="path"
             path="/sign-up"
@@ -41,7 +41,7 @@ export const SignUpPage: React.FC = () => {
             appearance={clerkAppearance}
           />
         </div>
-        <div id="demo-account-block" className="mt-4 pt-4 border-t border-border w-full text-center space-y-2">
+        <div id="demo-account-block" className="mt-4 pt-4 border-t border-border w-full max-w-[420px] text-center space-y-2">
           <p className="text-xs text-muted">
             Municipal access is granted by an administrator after verification.
           </p>

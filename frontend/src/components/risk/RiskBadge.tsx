@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldCheck, AlertCircle, AlertTriangle, Flame, Skull } from 'lucide-react';
 import { getRiskBand } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 interface RiskBadgeProps {
   score?: number;
@@ -57,7 +58,7 @@ export const RiskBadge: React.FC<RiskBadgeProps> = ({
       <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: band.color }} />
       <span>{band.label}</span>
       {score !== undefined && (
-        <span className="font-bold tabular-nums ml-0.5">({score.toFixed(0)})</span>
+        <span className="font-bold tabular-nums ml-0.5">({formatNumber(score, 0)})</span>
       )}
     </span>
   );

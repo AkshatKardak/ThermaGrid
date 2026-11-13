@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { heatColor } from '../heat';
 import { THREE_TOKENS } from '../tokens';
+import { formatNumber } from '../../utils/format';
 
 export interface StaticCityData {
   name: string;
@@ -117,7 +118,7 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
                 onClick={() => onCitySelect && onCitySelect(city.name)}
                 tabIndex={0}
                 role="button"
-                aria-label={`${city.name}: Risk score ${(city.risk * 100).toFixed(0)}, Temperature ${city.temp || '--'}°C`}
+                aria-label={`${city.name}: Risk score ${formatNumber(city.risk * 100, 0)}, Temperature ${city.temp || '--'}°C`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     onCitySelect && onCitySelect(city.name);
@@ -177,12 +178,12 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
               />
               <span className="font-semibold text-raised">{hoveredCity.name}</span>
               <span className="text-raised/70 font-mono">
-                {hoveredCity.lat.toFixed(2)}°N, {hoveredCity.lng.toFixed(2)}°E
+                {formatNumber(hoveredCity.lat, 2)}°N, {formatNumber(hoveredCity.lng, 2)}°E
               </span>
             </div>
             <div className="flex items-center gap-3 font-mono">
               <span className="inline-flex items-center gap-1">
-                Risk: <strong className="text-raised font-bold">{(hoveredCity.risk * 100).toFixed(1)}</strong>
+                Risk: <strong className="text-raised font-bold">{formatNumber(hoveredCity.risk * 100, 1)}</strong>
               </span>
               {hoveredCity.temp && <span>T: <strong className="text-raised font-bold">{hoveredCity.temp}°C</strong></span>}
               {hoveredCity.wbgt && <span>WBGT: <strong className="text-raised font-bold">{hoveredCity.wbgt}°C</strong></span>}
@@ -214,7 +215,7 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
                 <td>{c.name}</td>
                 <td>{c.lat}</td>
                 <td>{c.lng}</td>
-                <td>{(c.risk * 100).toFixed(0)}</td>
+                <td>{formatNumber(c.risk * 100, 0)}</td>
                 <td>{c.temp ? `${c.temp}°C` : 'N/A'}</td>
               </tr>
             ))}

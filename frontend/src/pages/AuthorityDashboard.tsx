@@ -24,6 +24,7 @@ import { useEquity } from '../hooks/useEquity';
 import { useAppStore } from '../store/useAppStore';
 import { apiClient } from '../lib/api';
 import { getRiskBand, MOTION } from '../theme/tokens';
+import { formatNumber } from '../utils/format';
 import type { Location } from '../types';
 
 export const AuthorityDashboard: React.FC = () => {
@@ -631,7 +632,7 @@ export const AuthorityDashboard: React.FC = () => {
                     </span>
                     <span className="font-mono text-base font-bold text-ink tabular-nums block">
                       {activeWardRisk?.risk_score != null
-                        ? Number(activeWardRisk.risk_score).toFixed(1)
+                        ? formatNumber(activeWardRisk.risk_score, 1)
                         : 'unavailable'}{' '}
                       <span className="text-xs text-muted font-normal">/ 100</span>
                     </span>
@@ -643,7 +644,7 @@ export const AuthorityDashboard: React.FC = () => {
                     </span>
                     <span className="font-mono text-base font-bold text-ink tabular-nums block">
                       {activeWardRisk?.wbgt_c != null
-                        ? `${Number(activeWardRisk.wbgt_c).toFixed(1)}°C`
+                        ? `${formatNumber(activeWardRisk.wbgt_c, 1)}°C`
                         : 'unavailable'}
                     </span>
                   </div>
@@ -661,7 +662,7 @@ export const AuthorityDashboard: React.FC = () => {
                     <span className="text-muted">Outdoor Workers</span>
                     <span className="text-ink tabular-nums">
                       {activeWard.outdoor_worker_ratio
-                        ? `${(activeWard.outdoor_worker_ratio * 100).toFixed(0)}%`
+                        ? `${formatNumber(activeWard.outdoor_worker_ratio * 100, 0)}%`
                         : 'unavailable'}
                     </span>
                   </div>
@@ -669,7 +670,7 @@ export const AuthorityDashboard: React.FC = () => {
                     <span className="text-muted">Informal Settlement</span>
                     <span className="text-muted italic">
                       {activeWard.informal_settlement_ratio != null
-                        ? `${(activeWard.informal_settlement_ratio * 100).toFixed(1)}%`
+                        ? `${formatNumber(activeWard.informal_settlement_ratio * 100, 1)}%`
                         : 'unavailable'}
                     </span>
                   </div>
@@ -677,7 +678,7 @@ export const AuthorityDashboard: React.FC = () => {
                     <span className="text-muted">Tree Canopy Fraction</span>
                     <span className="text-muted italic">
                       {activeWard.tree_canopy_fraction != null
-                        ? `${(activeWard.tree_canopy_fraction * 100).toFixed(1)}%`
+                        ? `${formatNumber(activeWard.tree_canopy_fraction * 100, 1)}%`
                         : 'unavailable'}
                     </span>
                   </div>
@@ -685,7 +686,7 @@ export const AuthorityDashboard: React.FC = () => {
                     <span className="text-muted">Cooling Deficit</span>
                     <span className="text-muted italic">
                       {activeWard.cooling_access_deficit != null
-                        ? `${(activeWard.cooling_access_deficit * 100).toFixed(1)}%`
+                        ? `${formatNumber(activeWard.cooling_access_deficit * 100, 1)}%`
                         : 'unavailable'}
                     </span>
                   </div>

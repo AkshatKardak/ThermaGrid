@@ -15,6 +15,8 @@ import { ThermalLagStaticFallback } from '../components/landing3d/ThermalLagStat
 import { IndiaChoropleth } from '../components/maps/IndiaChoropleth';
 import { HowItWorks } from '../components/landing/HowItWorks';
 import { LandingFaq } from '../components/landing/LandingFaq';
+import { ThermalPhaseLagChart } from '../components/landing/ThermalPhaseLagChart';
+import { formatNumber, roundNumber } from '../utils/format';
 import { getRiskHex } from '../components/landing3d/palette';
 
 // Lazy-load 3D scenes
@@ -78,7 +80,7 @@ export const Landing: React.FC = () => {
 
   const peakWbgt = React.useMemo(() => {
     if (activeWardList.length === 0) return 0;
-    return Number(Math.max(...activeWardList.map((w) => w.wbgt_c || 0)).toFixed(1));
+    return roundNumber(Math.max(...activeWardList.map((w) => w.wbgt_c || 0)), 1);
   }, [activeWardList]);
 
   const wardsCount = React.useMemo(() => {
@@ -206,8 +208,8 @@ export const Landing: React.FC = () => {
         </Container>
       </section>
 
-      {/* 3. Section: 3D Thermal Inertia House Archetypes */}
-      <section id="two-wards" className="py-12 sm:py-16">
+      {/* 3. Section: Thermal Inertia Curve */}
+      <section id="two-wards" className="py-8 sm:py-12">
         <Container>
           <div className="space-y-6">
             <SectionHeader
@@ -215,21 +217,9 @@ export const Landing: React.FC = () => {
               title="Informal Tin-Roof vs Engineered RCC Concrete"
               lead="Interactive 24-hour pattern demonstrating heat retention, envelope insulation disparity, and the critical late-afternoon indoor phase lag."
             />
-            {canRender3D ? (
-              <React.Suspense
-                fallback={
-                  <div className="h-[520px] rounded-[8px] border border-border bg-panel-dark flex items-center justify-center font-mono text-xs text-raised">
-                    Initializing Thermal Inertia Models...
-                  </div>
-                }
-              >
-                <ThermalLagHouses />
-              </React.Suspense>
-            ) : (
-              <ThermalLagStaticFallback />
-            )}
+            <ThermalPhaseLagChart />
 
-            <div className="pt-4">
+            <div className="pt-2">
               <TwoWardsComparison />
             </div>
           </div>
@@ -289,7 +279,7 @@ export const Landing: React.FC = () => {
                       </div>
                       <div className="flex items-center justify-between text-muted text-[11px] pt-1 border-t border-border/40">
                         <span>Risk: <strong className="text-ink">{Math.round(w.risk_score || 50)}</strong></span>
-                        <span>{Number(w.wbgt_c || 30).toFixed(1)}°C WBGT</span>
+                        <span>{formatNumber(w.wbgt_c || 30, 1)}°C WBGT</span>
                       </div>
                     </div>
                   );

@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import type { HourlyThermalItem } from '../../types';
 import { TOKENS, RISK_SCALE } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 interface TrendChartProps {
   items: HourlyThermalItem[];
@@ -117,7 +118,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ items, height = 320 }) =
                         {entry.name}:
                       </span>
                       <span className="font-bold text-ink tabular-nums">
-                        {Number(entry.value).toFixed(1)}°C
+                        {formatNumber(entry.value as number, 1)}°C
                       </span>
                     </div>
                   ))}

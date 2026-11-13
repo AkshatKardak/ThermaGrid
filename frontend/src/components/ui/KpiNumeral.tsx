@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { useCountUp } from '../../theme/motion';
+import { formatNumber } from '../../utils/format';
 
 interface KpiNumeralProps {
   value: number;
@@ -49,7 +50,7 @@ export const KpiNumeral: React.FC<KpiNumeralProps> = ({
   const multiplier = Math.pow(10, decimals);
   const rawTarget = Math.round(value * multiplier);
   const animatedRaw = useCountUp(rawTarget, 900, hasEntered);
-  const displayVal = (animatedRaw / multiplier).toFixed(decimals);
+  const displayVal = formatNumber(animatedRaw / multiplier, decimals);
 
   const sizeClass =
     size === 'xl'

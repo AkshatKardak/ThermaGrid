@@ -38,6 +38,16 @@ else:
             conn.execute(text("SELECT 1"))
         logger.info("Successfully connected to primary database (PostgreSQL/PostGIS).")
     except Exception as e:
+        if settings.app_env == "production" and not settings.allow_sqlite_fallback:
+            import urllib.parse
+            parsed = urllib.parse.urlparse(db_url)
+            host = parsed.hostname or "unknown-host"
+            logger.critical(
+                f"FATAL: Primary database connection failed in production! Host: {host}. "
+                f"ALLOW_SQLITE_FALLBACK is false. Error: {e}"
+            )
+            raise RuntimeError(f"Database connection to host '{host}' failed: {e}") from e
+
         logger.warning(
             f"Primary database connection ({db_url}) failed: {e}. "
             f"Falling back to local SQLite database: {settings.FALLBACK_SQLITE_URL}"

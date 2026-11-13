@@ -21,10 +21,12 @@ class Settings(BaseSettings):
     app_name: str = "ThermaGrid API"
     app_env: str = "development"
     debug: bool = True
-    api_v1_prefix: str = "/api"
-    api_prefix: str = "/api"
+    api_v1_prefix: str = "/api/v1"
+    api_prefix: str = "/api/v1"
     log_level: str = "INFO"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    scheduler_enabled: bool = True
+    allow_sqlite_fallback: bool = True
 
     # Database
     database_url: str = Field(default="", description="Postgres DSN — required, no default")
@@ -95,6 +97,10 @@ class Settings(BaseSettings):
     def APP_ENV(self) -> str: return self.app_env
     @property
     def DEBUG(self) -> bool: return self.debug
+    @property
+    def SCHEDULER_ENABLED(self) -> bool: return self.scheduler_enabled
+    @property
+    def ALLOW_SQLITE_FALLBACK(self) -> bool: return self.allow_sqlite_fallback
     @property
     def API_V1_PREFIX(self) -> str: return self.api_prefix
     @property

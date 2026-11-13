@@ -1,5 +1,6 @@
 import React from 'react';
 import { getRiskBand } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 interface RiskGaugeProps {
   score: number;
@@ -57,7 +58,7 @@ export const RiskGauge: React.FC<RiskGaugeProps> = ({
         {/* Center Readout */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="text-4xl font-extrabold font-mono tracking-tight text-ink tabular-nums">
-            {score.toFixed(1)}
+            {formatNumber(score, 1)}
           </span>
           <span className="text-[11px] font-mono uppercase tracking-wider text-muted -mt-1">
             out of 100

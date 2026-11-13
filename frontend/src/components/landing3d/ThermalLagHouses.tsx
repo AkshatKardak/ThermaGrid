@@ -7,6 +7,7 @@ import { useScrollProgress } from './useScrollProgress';
 import { evaluateThermalLag } from '../../lib/thermalLag';
 import { getRiskColor, getRiskHex } from './palette';
 import { THEME_COLORS } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 export interface ThermalLagHousesProps {
   className?: string;
@@ -381,7 +382,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
                 OUTDOOR AMBIENT
               </span>
               <span className="text-xl sm:text-2xl font-mono font-bold text-raised tabular-nums">
-                {thermalState.outdoorTemp.toFixed(1)}°C
+                {formatNumber(thermalState.outdoorTemp, 1)}°C
               </span>
             </div>
           </div>
@@ -441,11 +442,11 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
               </div>
               <div className="flex items-baseline justify-between font-mono my-1">
                 <span className="text-3xl sm:text-4xl font-bold text-raised tabular-nums">
-                  {thermalState.tinIndoorTemp.toFixed(1)}°C
+                  {formatNumber(thermalState.tinIndoorTemp, 1)}°C
                 </span>
                 <span className="text-xs text-raised/80 font-medium">
                   {thermalState.tinIndoorTemp >= thermalState.outdoorTemp ? '+' : ''}
-                  {(thermalState.tinIndoorTemp - thermalState.outdoorTemp).toFixed(1)}°C vs Outdoor
+                  {formatNumber(thermalState.tinIndoorTemp - thermalState.outdoorTemp, 1)}°C vs Outdoor
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-raised/70 leading-relaxed pt-1 border-t border-border/40">
@@ -469,11 +470,11 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
               </div>
               <div className="flex items-baseline justify-between font-mono my-1">
                 <span className="text-3xl sm:text-4xl font-bold text-raised tabular-nums">
-                  {thermalState.rccIndoorTemp.toFixed(1)}°C
+                  {formatNumber(thermalState.rccIndoorTemp, 1)}°C
                 </span>
                 <span className="text-xs text-raised/80 font-medium">
                   {thermalState.rccIndoorTemp >= thermalState.outdoorTemp ? '+' : ''}
-                  {(thermalState.rccIndoorTemp - thermalState.outdoorTemp).toFixed(1)}°C vs Outdoor
+                  {formatNumber(thermalState.rccIndoorTemp - thermalState.outdoorTemp, 1)}°C vs Outdoor
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-raised/70 leading-relaxed pt-1 border-t border-border/40">

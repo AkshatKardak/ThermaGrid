@@ -28,6 +28,7 @@ import { useRiskForecast } from '../hooks/useForecast';
 import { useAlerts } from '../hooks/useCoolingCentres';
 import { useWards } from '../hooks/useWards';
 import { useAppStore } from '../store/useAppStore';
+import { formatNumber } from '../utils/format';
 import { getRiskBand } from '../theme/tokens';
 import { TYPOGRAPHY } from '../theme/typography';
 
@@ -202,13 +203,13 @@ export const CitizenDashboard: React.FC = () => {
                   </span>
                 </div>
                 <span className="text-xs font-mono text-muted block mt-1">
-                  WBGT {thermal ? `${thermal.wbgt_c.toFixed(1)}°C` : '34.8°C'} · ISO 7243
+                  WBGT {thermal ? `${formatNumber(thermal.wbgt_c, 1)}°C` : '34.8°C'} · ISO 7243
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-[10px] font-mono text-muted uppercase block">Air Temp</span>
                 <span className="text-lg font-mono font-semibold text-ink tabular-nums">
-                  {risk ? `${risk.temperature_c.toFixed(1)}°C` : '37.4°C'}
+                  {risk ? `${formatNumber(risk.temperature_c, 1)}°C` : '37.4°C'}
                 </span>
               </div>
             </div>
@@ -222,7 +223,7 @@ export const CitizenDashboard: React.FC = () => {
                 <div>
                   <span className="text-[10px] text-muted block uppercase">UTCI Stress</span>
                   <span className="font-semibold text-sm">
-                    {thermal ? `${thermal.utci_c.toFixed(1)}°C` : '41.6°C'}
+                    {thermal ? `${formatNumber(thermal.utci_c, 1)}°C` : '41.6°C'}
                   </span>
                   <span className="text-[10px] text-muted block font-sans">
                     Universal Thermal Climate Index
@@ -231,7 +232,7 @@ export const CitizenDashboard: React.FC = () => {
                 <div>
                   <span className="text-[10px] text-muted block uppercase">Ambient Dry-Bulb</span>
                   <span className="font-semibold text-sm">
-                    {risk ? `${risk.temperature_c.toFixed(1)}°C` : '37.4°C'}
+                    {risk ? `${formatNumber(risk.temperature_c, 1)}°C` : '37.4°C'}
                   </span>
                   <span className="text-[10px] text-muted block font-sans">
                     Surface sensor reading

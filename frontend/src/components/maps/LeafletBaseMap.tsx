@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Polygon, CircleMarker, Tooltip, useMap } from 'react-leaflet';
 import type { Location, RiskCurrent } from '../../types';
 import { getRiskBand, TOKENS } from '../../theme/tokens';
+import { formatNumber } from '../../utils/format';
 
 interface LeafletBaseMapProps {
   wards: Location[];
@@ -91,9 +92,9 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
           const score = risk ? risk.risk_score : 50;
           const band = getRiskBand(score);
           const isSelected = ward.id === selectedLocationId;
-          const wbgtVal = risk?.wbgt_c ? `${risk.wbgt_c.toFixed(1)}°C` : '32.4°C';
+          const wbgtVal = risk?.wbgt_c ? `${formatNumber(risk.wbgt_c, 1)}°C` : '32.4°C';
           const workersVal = ward.outdoor_worker_ratio
-            ? `${(ward.outdoor_worker_ratio * 100).toFixed(0)}%`
+            ? `${formatNumber(ward.outdoor_worker_ratio * 100, 0)}%`
             : '28%';
 
           if (ward.geometry_geojson && ward.geometry_geojson.coordinates) {
@@ -140,7 +141,7 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: band.color }} />
                       <span className="font-bold text-raised">
-                        Score: {score.toFixed(1)}/100
+                        Score: {formatNumber(score, 1)}/100
                       </span>
                       <span className="text-raised/70">({band.label})</span>
                     </div>
