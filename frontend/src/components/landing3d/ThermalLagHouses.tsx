@@ -422,15 +422,15 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
         />
 
         {/* BOTTOM HUD: Side-by-Side Building Dynamics Comparison */}
-        <div className="relative z-20 space-y-3 pt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="relative z-20 space-y-4 pt-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
             {/* Tin Roof Card */}
-            <div className="p-4 rounded-[8px] bg-panel-dark/90 backdrop-blur-md border border-border space-y-2">
+            <div className="p-5 sm:p-6 rounded-[10px] bg-panel-dark/95 backdrop-blur-md border border-border space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-raised font-display">
+                <span className="text-sm font-semibold text-raised font-display">
                   Informal / Corrugated Tin
                 </span>
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1">
+                <span className="text-xs font-mono uppercase px-2.5 py-1 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1.5">
                   <span
                     className="w-1.5 h-1.5 rounded-full"
                     style={{ backgroundColor: getRiskHex(thermalState.tinIndoorTemp > 35 ? 75 : 30) }}
@@ -438,27 +438,27 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
                   {thermalState.tinAlertGrade}
                 </span>
               </div>
-              <div className="flex items-baseline justify-between font-mono">
-                <span className="text-2xl sm:text-3xl font-bold text-raised tabular-nums">
+              <div className="flex items-baseline justify-between font-mono my-1">
+                <span className="text-3xl sm:text-4xl font-bold text-raised tabular-nums">
                   {thermalState.tinIndoorTemp.toFixed(1)}°C
                 </span>
-                <span className="text-xs text-raised/70">
+                <span className="text-xs text-raised/80 font-medium">
                   {thermalState.tinIndoorTemp >= thermalState.outdoorTemp ? '+' : ''}
                   {(thermalState.tinIndoorTemp - thermalState.outdoorTemp).toFixed(1)}°C vs Outdoor
                 </span>
               </div>
-              <p className="text-xs text-raised/70 leading-relaxed">
+              <p className="text-xs sm:text-sm text-raised/70 leading-relaxed pt-1 border-t border-border/40">
                 Low thermal mass (τ ≈ 0.9h). Rapid solar absorption causes steep peak at 14:30; radiates quickly after sunset.
               </p>
             </div>
 
             {/* RCC Roof Card */}
-            <div className="p-4 rounded-[8px] bg-panel-dark/90 backdrop-blur-md border border-border space-y-2">
+            <div className="p-5 sm:p-6 rounded-[10px] bg-panel-dark/95 backdrop-blur-md border border-border space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-raised font-display">
+                <span className="text-sm font-semibold text-raised font-display">
                   Reinforced Concrete Slab (RCC)
                 </span>
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1">
+                <span className="text-xs font-mono uppercase px-2.5 py-1 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1.5">
                   <span
                     className="w-1.5 h-1.5 rounded-full"
                     style={{ backgroundColor: getRiskHex(thermalState.rccIndoorTemp > 35 ? 75 : 30) }}
@@ -466,16 +466,16 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
                   {thermalState.rccAlertGrade}
                 </span>
               </div>
-              <div className="flex items-baseline justify-between font-mono">
-                <span className="text-2xl sm:text-3xl font-bold text-raised tabular-nums">
+              <div className="flex items-baseline justify-between font-mono my-1">
+                <span className="text-3xl sm:text-4xl font-bold text-raised tabular-nums">
                   {thermalState.rccIndoorTemp.toFixed(1)}°C
                 </span>
-                <span className="text-xs text-raised/70">
+                <span className="text-xs text-raised/80 font-medium">
                   {thermalState.rccIndoorTemp >= thermalState.outdoorTemp ? '+' : ''}
                   {(thermalState.rccIndoorTemp - thermalState.outdoorTemp).toFixed(1)}°C vs Outdoor
                 </span>
               </div>
-              <p className="text-xs text-raised/70 leading-relaxed">
+              <p className="text-xs sm:text-sm text-raised/70 leading-relaxed pt-1 border-t border-border/40">
                 High thermal mass (τ ≈ 3.4h). Peak is delayed ~2.7h until 17:15; nocturnal concrete mass retains +2.7°C at 03:00.
               </p>
             </div>

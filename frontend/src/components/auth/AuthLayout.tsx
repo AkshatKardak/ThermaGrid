@@ -99,7 +99,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
           </div>
 
           {/* RIGHT COLUMN: 48% width on desktop — Authentication Chamber on --surface */}
-          <div className="w-full lg:w-[48%] min-h-[calc(100vh-64px)] relative bg-surface flex flex-col items-center justify-center p-6 sm:p-8 lg:p-12 overflow-y-auto border-t lg:border-t-0 lg:border-l border-border">
+          <div className="w-full lg:w-[48%] min-h-[calc(100vh-64px)] relative bg-surface flex flex-col items-center justify-center p-6 sm:p-10 lg:p-14 overflow-y-auto border-t lg:border-t-0 lg:border-l border-border">
             <motion.div
               initial={
                 prefersReducedMotion
@@ -118,15 +118,15 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
                       ease: [0.22, 1, 0.36, 1],
                     }
               }
-              className="w-full max-w-[460px] sm:max-w-[480px] flex flex-col items-center my-auto py-6"
+              className="w-full max-w-[520px] sm:max-w-[560px] flex flex-col items-center my-auto py-8"
             >
               {/* Card Header */}
-              <div className="text-center space-y-1.5 mb-6 w-full">
-                <h2 className="text-2xl sm:text-3xl font-bold text-ink font-display tracking-tight">{title}</h2>
-                <p className="text-sm text-muted">{subtitle}</p>
+              <div className="text-center space-y-2 mb-8 w-full">
+                <h2 className="text-3xl sm:text-4xl font-bold text-ink font-display tracking-tight leading-tight">{title}</h2>
+                <p className="text-sm sm:text-base text-muted max-w-sm mx-auto leading-relaxed">{subtitle}</p>
               </div>
 
-              {/* Form + Demo Panel Stack (Equal max-w-[460px] width) */}
+              {/* Form + Demo Panel Stack (Equal max-w width) */}
               <div className="w-full flex flex-col items-center">
                 {children}
               </div>

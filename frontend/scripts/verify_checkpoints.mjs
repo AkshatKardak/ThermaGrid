@@ -80,6 +80,7 @@ async function runVerification() {
     {
       const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
       await page.goto(`${BASE_URL}/sign-in`, { waitUntil: 'networkidle' });
+      await page.waitForSelector('#clerk-card-wrapper', { timeout: 10000 });
 
       // 1. Auth panel left edge equals header container left edge
       const headerContainerX = await page.$eval('#header-container', (el) => Math.round(el.getBoundingClientRect().left));
