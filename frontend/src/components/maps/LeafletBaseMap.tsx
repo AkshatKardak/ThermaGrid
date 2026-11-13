@@ -77,11 +77,12 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
       >
         <MapUpdater center={center} zoom={12} />
 
-        {/* Desaturated CartoDB tiles on panel-dark */}
+        {/* Keyless OpenStreetMap tiles with dark inversion filter */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          maxZoom={18}
-          className="filter brightness-[0.82] contrast-[1.12]"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          className="filter brightness-[0.72] contrast-[1.18] invert-[0.92] hue-rotate-[180deg]"
         />
 
         {/* Ward Polygons */}

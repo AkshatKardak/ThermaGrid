@@ -21,7 +21,8 @@ class Settings(BaseSettings):
     app_name: str = "ThermaGrid API"
     app_env: str = "development"
     debug: bool = True
-    api_v1_prefix: str = "/api/v1"
+    api_v1_prefix: str = "/api"
+    api_prefix: str = "/api"
     log_level: str = "INFO"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
@@ -95,7 +96,9 @@ class Settings(BaseSettings):
     @property
     def DEBUG(self) -> bool: return self.debug
     @property
-    def API_V1_PREFIX(self) -> str: return self.api_v1_prefix
+    def API_V1_PREFIX(self) -> str: return self.api_prefix
+    @property
+    def API_PREFIX(self) -> str: return self.api_prefix
     @property
     def LOG_LEVEL(self) -> str: return self.log_level
     @property

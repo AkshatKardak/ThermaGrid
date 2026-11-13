@@ -7,12 +7,12 @@ import { useEffect, useState } from 'react';
 
 export const MOTION = {
   dur: {
-    fast: 0.12, // 120ms
-    base: 0.20, // 200ms
-    slow: 0.32, // 320ms
-    scene: 0.70, // 700ms
-    chart: 1.20, // 1200ms
-    countUp: 0.90, // 900ms
+    fast: 0.12, /* 120ms */
+    base: 0.20, /* 200ms */
+    slow: 0.32, /* 320ms */
+    scene: 0.70, /* 700ms */
+    chart: 1.20, /* 1200ms */
+    countUp: 0.90, /* 900ms */
   },
   ease: {
     out: [0.16, 1, 0.3, 1] as const, // entrances

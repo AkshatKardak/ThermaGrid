@@ -5,6 +5,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { Container } from './components/common/Container';
 import { RequireAuth } from './components/common/RequireAuth';
+import { RequireAuthority } from './components/common/RequireAuthority';
 import { ScrollProgressRail } from './components/ui/ScrollProgressRail';
 
 // Public Pages
@@ -18,6 +19,10 @@ import { OverviewHub } from './pages/OverviewHub';
 import { CitizenDashboard } from './pages/CitizenDashboard';
 import { WorkerRisk } from './pages/WorkerRisk';
 import { AuthorityDashboard } from './pages/AuthorityDashboard';
+import { WardsTab } from './pages/authority/WardsTab';
+import { InterventionsTab } from './pages/authority/InterventionsTab';
+import { AlertsTab } from './pages/authority/AlertsTab';
+import { ReportsTab } from './pages/authority/ReportsTab';
 import { Analytics } from './pages/Analytics';
 import { LocationDetails } from './pages/LocationDetails';
 import { Account } from './pages/Account';
@@ -58,7 +63,46 @@ function AppShell() {
                     <Route path="/" element={<OverviewHub />} />
                     <Route path="/heat-risk" element={<CitizenDashboard />} />
                     <Route path="/worker" element={<WorkerRisk />} />
-                    <Route path="/authority" element={<AuthorityDashboard />} />
+                    <Route
+                      path="/authority"
+                      element={
+                        <RequireAuthority>
+                          <AuthorityDashboard />
+                        </RequireAuthority>
+                      }
+                    />
+                    <Route
+                      path="/wards"
+                      element={
+                        <RequireAuthority>
+                          <WardsTab />
+                        </RequireAuthority>
+                      }
+                    />
+                    <Route
+                      path="/interventions"
+                      element={
+                        <RequireAuthority>
+                          <InterventionsTab />
+                        </RequireAuthority>
+                      }
+                    />
+                    <Route
+                      path="/alerts"
+                      element={
+                        <RequireAuthority>
+                          <AlertsTab />
+                        </RequireAuthority>
+                      }
+                    />
+                    <Route
+                      path="/reports"
+                      element={
+                        <RequireAuthority>
+                          <ReportsTab />
+                        </RequireAuthority>
+                      }
+                    />
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/ward/:id" element={<LocationDetails />} />
                     <Route path="/account" element={<Account />} />
@@ -75,6 +119,10 @@ function AppShell() {
           <Route path="/citizen" element={<Navigate to="/app/heat-risk" replace />} />
           <Route path="/worker" element={<Navigate to="/app/worker" replace />} />
           <Route path="/authority" element={<Navigate to="/app/authority" replace />} />
+          <Route path="/wards" element={<Navigate to="/app/wards" replace />} />
+          <Route path="/interventions" element={<Navigate to="/app/interventions" replace />} />
+          <Route path="/alerts" element={<Navigate to="/app/alerts" replace />} />
+          <Route path="/reports" element={<Navigate to="/app/reports" replace />} />
           <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
           <Route path="/about" element={<Navigate to="/app" replace />} />
           <Route path="/docs" element={<Navigate to="/" replace />} />

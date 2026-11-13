@@ -11,12 +11,12 @@ test('thermalLag model is deterministic', () => {
   assert.equal(s1.rccIndoorTemp, s2.rccIndoorTemp);
 });
 
-test('outdoor diurnal curve peaks at 15:00 at 39°C', () => {
+test('outdoor daily curve peaks at 15:00 at 39°C', () => {
   const peak = getOutdoorTemp(15.0);
   assert.equal(peak, 39.0);
 });
 
-test('outdoor diurnal curve reaches minimum at 03:00 at 25°C', () => {
+test('outdoor daily curve reaches minimum at 03:00 at 25°C', () => {
   const min = getOutdoorTemp(3.0);
   assert.equal(min, 25.0);
 });

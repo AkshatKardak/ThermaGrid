@@ -117,8 +117,14 @@ export const AuthorityDashboard: React.FC = () => {
     if (!wardsRiskData || wardsRiskData.length === 0) {
       return { veryHigh: 0, extreme: 0, centresOpen: coolingCentres?.length ?? 0, acknowledged: 0 };
     }
-    const veryHigh = wardsRiskData.filter((w: any) => (w.band === 'Very High' || w.risk_band === 'Very High')).length;
-    const extreme = wardsRiskData.filter((w: any) => (w.band === 'Extreme' || w.risk_band === 'Extreme')).length;
+    const veryHigh = wardsRiskData.filter((w: any) => {
+      const score = Number(w.risk_score ?? w.risk ?? 0);
+      return score >= 70 && score < 85;
+    }).length;
+    const extreme = wardsRiskData.filter((w: any) => {
+      const score = Number(w.risk_score ?? w.risk ?? 0);
+      return score >= 85;
+    }).length;
     const centresOpen = coolingCentres?.length ?? 0;
     return { veryHigh, extreme, centresOpen, acknowledged: 0 };
   }, [wardsRiskData, coolingCentres]);
@@ -371,7 +377,7 @@ export const AuthorityDashboard: React.FC = () => {
                     CENTRES OPEN
                   </div>
                   <div className="font-mono text-[28px] leading-tight font-bold text-ink tabular-nums">
-                    {kpiCounts.centresOpen} <span className="text-muted font-normal text-lg">/ 12</span>
+                    {kpiCounts.centresOpen}
                   </div>
                 </div>
 
@@ -380,9 +386,11 @@ export const AuthorityDashboard: React.FC = () => {
                   <div className="text-[10px] uppercase font-mono text-muted tracking-wider">
                     ACKNOWLEDGED
                   </div>
-                  <div className="font-mono text-[28px] leading-tight font-bold text-ink tabular-nums flex items-center gap-2">
-                    <span>{kpiCounts.acknowledged}%</span>
-                    <span className="w-2.5 h-2.5 rounded-full bg-risk-1" />
+                  <div
+                    className="font-mono text-[28px] leading-tight font-bold text-muted tabular-nums flex items-center gap-2 cursor-help"
+                    title="Not yet tracked by municipal dispatch gateway"
+                  >
+                    <span>—</span>
                   </div>
                 </div>
               </div>
@@ -436,7 +444,7 @@ export const AuthorityDashboard: React.FC = () => {
                 {/* Footer: Recipient Count & Primary Action Button */}
                 <div className="pt-1 flex items-center justify-between">
                   <span className="text-[10px] font-mono text-muted">
-                    420,000 citizens · 18 contractors
+                    {activeWard?.population ? `${Number(activeWard.population).toLocaleString()} residents` : 'Live municipal coverage'}
                   </span>
                   <button
                     type="submit"

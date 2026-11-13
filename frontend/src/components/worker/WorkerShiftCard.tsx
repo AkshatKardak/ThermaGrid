@@ -525,12 +525,12 @@ EMERGENCY: Call 108 immediately for symptoms of heat stroke.
           </div>
         </div>
 
-        {/* Interactive Shift Diurnal WBGT Scrubber */}
+        {/* Interactive Shift 24-Hour WBGT Scrubber */}
         <div className="p-5 rounded-[8px] bg-raised border border-border space-y-3 no-print">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <span className="text-xs font-mono uppercase tracking-wider text-muted font-medium block">
-                Interactive Shift Diurnal WBGT Scrubber
+                Interactive Shift 24-Hour WBGT Scrubber
               </span>
               <p className="text-xs text-muted">
                 Scrub or click an hour to simulate heat strain and ISO 7243 rest requirements:
@@ -560,7 +560,7 @@ EMERGENCY: Call 108 immediately for symptoms of heat stroke.
             </div>
           </div>
 
-          {/* Diurnal WBGT Hourly Rail */}
+          {/* 24-Hour WBGT Hourly Rail */}
           {data?.wbgt_series && data.wbgt_series.length > 0 && (
             <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-2">
               {data.wbgt_series.map((item) => {

@@ -49,7 +49,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
     }
   }, [scrollProgress, userInteracted, isPlaying, staticHour]);
 
-  // Auto-play diurnal cycle loop
+  // Auto-play 24-hour cycle loop
   useEffect(() => {
     if (!isPlaying || staticHour !== undefined) return;
 
@@ -239,7 +239,8 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
     onRender: ({ camera }) => {
       const currentHour = hourRef.current;
       // Solar angle: 0 at 06:00, PI/2 at 12:00, PI at 18:00
-      const sunAngle = ((currentHour - 6) / 12) * Math.PI;
+      const SOLAR_SPAN_HOURS = 12;
+      const sunAngle = ((currentHour - 6) / SOLAR_SPAN_HOURS) * Math.PI;
       const isDaytime = currentHour >= 5.5 && currentHour <= 18.5;
 
       if (sunMeshRef.current && sunLightRef.current) {
@@ -325,7 +326,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
               <span className={`w-2.5 h-2.5 rounded-full ${isPlaying ? 'bg-accent animate-pulse' : 'bg-muted'}`} />
               <div>
                 <span className="text-[10px] font-mono uppercase text-raised/70 block">
-                  DIURNAL CLOCK
+                  DAILY CYCLE CLOCK
                 </span>
                 <span className="text-xl sm:text-2xl font-mono font-bold text-raised tabular-nums tracking-tight">
                   {thermalState.timeFormatted}
@@ -338,7 +339,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
               <button
                 type="button"
                 onClick={togglePlay}
-                title={isPlaying ? 'Pause diurnal cycle' : 'Play diurnal cycle'}
+                title={isPlaying ? 'Pause 24-hour cycle' : 'Play 24-hour cycle'}
                 className="w-8 h-8 rounded-[6px] bg-raised hover:bg-surface border border-border text-ink flex items-center justify-center shrink-0 transition-colors cursor-pointer"
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
@@ -353,7 +354,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
                   value={hour}
                   onChange={handleSliderChange}
                   className="w-full accent-accent cursor-pointer h-1.5 bg-raised/30 rounded-lg appearance-none"
-                  aria-label="Scrub 24-hour diurnal cycle"
+                  aria-label="Scrub 24-hour pattern"
                 />
                 <div className="flex justify-between text-[9px] font-mono text-raised/50 px-0.5">
                   <span>00h</span>

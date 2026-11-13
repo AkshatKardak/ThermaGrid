@@ -3,7 +3,6 @@ import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 import { Container } from '../components/common/Container';
-import { DataStatusBadge } from '../components/common/DataStatusBadge';
 import { TwoWardsComparison } from '../components/dashboard/TwoWardsComparison';
 import { SectionHeader } from '../components/ui/SectionHeader';
 import { KpiNumeral } from '../components/ui/KpiNumeral';
@@ -13,14 +12,12 @@ import { useWards } from '../hooks/useWards';
 import { useRole } from '../hooks/useRole';
 import { useCanRender3D } from '../components/landing3d/useCanRender3D';
 import { ThermalLagStaticFallback } from '../components/landing3d/ThermalLagStaticFallback';
-import { StaticWardMapFallback } from '../components/landing3d/StaticWardMapFallback';
+import { IndiaChoropleth } from '../components/maps/IndiaChoropleth';
+import { HowItWorks } from '../components/landing/HowItWorks';
+import { LandingFaq } from '../components/landing/LandingFaq';
 import { getRiskHex } from '../components/landing3d/palette';
 
 // Lazy-load 3D scenes
-const WardHeatSkyline = React.lazy(() =>
-  import('../components/landing3d/WardHeatSkyline').then((m) => ({ default: m.WardHeatSkyline }))
-);
-
 const ThermalLagHouses = React.lazy(() =>
   import('../components/landing3d/ThermalLagHouses').then((m) => ({ default: m.ThermalLagHouses }))
 );
@@ -37,6 +34,7 @@ interface DisplayWardItem {
   temperature_c: number;
   latitude: number;
   longitude: number;
+  population?: number;
   source?: string;
   is_demo?: boolean;
 }
@@ -53,14 +51,14 @@ export const Landing: React.FC = () => {
 
   const isLive = Boolean(wardsRisk && wardsRisk.length > 0);
 
-  // Sample state - explicitly gated behind source: 'sample'
+  // Fallback sample wards when API is initializing
   const sampleWards: DisplayWardItem[] = React.useMemo(
     () => [
-      { ward_name: 'Ward M/East (Govandi)', ward_code: 'WARD_ME', risk_score: 84.2, wbgt_c: 34.6, temperature_c: 38.2, latitude: 19.0558, longitude: 72.9315, source: 'sample' },
-      { ward_name: 'Ward G/North (Dharavi)', ward_code: 'WARD_GN', risk_score: 79.5, wbgt_c: 33.8, temperature_c: 37.9, latitude: 19.041, longitude: 72.855, source: 'sample' },
-      { ward_name: 'Ward L (Kurla East)', ward_code: 'WARD_L', risk_score: 73.1, wbgt_c: 33.1, temperature_c: 37.4, latitude: 19.068, longitude: 72.885, source: 'sample' },
-      { ward_name: 'Ward H/East (Bandra E)', ward_code: 'WARD_HE', risk_score: 68.4, wbgt_c: 32.5, temperature_c: 36.8, latitude: 19.058, longitude: 72.848, source: 'sample' },
-      { ward_name: 'Ward A (Colaba / Fort)', ward_code: 'WARD_A', risk_score: 38.6, wbgt_c: 28.2, temperature_c: 34.1, latitude: 18.922, longitude: 72.8347, source: 'sample' },
+      { ward_name: 'Ward M/East (Govandi)', ward_code: 'WARD_ME', risk_score: 84.2, wbgt_c: 34.6, temperature_c: 38.2, latitude: 19.0558, longitude: 72.9315, population: 807720, source: 'sample' },
+      { ward_name: 'Ward G/North (Dharavi)', ward_code: 'WARD_GN', risk_score: 79.5, wbgt_c: 33.8, temperature_c: 37.9, latitude: 19.041, longitude: 72.855, population: 599039, source: 'sample' },
+      { ward_name: 'Ward L (Kurla East)', ward_code: 'WARD_L', risk_score: 73.1, wbgt_c: 33.1, temperature_c: 37.4, latitude: 19.068, longitude: 72.885, population: 902227, source: 'sample' },
+      { ward_name: 'Ward H/East (Bandra E)', ward_code: 'WARD_HE', risk_score: 68.4, wbgt_c: 32.5, temperature_c: 36.8, latitude: 19.058, longitude: 72.848, population: 557239, source: 'sample' },
+      { ward_name: 'Ward A (Colaba / Fort)', ward_code: 'WARD_A', risk_score: 38.6, wbgt_c: 28.2, temperature_c: 34.1, latitude: 18.922, longitude: 72.8347, population: 185014, source: 'sample' },
     ],
     []
   );
@@ -95,43 +93,9 @@ export const Landing: React.FC = () => {
     return <Navigate to="/app" replace />;
   }
 
-  // 5-Stage Computational Pipeline Stops
-  const pipelineStages = [
-    {
-      step: '01',
-      name: 'Synoptic ingestion',
-      desc: 'Hourly surface weather from Open-Meteo & ERA5 reanalysis joined to ward census polygons.',
-      metric: '1.1km grid join',
-    },
-    {
-      step: '02',
-      name: 'Physiological physics',
-      desc: 'Liljegren wet-bulb globe temperature, 6th-order UTCI polynomial, and NOAA heat index.',
-      metric: 'ISO 7243 WBGT',
-    },
-    {
-      step: '03',
-      name: 'Microclimate lag',
-      desc: 'Envelope thermal inertia and 2–3 hour indoor phase lag across tin vs RCC concrete roofs.',
-      metric: '2–3h thermal delay',
-    },
-    {
-      step: '04',
-      name: 'Composite risk scoring',
-      desc: 'Weighted hazard, exposure and vulnerability, minus adaptive capacity',
-      metric: '0–100 composite',
-    },
-    {
-      step: '05',
-      name: 'Automated dispatch',
-      desc: 'Targeted municipal advisories, worker rest shift schedules, and cooling centre routes.',
-      metric: '5 languages · email + WhatsApp',
-    },
-  ];
-
   return (
     <div className="w-full flex flex-col">
-      {/* 1. Hero Section: Left Narrative (60%) + Right Live Ward Telemetry Matrix (40%) */}
+      {/* 1. Hero Section: Left Narrative (60%) + Right India Choropleth (40%) */}
       <section className="py-12 sm:py-16 lg:py-20">
         <Container id="hero-container">
           <div
@@ -216,106 +180,40 @@ export const Landing: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column (40% weight): Vertical Stack on --panel-dark */}
+            {/* Right Column: India Choropleth (40% weight) */}
             <div
               id="hero-right-card"
-              className="lg:col-span-5 bg-panel-dark border border-border rounded-[8px] p-5 flex flex-col justify-between corner-ticks relative z-10 h-full"
+              className="lg:col-span-5 flex flex-col justify-between h-full min-h-[480px] sm:min-h-[540px]"
             >
-              {/* Header row: Title left, exactly ONE DataStatusBadge right, same baseline */}
-              <div className="flex items-baseline justify-between gap-3 w-full pb-2">
-                <div>
-                  <span className="text-[10px] font-mono uppercase text-raised/70 block">
-                    REAL-TIME WARD SENSORS
-                  </span>
-                  <h3 className="text-sm font-semibold text-raised font-display">
-                    Extruded Ward Thermal Risk
-                  </h3>
-                </div>
-                <DataStatusBadge
-                  isDemo={!isLive || Boolean(wardsRisk?.some((w) => w.is_demo))}
-                  variant="dark"
-                />
-              </div>
-
-              {/* 3D Canvas Container: clamp(260px, 32vw, 360px), full inner width, 1px hairline border */}
-              <div
-                id="hero-canvas-container"
-                className="w-full h-[clamp(260px,32vw,360px)] border border-border/60 rounded-[6px] overflow-hidden relative my-2 bg-panel-dark"
-              >
-                {canRender3D ? (
-                  <React.Suspense
-                    fallback={
-                      <div className="w-full h-full flex items-center justify-center font-mono text-xs text-raised">
-                        Loading 3D Ward Map...
-                      </div>
-                    }
-                  >
-                    <WardHeatSkyline
-                      locations={wards || []}
-                      riskData={wardsRisk || []}
-                      selectedWardCode={selectedWardCode}
-                      onWardSelect={(code) => setSelectedWardCode(code)}
-                      isDemo={!isLive || Boolean(wardsRisk?.some((w) => w.is_demo))}
-                    />
-                  </React.Suspense>
-                ) : (
-                  <StaticWardMapFallback wards={rankedWards} />
-                )}
-              </div>
-
-              {/* Ranked Priority List: Sits BELOW canvas with ZERO overlap */}
-              <div id="hero-ranked-list" className="space-y-1.5 pt-2">
-                <div className="text-[10px] font-mono text-raised/70 pb-1 border-b border-border/40 flex justify-between">
-                  <span>Ranked Priority Wards</span>
-                  <span>Risk · WBGT</span>
-                </div>
-                {rankedWards.slice(0, 5).map((w: any, idx: number) => {
-                  const isSelected = w.ward_code === selectedWardCode;
-                  const riskHex = getRiskHex(w.risk_score || 50);
-
-                  return (
-                    <div
-                      key={w.ward_code || idx}
-                      onClick={() => setSelectedWardCode(w.ward_code)}
-                      className={`flex items-center justify-between p-2 rounded-[6px] transition-colors cursor-pointer border text-xs font-mono select-none ${
-                        isSelected
-                          ? 'bg-raised/15 border-accent text-raised'
-                          : 'hover:bg-raised/10 border-transparent text-raised/90'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
-                          style={{ backgroundColor: riskHex }}
-                          aria-hidden="true"
-                        />
-                        <span className="truncate">{w.ward_name}</span>
-                      </div>
-                      <div className="flex items-center gap-2.5 shrink-0 pl-2">
-                        <span className="font-semibold tabular-nums text-raised">
-                          {Math.round(w.risk_score || 50)}
-                        </span>
-                        <span className="text-raised/60 tabular-nums">
-                          {Number(w.wbgt_c || 30).toFixed(1)}°C
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <IndiaChoropleth />
             </div>
           </div>
         </Container>
       </section>
 
-      {/* 2. Section: 3D Thermal Inertia House Archetypes */}
+      {/* 2. Section: How it works (3 steps, plain language) */}
+      <section id="how-it-works-section" className="py-12 sm:py-16">
+        <Container>
+          <div className="space-y-8">
+            <SectionHeader
+              label="How it works"
+              title="From synoptic observation to municipal action"
+              lead="We read the weather → we work out how hot it feels to a person → we tell you who is at risk and what to do."
+              className="mb-6"
+            />
+            <HowItWorks />
+          </div>
+        </Container>
+      </section>
+
+      {/* 3. Section: 3D Thermal Inertia House Archetypes */}
       <section id="two-wards" className="py-12 sm:py-16">
         <Container>
           <div className="space-y-6">
             <SectionHeader
               label="BUILT-ENVIRONMENT THERMAL INERTIA"
               title="Informal Tin-Roof vs Engineered RCC Concrete"
-              lead="Interactive diurnal temperature progression demonstrating heat retention, envelope insulation disparity, and the critical late-afternoon indoor phase lag."
+              lead="Interactive 24-hour pattern demonstrating heat retention, envelope insulation disparity, and the critical late-afternoon indoor phase lag."
             />
             {canRender3D ? (
               <React.Suspense
@@ -338,8 +236,8 @@ export const Landing: React.FC = () => {
         </Container>
       </section>
 
-      {/* 3. Section: 3D Ward Heat City Landscape (Desktop) */}
-      <section className="py-12 sm:py-16 hidden md:block">
+      {/* 4. Section: 3D Ward Heat City Landscape */}
+      <section id="ward-heat-city" className="py-12 sm:py-16">
         <Container>
           <div className="space-y-6">
             <SectionHeader
@@ -347,135 +245,72 @@ export const Landing: React.FC = () => {
               title="Ward Heat City 3D Landscape"
               lead="Volumetric blocks mapping normative human thermal stress. Height and colour encode multi-factorial risk, not mere air temperature."
             />
-            <div className="border border-border rounded-[8px] overflow-hidden bg-panel-dark">
-              <React.Suspense
-                fallback={
-                  <div className="h-[420px] flex items-center justify-center font-mono text-xs text-raised">
-                    Initializing 3D Ward Heat Landscape...
-                  </div>
-                }
-              >
-                <WardHeatCity wards={activeWardList} height={420} />
-              </React.Suspense>
+            <React.Suspense
+              fallback={
+                <div className="h-[480px] flex items-center justify-center font-mono text-xs text-raised bg-panel-dark rounded-[8px]">
+                  Initializing 3D Ward Heat Landscape...
+                </div>
+              }
+            >
+              <WardHeatCity
+                wards={activeWardList}
+                height={480}
+                onWardSelect={(code) => setSelectedWardCode(String(code))}
+              />
+            </React.Suspense>
+
+            {/* Priority Wards Telemetry Connected to 3D City */}
+            <div id="ward-city-list" className="p-4 rounded-[8px] bg-surface border border-border space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-border">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-ink">
+                  Priority Wards Telemetry
+                </span>
+                <span className="text-xs font-mono text-muted">
+                  Click a block above or card below to inspect
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {rankedWards.map((w: any, idx: number) => {
+                  const isSelected = w.ward_code === selectedWardCode || w.id === selectedWardCode;
+                  const riskHex = getRiskHex(w.risk_score || 50);
+                  return (
+                    <div
+                      key={w.ward_code || idx}
+                      onClick={() => setSelectedWardCode(w.ward_code || w.id)}
+                      className={`p-3 rounded-[6px] border text-xs font-mono transition-colors cursor-pointer flex flex-col justify-between gap-2 ${
+                        isSelected
+                          ? 'bg-raised border-accent shadow-sm'
+                          : 'bg-raised/60 hover:bg-raised border-border'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: riskHex }} />
+                        <span className="font-bold text-ink truncate">{w.ward_name}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-muted text-[11px] pt-1 border-t border-border/40">
+                        <span>Risk: <strong className="text-ink">{Math.round(w.risk_score || 50)}</strong></span>
+                        <span>{Number(w.wbgt_c || 30).toFixed(1)}°C WBGT</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </Container>
       </section>
 
-      {/* 4. Section: Computational Pipeline & Provenance */}
-      <section id="how-it-works" className="py-16 lg:py-24">
-        <Container id="pipeline-container">
-          <SectionHeader
-            label="Computational pipeline"
-            title="From raw satellite telemetry to targeted municipal intervention"
-            lead="ThermaGrid bridges numerical weather prediction and urban epidemiology through five stages."
-            className="mb-10"
-          />
-
-          {/* 5-Stage Flow Rail */}
-          <div id="pipeline-grid" className="relative">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-6 relative">
-              {pipelineStages.map((stage, idx) => (
-                <div key={idx} className="relative flex flex-col items-start pl-12 lg:pl-0 h-full">
-                  {/* Mobile vertical connecting hairline (consecutive circles only, inset 8px) */}
-                  {idx < pipelineStages.length - 1 && (
-                    <div
-                      className="lg:hidden absolute left-[15px] top-10 bottom-[-24px] w-[1px] bg-border"
-                      aria-hidden="true"
-                    />
-                  )}
-
-                  {/* Desktop horizontal connector segment to next circle (between consecutive circles only, inset 8px) */}
-                  {/* Circle 05 (the last step) has NO connector past it! */}
-                  {idx < pipelineStages.length - 1 && (
-                    <div
-                      className="hidden lg:block absolute top-4 left-10 right-[-16px] h-[1px] bg-border"
-                      style={{ left: '40px', right: '-16px' }}
-                      aria-hidden="true"
-                    />
-                  )}
-
-                  {/* Stage Stop Marker */}
-                  <div className="absolute left-0 top-0 lg:static flex items-center justify-center w-8 h-8 rounded-full bg-surface border border-border text-xs font-mono font-medium text-ink tabular-nums z-10 shrink-0">
-                    {stage.step}
-                  </div>
-
-                  {/* Stop Content with Tag pinned to bottom */}
-                  <div className="lg:mt-4 flex flex-col flex-1 w-full justify-between">
-                    <div>
-                      <h4 className="text-base font-semibold text-ink font-display">
-                        {stage.name}
-                      </h4>
-                      <p className="text-sm leading-[22px] text-muted mt-2">
-                        {stage.desc}
-                      </p>
-                    </div>
-
-                    {/* Step Tag: mono 12px in --muted, pinned to bottom with mt-auto so all share one baseline */}
-                    <div className="mt-auto pt-4">
-                      <span className="text-xs font-mono text-muted tabular-nums">
-                        {stage.metric}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 5. Provenance Strip: exactly 64px gap below step row (mt-16) */}
-          <div
-            id="provenance-strip"
-            className="mt-16 p-6 rounded-[8px] bg-surface border border-border space-y-4"
-          >
-            <div className="text-xs font-mono text-muted uppercase tracking-wider">
-              Data provenance &amp; model auditability
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Card 1 */}
-              <div className="p-4 rounded-[6px] bg-raised border border-border flex flex-col justify-between h-full">
-                <span className="text-xs text-muted block pb-1">Observation source</span>
-                <span className="font-mono text-sm sm:text-base font-semibold text-ink block leading-snug">
-                  Open-Meteo &amp; ERA5
-                </span>
-                <span className="text-xs text-muted block pt-1">
-                  Hourly dry-bulb, dewpoint, wind
-                </span>
-              </div>
-
-              {/* Card 2 */}
-              <div className="p-4 rounded-[6px] bg-raised border border-border flex flex-col justify-between h-full">
-                <span className="text-xs text-muted block pb-1">Spatial resolution</span>
-                <span className="font-mono text-sm sm:text-base font-semibold text-ink block leading-snug">
-                  Ward-Level (~1.1km)
-                </span>
-                <span className="text-xs text-muted block pt-1">
-                  Polygon boundary joins
-                </span>
-              </div>
-
-              {/* Card 3 */}
-              <div className="p-4 rounded-[6px] bg-raised border border-border flex flex-col justify-between h-full">
-                <span className="text-xs text-muted block pb-1">Licensing &amp; code</span>
-                <span className="font-mono text-sm sm:text-base font-semibold text-ink block leading-snug">
-                  MIT License
-                </span>
-                <span className="text-xs text-muted block pt-1">
-                  Open source
-                </span>
-              </div>
-
-              {/* Card 4 */}
-              <div className="p-4 rounded-[6px] bg-raised border border-border flex flex-col justify-between h-full">
-                <span className="text-xs text-muted block pb-1">Telemetry cadence</span>
-                <span className="font-mono text-sm sm:text-base font-semibold text-ink block leading-snug">
-                  Hourly refresh
-                </span>
-                <span className="text-xs text-muted block pt-1">
-                  Scheduled ingestion
-                </span>
-              </div>
-            </div>
+      {/* 5. Section: Frequently Asked Questions (Accordion) */}
+      <section id="faq-section" className="py-12 sm:py-16">
+        <Container>
+          <div className="space-y-6">
+            <SectionHeader
+              label="Frequently Asked Questions"
+              title="Methodology, Ingestion Cadence &amp; Data Governance"
+              lead="Essential operational and technical clarifications regarding ThermaGrid's biometeorological architecture."
+              className="text-center mx-auto"
+            />
+            <LandingFaq />
           </div>
         </Container>
       </section>

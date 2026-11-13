@@ -10,12 +10,12 @@ export const ThermalLagStaticFallback: React.FC = () => {
     <div className="w-full space-y-6 select-none">
       {/* 2-Panel Comparison: Midday Peak vs Nocturnal Heat Retention */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Panel 1: 15:00 Diurnal Peak */}
+        {/* Panel 1: 15:00 Daily Peak */}
         <div className="p-6 rounded-[8px] bg-surface border border-border space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-accent" />
-              <span className="text-xs font-mono font-medium text-ink">15:00 DIURNAL PEAK</span>
+              <span className="text-xs font-mono font-medium text-ink">15:00 DAILY PEAK</span>
             </div>
             <span className="text-xs font-mono text-muted">
               Outdoor Ambient: <strong className="text-ink">{dayState.outdoorTemp.toFixed(1)}°C</strong>

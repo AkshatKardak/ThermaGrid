@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Flame, ArrowRight, LayoutDashboard } from 'lucide-react';
+import { ArrowRight, LayoutDashboard } from 'lucide-react';
 import { useAuth, UserButton } from '@clerk/clerk-react';
 import { env } from '../../config/env';
 import { Container } from '../common/Container';
@@ -14,18 +14,15 @@ export const PublicNavbar: React.FC = () => {
       <Container id="header-container">
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
-          <Link to="/" id="header-logo" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] bg-accent flex items-center justify-center shrink-0 transition-transform">
-              <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-on-accent transition-colors" />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-bold tracking-tight text-ink font-display">
-                Therma<span className="text-accent">Grid</span>
-              </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-[4px] text-[9px] font-mono font-semibold uppercase bg-raised text-muted border border-border">
-                Public
-              </span>
-            </div>
+          <Link to="/" id="header-logo" className="flex items-center gap-2 group">
+            <img
+              src="/thermagrid-logo.png"
+              alt="ThermaGrid"
+              className="h-8 sm:h-9 w-auto object-contain shrink-0"
+            />
+            <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-[4px] text-[9px] font-mono font-semibold uppercase bg-raised text-muted border border-border">
+              Public
+            </span>
           </Link>
 
           {/* Center Links */}

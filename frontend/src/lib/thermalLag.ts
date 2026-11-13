@@ -1,14 +1,14 @@
 /**
  * First-order biometeorological indoor thermal lag model.
- * Simulates indoor temperature response to outdoor diurnal cycle across roof types:
+ * Simulates indoor temperature response to outdoor daily cycle across roof types:
  * - Tin roof: Low thermal inertia (tau ~ 1h) + solar absorption gain. Peaks early (~14:30), cools rapidly at night.
  * - RCC roof: High thermal inertia (tau ~ 3.2h), heavy concrete envelope. Peaks late (~17:00), retains heat at night.
  */
 
 export interface ThermalConfig {
-  tMean: number;        // Baseline mean diurnal outdoor temp (°C)
-  tAmp: number;         // Amplitude of diurnal oscillation (°C)
-  peakHour: number;     // Hour of outdoor diurnal peak (15.0 = 15:00)
+  tMean: number;        // Baseline mean daily outdoor temp (°C)
+  tAmp: number;         // Amplitude of 24-hour oscillation (°C)
+  peakHour: number;     // Hour of outdoor daily peak (15.0 = 15:00)
   tin: {
     tau: number;        // Time constant (hours)
     solarGain: number;  // Peak solar penetration (°C)
@@ -35,7 +35,7 @@ export const THERMAL_CONFIG: ThermalConfig = {
 
 /**
  * Computes outdoor ambient temperature at hour t (0..24).
- * Diurnal sine wave peaking at peakHour (15:00) with 39°C max and 25°C min.
+ * Daily sine wave peaking at peakHour (15:00) with 39°C max and 25°C min.
  */
 export function getOutdoorTemp(t: number, config: ThermalConfig = THERMAL_CONFIG): number {
   const omega = (2 * Math.PI) / 24;
@@ -50,7 +50,8 @@ export function getOutdoorTemp(t: number, config: ThermalConfig = THERMAL_CONFIG
 function getSolarGain(t: number, gainMax: number): number {
   if (t < 6 || t > 18) return 0;
   // Half-sine solar bell curve from 06:00 to 18:00 peaking at 12:00
-  const solarAngle = ((t - 6) / 12) * Math.PI;
+  const SOLAR_SPAN_HOURS = 12;
+  const solarAngle = ((t - 6) / SOLAR_SPAN_HOURS) * Math.PI;
   return gainMax * Math.sin(solarAngle);
 }
 

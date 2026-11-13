@@ -32,7 +32,7 @@ export const HourlyStrip: React.FC<HourlyStripProps> = ({ items }) => {
     <div className="space-y-3">
       <div className="flex items-center justify-between text-xs">
         <div className="text-[11px] font-mono uppercase tracking-wider text-muted">
-          <span>Diurnal Heat Progression (24 Hours)</span>
+          <span>Daily Heat Progression (24 Hours)</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-muted">Peak stress expected:</span>

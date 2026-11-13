@@ -151,7 +151,7 @@ export const OverviewHub: React.FC = () => {
             {peakWindow}
           </span>
           <span className="text-xs font-mono text-muted uppercase tracking-wider block mt-1.5">
-            Diurnal Peak Window
+            Daily Peak Window
           </span>
         </div>
 

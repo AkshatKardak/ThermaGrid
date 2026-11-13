@@ -37,7 +37,7 @@ export const SafeWindowCard: React.FC<SafeWindowCardProps> = ({ locationId }) =>
           </span>
           <h3 className={`${TYPOGRAPHY.h3} text-ink`}>When Can I Go Out?</h3>
           <p className="text-xs text-muted mt-0.5">
-            Sliding diurnal risk analysis calibrated to your activity's thermal threshold.
+            Sliding daily cycle risk analysis calibrated to your activity's thermal threshold.
           </p>
         </div>
 

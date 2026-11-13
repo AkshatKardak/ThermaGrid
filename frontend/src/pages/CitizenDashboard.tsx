@@ -261,7 +261,7 @@ export const CitizenDashboard: React.FC = () => {
       {/* 6. Hourly Strip */}
       <section className="space-y-4">
         <SectionHeader
-          label="DIURNAL CYCLE TRAJECTORY"
+          label="DAILY CYCLE TRAJECTORY"
           title="Hourly Human Heat Progression"
           lead="Hourly resolution predictions calibrated with numerical meteorological models and urban canopy thermal storage."
         />

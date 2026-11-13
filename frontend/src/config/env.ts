@@ -18,10 +18,10 @@ interface EnvConfig {
 const rawEnv = import.meta.env;
 
 export const env: EnvConfig = Object.freeze({
-  API_BASE_URL: rawEnv.VITE_API_BASE_URL || 'http://localhost:8000/api/v1',
+  API_BASE_URL: rawEnv.VITE_API_BASE_URL || 'http://localhost:8000/api',
   APP_NAME: rawEnv.VITE_APP_NAME || 'ThermaGrid',
   CLERK_PUBLISHABLE_KEY: rawEnv.VITE_CLERK_PUBLISHABLE_KEY || '',
-  MAP_STYLE_URL: rawEnv.VITE_MAP_STYLE_URL || 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+  MAP_STYLE_URL: rawEnv.VITE_MAP_STYLE_URL || 'https://tiles.openfreemap.org/styles/positron',
   MAPBOX_TOKEN: rawEnv.VITE_MAPBOX_TOKEN || '',
   ENABLE_3D: rawEnv.VITE_ENABLE_3D !== 'false',
   ENABLE_ANALYTICS: rawEnv.VITE_ENABLE_ANALYTICS !== 'false',

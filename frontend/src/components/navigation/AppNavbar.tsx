@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Flame,
   LayoutDashboard,
   ShieldAlert,
   HardHat,
@@ -10,15 +9,38 @@ import {
   MapPin,
   Menu,
   X,
-  UserCheck,
+  ShieldCheck,
+  FileText,
   BellRing,
 } from 'lucide-react';
 import { UserButton } from '@clerk/clerk-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRole } from '../../hooks/useRole';
 import { useAppStore } from '../../store/useAppStore';
-import { env } from '../../config/env';
 import { INDIAN_STATES, getCitiesForState } from '../../config/indiaGeo';
+
+interface NavItemConfig {
+  to: string;
+  label: string;
+  icon: any;
+  roles: ('citizen' | 'worker' | 'authority' | 'admin')[];
+}
+
+const ALL_NAV_ITEMS: NavItemConfig[] = [
+  // Citizen / Worker Role Tabs
+  { to: '/app', label: 'Overview', icon: LayoutDashboard, roles: ['citizen', 'worker'] },
+  { to: '/app/heat-risk', label: 'Heat Risk', icon: ShieldAlert, roles: ['citizen', 'worker'] },
+  { to: '/app/worker', label: 'Worker', icon: HardHat, roles: ['citizen', 'worker'] },
+  { to: '/app/account', label: 'Account', icon: BellRing, roles: ['citizen', 'worker'] },
+
+  // Authority / Admin Role Tabs
+  { to: '/app/authority', label: 'Mission Control', icon: Building2, roles: ['authority', 'admin'] },
+  { to: '/app/wards', label: 'Wards', icon: MapPin, roles: ['authority', 'admin'] },
+  { to: '/app/interventions', label: 'Interventions', icon: ShieldCheck, roles: ['authority', 'admin'] },
+  { to: '/app/alerts', label: 'Alerts', icon: BellRing, roles: ['authority', 'admin'] },
+  { to: '/app/reports', label: 'Reports', icon: FileText, roles: ['authority', 'admin'] },
+  { to: '/app/analytics', label: 'Analytics', icon: Activity, roles: ['authority', 'admin'] },
+];
 
 export const AppNavbar: React.FC = () => {
   const location = useLocation();
@@ -26,20 +48,12 @@ export const AppNavbar: React.FC = () => {
   const { selectedState, setSelectedState, selectedCity, setSelectedCity } = useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Cities matching the selected state
+  // Available cities for selected state
   const availableCities = getCitiesForState(selectedState);
 
-  // App Nav Items
-  const navItems = [
-    { to: '/app', label: 'Overview', icon: LayoutDashboard },
-    { to: '/app/heat-risk', label: 'Heat Risk', icon: ShieldAlert },
-    { to: '/app/worker', label: 'Worker', icon: HardHat },
-    ...(isAuthority
-      ? [{ to: '/app/authority', label: 'Authority', icon: Building2, highlight: true }]
-      : []),
-    { to: '/app/analytics', label: 'Analytics', icon: Activity },
-    { to: '/app/account', label: 'Account', icon: BellRing },
-  ];
+  // Role-driven navigation array
+  const userRole = isAuthority ? 'authority' : 'citizen';
+  const navItems = ALL_NAV_ITEMS.filter((item) => item.roles.includes(userRole));
 
   const closeMenu = () => setMobileMenuOpen(false);
 
@@ -47,25 +61,26 @@ export const AppNavbar: React.FC = () => {
     <header className="sticky top-0 z-50 bg-surface border-b border-border transition-colors">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3">
-          {/* Brand -> /app */}
-          <Link to="/app" onClick={closeMenu} className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-8 h-8 rounded-[6px] bg-accent flex items-center justify-center transition-transform">
-              <Flame className="w-4 h-4 text-on-accent transition-colors" />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-base font-bold tracking-tight text-ink font-display">
-                Therma<span className="text-accent">Grid</span>
+          {/* Brand -> /app or /app/authority */}
+          <Link
+            to={isAuthority ? '/app/authority' : '/app'}
+            onClick={closeMenu}
+            className="flex items-center gap-2 shrink-0 group"
+          >
+            <img
+              src="/thermagrid-logo.png"
+              alt="ThermaGrid"
+              className="h-8 w-auto object-contain shrink-0"
+            />
+            {isAuthority && (
+              <span className="px-1.5 py-0.5 rounded-[4px] text-[9px] font-mono font-semibold uppercase bg-raised border border-border text-ink">
+                Authority
               </span>
-              {isAuthority && (
-                <span className="px-1.5 py-0.5 rounded-[4px] text-[9px] font-mono font-semibold uppercase bg-raised border border-border text-ink">
-                  Authority
-                </span>
-              )}
-            </div>
+            )}
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -90,49 +105,12 @@ export const AppNavbar: React.FC = () => {
             })}
           </nav>
 
-          {/* Medium screen navigation (compact) */}
-          <nav className="hidden lg:flex xl:hidden items-center gap-1">
-            {navItems.slice(0, 5).map((item) => {
-              const Icon = item.icon;
-              const isActive =
-                item.to === '/app'
-                  ? location.pathname === '/app'
-                  : location.pathname.startsWith(item.to);
-
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={`flex items-center gap-1 px-2 py-1.5 rounded-[6px] text-xs font-mono font-medium transition-colors ${
-                    isActive
-                      ? 'bg-raised text-ink border border-border'
-                      : 'text-muted hover:text-ink hover:bg-raised'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-accent' : 'text-muted'}`} />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-            <Link
-              to="/app/account"
-              className={`p-1.5 rounded-[6px] text-xs transition-colors ${
-                location.pathname.startsWith('/app/account')
-                  ? 'bg-raised text-ink border border-border'
-                  : 'text-muted hover:text-ink'
-              }`}
-              title="Account & Alerts"
-            >
-              <BellRing className="w-3.5 h-3.5" />
-            </Link>
-          </nav>
-
-          {/* Right controls: State & City Selectors + User */}
+          {/* Right controls: State & City Selectors + User Profile */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             {/* Dual State / City Selector */}
             <div className="flex items-center gap-1.5 bg-raised px-2 sm:px-2.5 py-1.5 rounded-[6px] border border-border text-xs">
               <MapPin className="w-3.5 h-3.5 text-accent shrink-0" />
-              
+
               {/* State Select */}
               <select
                 value={selectedState}
@@ -142,52 +120,55 @@ export const AppNavbar: React.FC = () => {
                 title={`State: ${selectedState}`}
               >
                 {INDIAN_STATES.map((s) => (
-                  <option key={s.name} value={s.name} className="bg-raised text-ink">
+                  <option key={s.name} value={s.name}>
                     {s.name}
                   </option>
                 ))}
               </select>
 
-              <span className="text-muted select-none font-mono">/</span>
+              <span className="text-border">/</span>
 
               {/* City Select */}
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="bg-transparent text-accent font-mono font-medium outline-none cursor-pointer pr-1 text-xs max-w-[90px] sm:max-w-[115px] truncate"
-                aria-label="Select City"
+                className="bg-transparent text-ink font-mono font-medium outline-none cursor-pointer text-xs max-w-[85px] sm:max-w-[115px] truncate"
+                aria-label="Select City or District"
                 title={`City: ${selectedCity}`}
               >
                 {availableCities.map((c) => (
-                  <option key={c.name} value={c.name} className="bg-raised text-ink">
+                  <option key={c.name} value={c.name}>
                     {c.name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Clerk UserButton */}
-            {env.CLERK_PUBLISHABLE_KEY ? (
-              <UserButton afterSignOutUrl="/" />
-            ) : (
-              <div className="w-7 h-7 rounded-full bg-raised border border-border flex items-center justify-center text-xs text-muted">
-                <UserCheck className="w-3.5 h-3.5" />
-              </div>
-            )}
+            {/* Clerk User Button */}
+            <div className="pl-1 shrink-0 flex items-center">
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: 'w-8 h-8 rounded-[6px] border border-border',
+                  },
+                }}
+              />
+            </div>
 
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 rounded-[6px] bg-raised border border-border text-ink hover:bg-surface transition-colors"
-              aria-label="Toggle Navigation Menu"
+              className="p-2 rounded-[6px] text-muted hover:text-ink lg:hidden transition-colors border border-border bg-raised"
+              aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Navigation */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
@@ -196,7 +177,7 @@ export const AppNavbar: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeMenu}
-              className="fixed inset-0 bg-ink/20 z-40 lg:hidden"
+              className="fixed inset-0 bg-ink/40 z-40 lg:hidden"
             />
             <motion.div
               initial={{ x: '100%' }}
@@ -207,10 +188,11 @@ export const AppNavbar: React.FC = () => {
             >
               <div className="space-y-6">
                 <div className="flex items-center justify-between pb-4 border-b border-border">
-                  <div className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-accent" />
-                    <span className="text-sm font-bold text-ink font-display">ThermaGrid App</span>
-                  </div>
+                  <img
+                    src="/thermagrid-logo.png"
+                    alt="ThermaGrid"
+                    className="h-7 w-auto object-contain"
+                  />
                   <button
                     onClick={closeMenu}
                     className="p-1 rounded-[4px] text-muted hover:text-ink"
@@ -221,33 +203,33 @@ export const AppNavbar: React.FC = () => {
 
                 {/* State & City Controls in Drawer */}
                 <div className="p-3.5 rounded-[6px] bg-raised border border-border space-y-3">
-                  <span className="text-[10px] font-mono text-muted uppercase tracking-wider block">
-                    Telemetry Territory
-                  </span>
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted font-semibold">
+                    Spatial Jurisdiction Focus
+                  </div>
                   <div className="space-y-2">
                     <div>
                       <label className="text-[10px] font-mono text-muted block mb-1">State</label>
                       <select
                         value={selectedState}
                         onChange={(e) => setSelectedState(e.target.value)}
-                        className="w-full bg-surface border border-border rounded-[6px] px-2.5 py-1.5 text-xs text-ink outline-none focus:border-accent"
+                        className="w-full bg-surface border border-border rounded-[4px] p-1.5 text-xs font-mono text-ink"
                       >
                         {INDIAN_STATES.map((s) => (
-                          <option key={s.name} value={s.name} className="bg-surface text-ink">
+                          <option key={s.name} value={s.name}>
                             {s.name}
                           </option>
                         ))}
                       </select>
                     </div>
                     <div>
-                      <label className="text-[10px] font-mono text-muted block mb-1">City / Urban Center</label>
+                      <label className="text-[10px] font-mono text-muted block mb-1">City / District</label>
                       <select
                         value={selectedCity}
                         onChange={(e) => setSelectedCity(e.target.value)}
-                        className="w-full bg-surface border border-border rounded-[6px] px-2.5 py-1.5 text-xs text-accent font-medium outline-none focus:border-accent"
+                        className="w-full bg-surface border border-border rounded-[4px] p-1.5 text-xs font-mono text-ink"
                       >
                         {availableCities.map((c) => (
-                          <option key={c.name} value={c.name} className="bg-surface text-ink">
+                          <option key={c.name} value={c.name}>
                             {c.name}
                           </option>
                         ))}
@@ -256,10 +238,11 @@ export const AppNavbar: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Role-driven Nav links */}
                 <div className="space-y-1">
-                  <span className="text-[10px] font-mono text-muted uppercase tracking-wider block px-2 mb-2">
-                    Navigation
-                  </span>
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted font-semibold px-2 mb-2">
+                    {isAuthority ? 'Authority Console' : 'Navigation'}
+                  </div>
                   {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive =
@@ -272,13 +255,13 @@ export const AppNavbar: React.FC = () => {
                         key={item.to}
                         to={item.to}
                         onClick={closeMenu}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-sm font-medium transition-colors ${
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-xs font-mono font-medium transition-colors ${
                           isActive
-                            ? 'bg-raised text-ink border border-border font-medium'
+                            ? 'bg-raised text-ink border border-border font-bold'
                             : 'text-muted hover:text-ink hover:bg-raised'
                         }`}
                       >
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-accent' : 'text-muted'}`} />
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-accent' : 'text-muted'}`} />
                         <span>{item.label}</span>
                       </Link>
                     );
@@ -286,15 +269,10 @@ export const AppNavbar: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-border space-y-2 text-xs">
-                <div className="flex items-center justify-between text-muted">
-                  <span>Active Role:</span>
-                  <span className="font-mono text-ink capitalize">{role}</span>
-                </div>
-                <div className="flex items-center justify-between text-muted">
-                  <span>Jurisdiction:</span>
-                  <span className="font-mono text-accent">{selectedCity}, {selectedState}</span>
-                </div>
+              {/* Drawer Footer */}
+              <div className="pt-6 border-t border-border flex items-center justify-between text-xs font-mono text-muted">
+                <span>Role: <strong className="text-ink uppercase">{role}</strong></span>
+                <span className="text-[10px]">ThermaGrid Platform</span>
               </div>
             </motion.div>
           </>

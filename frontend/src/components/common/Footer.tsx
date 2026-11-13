@@ -12,9 +12,11 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
           {/* Col 1: Platform Overview & Mandate */}
           <div className="space-y-3">
-            <h4 className="text-base font-bold text-ink font-display">
-              Therma<span className="text-accent">Grid</span>
-            </h4>
+            <img
+              src="/thermagrid-logo.png"
+              alt="ThermaGrid"
+              className="h-8 w-auto object-contain"
+            />
             <p className="text-xs text-muted leading-relaxed max-w-[42ch]">
               Hyperlocal human thermal-stress early-warning & decision-support system
               (National Climate & Environmental Initiative). Calibrated biometeorological indices (WBGT, UTCI, Heat Index) intersecting ward-level built-environment vulnerability.

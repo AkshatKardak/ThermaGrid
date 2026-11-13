@@ -45,7 +45,7 @@ export const LocationDetails: React.FC = () => {
     { label: 'Avg Thermal Stress', value: `${(riskScore * 0.88).toFixed(1)} HTSI`, sub: 'Seasonal Baseline' },
     { label: 'Extreme Days / Year', value: '38 Days', sub: 'WBGT ≥ 32.2°C' },
     { label: 'Peak Stress Month', value: 'May', sub: 'Pre-Monsoon Solar' },
-    { label: 'Peak Stress Hours', value: '13:00 – 16:30', sub: 'Maximum Diurnal' },
+    { label: 'Peak Stress Hours', value: '13:00 – 16:30', sub: 'Maximum Daily Cycle' },
     { label: 'Microclimate Trend', value: '+1.8°C', sub: 'Per Decade UHI' },
     { label: 'Hotspot Status', value: 'Tier-1 Critical', sub: 'Informal Canopy Deficit' },
   ];
@@ -148,7 +148,7 @@ export const LocationDetails: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Side-by-Side 7/5 Split: History Diurnal Chart vs Forecast Uncertainty Chart */}
+      {/* 2. Side-by-Side 7/5 Split: History Daily Pattern Chart vs Forecast Uncertainty Chart */}
       <section className="space-y-4">
         <SectionHeader
           label="Temporal divergence & predictive uncertainty"
@@ -161,7 +161,7 @@ export const LocationDetails: React.FC = () => {
           <div className="lg:col-span-7">
             <Card
               tier="l1"
-              title="72-Hour Diurnal Thermal Curves"
+              title="72-Hour Daily Pattern Thermal Curves"
               subtitle="Observed WBGT, UTCI, and Heat Index vs Dry-Bulb Air Temperature"
             >
               {history?.items ? (

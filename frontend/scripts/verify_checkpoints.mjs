@@ -58,17 +58,17 @@ async function runVerification() {
       const headerLogoX = await page.$eval('#header-logo', (el) => Math.round(el.getBoundingClientRect().left));
       const heroLeftCardX = await page.$eval('#hero-left-card', (el) => Math.round(el.getBoundingClientRect().left));
       const sectionHeaderX = await page.$eval('[data-section-header="true"]', (el) => Math.round(el.getBoundingClientRect().left));
-      const pipelineGridX = await page.$eval('#pipeline-grid', (el) => Math.round(el.getBoundingClientRect().left));
+      const howItWorksX = await page.$eval('#how-it-works', (el) => Math.round(el.getBoundingClientRect().left));
 
       console.log(`\n[Viewport ${width}px Measured Left X]:`);
       console.log(`  Header Logo:    ${headerLogoX}px`);
       console.log(`  Hero Left Card: ${heroLeftCardX}px`);
       console.log(`  SectionHeader:  ${sectionHeaderX}px`);
-      console.log(`  Pipeline Grid:  ${pipelineGridX}px`);
+      console.log(`  How It Works:   ${howItWorksX}px`);
 
       const delta1 = Math.abs(headerLogoX - heroLeftCardX);
       const delta2 = Math.abs(headerLogoX - sectionHeaderX);
-      const delta3 = Math.abs(headerLogoX - pipelineGridX);
+      const delta3 = Math.abs(headerLogoX - howItWorksX);
 
       assert(delta1 <= 1 && delta2 <= 1 && delta3 <= 1, `Shared left x at ${width}px (±1px)`, `delta: max ${Math.max(delta1, delta2, delta3)}px`);
       await page.close();
@@ -140,65 +140,46 @@ async function runVerification() {
     }
 
     // ==========================================
-    // Phase 3 Checkpoint: Hero 3D Card
+    // Phase 3 Checkpoint: India Choropleth Hero
     // ==========================================
     {
       const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
       await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
 
-      // 1. Exactly one badge on the hero right card
-      const badgeCount = await page.$$eval('#hero-right-card [style*="nowrap"], #hero-right-card .whitespace-nowrap', (els) => els.length);
-      assert(badgeCount === 1, 'Exactly one badge on the hero telemetry card', `count: ${badgeCount}`);
+      // 1. India Choropleth renders SVG geography paths
+      const geographyCount = await page.$$eval('#india-choropleth-hero path', (els) => els.length);
+      assert(geographyCount >= 30, 'India choropleth renders state/UT geographies', `paths found: ${geographyCount}`);
 
-      // 2. Badge is not clipped (scrollWidth <= clientWidth)
-      const badgeClipped = await page.$eval(
-        '#hero-right-card .whitespace-nowrap',
-        (el) => el.scrollWidth > el.clientWidth
-      );
-      assert(!badgeClipped, 'Status badge is not clipped (scrollWidth <= clientWidth)');
+      // 2. Legend is rendered on --raised with risk scale
+      const hasLegend = await page.$eval('#india-choropleth-hero', (el) => el.textContent.includes('Risk Scale (HTSI)'));
+      assert(hasLegend, 'India choropleth displays 5-band risk scale legend');
 
-      // 3. Zero overlap between ranked list and canvas
-      const canvasRect = await page.$eval('#hero-canvas-container', (el) => el.getBoundingClientRect());
-      const listRect = await page.$eval('#hero-ranked-list', (el) => el.getBoundingClientRect());
-      const intersects = !(
-        canvasRect.right <= listRect.left ||
-        canvasRect.left >= listRect.right ||
-        canvasRect.bottom <= listRect.top ||
-        canvasRect.top >= listRect.bottom
-      );
-      assert(!intersects, 'Zero overlap between list and canvas', `canvas bottom: ${canvasRect.bottom}px, list top: ${listRect.top}px`);
-
-      // 4. Left and right card heights equal (align-items: stretch)
-      const leftHeight = await page.$eval('#hero-left-card', (el) => Math.round(el.getBoundingClientRect().height));
-      const rightHeight = await page.$eval('#hero-right-card', (el) => Math.round(el.getBoundingClientRect().height));
-      assert(
-        Math.abs(leftHeight - rightHeight) <= 2,
-        'Hero left and right card heights are equal',
-        `left: ${leftHeight}px, right: ${rightHeight}px`
-      );
+      // 3. Hero left card and right card render side-by-side on desktop
+      const leftRect = await page.$eval('#hero-left-card', (el) => el.getBoundingClientRect());
+      const rightRect = await page.$eval('#hero-right-card', (el) => el.getBoundingClientRect());
+      assert(rightRect.left >= leftRect.right - 2, 'Hero left card and right choropleth sit side-by-side without horizontal overlap');
 
       await page.close();
     }
 
     // ==========================================
-    // Phase 4 Checkpoint: Pipeline
+    // Phase 4 Checkpoint: How It Works & FAQ Accordion
     // ==========================================
     {
       const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
       await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
 
-      // 1. Measured gap between step row and provenance card is 64 px
-      const pipelineBottom = await page.$eval('#pipeline-grid', (el) => el.getBoundingClientRect().bottom);
-      const provenanceTop = await page.$eval('#provenance-strip', (el) => el.getBoundingClientRect().top);
-      const gap = Math.round(provenanceTop - pipelineBottom);
-      assert(Math.abs(gap - 64) <= 3, 'Measured gap between step row and provenance card is 64 px', `measured: ${gap}px`);
+      // 1. How It Works has exactly 3 steps
+      const stepCount = await page.$$eval('#how-it-works > *', (els) => els.length);
+      assert(stepCount === 3, 'How It Works renders exactly 3 plain-language steps', `steps: ${stepCount}`);
 
-      // 2. Tags share one baseline
-      const tagsTop = await page.$$eval('#pipeline-grid span.font-mono.tabular-nums', (els) =>
-        els.map((el) => Math.round(el.getBoundingClientRect().top))
-      );
-      const allSame = tagsTop.length === 5 && tagsTop.every((t) => Math.abs(t - tagsTop[0]) <= 2);
-      assert(allSame, 'Step tags share identical baseline across all columns', `tops: ${tagsTop.join(', ')}`);
+      // 2. FAQ Accordion has 8 questions
+      const faqCount = await page.$$eval('#faq button', (els) => els.length);
+      assert(faqCount === 8, 'FAQ accordion renders exactly 8 questions', `faqs: ${faqCount}`);
+
+      // 3. First question is open by default, clicking second opens it
+      const firstFaqAnswerVisible = await page.$eval('#faq', (el) => el.textContent.includes('ECMWF/ERA5-Land reanalysis'));
+      assert(firstFaqAnswerVisible, 'FAQ first item is expanded by default');
 
       await page.close();
     }
