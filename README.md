@@ -25,7 +25,7 @@ Urban heatwaves are among the deadliest climate hazards, yet municipal disaster 
 - **Hyperlocal Ward Risk Scoring:** Evaluates real-time ward vulnerability using the multidimensional composite risk formulation:
   $$R = w_h H + w_e E + w_v V - w_a A$$
   balancing Hazard ($H$), Exposure ($E$), Vulnerability ($V$), and Adaptive Capacity ($A$).
-- **Indoor Thermal Lag Simulation:** Simulates indoor heat escalation and multi-hour thermal lag based on building and roof archetypes (e.g., tin roofs vs. RCC).
+- **Indoor Thermal Lag Dynamics:** Models indoor heat escalation and multi-hour thermal lag based on building and roof archetypes (e.g., tin roofs vs. RCC).
 - **Citizen Safety & Actionability:** Equips residents with a Safe-Window planner for outdoor tasks, night-time thermal risk tracking, automated multi-channel alert subscriptions, and a cooling centre locator.
 - **Worker & Family Protection:** Delivers ISO 7243-compliant rest-hydration shift cards and Care Circles to monitor vulnerable dependents across different wards.
 - **Municipal Command Deck:** Empowers city authorities with ward-by-ward risk rankings, live intervention tracking, and emergency broadcast dispatching.
@@ -157,7 +157,7 @@ The backend is built using FastAPI (Python 3.11+) and delivers asynchronous REST
 
 ### Core Capabilities
 - **Biometeorological Physics Engine:** Evaluates Liljegren (2008) Wet-Bulb Globe Temperature (WBGT), 6th-order polynomial Universal Thermal Climate Index (UTCI), and Rothfusz Heat Index equations.
-- **Indoor Thermal Lag Simulation:** Simulates roof and wall envelope thermal inertia (tin vs. concrete RCC) and 2–3 hour nocturnal phase lag.
+- **Indoor Thermal Lag Dynamics:** Models roof and wall envelope thermal inertia (tin vs. concrete RCC) and 2–3 hour nocturnal phase lag.
 - **Multidimensional Spatial Risk Scoring:**
   $$R = w_h H + w_e E + w_v V - w_a A$$
   Evaluates hazard ($H$), exposure ($E$), vulnerability ($V$), and adaptive capacity ($A$) per ward.
@@ -389,14 +389,12 @@ VITE_ENABLE_3D=
 
 ---
 
-## Demo Accounts
+## User Accounts & Role Provisioning
 
-Pre-configured verified test accounts for evaluation:
+ThermaGrid uses Clerk for secure authentication with role-based access control:
 
-- **Municipal Authority Account:** `authority@thermagrid.demo` (Role: `authority`) — grants access to the Municipal Command Deck, Intervention Queue, and Emergency Broadcasts.
-- **Citizen Account:** `citizen@thermagrid.demo` (Role: `citizen`) — grants access to Citizen Heat Risk, Safe Windows, Care Circles, and Alert Subscriptions.
-
-> Quick evaluation credentials can be copied directly in the web app via the one-click demo login panel. All credential files and local environment files (`.env`, `*demo_account*`, `*demo_credentials*`) are configured in `.gitignore` to prevent secret leakage and security alerts.
+- **Citizen Access (Default):** Any citizen signing in via Google or email gains immediate access to Citizen Heat Risk, Safe Windows, Care Circles, and Alert Subscriptions.
+- **Municipal Authority Access:** Municipal officers sign in normally, and an administrator assigns `role: "authority"` in Clerk's `publicMetadata` (`{ "role": "authority" }`). Upon token refresh, the Municipal Mission Control console, Ward Intervention Queue, and Emergency Broadcasts unlock automatically.
 
 ---
 

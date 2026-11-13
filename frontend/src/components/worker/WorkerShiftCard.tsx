@@ -26,9 +26,9 @@ export const WorkerShiftCard: React.FC<WorkerShiftCardProps> = ({ locationId }) 
     const text = `
 THERMAGRID WORKER HEAT SAFETY SHIFT CARD
 Ward: ${data.ward_name} · Shift: ${data.start} – ${data.end}
-Exposure: ${data.exposure.toUpperCase()} · Work Rate: ${data.met} MET
-Hydration Target: ${data.water_ml_per_hour} mL per hour (continuous intake)
-Heavy Work Window: ${data.recommended_heavy_work_window}
+Exposure: ${data.exposure.toUpperCase()} · Work Rate: ${met === 4.0 ? 'Moderate' : met === 6.0 ? 'Heavy' : 'Very Heavy'}
+Water to drink: ${data.water_ml_per_hour} mL per hour (continuous intake)
+Best time for heavy work: ${data.recommended_heavy_work_window}
 
 SCHEDULED BREAKS (ISO 7243 Compliant):
 ${data.breaks.map((b) => `• ${b.start} – ${b.end}: ${b.reason} (${b.duration || 'Rest'})`).join('\n')}
@@ -70,7 +70,7 @@ NOTICE: ${data.disclaimer}
             <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-accent block mb-1">
               ISO 7243 Work-Rest Dispatch
             </span>
-            <h3 className={`${TYPOGRAPHY.h3} text-ink`}>Generate Worker Shift Card</h3>
+            <h3 className={`${TYPOGRAPHY.h3} text-ink`}>Make today's card</h3>
           </div>
 
           <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ NOTICE: ${data.disclaimer}
               className="px-3.5 py-1.5 rounded-[6px] bg-accent hover:bg-accent-hover text-on-accent text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print A5 card</span>
+              <span>Print</span>
             </button>
           </div>
         </div>
@@ -144,17 +144,17 @@ NOTICE: ${data.disclaimer}
           </div>
 
           <div>
-            <label className="font-mono text-[10px] uppercase text-muted block mb-1">
-              Labor Intensity (MET)
+            <label className="font-mono text-[10px] uppercase text-muted block mb-1" title="Metabolic Equivalent of Task (MET)">
+              Work Intensity
             </label>
             <select
               value={met}
               onChange={(e) => setMet(Number(e.target.value))}
               className="w-full bg-raised border border-border rounded-[6px] p-2 text-ink font-mono text-xs outline-none focus:border-accent"
             >
-              <option value={4.0}>Moderate (4.0 MET)</option>
-              <option value={6.0}>Heavy Manual (6.0 MET)</option>
-              <option value={8.0}>Very Heavy (8.0 MET)</option>
+              <option value={4.0} title="4.0 MET">Moderate work</option>
+              <option value={6.0} title="6.0 MET">Heavy work</option>
+              <option value={8.0} title="8.0 MET">Very heavy work</option>
             </select>
           </div>
 
@@ -215,10 +215,13 @@ NOTICE: ${data.disclaimer}
           </div>
 
           <div className="text-right">
-            <span className="text-[10px] font-mono uppercase text-muted block">Max Effective WBGT</span>
+            <span className="text-[10px] font-mono uppercase text-muted block" title="Max Effective WBGT">
+              Hottest part of the shift
+            </span>
             <span className="text-2xl font-mono font-bold text-ink tabular-nums">
               {data?.max_wbgt_c.toFixed(1)}°C
             </span>
+            <span className="text-[10px] text-muted block">WBGT · ISO 7243</span>
           </div>
         </div>
 
@@ -229,7 +232,9 @@ NOTICE: ${data.disclaimer}
               <Droplets className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-mono uppercase text-muted block">Hydration Target</span>
+              <span className="text-[10px] font-mono uppercase text-muted block" title="Hydration Target">
+                Water to drink today
+              </span>
               <span className="text-lg font-mono font-bold text-ink tabular-nums">
                 {data?.water_ml_per_hour} mL / hour
               </span>
@@ -242,7 +247,9 @@ NOTICE: ${data.disclaimer}
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-mono uppercase text-muted block">Recommended Heavy Work</span>
+              <span className="text-[10px] font-mono uppercase text-muted block" title="Recommended Heavy Work">
+                Best time for heavy work
+              </span>
               <span className="text-sm font-mono font-bold text-ink">
                 {data?.recommended_heavy_work_window}
               </span>
@@ -253,8 +260,8 @@ NOTICE: ${data.disclaimer}
 
         {/* Horizontal Breaks Timeline */}
         <div className="space-y-3">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-muted block">
-            Scheduled Rest Intervals
+          <span className="text-[11px] font-mono uppercase tracking-wider text-muted block" title="Scheduled Rest Intervals">
+            Scheduled Breaks
           </span>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -307,7 +314,7 @@ NOTICE: ${data.disclaimer}
             <ShieldCheck className="w-3.5 h-3.5 text-muted shrink-0" />
             <span>{data?.disclaimer || 'Advisory only — not medical advice.'}</span>
           </div>
-          <span className="hidden sm:inline">Emergency SOS: 108</span>
+          <span className="font-bold text-risk-5 flex items-center gap-1 text-xs">Emergency: call 108</span>
         </div>
       </div>
     </div>

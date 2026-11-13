@@ -98,23 +98,6 @@ def test_get_current_risk():
     assert "explanation" in data
 
 
-def test_what_if_simulation():
-    payload = {
-        "location_id": 1,
-        "green_cover_expansion_pct": 20.0,
-        "cool_roofs_adoption_pct": 35.0,
-        "misting_shelters_count": 4,
-        "shift_outdoor_hours_by": 2,
-    }
-    response = client.post("/api/v1/simulation", json=payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert data["is_demo"] is True
-    assert "DEMO DATA" in data["demo_label"]
-    assert data["simulated_risk_score"] <= data["baseline_risk_score"]
-    assert data["risk_reduction_points"] >= 0.0
-    assert data["population_protected_count"] > 0
-
 
 def test_cooling_centres_list():
     response = client.get("/api/v1/cooling-centres")
@@ -260,7 +243,7 @@ def test_subscriptions_user_scoping_and_validation():
         json={
             "ward_id": 1,
             "channel": "email",
-            "destination": "authority@thermagrid.demo",
+            "destination": "officer@example.com",
             "threshold": 75,
             "language": "en",
             "quiet_hours": "22:00-06:00",

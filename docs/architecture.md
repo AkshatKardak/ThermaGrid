@@ -63,7 +63,7 @@ thermagrid/
 - Thin orchestration layer wrapping the `analytics` package.
 - Single cached `Settings` singleton via `pydantic-settings`.
 - PostGIS database connection with automatic fallback to local SQLite for zero-configuration development.
-- Endpoints for auth, locations, weather, thermal indices, risk scores, forecasts, simulation, cooling centres, and alerts.
+- Endpoints for auth, locations, weather, thermal indices, risk scores, forecasts, cooling centres, and alerts.
 - Configurable risk thresholds stored in database (`risk_config`).
 
 #### Database Migrations & Baseline Hygiene

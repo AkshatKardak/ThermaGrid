@@ -209,19 +209,4 @@ export interface DataSource {
   description?: string;
 }
 
-export interface SimulationResult {
-  location_id: number;
-  city: string;
-  ward_name: string;
-  baseline_risk_score: number;
-  simulated_risk_score: number;
-  risk_reduction_points: number;
-  baseline_wbgt_c: number;
-  simulated_wbgt_c: number;
-  estimated_uhi_reduction_c: number;
-  population_protected_count: number;
-  is_demo: boolean;
-  demo_label: string;
-}
-
 export const TYPES_VERSION = '1.0.0';

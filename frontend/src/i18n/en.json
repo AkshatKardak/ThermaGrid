@@ -5,7 +5,6 @@
     "worker": "Worker",
     "authority": "Authority",
     "analytics": "Analytics",
-    "simulation": "Simulation",
     "about": "About",
     "account": "Account",
     "sign_in": "Sign In",
@@ -91,9 +90,9 @@
     "clothing_heavy": "Heavy PPE (+3°C CAV)",
     "acclimatised": "Acclimatised",
     "unacclimatised": "Unacclimatised (+2°C limit)",
-    "hydration_target": "Hydration Target",
-    "heavy_work_window": "Recommended Heavy Work",
-    "scheduled_breaks": "Scheduled Rest Intervals"
+    "hydration_target": "Water to drink today",
+    "heavy_work_window": "Best time for heavy work",
+    "scheduled_breaks": "Scheduled Breaks"
   },
   "imd": {
     "normal": "No Warning (Normal)",

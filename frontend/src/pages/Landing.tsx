@@ -225,7 +225,7 @@ export const Landing: React.FC = () => {
               <div className="flex items-baseline justify-between gap-3 w-full pb-2">
                 <div>
                   <span className="text-[10px] font-mono uppercase text-raised/70 block">
-                    REAL-TIME WARD TELEMETRY
+                    REAL-TIME WARD SENSORS
                   </span>
                   <h3 className="text-sm font-semibold text-raised font-display">
                     Extruded Ward Thermal Risk

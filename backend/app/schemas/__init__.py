@@ -9,8 +9,6 @@ from app.schemas.thermal import ThermalCurrentOut, ThermalHistoryOut
 from app.schemas.risk import (
     RiskCurrentOut,
     RiskForecastOut,
-    SimulationScenarioRequest,
-    SimulationScenarioResponse,
 )
 from app.schemas.cooling_centre import CoolingCentreOut
 from app.schemas.alert import AlertCreate, AlertOut
@@ -29,8 +27,6 @@ __all__ = [
     "ThermalHistoryOut",
     "RiskCurrentOut",
     "RiskForecastOut",
-    "SimulationScenarioRequest",
-    "SimulationScenarioResponse",
     "CoolingCentreOut",
     "AlertCreate",
     "AlertOut",

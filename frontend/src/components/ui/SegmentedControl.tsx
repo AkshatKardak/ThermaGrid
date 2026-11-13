@@ -4,6 +4,7 @@ export interface SegmentOption<T extends string | number> {
   value: T;
   label: string;
   sublabel?: string;
+  title?: string;
 }
 
 interface SegmentedControlProps<T extends string | number> {
@@ -30,6 +31,7 @@ export function SegmentedControl<T extends string | number>({
           <button
             key={String(opt.value)}
             type="button"
+            title={opt.title}
             onClick={() => onChange(opt.value)}
             className={`px-3 py-1.5 rounded-[4px] text-xs font-mono transition-all duration-150 flex flex-col items-center justify-center ${
               isSelected

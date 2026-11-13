@@ -1,6 +1,6 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/api';
-import type { CoolingCentre, Alert, DataSource, SimulationResult } from '../types';
+import type { CoolingCentre, Alert, DataSource } from '../types';
 
 export function useCoolingCentres(city?: string, lat?: number, lon?: number) {
   return useQuery({
@@ -35,23 +35,6 @@ export function useDataSources() {
     queryKey: ['data-sources'],
     queryFn: async () => {
       const { data } = await apiClient.get<DataSource[]>('/data-sources');
-      return data;
-    },
-  });
-}
-
-export interface SimulationPayload {
-  location_id: number;
-  green_cover_expansion_pct: number;
-  cool_roofs_adoption_pct: number;
-  misting_shelters_count: number;
-  shift_outdoor_hours_by: number;
-}
-
-export function useSimulation() {
-  return useMutation({
-    mutationFn: async (payload: SimulationPayload) => {
-      const { data } = await apiClient.post<SimulationResult>('/simulation', payload);
       return data;
     },
   });

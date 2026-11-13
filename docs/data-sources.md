@@ -24,4 +24,4 @@ All ingested observational telemetry passes through `analytics/src/cleaning/vali
   - Relative Humidity: $0.0\% \le RH \le 100.0\%$
   - 10m Wind Speed: $0.0 \le v \le 65.0\text{ m/s}$
   - Solar Irradiance: $0.0 \le S \le 1400.0\text{ W/m}^2$
-- **Simulation Tagging:** Any missing or simulated telemetry is explicitly tagged with `is_demo=true` and labeled `DEMO DATA` in both API responses and UI components.
+- **Synthetic / Fallback Tagging:** Any missing or synthetic telemetry is explicitly tagged with `is_demo=true` and labeled `DEMO DATA` in both API responses and UI components.

@@ -7,7 +7,6 @@ import {
   HardHat,
   ShieldAlert,
   BarChart2,
-  Compass,
   Settings,
   Send,
   Check,
@@ -217,7 +216,6 @@ export const AuthorityDashboard: React.FC = () => {
               { path: '/app/worker', icon: HardHat, label: 'Worker Safety' },
               { path: '/app/authority', icon: ShieldAlert, label: 'Mission Control', active: true },
               { path: '/app/analytics', icon: BarChart2, label: 'Analytics' },
-              { path: '/app/simulation', icon: Compass, label: 'Simulation' },
             ].map((item) => {
               const Icon = item.icon;
               return (
@@ -298,7 +296,7 @@ export const AuthorityDashboard: React.FC = () => {
             <div className="flex items-center gap-2 border-l border-border pl-4">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               <span className="text-[11px] font-mono text-accent font-medium tracking-wide">
-                LIVE TELEMETRY
+                LIVE SENSORS
               </span>
             </div>
           </div>

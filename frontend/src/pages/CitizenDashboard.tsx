@@ -176,39 +176,69 @@ export const CitizenDashboard: React.FC = () => {
                 suffix="/100"
               />
             </div>
-            <p className="text-xs font-mono text-muted">
-              Normalized Human Thermal Strain Index (HTSI)
-            </p>
+            <div className="flex items-center gap-2 text-xs font-mono text-ink">
+              <span
+                className="w-2.5 h-2.5 rounded-full shrink-0"
+                style={{ backgroundColor: currentBand.color }}
+              />
+              <span className="font-semibold">Heat level: {currentBand.label}</span>
+            </div>
           </div>
 
-          <div className="md:col-span-7 grid grid-cols-3 gap-4 border-l border-border pl-0 md:pl-6">
-            <div>
-              <span className="text-[11px] font-mono text-muted uppercase block">
-                ISO WBGT
-              </span>
-              <span className="text-2xl font-mono font-bold text-ink tabular-nums">
-                {thermal ? `${thermal.wbgt_c.toFixed(1)}°C` : '34.8°C'}
-              </span>
-              <span className="text-[10px] text-muted block">Wet-Bulb Globe</span>
+          <div className="md:col-span-7 border-l border-border pl-0 md:pl-6 space-y-3">
+            {/* Primary Heat Level Card: Exactly ONE visible thermal index */}
+            <div className="p-4 rounded-[8px] bg-raised border border-border flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-mono text-muted uppercase block">
+                  Primary Observation
+                </span>
+                <div className="flex items-center gap-2.5 mt-0.5">
+                  <span
+                    className="w-3 h-3 rounded-full shrink-0"
+                    style={{ backgroundColor: currentBand.color }}
+                  />
+                  <span className="text-xl font-mono font-bold text-ink">
+                    Heat level: {currentBand.label}
+                  </span>
+                </div>
+                <span className="text-xs font-mono text-muted block mt-1">
+                  WBGT {thermal ? `${thermal.wbgt_c.toFixed(1)}°C` : '34.8°C'} · ISO 7243
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] font-mono text-muted uppercase block">Air Temp</span>
+                <span className="text-lg font-mono font-semibold text-ink tabular-nums">
+                  {risk ? `${risk.temperature_c.toFixed(1)}°C` : '37.4°C'}
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="text-[11px] font-mono text-muted uppercase block">
-                UTCI Stress
-              </span>
-              <span className="text-2xl font-mono font-bold text-ink tabular-nums">
-                {thermal ? `${thermal.utci_c.toFixed(1)}°C` : '41.6°C'}
-              </span>
-              <span className="text-[10px] text-muted block">Universal Thermal</span>
-            </div>
-            <div>
-              <span className="text-[11px] font-mono text-muted uppercase block">
-                Air Temp
-              </span>
-              <span className="text-2xl font-mono font-bold text-ink tabular-nums">
-                {risk ? `${risk.temperature_c.toFixed(1)}°C` : '37.4°C'}
-              </span>
-              <span className="text-[10px] text-muted block">Ambient Dry-Bulb</span>
-            </div>
+
+            {/* Collapsed "How this is calculated" block */}
+            <details className="text-xs text-muted cursor-pointer group">
+              <summary className="font-mono text-[11px] hover:text-ink transition-colors select-none">
+                ▸ How this is calculated
+              </summary>
+              <div className="mt-2 p-3 rounded-[6px] bg-raised border border-border grid grid-cols-2 gap-3 text-ink font-mono text-xs">
+                <div>
+                  <span className="text-[10px] text-muted block uppercase">UTCI Stress</span>
+                  <span className="font-semibold text-sm">
+                    {thermal ? `${thermal.utci_c.toFixed(1)}°C` : '41.6°C'}
+                  </span>
+                  <span className="text-[10px] text-muted block font-sans">
+                    Universal Thermal Climate Index
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-muted block uppercase">Ambient Dry-Bulb</span>
+                  <span className="font-semibold text-sm">
+                    {risk ? `${risk.temperature_c.toFixed(1)}°C` : '37.4°C'}
+                  </span>
+                  <span className="text-[10px] text-muted block font-sans">
+                    Surface sensor reading
+                  </span>
+                </div>
+              </div>
+            </details>
           </div>
         </div>
       </div>
@@ -265,7 +295,7 @@ export const CitizenDashboard: React.FC = () => {
                 <div className="p-3.5 rounded-[8px] bg-raised border border-border flex items-start gap-3">
                   <Droplets className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-xs font-bold text-ink block">Hydration Target</span>
+                    <span className="text-xs font-bold text-ink block" title="Hydration Target">Water to drink today</span>
                     <span className="text-xs text-muted leading-normal">
                       Drink 250ml cool water / ORS solution every 30 minutes.
                     </span>

@@ -20,7 +20,6 @@ import { WorkerRisk } from './pages/WorkerRisk';
 import { AuthorityDashboard } from './pages/AuthorityDashboard';
 import { Analytics } from './pages/Analytics';
 import { LocationDetails } from './pages/LocationDetails';
-import { Simulation } from './pages/Simulation';
 import { Account } from './pages/Account';
 
 function LocationRedirect() {
@@ -61,7 +60,6 @@ function AppShell() {
                     <Route path="/worker" element={<WorkerRisk />} />
                     <Route path="/authority" element={<AuthorityDashboard />} />
                     <Route path="/analytics" element={<Analytics />} />
-                    <Route path="/simulation" element={<Simulation />} />
                     <Route path="/ward/:id" element={<LocationDetails />} />
                     <Route path="/account" element={<Account />} />
                     <Route path="/about" element={<Navigate to="/app" replace />} />
@@ -78,7 +76,6 @@ function AppShell() {
           <Route path="/worker" element={<Navigate to="/app/worker" replace />} />
           <Route path="/authority" element={<Navigate to="/app/authority" replace />} />
           <Route path="/analytics" element={<Navigate to="/app/analytics" replace />} />
-          <Route path="/simulation" element={<Navigate to="/app/simulation" replace />} />
           <Route path="/about" element={<Navigate to="/app" replace />} />
           <Route path="/docs" element={<Navigate to="/" replace />} />
           <Route path="/location/:id" element={<LocationRedirect />} />

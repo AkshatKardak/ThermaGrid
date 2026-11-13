@@ -18,17 +18,16 @@ Follow this scripted 3-minute click path to evaluate all core user-facing and au
 ---
 
 ### Step 2 · Sign-Up & Sign-In (`/sign-up` & `/sign-in`)
-1. On `/sign-up`, see Clerk's component customized in Midnight Climate dark palette (`#1F3445` surface, amethyst primary).
+1. On `/sign-up`, see Clerk's component customized in ThermaGrid editorial palette (`#14181A` panel-dark, `#1F3A5F` accent).
 2. Click "Sign in" link or navigate to `/sign-in`.
-3. In the **Demo Account Panel** under the form:
-   - Click **"Citizen Demo"**: copies `citizen@thermagrid.demo` to clipboard.
-   - Paste email, enter password `ThermaGrid#2026`, and submit.
+3. Sign in using your Google account or email code.
+4. Municipal access notice confirms that authority access is provisioned by administrators after verification.
 
 ---
 
 ### Step 3 · Overview Hub (`/app`)
 1. Post-login redirects directly to `/app`.
-2. See the **App Navbar**: Brand → `/app`, Overview, Heat risk, Worker, Analytics, Simulation, About, Account, City selector, and Clerk `<UserButton />`.
+2. See the **App Navbar**: Brand → `/app`, Overview, Heat risk, Worker, Analytics, Account, City selector, and Clerk `<UserButton />`.
    *(Notice: Authority console is hidden for the citizen role).*
 3. Overview Hub highlights:
    - Personalized greeting with first name.
@@ -100,21 +99,13 @@ Follow this scripted 3-minute click path to evaluate all core user-facing and au
 ---
 
 ### Step 10 · Switch to Authority Account (`/app/authority`)
-1. Click the Clerk `<UserButton />` in the top right and click **Sign out**.
-2. Go to `/sign-in` and click **"Authority Demo"** in the demo panel (copies `authority@thermagrid.demo`).
-3. Enter password `ThermaGrid#2026` and sign in.
-4. In the App Navbar, see the **Authority** link unlocked with an amethyst badge.
-5. Click **Authority** to view:
+1. In Clerk Dashboard → Users → your user → Metadata → Public, set:
+   ```json
+   { "role": "authority" }
+   ```
+2. Sign out and back in to reissue the session token with the updated role.
+3. In the App Navbar, see the **Authority** link unlocked.
+4. Click **Authority** to view:
    - 3D City extruded block mesh.
    - Ward intervention queue and priority ranking.
    - Municipal broadcast dispatch console.
-
----
-
-### Step 11 · What-If Simulation Sandbox (`/app/simulation`)
-1. Click **Simulation** in the navbar.
-2. Adjust the intervention sliders:
-   - Cool Roofs Adoption: +35%
-   - Green Canopy Expansion: +20%
-   - Misting Shelters: 6
-3. Click **Run Simulation**: observe the baseline vs simulated risk reduction points and population protected count.

@@ -125,17 +125,17 @@ export const WorkerRisk: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 border-t border-border">
-            {/* Step 2: Intensity MET 3-6 */}
+            {/* Step 2: Exertion Intensity */}
             <div className="space-y-2">
               <label className="text-xs font-mono uppercase tracking-[0.10em] text-muted">
                 Step 2: Exertion Intensity
               </label>
               <SegmentedControl<Intensity>
                 options={[
-                  { value: 'met3', label: 'Light', sublabel: '3.0 MET' },
-                  { value: 'met4', label: 'Moderate', sublabel: '4.2 MET' },
-                  { value: 'met5', label: 'Heavy', sublabel: '5.5 MET' },
-                  { value: 'met6', label: 'Extreme', sublabel: '6.8 MET' },
+                  { value: 'met3', label: 'Light', title: '3.0 MET' },
+                  { value: 'met4', label: 'Moderate', title: '4.2 MET' },
+                  { value: 'met5', label: 'Heavy', title: '5.5 MET' },
+                  { value: 'met6', label: 'Extreme', title: '6.8 MET' },
                 ]}
                 value={intensity}
                 onChange={setIntensity}
@@ -249,7 +249,7 @@ export const WorkerRisk: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Work/Rest Schedule Generator & Hydration Cadence */}
+      {/* 3. Work/Rest Schedule Generator & Hydration */}
       <WorkRestAdvisory
         wbgt={effectiveWbgt}
         category={workBand.label}

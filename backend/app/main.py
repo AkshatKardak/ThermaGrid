@@ -24,7 +24,6 @@ from app.api.routes.thermal import router as thermal_router
 from app.api.routes.risk import router as risk_router
 from app.api.routes.analytics import router as analytics_router
 from app.api.routes.forecast import router as forecast_router
-from app.api.routes.simulation import router as simulation_router
 from app.api.routes.interventions import router as interventions_router
 from app.api.routes.cooling_centres import router as cooling_centres_router
 from app.api.routes.alerts import router as alerts_router
@@ -214,7 +213,6 @@ def create_application() -> FastAPI:
         app.include_router(risk_router, prefix=prefix)
         app.include_router(analytics_router, prefix=prefix)
         app.include_router(forecast_router, prefix=prefix)
-        app.include_router(simulation_router, prefix=prefix)
         app.include_router(interventions_router, prefix=prefix)
         app.include_router(cooling_centres_router, prefix=prefix)
         app.include_router(alerts_router, prefix=prefix)

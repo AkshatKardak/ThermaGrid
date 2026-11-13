@@ -83,12 +83,12 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
           </div>
         </div>
 
-        {/* Hydration Cadence & WBGT Strip */}
+        {/* Advisory Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-raised p-4 rounded-[6px] border border-border space-y-1">
-            <div className="flex items-center gap-2 text-xs font-mono text-muted">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted" title="Shift Rest Interval">
               <Timer className="w-4 h-4 text-muted" />
-              <span>Shift Rest Interval</span>
+              <span>Break every</span>
             </div>
             <div className="text-xl font-mono font-bold text-ink tabular-nums">
               Every {60 - restMin} mins
@@ -99,9 +99,9 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
           </div>
 
           <div className="bg-raised p-4 rounded-[6px] border border-border space-y-1">
-            <div className="flex items-center gap-2 text-xs font-mono text-muted">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted" title="Hydration Cadence">
               <Droplets className="w-4 h-4 text-accent" />
-              <span>Hydration Cadence</span>
+              <span>Drink water every</span>
             </div>
             <div className="text-xl font-mono font-bold text-ink tabular-nums">
               {hydrationMlPerHour} ml / hr
@@ -112,14 +112,14 @@ export const WorkRestAdvisory: React.FC<WorkRestAdvisoryProps> = ({
           </div>
 
           <div className="bg-raised p-4 rounded-[6px] border border-border space-y-1">
-            <div className="flex items-center gap-2 text-xs font-mono text-muted">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted" title="WBGT Stress Level">
               <AlertOctagon className="w-4 h-4 text-risk-4" />
-              <span>WBGT Stress Level</span>
+              <span>Heat level</span>
             </div>
             <div className="text-xl font-mono font-bold text-ink tabular-nums">
-              {wbgt.toFixed(1)}°C
+              {category}
             </div>
-            <p className="text-[11px] text-muted">{category}</p>
+            <p className="text-[11px] text-muted">WBGT {wbgt.toFixed(1)}°C · ISO 7243</p>
           </div>
         </div>
 

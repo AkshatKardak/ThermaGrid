@@ -257,7 +257,7 @@ export const DevKit: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card tier="l1" title="Interactive Slider">
             <Slider
-              label="Simulation Heat Offset"
+              label="Heat Stress Offset"
               value={sliderVal}
               min={0}
               max={100}

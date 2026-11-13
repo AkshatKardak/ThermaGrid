@@ -7,7 +7,6 @@ import {
   HardHat,
   Building2,
   Activity,
-  Sliders,
   MapPin,
   Menu,
   X,
@@ -39,7 +38,6 @@ export const AppNavbar: React.FC = () => {
       ? [{ to: '/app/authority', label: 'Authority', icon: Building2, highlight: true }]
       : []),
     { to: '/app/analytics', label: 'Analytics', icon: Activity },
-    { to: '/app/simulation', label: 'Simulation', icon: Sliders },
     { to: '/app/account', label: 'Account', icon: BellRing },
   ];
 

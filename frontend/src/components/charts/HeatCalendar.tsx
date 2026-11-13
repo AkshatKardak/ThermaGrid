@@ -4,7 +4,7 @@ import { getRiskBand } from '../../theme/tokens';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const YEARS = [2021, 2022, 2023, 2024, 2025, 2026];
 
-// Deterministic historical stress simulation for Indian cities (March-June peak)
+// Deterministic historical heat stress dataset for Indian cities (March-June peak)
 function getHistoricalRisk(year: number, monthIndex: number): number {
   const baseCurve = [24, 32, 58, 82, 89, 74, 52, 44, 46, 42, 30, 22];
   const yearAnomaly = (year - 2021) * 2.8; // Climate warming trend
