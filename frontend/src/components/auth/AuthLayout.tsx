@@ -123,7 +123,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
               {/* Card Header */}
               <div className="text-center space-y-2 mb-8 w-full">
                 <h2 className="text-3xl sm:text-4xl font-bold text-ink font-display tracking-tight leading-tight">{title}</h2>
-                <p className="text-sm sm:text-base text-muted max-w-sm mx-auto leading-relaxed">{subtitle}</p>
+                <p className="text-sm sm:text-base text-muted max-w-md mx-auto leading-relaxed">{subtitle}</p>
               </div>
 
               {/* Form + Demo Panel Stack (Equal max-w width) */}

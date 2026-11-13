@@ -18,10 +18,10 @@ export const SignInPage: React.FC = () => {
       title="Sign in"
       subtitle="Access municipal heat intelligence and live ward advisories"
     >
-      <div id="auth-form-stack" className="w-full max-w-[420px] flex flex-col items-center mx-auto">
-        <div id="clerk-card-wrapper" className="w-full max-w-[420px] flex justify-center">
+      <div id="auth-form-stack" className="w-full max-w-[480px] flex flex-col items-center mx-auto">
+        <div id="clerk-card-wrapper" className="w-full max-w-[480px] flex justify-center">
           {!isLoaded ? (
-            <div className="w-full h-80 rounded-[8px] bg-raised border border-border flex items-center justify-center text-muted text-xs font-mono animate-pulse">
+            <div className="w-full h-96 rounded-[10px] bg-raised border border-border flex items-center justify-center text-muted text-xs font-mono animate-pulse">
               Loading authentication...
             </div>
           ) : (
@@ -34,7 +34,7 @@ export const SignInPage: React.FC = () => {
             />
           )}
         </div>
-        <div id="demo-account-block" className="mt-6 pt-5 border-t border-border w-full max-w-[420px] text-center space-y-2.5">
+        <div id="demo-account-block" className="mt-6 pt-5 border-t border-border w-full max-w-[480px] text-center space-y-2.5">
           <p className="text-xs text-muted leading-relaxed">
             Municipal console access is granted by an administrator after official verification.
           </p>

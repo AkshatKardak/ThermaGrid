@@ -132,11 +132,19 @@ export const WardsTab: React.FC = () => {
     return [...rows]
       .sort((a, b) => b.risk_score - a.risk_score)
       .slice(0, 10)
-      .map((w) => ({
-        name: w.ward_name,
-        risk: w.risk_score,
-        color: w.band.color,
-      }));
+      .map((w) => {
+        // Clean display name so long ward strings don't overlap with chart bars
+        const shortName =
+          w.ward_name.length > 18
+            ? `${w.ward_name.slice(0, 17)}…`
+            : w.ward_name;
+        return {
+          name: shortName,
+          fullName: w.ward_name,
+          risk: w.risk_score,
+          color: w.band.color,
+        };
+      });
   }, [rows]);
 
   // Band distribution for Donut chart
@@ -199,29 +207,29 @@ export const WardsTab: React.FC = () => {
       {/* Analytical Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Chart 1: Horizontal Bar of Top 10 Wards */}
-        <Card className="lg:col-span-7 p-4 space-y-3">
-          <div className="flex items-center justify-between border-b border-border pb-2.5">
-            <div>
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-ink">
+        <Card className="lg:col-span-7 p-4 sm:p-5 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-border pb-3">
+            <div className="space-y-1">
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-ink leading-tight">
                 Top 10 High-Risk Wards
               </h3>
-              <span className="text-[11px] text-muted font-sans">
+              <p className="text-[11px] text-muted font-sans leading-normal block">
                 Human Thermal Stress Index (HTSI 0–100)
-              </span>
+              </p>
             </div>
-            <span className="text-[10px] font-mono text-muted">
-              Source: IMD AWS · Updated Live
+            <span className="text-[10px] font-mono text-muted shrink-0 self-start sm:self-auto bg-raised px-2 py-0.5 rounded border border-border">
+              Source: IMD AWS · Live Telemetry
             </span>
           </div>
 
           {top10Wards.length === 0 ? (
-            <div className="h-56 flex items-center justify-center text-xs font-mono text-muted">
+            <div className="h-64 flex items-center justify-center text-xs font-mono text-muted">
               No data for this period
             </div>
           ) : (
-            <div className="h-60 w-full">
+            <div className="h-72 w-full pt-1">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={top10Wards} layout="vertical" margin={{ left: 20, right: 20, top: 5, bottom: 5 }}>
+                <BarChart data={top10Wards} layout="vertical" margin={{ left: 10, right: 28, top: 8, bottom: 8 }}>
                   <XAxis
                     type="number"
                     domain={[0, 100]}
@@ -232,8 +240,9 @@ export const WardsTab: React.FC = () => {
                     type="category"
                     dataKey="name"
                     stroke={TOKENS.border}
-                    tick={{ fill: TOKENS.ink, fontSize: 11, fontFamily: 'IBM Plex Mono' }}
-                    width={90}
+                    tick={{ fill: TOKENS.ink, fontSize: 10, fontFamily: 'IBM Plex Mono' }}
+                    width={125}
+                    interval={0}
                   />
                   <Tooltip
                     contentStyle={{
@@ -242,6 +251,10 @@ export const WardsTab: React.FC = () => {
                       borderRadius: '6px',
                       fontFamily: 'IBM Plex Mono',
                       fontSize: '11px',
+                    }}
+                    labelFormatter={(_label, payload) => {
+                      const item = payload?.[0]?.payload;
+                      return item?.fullName || _label;
                     }}
                     formatter={(val: any) => [`${formatNumber(val, 1)} / 100`, 'HTSI Score']}
                   />
