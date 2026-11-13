@@ -318,17 +318,15 @@ export const Landing: React.FC = () => {
               lead="Interactive diurnal temperature progression demonstrating heat retention, envelope insulation disparity, and the critical late-afternoon indoor phase lag."
             />
             {canRender3D ? (
-              <div className="border border-border rounded-[8px] overflow-hidden bg-panel-dark">
-                <React.Suspense
-                  fallback={
-                    <div className="h-[460px] flex items-center justify-center font-mono text-xs text-raised">
-                      Initializing Thermal Inertia Models...
-                    </div>
-                  }
-                >
-                  <ThermalLagHouses />
-                </React.Suspense>
-              </div>
+              <React.Suspense
+                fallback={
+                  <div className="h-[520px] rounded-[8px] border border-border bg-panel-dark flex items-center justify-center font-mono text-xs text-raised">
+                    Initializing Thermal Inertia Models...
+                  </div>
+                }
+              >
+                <ThermalLagHouses />
+              </React.Suspense>
             ) : (
               <ThermalLagStaticFallback />
             )}

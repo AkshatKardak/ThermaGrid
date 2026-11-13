@@ -1,5 +1,7 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Play, Pause, RotateCcw, Sun, Moon, Clock, Info } from 'lucide-react';
 import { useThreeScene } from './useThreeScene';
 import { useScrollProgress } from './useScrollProgress';
 import { evaluateThermalLag } from '../../lib/thermalLag';
@@ -11,15 +13,64 @@ export interface ThermalLagHousesProps {
   staticHour?: number; // For static fallback mode
 }
 
+const PRESET_HOURS = [
+  { label: 'Dawn', hour: 6.0, icon: Sun, desc: '06:00 · Cool sunrise baseline' },
+  { label: 'Solar Peak', hour: 12.0, icon: Sun, desc: '12:00 · Maximum solar radiation' },
+  { label: 'Tin Peak', hour: 14.5, icon: Clock, desc: '14:30 · Tin breaches 41.2°C' },
+  { label: 'Concrete Lag Peak', hour: 17.25, icon: Clock, desc: '17:15 · Concrete delayed peak' },
+  { label: 'Night Retention', hour: 3.0, icon: Moon, desc: '03:00 · Nocturnal concrete heat' },
+];
+
 export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
   className = '',
   staticHour,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // When staticHour is provided (static fallback), progress is fixed; otherwise scrubs with sticky scroll
-  const scrollProgress = useScrollProgress(containerRef, { mode: 'sticky' });
-  const hour = staticHour !== undefined ? staticHour : scrollProgress * 24;
+  // Hour state: default to 14.5 (14:30 Tin peak) so the scene is immediately bright & informative
+  const [hour, setHour] = useState<number>(staticHour !== undefined ? staticHour : 14.5);
+  const [isPlaying, setIsPlaying] = useState<boolean>(staticHour === undefined);
+  const [userInteracted, setUserInteracted] = useState<boolean>(false);
+
+  const hourRef = useRef<number>(hour);
+  hourRef.current = hour;
+
+  // Viewport scroll progress (inView mode for smooth background scrub when scrolling naturally)
+  const scrollProgress = useScrollProgress(containerRef, { mode: 'inView' });
+
+  // Update hour from scroll if user is scrolling naturally and hasn't manually paused/dragged
+  useEffect(() => {
+    if (staticHour !== undefined || userInteracted || isPlaying) return;
+    if (scrollProgress > 0.1 && scrollProgress < 0.9) {
+      // Map scroll progress (0.1..0.9) to daylight & afternoon hours (06:00..20:00)
+      const normalized = (scrollProgress - 0.1) / 0.8;
+      const targetHour = 6.0 + normalized * 14.0;
+      setHour(targetHour);
+    }
+  }, [scrollProgress, userInteracted, isPlaying, staticHour]);
+
+  // Auto-play diurnal cycle loop
+  useEffect(() => {
+    if (!isPlaying || staticHour !== undefined) return;
+
+    let animId: number;
+    let lastTime = performance.now();
+
+    const loop = (now: number) => {
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+
+      // Advance ~1.2 hours per second (full 24h cycle in 20 seconds)
+      const nextHour = (hourRef.current + delta * 1.2) % 24;
+      hourRef.current = nextHour;
+      setHour(nextHour);
+
+      animId = requestAnimationFrame(loop);
+    };
+
+    animId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animId);
+  }, [isPlaying, staticHour]);
 
   const thermalState = useMemo(() => evaluateThermalLag(hour), [hour]);
 
@@ -33,33 +84,33 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
     cameraFov: 40,
     cameraNear: 0.1,
     cameraFar: 100,
-    cameraPosition: [0, 9, 17],
+    cameraPosition: [0, 8.5, 16.5],
     cameraLookAt: [0, 1.2, 0],
     clearAlpha: 0,
     onInit: ({ scene }) => {
       // 1. Soft Ambient Light
-      const ambient = new THREE.AmbientLight(0xd8e8e6, 0.55);
+      const ambient = new THREE.AmbientLight(0xd8e8e6, 0.65);
       scene.add(ambient);
 
       // 2. Sunlight Directional
-      const sunLight = new THREE.DirectionalLight(0xfffaed, 0.95);
+      const sunLight = new THREE.DirectionalLight(0xfffaed, 1.1);
       sunLight.position.set(0, 15, 6);
       scene.add(sunLight);
       sunLightRef.current = sunLight;
 
-      // 3. Sun Marker Sphere (overhead arc)
-      const sunGeo = new THREE.SphereGeometry(0.4, 24, 24);
-      const sunMat = new THREE.MeshBasicMaterial({ color: 0xffe082 });
+      // 3. Sun Marker Sphere with warm glow
+      const sunGeo = new THREE.SphereGeometry(0.45, 24, 24);
+      const sunMat = new THREE.MeshBasicMaterial({ color: 0xffd54f });
       const sunMesh = new THREE.Mesh(sunGeo, sunMat);
       scene.add(sunMesh);
       sunMeshRef.current = sunMesh;
 
       // 4. Ground Grid & Base Platform in --raised
-      const grid = new THREE.GridHelper(20, 20, THEME_COLORS.raised, THEME_COLORS.raised);
+      const grid = new THREE.GridHelper(22, 22, THEME_COLORS.raised, THEME_COLORS.raised);
       grid.position.y = 0;
       if (grid.material instanceof THREE.Material) {
         grid.material.transparent = true;
-        grid.material.opacity = 0.25;
+        grid.material.opacity = 0.22;
       }
       scene.add(grid);
 
@@ -75,7 +126,6 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
       const leftHouseGroup = new THREE.Group();
       leftHouseGroup.position.set(-3.6, 0, 0);
 
-      // Clay walls material (back, left, right walls — front cut away)
       const wallMat = new THREE.MeshStandardMaterial({
         color: new THREE.Color(THEME_COLORS.raised),
         roughness: 0.9,
@@ -106,26 +156,26 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
       floorLeft.position.set(0, 0.1, 0);
       leftHouseGroup.add(floorLeft);
 
-      // Corrugated Tin Roof (sloped thin sheets in #6B7C8A)
-      const tinRoofGeo = new THREE.BoxGeometry(4.6, 0.1, 4.4);
+      // Corrugated Tin Roof
+      const tinRoofGeo = new THREE.BoxGeometry(4.6, 0.12, 4.4);
       const tinRoofMat = new THREE.MeshStandardMaterial({
         color: new THREE.Color(THEME_COLORS.muted),
-        roughness: 0.6,
-        metalness: 0.25,
+        roughness: 0.55,
+        metalness: 0.35,
       });
       const tinRoof = new THREE.Mesh(tinRoofGeo, tinRoofMat);
       tinRoof.position.set(0, 3.35, 0);
-      tinRoof.rotation.z = -0.06; // slight single-pitch corrugated slope
+      tinRoof.rotation.z = -0.06;
       leftHouseGroup.add(tinRoof);
 
       // Interior Air Volume (Responsive to heat)
       const interiorGeo = new THREE.BoxGeometry(3.6, 2.9, 3.5);
       const tinInteriorMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(getRiskColor(50)),
+        color: new THREE.Color(getRiskColor(75)),
         roughness: 0.95,
         metalness: 0,
         transparent: true,
-        opacity: 0.85,
+        opacity: 0.82,
       });
       const tinInterior = new THREE.Mesh(interiorGeo, tinInteriorMat);
       tinInterior.position.set(0, 1.55, 0.05);
@@ -160,7 +210,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
       floorRight.position.set(0, 0.1, 0);
       rightHouseGroup.add(floorRight);
 
-      // Heavy Reinforced Concrete RCC Roof (thick slab in panel-dark)
+      // Heavy Reinforced Concrete RCC Roof
       const rccRoofGeo = new THREE.BoxGeometry(4.4, 0.55, 4.4);
       const rccRoofMat = new THREE.MeshStandardMaterial({
         color: new THREE.Color(THEME_COLORS.raised),
@@ -173,11 +223,11 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
 
       // Interior Air Volume (Responsive to heat)
       const rccInteriorMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(getRiskColor(50)),
+        color: new THREE.Color(getRiskColor(45)),
         roughness: 0.95,
         metalness: 0,
         transparent: true,
-        opacity: 0.85,
+        opacity: 0.82,
       });
       const rccInterior = new THREE.Mesh(interiorGeo, rccInteriorMat);
       rccInterior.position.set(0, 1.55, 0.05);
@@ -187,13 +237,13 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
       scene.add(rightHouseGroup);
     },
     onRender: ({ camera }) => {
-      // 1. Arc sun position and direction light across diurnal cycle (06:00 to 18:00)
-      const currentHour = hour;
-      const sunAngle = ((currentHour - 6) / 12) * Math.PI; // -pi/2 at 00:00, 0 at 12:00, pi at 18:00
-      const isDaytime = currentHour >= 6 && currentHour <= 18;
+      const currentHour = hourRef.current;
+      // Solar angle: 0 at 06:00, PI/2 at 12:00, PI at 18:00
+      const sunAngle = ((currentHour - 6) / 12) * Math.PI;
+      const isDaytime = currentHour >= 5.5 && currentHour <= 18.5;
 
       if (sunMeshRef.current && sunLightRef.current) {
-        const radius = 10;
+        const radius = 11;
         const sunX = Math.cos(sunAngle) * radius;
         const sunY = Math.sin(sunAngle) * radius;
         const sunZ = -2;
@@ -202,13 +252,12 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
         sunLightRef.current.position.set(-sunX * 1.5, Math.max(sunY * 1.5, 2), sunZ + 5);
 
         // Day vs Night light intensity
-        const dayIntensity = Math.max(0.15, Math.sin(Math.max(sunAngle, 0)) * 0.9);
+        const dayIntensity = Math.max(0.2, Math.sin(Math.max(sunAngle, 0)) * 1.1);
         sunLightRef.current.intensity = isDaytime ? dayIntensity : 0.08;
         sunMeshRef.current.visible = isDaytime;
       }
 
-      // 2. Dynamically update interior volume colors based on indoor temp
-      // Map indoor temp to risk score: 25°C -> 10 (safe), 32°C -> 45 (mod), 37°C -> 75 (high), 41°C -> 95 (extreme)
+      // Map indoor temp to risk score: 25°C -> 10, 32°C -> 45, 37°C -> 75, 41°C -> 95
       const mapTempToScore = (temp: number) => {
         return Math.min(Math.max(((temp - 25) / 16) * 100, 0), 100);
       };
@@ -217,61 +266,150 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
         const tinScore = mapTempToScore(thermalState.tinIndoorTemp);
         const targetColor = getRiskColor(tinScore);
         const mat = tinInteriorRef.current.material as THREE.MeshStandardMaterial;
-        mat.color.lerp(targetColor, 0.2);
+        mat.color.lerp(targetColor, 0.25);
       }
 
       if (rccInteriorRef.current) {
         const rccScore = mapTempToScore(thermalState.rccIndoorTemp);
         const targetColor = getRiskColor(rccScore);
         const mat = rccInteriorRef.current.material as THREE.MeshStandardMaterial;
-        mat.color.lerp(targetColor, 0.2);
+        mat.color.lerp(targetColor, 0.25);
       }
 
-      // 3. Camera subtle azimuth drift
-      const drift = (scrollProgress - 0.5) * 0.08;
-      camera.position.x = Math.sin(drift) * 17;
-      camera.position.z = Math.cos(drift) * 17;
+      // Subtle camera angle
+      camera.position.x = Math.sin(0.04) * 16.5;
+      camera.position.z = Math.cos(0.04) * 16.5;
       camera.lookAt(0, 1.2, 0);
     },
   });
 
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setUserInteracted(true);
+    setIsPlaying(false);
+    setHour(val);
+  };
+
+  const handlePresetClick = (presetHour: number) => {
+    setUserInteracted(true);
+    setIsPlaying(false);
+    setHour(presetHour);
+  };
+
+  const togglePlay = () => {
+    setUserInteracted(true);
+    setIsPlaying((prev) => !prev);
+  };
+
+  const resetToPeak = () => {
+    setUserInteracted(true);
+    setIsPlaying(false);
+    setHour(14.5);
+  };
+
   return (
-    <div
+    <motion.div
       ref={containerRef}
-      className={`relative w-full ${staticHour !== undefined ? 'h-[420px]' : 'h-[125vh]'} ${className}`}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className={`relative w-full rounded-[8px] border border-border bg-panel-dark overflow-hidden select-none ${className}`}
     >
-      {/* Sticky Viewport Container */}
-      <div className={`${staticHour !== undefined ? 'relative h-full' : 'sticky top-16 h-[460px] sm:h-[500px]'} w-full overflow-hidden flex flex-col justify-between p-4 sm:p-6 lg:p-8 select-none`}>
-        {/* TOP HUD: Clock & Shared Outdoor Ambient */}
-        <div className="relative z-20 flex flex-wrap items-center justify-between gap-4 p-4 rounded-[8px] bg-panel-dark/95 border border-border">
-          <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-accent" />
-            <div>
+      <div className="relative w-full min-h-[520px] sm:min-h-[560px] flex flex-col justify-between p-4 sm:p-6 lg:p-7">
+        {/* TOP HUD: Clock, Interactive Controls & Outdoor Temp */}
+        <div className="relative z-20 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-4 p-3.5 sm:p-4 rounded-[8px] bg-panel-dark/90 backdrop-blur-md border border-border">
+            {/* Clock & Time Display */}
+            <div className="flex items-center gap-3">
+              <span className={`w-2.5 h-2.5 rounded-full ${isPlaying ? 'bg-accent animate-pulse' : 'bg-muted'}`} />
+              <div>
+                <span className="text-[10px] font-mono uppercase text-raised/70 block">
+                  DIURNAL CLOCK
+                </span>
+                <span className="text-xl sm:text-2xl font-mono font-bold text-raised tabular-nums tracking-tight">
+                  {thermalState.timeFormatted}
+                </span>
+              </div>
+            </div>
+
+            {/* Play/Pause & Interactive Scrubber */}
+            <div className="flex-1 max-w-xs sm:max-w-sm flex items-center gap-2.5 px-2">
+              <button
+                type="button"
+                onClick={togglePlay}
+                title={isPlaying ? 'Pause diurnal cycle' : 'Play diurnal cycle'}
+                className="w-8 h-8 rounded-[6px] bg-raised hover:bg-surface border border-border text-ink flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+              >
+                {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
+              </button>
+
+              <div className="flex-1 flex flex-col gap-1">
+                <input
+                  type="range"
+                  min="0"
+                  max="24"
+                  step="0.1"
+                  value={hour}
+                  onChange={handleSliderChange}
+                  className="w-full accent-accent cursor-pointer h-1.5 bg-raised/30 rounded-lg appearance-none"
+                  aria-label="Scrub 24-hour diurnal cycle"
+                />
+                <div className="flex justify-between text-[9px] font-mono text-raised/50 px-0.5">
+                  <span>00h</span>
+                  <span>06h</span>
+                  <span>12h</span>
+                  <span>18h</span>
+                  <span>24h</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={resetToPeak}
+                title="Reset to 14:30 Peak"
+                className="w-8 h-8 rounded-[6px] bg-raised/70 hover:bg-raised border border-border text-ink flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Shared Ambient Temperature */}
+            <div className="text-right">
               <span className="text-[10px] font-mono uppercase text-raised/70 block">
-                DIURNAL TIMELINE
+                OUTDOOR AMBIENT
               </span>
-              <span className="text-xl sm:text-2xl font-mono font-bold text-raised tabular-nums tracking-tight">
-                {thermalState.timeFormatted}
+              <span className="text-xl sm:text-2xl font-mono font-bold text-raised tabular-nums">
+                {thermalState.outdoorTemp.toFixed(1)}°C
               </span>
             </div>
           </div>
 
-          {/* Scrub Instruction */}
-          {staticHour === undefined && (
-            <div className="hidden md:flex items-center gap-2 text-xs font-mono text-raised/80">
-              <span>Scroll to scrub 24-hour sun cycle</span>
-              <span className="text-raised/60">({Math.round(scrollProgress * 100)}%)</span>
-            </div>
-          )}
-
-          {/* Shared Ambient Temperature */}
-          <div className="text-right">
-            <span className="text-[10px] font-mono uppercase text-raised/70 block">
-              SHARED OUTDOOR AMBIENT
+          {/* Quick Jump Scenario Presets */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-mono uppercase text-raised/60 mr-1 hidden sm:inline">
+              Key Timestamps:
             </span>
-            <span className="text-xl sm:text-2xl font-mono font-bold text-raised tabular-nums">
-              {thermalState.outdoorTemp.toFixed(1)}°C
-            </span>
+            {PRESET_HOURS.map((p) => {
+              const isActive = Math.abs(hour - p.hour) < 0.75;
+              const Icon = p.icon;
+              return (
+                <button
+                  key={p.label}
+                  type="button"
+                  onClick={() => handlePresetClick(p.hour)}
+                  title={p.desc}
+                  className={`px-2.5 py-1 rounded-[6px] text-[11px] font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-accent text-on-accent border border-accent font-semibold shadow-none'
+                      : 'bg-panel-dark/80 hover:bg-panel-dark text-raised/70 hover:text-raised border border-border/70'
+                  }`}
+                >
+                  <Icon className="w-3 h-3" />
+                  <span>{p.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -284,72 +422,106 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
         />
 
         {/* BOTTOM HUD: Side-by-Side Building Dynamics Comparison */}
-        <div className="relative z-20 grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-          {/* Tin Roof Card */}
-          <div className="p-4 rounded-[8px] bg-panel-dark/95 border border-border space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-raised font-display">
-                Informal / Corrugated Tin
-              </span>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getRiskHex(thermalState.tinIndoorTemp > 35 ? 75 : 30) }} />
-                {thermalState.tinAlertGrade}
-              </span>
+        <div className="relative z-20 space-y-3 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Tin Roof Card */}
+            <div className="p-4 rounded-[8px] bg-panel-dark/90 backdrop-blur-md border border-border space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-raised font-display">
+                  Informal / Corrugated Tin
+                </span>
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: getRiskHex(thermalState.tinIndoorTemp > 35 ? 75 : 30) }}
+                  />
+                  {thermalState.tinAlertGrade}
+                </span>
+              </div>
+              <div className="flex items-baseline justify-between font-mono">
+                <span className="text-2xl sm:text-3xl font-bold text-raised tabular-nums">
+                  {thermalState.tinIndoorTemp.toFixed(1)}°C
+                </span>
+                <span className="text-xs text-raised/70">
+                  {thermalState.tinIndoorTemp >= thermalState.outdoorTemp ? '+' : ''}
+                  {(thermalState.tinIndoorTemp - thermalState.outdoorTemp).toFixed(1)}°C vs Outdoor
+                </span>
+              </div>
+              <p className="text-xs text-raised/70 leading-relaxed">
+                Low thermal mass (τ ≈ 0.9h). Rapid solar absorption causes steep peak at 14:30; radiates quickly after sunset.
+              </p>
             </div>
-            <div className="flex items-baseline justify-between font-mono">
-              <span className="text-2xl sm:text-3xl font-bold text-raised tabular-nums">
-                {thermalState.tinIndoorTemp.toFixed(1)}°C
-              </span>
-              <span className="text-xs text-raised/70">
-                {thermalState.tinIndoorTemp >= thermalState.outdoorTemp ? '+' : ''}
-                {(thermalState.tinIndoorTemp - thermalState.outdoorTemp).toFixed(1)}°C vs Outdoor
-              </span>
+
+            {/* RCC Roof Card */}
+            <div className="p-4 rounded-[8px] bg-panel-dark/90 backdrop-blur-md border border-border space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-raised font-display">
+                  Reinforced Concrete Slab (RCC)
+                </span>
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: getRiskHex(thermalState.rccIndoorTemp > 35 ? 75 : 30) }}
+                  />
+                  {thermalState.rccAlertGrade}
+                </span>
+              </div>
+              <div className="flex items-baseline justify-between font-mono">
+                <span className="text-2xl sm:text-3xl font-bold text-raised tabular-nums">
+                  {thermalState.rccIndoorTemp.toFixed(1)}°C
+                </span>
+                <span className="text-xs text-raised/70">
+                  {thermalState.rccIndoorTemp >= thermalState.outdoorTemp ? '+' : ''}
+                  {(thermalState.rccIndoorTemp - thermalState.outdoorTemp).toFixed(1)}°C vs Outdoor
+                </span>
+              </div>
+              <p className="text-xs text-raised/70 leading-relaxed">
+                High thermal mass (τ ≈ 3.4h). Peak is delayed ~2.7h until 17:15; nocturnal concrete mass retains +2.7°C at 03:00.
+              </p>
             </div>
-            <p className="text-xs text-raised/70 leading-relaxed">
-              Low thermal mass (τ ≈ 0.9h). Rapid solar absorption causes steep peak at 14:30; radiates quickly after sunset.
-            </p>
           </div>
 
-          {/* RCC Roof Card */}
-          <div className="p-4 rounded-[8px] bg-panel-dark/95 border border-border space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-raised font-display">
-                Reinforced Concrete Slab (RCC)
-              </span>
-              <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getRiskHex(thermalState.rccIndoorTemp > 35 ? 75 : 30) }} />
-                {thermalState.rccAlertGrade}
-              </span>
-            </div>
-            <div className="flex items-baseline justify-between font-mono">
-              <span className="text-2xl sm:text-3xl font-bold text-raised tabular-nums">
-                {thermalState.rccIndoorTemp.toFixed(1)}°C
-              </span>
-              <span className="text-xs text-raised/70">
-                {thermalState.rccIndoorTemp >= thermalState.outdoorTemp ? '+' : ''}
-                {(thermalState.rccIndoorTemp - thermalState.outdoorTemp).toFixed(1)}°C vs Outdoor
-              </span>
-            </div>
-            <p className="text-xs text-raised/70 leading-relaxed">
-              High thermal mass (τ ≈ 3.4h). Peak is delayed ~2.7h until 17:15; nocturnal concrete mass retains +2.7°C at 03:00.
-            </p>
-          </div>
+          {/* Dynamic Scientific Callout Banners */}
+          <AnimatePresence mode="wait">
+            {hour >= 14 && hour <= 18 && (
+              <motion.div
+                key="phase-lag"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25 }}
+                className="p-2.5 rounded-[6px] bg-panel-dark/95 border border-border text-center text-xs font-mono text-raised flex items-center justify-center gap-2"
+              >
+                <span className="text-accent font-semibold flex items-center gap-1">
+                  <Info className="w-3.5 h-3.5 text-accent shrink-0" />
+                  Phase Lag Observed:
+                </span>
+                <span>
+                  While outdoor temp cools from 39°C to 35°C, concrete thermal inertia delays RCC indoor peak to 17:15.
+                </span>
+              </motion.div>
+            )}
+            {(hour < 5.5 || hour >= 22.5) && (
+              <motion.div
+                key="nocturnal"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25 }}
+                className="p-2.5 rounded-[6px] bg-panel-dark/95 border border-border text-center text-xs font-mono text-raised flex items-center justify-center gap-2"
+              >
+                <span className="text-accent font-semibold flex items-center gap-1">
+                  <Moon className="w-3.5 h-3.5 text-accent shrink-0" />
+                  Nocturnal Heat Retention:
+                </span>
+                <span>
+                  At night, tin sheds heat to ~25°C while concrete mass retains 28.1°C (+2.7°C nocturnal thermal strain).
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-
-        {/* Phase Lag Callout Banner */}
-        {hour >= 14 && hour <= 18 && (
-          <div className="relative z-20 mt-2 p-2.5 rounded-[6px] bg-panel-dark/95 border border-border text-center text-xs font-mono text-raised">
-            <span className="text-accent font-medium mr-2">● Phase Lag Observed:</span>
-            While outdoor temp cools from 39°C to 35°C, concrete thermal inertia delays RCC indoor peak to 17:15.
-          </div>
-        )}
-        {(hour < 5 || hour >= 23) && (
-          <div className="relative z-20 mt-2 p-2.5 rounded-[6px] bg-panel-dark/95 border border-border text-center text-xs font-mono text-raised">
-            <span className="text-accent font-medium mr-2">● Nocturnal Retention:</span>
-            At 03:00, tin sheds heat to 25.4°C while concrete mass retains 28.1°C (+2.7°C nighttime thermal strain).
-          </div>
-        )}
       </div>
-    </div>
+    </motion.div>
   );
 };
