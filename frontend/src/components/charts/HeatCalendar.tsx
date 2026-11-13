@@ -23,7 +23,7 @@ export const HeatCalendar: React.FC = () => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs font-mono uppercase tracking-[0.10em] text-muted">
-          Synoptic Heat Stress Matrix (Monthly Average HTSI)
+          Monthly Heat Danger History (Average Risk Score)
         </span>
         {hoveredCell && (
           <div className="text-xs font-mono text-ink bg-raised px-2.5 py-1 rounded-[4px] border border-border flex items-center gap-1.5">

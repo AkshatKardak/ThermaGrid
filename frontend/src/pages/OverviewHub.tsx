@@ -97,10 +97,10 @@ export const OverviewHub: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-4 border-b border-border">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold font-display text-ink tracking-tight">
-            {ward?.ward_name || 'Ward M/East'} · {selectedCity}
+            {ward?.ward_name || 'Active Ward'} · {selectedCity}
           </h1>
           <span className="text-xs font-mono text-muted mt-0.5 block">
-            Hyperlocal human thermal stress and ward-level biometeorological telemetry
+            Hyperlocal heat danger and real-time ward safety monitoring
           </span>
         </div>
         <div className="flex items-center gap-3">

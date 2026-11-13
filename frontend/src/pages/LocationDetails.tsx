@@ -154,7 +154,7 @@ export const LocationDetails: React.FC = () => {
         <SectionHeader
           label="Temporal divergence & predictive uncertainty"
           title="Microclimate Trajectory & Risk Forecast Cone"
-          lead="Historical 72-hour biometeorological divergence alongside future risk probability envelope."
+          lead="Past 72-hour observed temperature alongside projected 48-hour heat forecast."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">

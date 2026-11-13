@@ -161,7 +161,7 @@ export const Landing: React.FC = () => {
                   <span className="block font-mono text-2xl sm:text-3xl font-bold text-ink tracking-tight tabular-nums">
                     {peakWbgt}°C
                   </span>
-                  <span className={TYPOGRAPHY.micro}>Peak ISO WBGT</span>
+                  <span className={TYPOGRAPHY.micro}>Peak Heat Stress</span>
                 </div>
                 <div>
                   <KpiNumeral
@@ -199,8 +199,8 @@ export const Landing: React.FC = () => {
           <div className="space-y-8">
             <SectionHeader
               label="How it works"
-              title="From synoptic observation to municipal action"
-              lead="We read the weather → we work out how hot it feels to a person → we tell you who is at risk and what to do."
+              title="From Weather Satellites to Street-Level Protection"
+              lead="We read real-time weather data → calculate how heat actually affects human bodies → deliver direct safety actions to workers, citizens, and city officials."
               className="mb-6"
             />
             <HowItWorks />
@@ -208,16 +208,27 @@ export const Landing: React.FC = () => {
         </Container>
       </section>
 
-      {/* 3. Section: Thermal Inertia Curve */}
+      {/* 3. Section: Thermal Inertia & Housing Comparison */}
       <section id="two-wards" className="py-8 sm:py-12">
         <Container>
           <div className="space-y-6">
             <SectionHeader
-              label="BUILT-ENVIRONMENT THERMAL INERTIA"
-              title="Informal Tin-Roof vs Engineered RCC Concrete"
-              lead="Interactive 24-hour pattern demonstrating heat retention, envelope insulation disparity, and the critical late-afternoon indoor phase lag."
+              label="HOW HOMES ABSORB AND TRAP HEAT"
+              title="Informal Tin-Roof vs Engineered Concrete (RCC)"
+              lead="Watch how heat moves through a tin roof compared to a concrete roof across a 24-hour heatwave. Thin tin roofs turn into ovens by early afternoon, while concrete roofs trap heat and keep rooms uncomfortably warm all night long."
             />
-            <ThermalPhaseLagChart />
+
+            {canRender3D ? (
+              <React.Suspense fallback={<ThermalLagStaticFallback />}>
+                <ThermalLagHouses />
+              </React.Suspense>
+            ) : (
+              <ThermalLagStaticFallback />
+            )}
+
+            <div className="pt-2">
+              <ThermalPhaseLagChart />
+            </div>
 
             <div className="pt-2">
               <TwoWardsComparison />
@@ -231,9 +242,9 @@ export const Landing: React.FC = () => {
         <Container>
           <div className="space-y-6">
             <SectionHeader
-              label="EXTRUDED URBAN HEAT FIELD"
-              title="Ward Heat City 3D Landscape"
-              lead="Volumetric blocks mapping normative human thermal stress. Height and colour encode multi-factorial risk, not mere air temperature."
+              label="URBAN HEAT MAP"
+              title="3D City Heat Landscape"
+              lead="3D blocks showing neighborhood heat danger. Block height and color reveal real human risk, combining weather, population, and housing type."
             />
             <React.Suspense
               fallback={
@@ -296,8 +307,8 @@ export const Landing: React.FC = () => {
           <div className="space-y-6">
             <SectionHeader
               label="Frequently Asked Questions"
-              title="Methodology, Ingestion Cadence &amp; Data Governance"
-              lead="Essential operational and technical clarifications regarding ThermaGrid's biometeorological architecture."
+              title="Methodology, Update Times &amp; Data Sources"
+              lead="Key answers about ThermaGrid's heat tracking, sensor accuracy, and safety warnings."
               className="text-center mx-auto"
             />
             <LandingFaq />

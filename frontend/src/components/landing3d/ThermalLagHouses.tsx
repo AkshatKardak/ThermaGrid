@@ -15,11 +15,11 @@ export interface ThermalLagHousesProps {
 }
 
 const PRESET_HOURS = [
-  { label: 'Dawn', hour: 6.0, icon: Sun, desc: '06:00 · Cool sunrise baseline' },
-  { label: 'Solar Peak', hour: 12.0, icon: Sun, desc: '12:00 · Maximum solar radiation' },
-  { label: 'Tin Peak', hour: 14.5, icon: Clock, desc: '14:30 · Tin breaches 41.2°C' },
-  { label: 'Concrete Lag Peak', hour: 17.25, icon: Clock, desc: '17:15 · Concrete delayed peak' },
-  { label: 'Night Retention', hour: 3.0, icon: Moon, desc: '03:00 · Nocturnal concrete heat' },
+  { label: 'Dawn (06:00)', hour: 6.0, icon: Sun, desc: 'Cool morning baseline before sunrise' },
+  { label: 'Solar Peak (12:00)', hour: 12.0, icon: Sun, desc: 'Sun directly overhead at maximum intensity' },
+  { label: 'Tin Roof Peak (14:30)', hour: 14.5, icon: Clock, desc: 'Thin metal roof peaks at dangerous 41.2°C' },
+  { label: 'Concrete Delayed Peak (17:15)', hour: 17.25, icon: Clock, desc: 'Concrete roof heat delay causes late afternoon indoor peak' },
+  { label: 'Night Heat Trap (03:00)', hour: 3.0, icon: Moon, desc: 'Concrete retains trapped heat all night long' },
 ];
 
 export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
@@ -35,20 +35,6 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
 
   const hourRef = useRef<number>(hour);
   hourRef.current = hour;
-
-  // Viewport scroll progress (inView mode for smooth background scrub when scrolling naturally)
-  const scrollProgress = useScrollProgress(containerRef, { mode: 'inView' });
-
-  // Update hour from scroll if user is scrolling naturally and hasn't manually paused/dragged
-  useEffect(() => {
-    if (staticHour !== undefined || userInteracted || isPlaying) return;
-    if (scrollProgress > 0.1 && scrollProgress < 0.9) {
-      // Map scroll progress (0.1..0.9) to daylight & afternoon hours (06:00..20:00)
-      const normalized = (scrollProgress - 0.1) / 0.8;
-      const targetHour = 6.0 + normalized * 14.0;
-      setHour(targetHour);
-    }
-  }, [scrollProgress, userInteracted, isPlaying, staticHour]);
 
   // Auto-play 24-hour cycle loop
   useEffect(() => {
@@ -430,7 +416,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
             <div className="p-5 sm:p-6 rounded-[10px] bg-panel-dark/95 backdrop-blur-md border border-border space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-raised font-display">
-                  Informal / Corrugated Tin
+                  Informal Tin-Roof Home
                 </span>
                 <span className="text-xs font-mono uppercase px-2.5 py-1 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1.5">
                   <span
@@ -450,7 +436,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-raised/70 leading-relaxed pt-1 border-t border-border/40">
-                Low thermal mass (τ ≈ 0.9h). Rapid solar absorption causes steep peak at 14:30; radiates quickly after sunset.
+                Thin metal absorbs direct sunlight immediately. By 2:30 PM the room turns into an oven (41°C). Once the sun sets, it cools down quickly.
               </p>
             </div>
 
@@ -458,7 +444,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
             <div className="p-5 sm:p-6 rounded-[10px] bg-panel-dark/95 backdrop-blur-md border border-border space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-raised font-display">
-                  Reinforced Concrete Slab (RCC)
+                  Engineered Concrete (RCC) Home
                 </span>
                 <span className="text-xs font-mono uppercase px-2.5 py-1 rounded-[4px] font-medium bg-raised text-ink border border-border inline-flex items-center gap-1.5">
                   <span
@@ -478,7 +464,7 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-raised/70 leading-relaxed pt-1 border-t border-border/40">
-                High thermal mass (τ ≈ 3.4h). Peak is delayed ~2.7h until 17:15; nocturnal concrete mass retains +2.7°C at 03:00.
+                Thick concrete delays heat from penetrating, reaching its hottest indoor temperature late at 5:15 PM. At night, it traps heat and stays warm until morning.
               </p>
             </div>
           </div>
@@ -496,10 +482,10 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
               >
                 <span className="text-accent font-semibold flex items-center gap-1">
                   <Info className="w-3.5 h-3.5 text-accent shrink-0" />
-                  Phase Lag Observed:
+                  Heat Delay Observed:
                 </span>
                 <span>
-                  While outdoor temp cools from 39°C to 35°C, concrete thermal inertia delays RCC indoor peak to 17:15.
+                  While outdoor air cools from 39°C down to 35°C, heat soaked into the concrete roof continues warming the room until 5:15 PM.
                 </span>
               </motion.div>
             )}
@@ -514,10 +500,10 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
               >
                 <span className="text-accent font-semibold flex items-center gap-1">
                   <Moon className="w-3.5 h-3.5 text-accent shrink-0" />
-                  Nocturnal Heat Retention:
+                  Trapped Nighttime Heat:
                 </span>
                 <span>
-                  At night, tin sheds heat to ~25°C while concrete mass retains 28.1°C (+2.7°C nocturnal thermal strain).
+                  At night, tin roofs cool to 25°C while concrete holds 28°C (+3°C trapped heat), disrupting sleep and recovery.
                 </span>
               </motion.div>
             )}

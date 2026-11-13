@@ -25,20 +25,20 @@ const PRE_APPROVED_TEMPLATES = [
   {
     grade: 'Red Alert (Severe)',
     level: 'Extreme',
-    title: 'RED ALERT: MANDATORY OUTDOOR LABOR CESSATION',
-    text: 'IMD Red Warning. Severe heatwave across ward sectors. Mandatory shutdown of strenuous physical outdoor work between 11:30 and 16:30. Activate shaded hydration camps immediately.',
+    title: 'RED ALERT: HALT DANGEROUS OUTDOOR WORK',
+    text: 'IMD Red Warning. Severe heatwave across ward sectors. Mandatory shutdown of strenuous physical outdoor work between 11:30 AM and 4:30 PM. Drink water with electrolytes and rest in shaded cooling shelters.',
   },
   {
     grade: 'Orange Alert (High)',
     level: 'Very High',
-    title: 'ORANGE ALERT: 30M WORK/REST SCHEDULE ACTIVE',
-    text: 'IMD Orange Alert. Effective WBGT exceeds 30°C. Contractors must enforce 30m work / 30m rest cycle with chilled ORS electrolytes. Monitor elderly and pregnant residents.',
+    title: 'ORANGE ALERT: MANDATORY 30-MIN WORK/REST CYCLES',
+    text: 'IMD Orange Alert. Extreme heat strain. Contractors and employers must enforce 30-minute work and 30-minute rest cycles with cold ORS hydration. Check on vulnerable community members.',
   },
   {
     grade: 'Yellow Advisory (Moderate)',
     level: 'High',
-    title: 'YELLOW ADVISORY: CONTINUOUS HYDRATION DIRECTIVE',
-    text: 'IMD Yellow Watch. Rising ambient heat strain. Drink minimum 500–750mL water per hour. Community health workers on patrol.',
+    title: 'YELLOW ADVISORY: REGULAR WATER & HYDRATION DIRECTIVE',
+    text: 'IMD Yellow Watch. Rising midday heat stress. Drink at least 500–750mL water every hour. Community cooling stations and shaded shelters are active.',
   },
 ];
 
@@ -125,25 +125,38 @@ export const AlertsTab: React.FC = () => {
     { name: 'Yellow Watch', count: 42, color: RISK_SCALE.risk2 },
   ];
 
-  // Delivery log table rows
-  const deliveryLogs = (alertsData && alertsData.length > 0)
-    ? alertsData.map((a: any, idx: number) => ({
+  // Delivery log table rows dynamically scoped to active city
+  const deliveryLogs = useMemo(() => {
+    if (alertsData && alertsData.length > 0) {
+      return alertsData.map((a: any, idx: number) => ({
         id: a.id || `alert-${idx}`,
         timestamp: a.issued_at ? new Date(a.issued_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '11:30',
-        ward: a.title?.split(':')[1]?.trim() || selectedCity || 'Active Ward',
+        ward: a.title?.split(':')[1]?.trim() || (wardsData?.[idx]?.ward_name) || selectedCity || 'Active Ward',
         grade: a.alert_level || 'Very High',
         sent: 1450,
         delivered: 1418,
         failed: 32,
         reason: 'Handset unreachable / DND active',
-      }))
-    : [
-        { id: 1, timestamp: '14:30', ward: 'Ward A (Colaba)', grade: 'Red Alert', sent: 1450, delivered: 1422, failed: 28, reason: 'Carrier SMS timeout' },
-        { id: 2, timestamp: '12:15', ward: 'Ward G/N (Dharavi)', grade: 'Red Alert', sent: 3200, delivered: 3140, failed: 60, reason: 'Telecom tower congestion' },
-        { id: 3, timestamp: '09:00', ward: 'Ward K/E (Andheri E)', grade: 'Orange Alert', sent: 2100, delivered: 2085, failed: 15, reason: 'Invalid handset MSISDN' },
-        { id: 4, timestamp: '07:30', ward: 'Ward M/E (Govandi)', grade: 'Orange Alert', sent: 2750, delivered: 2710, failed: 40, reason: 'Carrier SMS timeout' },
-        { id: 5, timestamp: 'Yesterday', ward: 'Ward F/N (Matunga)', grade: 'Yellow Watch', sent: 1800, delivered: 1792, failed: 8, reason: 'Handset switched off' },
-      ];
+      }));
+    }
+    if (wardsData && wardsData.length > 0) {
+      return wardsData.slice(0, 5).map((w: any, idx: number) => ({
+        id: `delivery-${w.id || idx}`,
+        timestamp: idx === 0 ? '14:30' : idx === 1 ? '12:15' : idx === 2 ? '09:00' : idx === 3 ? '07:30' : 'Yesterday',
+        ward: `${w.ward_name} (${w.ward_code})`,
+        grade: idx < 2 ? 'Red Alert' : idx < 4 ? 'Orange Alert' : 'Yellow Watch',
+        sent: 1450 + idx * 350,
+        delivered: 1420 + idx * 340,
+        failed: 25 + idx * 8,
+        reason: idx % 2 === 0 ? 'Carrier SMS timeout' : 'Telecom tower congestion',
+      }));
+    }
+    return [
+      { id: 1, timestamp: '14:30', ward: `${selectedCity || 'Urban'} Sector 1`, grade: 'Red Alert', sent: 1450, delivered: 1422, failed: 28, reason: 'Carrier SMS timeout' },
+      { id: 2, timestamp: '12:15', ward: `${selectedCity || 'Urban'} Sector 2`, grade: 'Red Alert', sent: 3200, delivered: 3140, failed: 60, reason: 'Telecom tower congestion' },
+      { id: 3, timestamp: '09:00', ward: `${selectedCity || 'Urban'} Sector 3`, grade: 'Orange Alert', sent: 2100, delivered: 2085, failed: 15, reason: 'Invalid handset MSISDN' },
+    ];
+  }, [alertsData, wardsData, selectedCity]);
 
   return (
     <div className="space-y-6">
@@ -153,14 +166,14 @@ export const AlertsTab: React.FC = () => {
           <div className="flex items-center gap-1.5 mb-1">
             <BellRing className="w-4 h-4 text-accent" />
             <span className="text-[11px] font-mono uppercase tracking-wider text-accent font-semibold">
-              Emergency Public Broadcast Gateway
+              Emergency Heat Warning Broadcast
             </span>
           </div>
           <h1 className="text-2xl font-bold font-display text-ink tracking-tight">
-            Municipal Alerts Composer &amp; Dispatch Log
+            City Heat Alerts &amp; Broadcast History
           </h1>
           <p className="text-xs text-muted mt-0.5">
-            Pre-approved multi-lingual emergency bulletins dispatched across verified SMS, WhatsApp, and siren beacons.
+            Official heat warnings sent across SMS, WhatsApp, and emergency speakers in local languages.
           </p>
         </div>
       </div>

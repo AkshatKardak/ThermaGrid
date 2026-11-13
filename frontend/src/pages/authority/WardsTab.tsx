@@ -74,8 +74,8 @@ export const WardsTab: React.FC = () => {
         id: ward.id,
         ward_code: ward.ward_code,
         ward_name: ward.ward_name,
-        city: ward.city || selectedCity || 'Mumbai',
-        state: selectedState || 'Maharashtra',
+        city: ward.city || selectedCity || (wardsData?.[0]?.city) || 'Active City',
+        state: ward.state || selectedState || (wardsData?.[0]?.state) || 'Active State',
         risk_score: riskScore,
         band,
         wbgt_c: wbgt,
@@ -180,10 +180,10 @@ export const WardsTab: React.FC = () => {
             </span>
           </div>
           <h1 className="text-2xl font-bold font-display text-ink tracking-tight">
-            Wards Directory — {selectedCity || 'Mumbai'}, {selectedState || 'Maharashtra'}
+            Wards Directory — {selectedCity || (wardsData?.[0]?.city) || 'All Monitored Wards'}{selectedState ? `, ${selectedState}` : ''}
           </h1>
           <p className="text-xs text-muted mt-0.5">
-            Complete analytical ledger intersecting biometeorological hazard, demographic exposure, and equity deficit.
+            Complete ward ledger combining heat danger levels, outdoor workers, population density, and support gaps.
           </p>
         </div>
 

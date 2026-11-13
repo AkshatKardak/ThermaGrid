@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
               />
             </Link>
             <p className="text-xs text-muted leading-relaxed">
-              Hyperlocal human thermal-stress early-warning and municipal decision-support system. Calibrated biometeorological physics intersecting ward-level built-environment vulnerability.
+              Hyperlocal heat early-warning and city safety platform. Protecting citizens, outdoor workers, and vulnerable communities across Indian cities.
             </p>
             <div className="pt-1 text-[11px] font-mono text-muted flex items-center gap-1.5">
               <span>National Climate &amp; Environmental Intelligence</span>

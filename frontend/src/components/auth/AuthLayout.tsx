@@ -44,7 +44,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
             {/* Top Row: Eyebrow on left, DataStatusBadge on right, same baseline */}
             <div className="relative z-10 flex items-baseline justify-between gap-4 w-full">
               <span className="text-xs font-mono font-medium text-raised/80 uppercase tracking-wider">
-                National Synoptic Thermal Field
+                National Heat Early Warning Network
               </span>
               <DataStatusBadge isDemo={false} variant="dark" />
             </div>
@@ -58,7 +58,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
                   protect lives
                 </h1>
                 <p className="text-sm sm:text-base text-raised/75 leading-relaxed pt-1 max-w-md">
-                  Ward-level thermal risk telemetry, biometeorological physics, and municipal early warnings across India.
+                  Ward-level heat risk monitoring, worker safety guidelines, and emergency alerts across India.
                 </p>
               </div>
 

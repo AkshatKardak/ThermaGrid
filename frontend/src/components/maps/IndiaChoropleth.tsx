@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simple-maps';
+import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from 'react-simple-maps';
 import { useNavigate } from 'react-router-dom';
 import { Maximize2, Minimize2, RotateCcw, Plus, Minus, X } from 'lucide-react';
 import indiaGeo from '../../assets/geo/india-states.json';
@@ -9,6 +9,22 @@ import { useAllWardsRisk } from '../../hooks/useRisk';
 import { getRiskBand, TOKENS, RISK_SCALE } from '../../theme/tokens';
 import { getRiskHex } from '../landing3d/palette';
 import { formatNumber } from '../../utils/format';
+
+// Major Indian Urban Monitoring Telemetry Hubs
+const MAJOR_HUBS = [
+  { name: 'Srinagar', state: 'Jammu and Kashmir', coordinates: [74.7973, 34.0837] as [number, number], score: 45.0, temp: '26.4°C' },
+  { name: 'Delhi', state: 'Delhi', coordinates: [77.1025, 28.7041] as [number, number], score: 84.0, temp: '42.1°C' },
+  { name: 'Jaipur', state: 'Rajasthan', coordinates: [75.7873, 26.9124] as [number, number], score: 86.4, temp: '43.5°C' },
+  { name: 'Ahmedabad', state: 'Gujarat', coordinates: [72.5714, 23.0225] as [number, number], score: 78.2, temp: '41.0°C' },
+  { name: 'Mumbai', state: 'Maharashtra', coordinates: [72.8777, 19.0760] as [number, number], score: 84.5, temp: '36.8°C' },
+  { name: 'Bengaluru', state: 'Karnataka', coordinates: [77.5946, 12.9716] as [number, number], score: 62.5, temp: '33.2°C' },
+  { name: 'Chennai', state: 'Tamil Nadu', coordinates: [80.2707, 13.0827] as [number, number], score: 68.0, temp: '37.4°C' },
+  { name: 'Hyderabad', state: 'Telangana', coordinates: [78.4867, 17.3850] as [number, number], score: 80.4, temp: '39.8°C' },
+  { name: 'Kolkata', state: 'West Bengal', coordinates: [88.3639, 22.5726] as [number, number], score: 73.2, temp: '38.5°C' },
+  { name: 'Lucknow', state: 'Uttar Pradesh', coordinates: [80.9462, 26.8467] as [number, number], score: 82.1, temp: '41.2°C' },
+  { name: 'Bhubaneswar', state: 'Odisha', coordinates: [85.8245, 20.2961] as [number, number], score: 84.8, temp: '40.6°C' },
+  { name: 'Patna', state: 'Bihar', coordinates: [85.1376, 25.5941] as [number, number], score: 74.0, temp: '39.1°C' },
+];
 
 // State-level empirical & reanalysis baseline risk scores
 const STATE_RISK_MAP: Record<string, { score: number; level: 'ward-level' | 'district-level' }> = {
@@ -147,13 +163,13 @@ export const IndiaChoropleth: React.FC = () => {
       {/* Top Header / Context */}
       <div className="absolute top-4 left-4 z-20 space-y-1 bg-raised/95 backdrop-blur-sm p-3 sm:p-3.5 rounded-[8px] border border-border max-w-[280px] sm:max-w-[320px] shadow-sm">
         <span className="text-[10px] font-mono uppercase tracking-wider text-accent font-semibold block">
-          National Heat Exposure Choropleth
+          National Heat Exposure Map
         </span>
         <h3 className="text-sm font-bold font-display text-ink leading-tight">
-          Synoptic State &amp; UT Biometeorological Field
+          Live Heat Danger Across All Indian States &amp; Cities
         </h3>
         <p className="text-[11px] text-muted leading-snug">
-          Clipped to Survey of India national boundary. Click any state to inspect localized ward and district telemetry.
+          Survey of India boundary. Click any city marker or state to inspect local heat danger and ward details.
         </p>
       </div>
 
@@ -332,6 +348,76 @@ export const IndiaChoropleth: React.FC = () => {
                 ))
               }
             </Geographies>
+
+            {/* Major Indian City Telemetry Markers with Glow & Pulse */}
+            {MAJOR_HUBS.map((hub) => {
+              const hubColor = getRiskHex(hub.score);
+              return (
+                <Marker
+                  key={hub.name}
+                  coordinates={hub.coordinates}
+                  onMouseEnter={(evt) => {
+                    const containerRect = containerRef.current?.getBoundingClientRect();
+                    const x = containerRect ? evt.clientX - containerRect.left : evt.clientX;
+                    const y = containerRect ? evt.clientY - containerRect.top : evt.clientY;
+                    const band = getRiskBand(hub.score);
+                    setTooltip({
+                      name: `${hub.name} (${hub.state})`,
+                      score: hub.score,
+                      bandLabel: `${band.label} · ${hub.temp} Air Temp`,
+                      level: 'Monitored City Hub',
+                      x,
+                      y,
+                    });
+                  }}
+                  onMouseMove={(evt) => {
+                    const containerRect = containerRef.current?.getBoundingClientRect();
+                    const x = containerRect ? evt.clientX - containerRect.left : evt.clientX;
+                    const y = containerRect ? evt.clientY - containerRect.top : evt.clientY;
+                    setTooltip((prev) => (prev ? { ...prev, x, y } : null));
+                  }}
+                  onMouseLeave={() => setTooltip(null)}
+                  onClick={() => {
+                    setSelectedState(hub.state);
+                    navigate(`/app/wards?city=${encodeURIComponent(hub.name)}`);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {/* Pulsing beacon ring */}
+                  <circle
+                    r={7 / position.zoom}
+                    fill={hubColor}
+                    opacity={0.3}
+                    className="animate-ping"
+                  />
+                  {/* Outer circle */}
+                  <circle
+                    r={4.5 / position.zoom}
+                    fill={hubColor}
+                    stroke="#ffffff"
+                    strokeWidth={1.2 / position.zoom}
+                  />
+                  {/* City label with legible backdrop stroke */}
+                  <text
+                    textAnchor="middle"
+                    y={-7 / position.zoom}
+                    style={{
+                      fontFamily: 'monospace',
+                      fontSize: `${10 / Math.max(position.zoom * 0.85, 1)}px`,
+                      fontWeight: 700,
+                      fill: TOKENS.ink,
+                      pointerEvents: 'none',
+                      paintOrder: 'stroke',
+                      stroke: TOKENS.surface,
+                      strokeWidth: `${2.5 / position.zoom}px`,
+                      strokeLinejoin: 'round',
+                    }}
+                  >
+                    {hub.name}
+                  </text>
+                </Marker>
+              );
+            })}
           </ZoomableGroup>
         </ComposableMap>
       </div>

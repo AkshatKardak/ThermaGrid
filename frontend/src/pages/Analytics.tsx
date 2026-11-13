@@ -180,14 +180,14 @@ export const Analytics: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-bold font-display text-ink tracking-tight">
-              Thermal Biometeorology &amp; Analytics
+              Heat Analytics &amp; Microclimates
             </h1>
             <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold uppercase bg-surface text-ink border border-border">
-              Synoptic Telemetry
+              Live Sensor Data
             </span>
           </div>
           <p className="text-xs text-muted mt-1 leading-relaxed max-w-2xl">
-            Hyperlocal microclimate patterns, Heat Stress Index (HTSI) exposure matrices, and cross-ward biophysical correlations for {selectedCity}.
+            Hyperlocal neighborhood patterns, Heat Stress Index (HTSI) exposure maps, and cross-ward comparisons for {selectedCity}.
           </p>
         </div>
 
@@ -241,7 +241,7 @@ export const Analytics: React.FC = () => {
                 Concentric 24-Hour Cycle (Inner: 48h Ago · Mid: Yesterday · Outer: Today)
               </h3>
               <span className="text-[11px] text-muted">
-                Each radial segment maps a 1-hour interval evaluated from synoptic reanalysis
+                Each radial segment maps a 1-hour interval evaluated from live weather observations
               </span>
             </div>
             <div className="flex items-center gap-3 text-[10px] font-mono text-muted">
@@ -440,7 +440,7 @@ export const Analytics: React.FC = () => {
               Ward Risk Band Distribution
             </h3>
             <span className="text-[11px] text-muted">
-              Current breakdown across 5 normative HTSI risk bands
+              Current breakdown across 5 heat danger levels
             </span>
           </div>
 

@@ -75,7 +75,7 @@ export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {
             <div className="flex items-center gap-2 mb-1">
               <Moon className="w-4 h-4 text-muted" />
               <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-muted">
-                Overnight Biometeorology
+                Overnight Heat &amp; Sleep Safety
               </span>
             </div>
             <h3 className={`${TYPOGRAPHY.h3} text-ink flex items-center gap-2`}>

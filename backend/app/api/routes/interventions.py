@@ -6,6 +6,7 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.db.session import get_db
 from app.models.location import Location
@@ -186,13 +187,24 @@ def create_optimal_intervention_plan(
 @router.get("/outcomes")
 def get_intervention_outcomes(
     limit: int = Query(50, ge=1, le=200),
+    city: Optional[str] = Query(None),
+    state: Optional[str] = Query(None),
     db: Session = Depends(get_db),
 ):
     """
     Returns recorded intervention allocations and audited pre/post risk score deltas.
+    Optionally scopes to a specific city or state.
     """
+    query = db.query(InterventionOutcome)
+    if city or state:
+        query = query.join(Location, InterventionOutcome.location_id == Location.id)
+        if city:
+            query = query.filter(func.lower(Location.city) == city.strip().lower())
+        if state:
+            query = query.filter(func.lower(Location.state) == state.strip().lower())
+
     records = (
-        db.query(InterventionOutcome)
+        query
         .order_by(InterventionOutcome.created_at.desc())
         .limit(limit)
         .all()

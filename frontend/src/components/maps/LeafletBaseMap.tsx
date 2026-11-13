@@ -212,7 +212,7 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
           <span className="text-ink font-semibold">
             {activeViewMode === 'india'
               ? '🇮🇳 Pan-India National Telemetry'
-              : `🎯 ${selectedWard?.ward_name || 'Mumbai Urban Sector'}`}
+              : `🎯 ${selectedWard?.ward_name || (wards && wards.length > 0 ? wards[0]?.ward_name : 'Active Sector')}`}
           </span>
         </div>
 

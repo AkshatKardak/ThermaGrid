@@ -10,24 +10,24 @@ export const TwoWardsComparison: React.FC = () => {
       <div className="p-4 rounded-[8px] bg-surface border border-border flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-[11px] uppercase font-mono tracking-[0.10em] text-muted">
-            Simultaneous Ambient Meteorology:
+            Current Outdoor Weather:
           </span>
           <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-ink">
             <span className="font-bold text-ink bg-raised px-2.5 py-1 rounded-[4px] border border-border">
-              36.0°C Dry-Bulb
+              36.0°C Air Temp
             </span>
             <span className="text-muted">•</span>
             <span className="font-bold text-ink bg-raised px-2.5 py-1 rounded-[4px] border border-border">
-              65% Rel. Humidity
+              65% Humidity
             </span>
             <span className="text-muted">•</span>
             <span className="font-bold text-ink bg-raised px-2.5 py-1 rounded-[4px] border border-border">
-              800 W/m² Solar Irradiance
+              800 W/m² Sun Heat
             </span>
           </div>
         </div>
         <div className="text-xs font-mono text-muted">
-          City: <span className="text-ink font-semibold">Mumbai, India</span>
+          Case Study: <span className="text-ink font-semibold">Microclimate Disparity</span>
         </div>
       </div>
 
@@ -41,10 +41,10 @@ export const TwoWardsComparison: React.FC = () => {
               <div>
                 <span className="text-[11px] font-mono font-medium uppercase tracking-[0.10em] text-muted flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-risk-4" />
-                  Ward M/East (Govandi / Shivaji Nagar)
+                  Ward M/East (Dense Informal Settlement)
                 </span>
                 <h3 className={`${TYPOGRAPHY.h3} text-ink mt-0.5`}>
-                  Dense Informal Settlement
+                  Low Canopy · High Heat Retention
                 </h3>
               </div>
               <RiskBadge score={84.5} size="lg" />
@@ -53,11 +53,11 @@ export const TwoWardsComparison: React.FC = () => {
             {/* Recessed Thermal Indices Strip */}
             <div className="grid grid-cols-3 gap-2 p-3 rounded-[6px] bg-raised border border-border text-center font-mono">
               <div>
-                <span className="block text-[10px] text-muted uppercase">ISO WBGT</span>
+                <span className="block text-[10px] text-muted uppercase">Work Heat Stress</span>
                 <span className="text-base font-bold text-ink tabular-nums">34.9°C</span>
               </div>
               <div className="border-x border-border">
-                <span className="block text-[10px] text-muted uppercase">UTCI Stress</span>
+                <span className="block text-[10px] text-muted uppercase">Body Felt Temp</span>
                 <span className="text-base font-bold text-ink tabular-nums">41.8°C</span>
               </div>
               <div>
@@ -133,11 +133,11 @@ export const TwoWardsComparison: React.FC = () => {
             {/* Recessed Thermal Indices Strip */}
             <div className="grid grid-cols-3 gap-2 p-3 rounded-[6px] bg-raised border border-border text-center font-mono">
               <div>
-                <span className="block text-[10px] text-muted uppercase">ISO WBGT</span>
+                <span className="block text-[10px] text-muted uppercase">Work Heat Stress</span>
                 <span className="text-base font-bold text-ink tabular-nums">29.1°C</span>
               </div>
               <div className="border-x border-border">
-                <span className="block text-[10px] text-muted uppercase">UTCI Stress</span>
+                <span className="block text-[10px] text-muted uppercase">Body Felt Temp</span>
                 <span className="text-base font-bold text-ink tabular-nums">33.2°C</span>
               </div>
               <div>

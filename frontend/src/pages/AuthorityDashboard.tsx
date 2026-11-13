@@ -63,7 +63,7 @@ export const AuthorityDashboard: React.FC = () => {
   // Pre-approved alert templates
   const alertTemplates = [
     'Level-3 Heatwave Action: Halt outdoor physical shifts (12:00-16:00) and open municipal hydration wings.',
-    'Nocturnal Heat Advisory: High indoor thermal inertia. Keep windows cross-ventilated; visit community cooling centres.',
+    'Nocturnal Heat Advisory: High trapped indoor heat. Keep windows cross-ventilated; visit community cooling shelters.',
     'Rapid Emergency Alert: WBGT exceeded 35°C threshold. Immediate worker hydration and rest rotations enforced.',
   ];
 
@@ -480,7 +480,7 @@ export const AuthorityDashboard: React.FC = () => {
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[10px] uppercase font-bold text-ink tracking-wider">
-                        TOP UNDERSERVED WARD
+                        MOST OVERLOOKED / HIGH-NEED WARD
                       </span>
                       <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-surface text-ink font-bold border border-border">
                         GAP {equityData.top_underserved_ward.equity_gap_signed}
@@ -514,10 +514,10 @@ export const AuthorityDashboard: React.FC = () => {
                         : 'text-muted hover:text-ink'
                     }`}
                   >
-                    EQUITY GAP MATRIX
+                    SUPPORT GAP MATRIX
                   </button>
                 </div>
-                <span className="text-[10px] font-mono text-muted">Automated ISO 7243 Matrix</span>
+                <span className="text-[10px] font-mono text-muted">Heat Safety Standards Matrix</span>
               </div>
 
               {queueTab === 'queue' ? (

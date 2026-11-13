@@ -37,10 +37,10 @@ const ARCHETYPES: Record<ArchetypeKey, ArchetypeConfig> = {
   },
   ac: {
     id: 'ac',
-    label: 'Active HVAC Conditioned',
-    sublabel: 'Active climate control suppressing diurnal thermal flux',
+    label: 'Air Conditioned Home',
+    sublabel: 'Air conditioning eliminates heat spikes and night heat traps',
     lagHours: 0.2,
-    lagLabel: 'Active climate regulation (no phase lag)',
+    lagLabel: 'Active climate regulation (steady cool)',
     damping: 0.15,
     solarOffset: -6.5,
   },
@@ -150,13 +150,13 @@ export const ThermalPhaseLagChart: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
           <span className="text-[10px] font-mono uppercase tracking-wider text-accent font-semibold block">
-            Envelope Thermal Inertia Dynamics
+            How Building Materials Absorb &amp; Delay Heat
           </span>
           <h3 className="text-base font-bold font-display text-ink mt-0.5">
-            24-Hour Phase-Lag Progression: Outdoor vs. Indoor
+            24-Hour Temperature Curve: Outdoor vs. Indoor
           </h3>
           <p className="text-xs text-muted mt-0.5">
-            Demonstrates late-afternoon indoor heat escalation and insulation phase delay across building envelopes.
+            Shows how tin roofs peak early at 2:30 PM while concrete roofs delay peak heat to late afternoon.
           </p>
         </div>
 

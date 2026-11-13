@@ -14,13 +14,13 @@ export const HowItWorks: React.FC = () => {
       num: '02',
       icon: UserCheck,
       title: 'We calculate human heat strain',
-      desc: 'Biometeorological physics models (ISO 7243 WBGT, UTCI, and Heat Index) compute how heat actually stresses the human cardiovascular system.',
+      desc: 'Proven heat stress formulas (WBGT, UTCI, and Heat Index) calculate how temperature, humidity, and direct sunlight actually strain the human body and heart.',
     },
     {
       num: '03',
       icon: BellRing,
       title: 'We pinpoint who is at risk & what to do',
-      desc: 'Demographic exposure overlays and built-environment thermal mass trigger targeted municipal advisories, work-rest schedules, and cooling centers.',
+      desc: 'Neighborhood population data and housing types trigger clear safety advisories, mandatory work-rest breaks, and emergency cooling shelters.',
     },
   ];
 

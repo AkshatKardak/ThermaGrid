@@ -217,7 +217,7 @@ export const ReportsTab: React.FC = () => {
               City Heat Action Plan Executive Audit Summary
             </h2>
             <p className="text-xs font-mono text-muted">
-              Reporting Jurisdiction: {selectedCity || 'Mumbai'}, {selectedState || 'Maharashtra'} · Window: {startDate} to {endDate}
+              Reporting Jurisdiction: {selectedCity || 'National Coverage'}{selectedState ? `, ${selectedState}` : ''} · Window: {startDate} to {endDate}
             </p>
           </div>
           <div className="text-right font-mono text-xs text-muted">
@@ -238,7 +238,7 @@ export const ReportsTab: React.FC = () => {
             <span className="text-muted text-[10px]">100% compliant with ORS provision</span>
           </div>
           <div className="p-4 rounded-[8px] bg-raised border border-border space-y-1">
-            <span className="text-muted block text-[10px] uppercase">Estimated Exposure Attenuation</span>
+            <span className="text-muted block text-[10px] uppercase">Estimated Heat Risk Reduction</span>
             <span className="text-2xl font-bold text-ink block">-6.8 pts</span>
             <span className="text-muted text-[10px]">Observed across 48h audit window</span>
           </div>
