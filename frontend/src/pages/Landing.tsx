@@ -121,7 +121,7 @@ export const Landing: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-24 sm:space-y-32">
+    <div className="space-y-12 sm:space-y-16">
       {/* 1. Hero Section: Left Narrative (7 cols / 60%) + Right Live Ward Telemetry Matrix (5 cols / 40%) */}
       <section
         ref={heroRef}
@@ -203,7 +203,7 @@ export const Landing: React.FC = () => {
 
         {/* Right Column (40% weight): 3D Extruded Ward Map framed in --panel-dark (or static fallback) */}
         {canRender3D ? (
-          <div className="lg:col-span-5 bg-panel-dark border border-border rounded-[8px] overflow-hidden flex flex-col justify-between corner-ticks relative min-h-[500px]">
+          <div className="lg:col-span-5 bg-panel-dark border border-border rounded-[8px] overflow-hidden flex flex-col justify-between corner-ticks relative min-h-[380px] lg:min-h-[420px]">
             {/* 3D Extruded Ward Heat Skyline */}
             <div className="absolute inset-0 z-0">
               <React.Suspense
@@ -281,7 +281,7 @@ export const Landing: React.FC = () => {
           </div>
         ) : (
           // Static Fallback (Standard ranking list)
-          <div className="lg:col-span-5 bg-surface border border-border rounded-[8px] overflow-hidden flex flex-col justify-between corner-ticks relative min-h-[500px] p-5 sm:p-6">
+          <div className="lg:col-span-5 bg-surface border border-border rounded-[8px] overflow-hidden flex flex-col justify-between corner-ticks relative min-h-[380px] lg:min-h-[420px] p-5 sm:p-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-3 border-b border-border">
                 <div>
@@ -374,7 +374,7 @@ export const Landing: React.FC = () => {
           <div className="border border-border rounded-[8px] overflow-hidden bg-panel-dark">
             <React.Suspense
               fallback={
-                <div className="h-96 flex items-center justify-center font-mono text-xs text-raised bg-panel-dark">
+                <div className="h-80 flex items-center justify-center font-mono text-xs text-raised bg-panel-dark">
                   Loading Thermal Lag Simulation...
                 </div>
               }
@@ -386,7 +386,7 @@ export const Landing: React.FC = () => {
           <ThermalLagStaticFallback />
         )}
 
-        <div className="pt-6">
+        <div className="pt-4">
           <TwoWardsComparison />
         </div>
       </section>
@@ -401,12 +401,12 @@ export const Landing: React.FC = () => {
         <div className="border border-border rounded-[8px] overflow-hidden bg-panel-dark">
           <React.Suspense
             fallback={
-              <div className="h-[560px] flex items-center justify-center font-mono text-xs text-raised">
+              <div className="h-[420px] flex items-center justify-center font-mono text-xs text-raised">
                 Initializing 3D Ward Heat Landscape...
               </div>
             }
           >
-            <WardHeatCity wards={activeWardList} height={560} />
+            <WardHeatCity wards={activeWardList} height={420} />
           </React.Suspense>
         </div>
       </section>

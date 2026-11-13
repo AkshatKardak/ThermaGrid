@@ -130,6 +130,11 @@ export interface RiskCurrent {
   latitude?: number;
   longitude?: number;
   population?: number;
+  imd_grade?: 'NORMAL' | 'YELLOW' | 'ORANGE' | 'RED';
+  imd_label?: string;
+  consecutive_hot_days?: number;
+  consecutive_hot_nights?: number;
+  hours_to_threshold?: number | null;
   is_demo: boolean;
   demo_label?: string;
 }

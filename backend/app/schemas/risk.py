@@ -40,6 +40,11 @@ class RiskCurrentOut(BaseModel):
     is_demo: bool = False
     demo_label: Optional[str] = None
     provenance: Optional[ProvenanceEnvelope] = None
+    imd_grade: Optional[str] = "NORMAL"
+    imd_label: Optional[str] = "No Warning (Normal)"
+    consecutive_hot_days: Optional[int] = 0
+    consecutive_hot_nights: Optional[int] = 0
+    hours_to_threshold: Optional[float] = None
 
 
 class HourlyRiskForecastItem(BaseModel):

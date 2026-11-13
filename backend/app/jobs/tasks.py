@@ -16,7 +16,7 @@ from app.models.thermal import ThermalIndex
 from app.models.risk import RiskScore, WardRiskCurrent
 from app.models.alert import Alert
 from app.core.config import get_settings
-from app.services.alert_service import maybe_alert
+from app.services.alert_service import maybe_alert, dispatch_ward_alerts
 from app.services.weather_service import WeatherService
 from app.services.thermal_service import ThermalService
 from app.services.risk_service import RiskService
@@ -135,6 +135,11 @@ async def compute_thermal() -> None:
                     w_curr.explanation = r["explanation"]
                     w_curr.is_demo = r.get("is_demo", False)
                     w_curr.demo_label = r.get("demo_label")
+                    w_curr.imd_grade = r.get("imd_grade", "NORMAL")
+                    w_curr.imd_label = r.get("imd_label", "No Warning (Normal)")
+                    w_curr.consecutive_hot_days = r.get("consecutive_hot_days", 0)
+                    w_curr.consecutive_hot_nights = r.get("consecutive_hot_nights", 0)
+                    w_curr.hours_to_threshold = r.get("hours_to_threshold")
                     w_curr.calculated_for = r.get("calculated_for", datetime.now(timezone.utc))
                     w_curr.updated_at = datetime.now(timezone.utc)
 
@@ -186,5 +191,8 @@ async def evaluate_alerts() -> None:
                     ward=ward_name,
                     peak="13:00 - 15:30 IST",
                 )
+
+                if loc:
+                    await dispatch_ward_alerts(db, loc, item)
     except Exception as e:
         log.error(f"[JOB:evaluate_alerts] Alert evaluation error: {e}")

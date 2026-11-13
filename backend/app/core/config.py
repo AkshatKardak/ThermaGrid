@@ -58,6 +58,12 @@ class Settings(BaseSettings):
     # Alerts
     alert_provider: str = "none"  # resend | whatsapp | none
     alert_threshold: float = 80.0
+    alert_cooldown_minutes: int = 180
+    alert_max_per_day: int = 2
+    alert_season_budget: int = 40
+    sms_enabled: bool = False
+    textbelt_key: str = "textbelt"
+    demo_alert_phone: str = ""
 
     # Weather
     open_meteo_base_url: str = "https://api.open-meteo.com/v1"
@@ -104,6 +110,18 @@ class Settings(BaseSettings):
     def ALERT_PROVIDER(self) -> str: return self.alert_provider
     @property
     def ALERT_THRESHOLD(self) -> float: return self.alert_threshold
+    @property
+    def ALERT_COOLDOWN_MINUTES(self) -> int: return self.alert_cooldown_minutes
+    @property
+    def ALERT_MAX_PER_DAY(self) -> int: return self.alert_max_per_day
+    @property
+    def ALERT_SEASON_BUDGET(self) -> int: return self.alert_season_budget
+    @property
+    def SMS_ENABLED(self) -> bool: return self.sms_enabled
+    @property
+    def TEXTBELT_KEY(self) -> str: return self.textbelt_key
+    @property
+    def DEMO_ALERT_PHONE(self) -> str: return self.demo_alert_phone
     @property
     def OPEN_METEO_BASE_URL(self) -> str: return self.open_meteo_base_url
     @property

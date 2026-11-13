@@ -410,6 +410,21 @@ Pre-configured verified test accounts for evaluation:
 
 ---
 
+## Historical Disaster Backtest
+
+ThermaGrid's biometeorological physics and composite risk alerting engine are validated against canonical historical heatwave disasters, including the **Ahmedabad May 2010 Super Heatwave** (May 20–23, 2010; 46.8°C peak, 1,344 excess deaths).
+
+To re-run the backtest audit:
+```bash
+python scripts/backtest.py --event ahmedabad-2010
+```
+
+Audited artifacts are generated in [`docs/backtest/`](docs/backtest/):
+- [`docs/backtest/ahmedabad-2010.md`](docs/backtest/ahmedabad-2010.md) — Complete markdown audit table & diurnal progression.
+- [`docs/backtest/ahmedabad-2010.json`](docs/backtest/ahmedabad-2010.json) — Full machine-readable evaluation telemetry.
+
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

@@ -4,6 +4,7 @@ Analytics routes: Trends, spatial hotspots, exposure distribution, and vulnerabi
 
 import sys
 import os
+import math
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -316,4 +317,109 @@ def get_telemetry_quality():
         "telemetry_stream": "National Automated Synoptic Network",
         "audit_timestamp": report,
         "provenance": create_provenance(source="observed", completeness=report["completeness"], quality_score=report["quality_score"]),
+    }
+
+
+def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    R = 6371.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = (
+        math.sin(dlat / 2.0) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2.0) ** 2
+    )
+    c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
+    return R * c
+
+
+@router.get("/cooling-gap")
+def get_cooling_centre_gap_analysis(
+    location_id: Optional[int] = Query(None, description="Optional ward location ID"),
+    city: Optional[str] = Query("Mumbai", description="City filter"),
+    db: Session = Depends(get_db),
+):
+    """
+    Cooling-centre spatial gap analysis.
+    Computes nearest cooling centre distance, count within 2km walking radius,
+    and flags critical cooling desert wards.
+    """
+    from app.models.cooling_centre import CoolingCentre
+    city_str = str(city) if (city and not hasattr(city, "default")) else "Mumbai"
+
+    centres_query = db.query(CoolingCentre).filter(CoolingCentre.is_active == 1)
+    if city_str:
+        centres = centres_query.filter(CoolingCentre.city.ilike(f"%{city_str}%")).all()
+    else:
+        centres = centres_query.all()
+
+    # Fallback to all active centres if city-specific list is empty
+    if not centres:
+        centres = db.query(CoolingCentre).filter(CoolingCentre.is_active == 1).all()
+
+    def analyze_ward(w: Location):
+        if not centres:
+            return {
+                "location_id": w.id,
+                "ward_name": w.ward_name,
+                "ward_code": w.ward_code,
+                "latitude": w.latitude,
+                "longitude": w.longitude,
+                "population": w.population,
+                "nearest_centre_km": 999.0,
+                "nearest_centre_name": None,
+                "centres_within_2km": 0,
+                "gap_flag": True,
+            }
+
+        distances = [
+            (c, _haversine_km(w.latitude, w.longitude, c.latitude, c.longitude))
+            for c in centres
+        ]
+        distances.sort(key=lambda x: x[1])
+        nearest_c, nearest_dist = distances[0]
+        within_2km = sum(1 for _, d in distances if d <= 2.0)
+        gap_flag = bool(within_2km == 0 or nearest_dist > 2.0)
+
+        return {
+            "location_id": w.id,
+            "ward_name": w.ward_name,
+            "ward_code": w.ward_code,
+            "latitude": w.latitude,
+            "longitude": w.longitude,
+            "population": w.population,
+            "nearest_centre_km": round(nearest_dist, 2),
+            "nearest_centre_name": nearest_c.name,
+            "centres_within_2km": within_2km,
+            "gap_flag": gap_flag,
+        }
+
+    if location_id is not None:
+        loc = db.query(Location).filter(Location.id == location_id).first()
+        if not loc:
+            raise HTTPException(status_code=404, detail=f"Location ID {location_id} not found")
+        res = analyze_ward(loc)
+        return {
+            "city": city_str,
+            **res,
+            "provenance": create_provenance(source="observed", completeness=1.0, quality_score=0.98),
+        }
+
+    wards = (
+        db.query(Location)
+        .filter(Location.city.ilike(f"%{city_str}%") if city_str else True)
+        .all()
+    )
+    if not wards:
+        wards = db.query(Location).filter(Location.level == "ward").all()
+
+    ward_analyses = [analyze_ward(w) for w in wards]
+    total_gaps = sum(1 for a in ward_analyses if a["gap_flag"])
+
+    return {
+        "city": city_str,
+        "total_wards": len(ward_analyses),
+        "wards_with_gap": total_gaps,
+        "gap_percentage": round((total_gaps / max(1, len(ward_analyses))) * 100, 1),
+        "results": ward_analyses,
+        "provenance": create_provenance(source="observed", completeness=1.0, quality_score=0.98),
     }

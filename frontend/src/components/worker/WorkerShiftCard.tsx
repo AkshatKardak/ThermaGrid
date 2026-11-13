@@ -12,12 +12,14 @@ interface WorkerShiftCardProps {
 export const WorkerShiftCard: React.FC<WorkerShiftCardProps> = ({ locationId }) => {
   const [met, setMet] = useState(6.0);
   const [exposure, setExposure] = useState('sun');
+  const [clothing, setClothing] = useState('normal');
+  const [acclimatised, setAcclimatised] = useState(true);
   const [start, setStart] = useState('09:00');
   const [end, setEnd] = useState('18:00');
   const [copied, setCopied] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const { data } = useWorkerShiftCard(locationId, met, exposure, start, end);
+  const { data } = useWorkerShiftCard(locationId, met, exposure, start, end, clothing, acclimatised);
 
   const handleCopyText = () => {
     if (!data) return;
@@ -102,7 +104,7 @@ NOTICE: ${data.disclaimer}
         </div>
 
         {/* Shift Options */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
           <div>
             <label className="font-mono text-[10px] uppercase text-muted block mb-1">
               Start Time
@@ -155,6 +157,35 @@ NOTICE: ${data.disclaimer}
               <option value={8.0}>Very Heavy (8.0 MET)</option>
             </select>
           </div>
+
+          <div>
+            <label className="font-mono text-[10px] uppercase text-muted block mb-1">
+              Clothing (CAV)
+            </label>
+            <select
+              value={clothing}
+              onChange={(e) => setClothing(e.target.value)}
+              className="w-full bg-raised border border-border rounded-[6px] p-2 text-ink font-mono text-xs outline-none focus:border-accent"
+            >
+              <option value="light">Light (+0°C CAV)</option>
+              <option value="normal">Standard (+1°C CAV)</option>
+              <option value="heavy">Heavy PPE (+3°C CAV)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="font-mono text-[10px] uppercase text-muted block mb-1">
+              Acclimatisation
+            </label>
+            <select
+              value={acclimatised ? 'yes' : 'no'}
+              onChange={(e) => setAcclimatised(e.target.value === 'yes')}
+              className="w-full bg-raised border border-border rounded-[6px] p-2 text-ink font-mono text-xs outline-none focus:border-accent"
+            >
+              <option value="yes">Acclimatised</option>
+              <option value="no">Unacclimatised (+2°C)</option>
+            </select>
+          </div>
         </div>
       </Card>
 
@@ -179,7 +210,7 @@ NOTICE: ${data.disclaimer}
               {data?.ward_name || `Ward Location #${locationId}`}
             </h2>
             <p className="text-xs text-muted font-mono">
-              Shift Hours: {data?.start} – {data?.end} · Exposure: {data?.exposure.toUpperCase()}
+              Shift Hours: {data?.start} – {data?.end} · Exposure: {data?.exposure.toUpperCase()} · Clothing: {data?.clothing?.toUpperCase() || 'NORMAL'} · {data?.acclimatised !== false ? 'Acclimatised' : 'Unacclimatised (+2°C limit)'}
             </p>
           </div>
 

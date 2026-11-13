@@ -343,6 +343,11 @@ def get_all_wards_risk(
                 "latitude": r.latitude,
                 "longitude": r.longitude,
                 "population": r.population,
+                "imd_grade": getattr(r, "imd_grade", "NORMAL") or "NORMAL",
+                "imd_label": getattr(r, "imd_label", "No Warning (Normal)") or "No Warning (Normal)",
+                "consecutive_hot_days": getattr(r, "consecutive_hot_days", 0) or 0,
+                "consecutive_hot_nights": getattr(r, "consecutive_hot_nights", 0) or 0,
+                "hours_to_threshold": getattr(r, "hours_to_threshold", None),
             })
         return results
 

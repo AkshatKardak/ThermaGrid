@@ -238,10 +238,10 @@ export const ThermalLagHouses: React.FC<ThermalLagHousesProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full ${staticHour !== undefined ? 'h-[500px]' : 'h-[220vh]'} ${className}`}
+      className={`relative w-full ${staticHour !== undefined ? 'h-[420px]' : 'h-[125vh]'} ${className}`}
     >
       {/* Sticky Viewport Container */}
-      <div className={`${staticHour !== undefined ? 'relative h-full' : 'sticky top-16 h-[calc(100vh-4rem)]'} w-full overflow-hidden flex flex-col justify-between p-4 sm:p-6 lg:p-8 select-none`}>
+      <div className={`${staticHour !== undefined ? 'relative h-full' : 'sticky top-16 h-[460px] sm:h-[500px]'} w-full overflow-hidden flex flex-col justify-between p-4 sm:p-6 lg:p-8 select-none`}>
         {/* TOP HUD: Clock & Shared Outdoor Ambient */}
         <div className="relative z-20 flex flex-wrap items-center justify-between gap-4 p-4 rounded-[8px] bg-panel-dark/95 border border-border">
           <div className="flex items-center gap-3">

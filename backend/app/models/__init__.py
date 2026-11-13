@@ -12,6 +12,8 @@ from app.models.alert import Alert
 from app.models.data_source import DataSource
 from app.models.subscription import Subscription
 from app.models.dependent import Dependent
+from app.models.alert_dispatch import AlertDispatch
+from app.models.intervention_outcome import InterventionOutcome
 
 __all__ = [
     "User",
@@ -28,4 +30,6 @@ __all__ = [
     "DataSource",
     "Subscription",
     "Dependent",
+    "AlertDispatch",
+    "InterventionOutcome",
 ]

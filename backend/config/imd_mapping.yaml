@@ -1,0 +1,41 @@
+# India Meteorological Department (IMD) Heatwave Alert Grading Standards
+# Governs thresholds for heatwave, severe heatwave, and municipal HAP response tiers.
+
+grades:
+  normal:
+    code: NORMAL
+    color: "#2FA37C"
+    label: "No Warning (Normal)"
+    imd_criteria: "Normal biometeorological conditions. Maximum temperature within historical baseline."
+    action: "Maintain standard hydration and daytime routine."
+
+  yellow:
+    code: YELLOW
+    color: "#E8C547"
+    label: "Heat Alert (Watch)"
+    imd_criteria: "Tmax >= 40.0°C (Plains) or >= 37.0°C (Coastal) or departure 4.5°C to 5.4°C."
+    action: "Moderate thermal stress. Tolerable for general public, but high health concern for infants, elderly, and chronic illness patients."
+
+  orange:
+    code: ORANGE
+    color: "#D97706"
+    label: "Severe Heat Alert (Be Prepared)"
+    imd_criteria: "Tmax >= 42.0°C (Plains) or >= 39.0°C (Coastal) for 2+ consecutive days, or departure 5.5°C to 6.4°C."
+    action: "High health risk for vulnerable individuals and outdoor manual workers. Avoid midday sun, provide shaded rest, open cooling centres."
+
+  red:
+    code: RED
+    color: "#C31D3C"
+    label: "Extreme Heat Emergency (Take Action)"
+    imd_criteria: "Tmax >= 45.0°C or severe heatwave (departure >= 6.5°C) for 2+ days, or WBGT >= 32.2°C."
+    action: "High likelihood of heat illness and heat stroke in all ages. Extreme care needed. Suspend outdoor physical labor, activate emergency sirens and mobile water tankers."
+
+coastal_cities:
+  - Mumbai
+  - Chennai
+  - Kolkata
+  - Surat
+  - Visakhapatnam
+  - Kochi
+  - Mangalore
+  - Goa

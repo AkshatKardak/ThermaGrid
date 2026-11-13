@@ -83,5 +83,33 @@
     "closed": "Closed",
     "hours_unknown": "Hours Unknown",
     "capacity": "Capacity"
+  },
+  "worker": {
+    "clothing": "Clothing (CAV)",
+    "clothing_light": "Light (+0°C CAV)",
+    "clothing_normal": "Standard (+1°C CAV)",
+    "clothing_heavy": "Heavy PPE (+3°C CAV)",
+    "acclimatised": "Acclimatised",
+    "unacclimatised": "Unacclimatised (+2°C limit)",
+    "hydration_target": "Hydration Target",
+    "heavy_work_window": "Recommended Heavy Work",
+    "scheduled_breaks": "Scheduled Rest Intervals"
+  },
+  "imd": {
+    "normal": "No Warning (Normal)",
+    "yellow": "Heat Alert (Watch)",
+    "orange": "Severe Heat Alert (Be Prepared)",
+    "red": "Extreme Heat Emergency (Take Action)"
+  },
+  "countdown": {
+    "warning_active": "Threshold Active (Warning)",
+    "warning_in": "Warning Threshold in",
+    "safe_window": "Safe Window"
+  },
+  "interventions": {
+    "optimal_plan": "Optimal Municipal Resource Plan",
+    "budget_utilization": "Budget Utilization",
+    "risk_reduced": "Risk Points Reduced",
+    "population_protected": "Population Protected"
   }
 }

@@ -33,6 +33,7 @@ from app.api.routes.planner import router as planner_router
 from app.api.routes.subscriptions import router as subscriptions_router
 from app.api.routes.dependents import router as dependents_router
 from app.api.routes.worker import router as worker_router
+from app.api.routes.reports import router as reports_router
 
 setup_logging()
 logger = logging.getLogger("thermagrid.main")
@@ -168,6 +169,22 @@ def create_application() -> FastAPI:
             headers={"Retry-After": "300"},
         )
 
+    # ValueError Exception Handler (e.g. Entity not found or validation error)
+    @app.exception_handler(ValueError)
+    async def value_error_handler(request: Request, exc: ValueError):
+        msg = str(exc)
+        if "not found" in msg.lower():
+            logger.info(f"Resource not found at {request.url.path}: {msg}")
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": msg},
+            )
+        logger.warning(f"Bad request value error at {request.url.path}: {msg}")
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"detail": msg},
+        )
+
     # Global Exception Handler
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
@@ -206,6 +223,7 @@ def create_application() -> FastAPI:
         app.include_router(subscriptions_router, prefix=prefix)
         app.include_router(dependents_router, prefix=prefix)
         app.include_router(worker_router, prefix=prefix)
+        app.include_router(reports_router, prefix=prefix)
 
     return app
 

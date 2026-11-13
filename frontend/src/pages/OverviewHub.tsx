@@ -65,6 +65,7 @@ export const OverviewHub: React.FC = () => {
           bandCode: band.code,
           wbgt: r.wbgt_c,
           workers: Math.round((r.population || 450000) * 0.28),
+          hoursToThreshold: r.hours_to_threshold,
         };
       });
     }
@@ -84,6 +85,7 @@ export const OverviewHub: React.FC = () => {
         bandCode: band.code,
         wbgt,
         workers,
+        hoursToThreshold: r?.hours_to_threshold,
       };
     }).sort((a, b) => b.score - a.score);
   }, [allWardsRisk, wardsList]);
@@ -116,8 +118,8 @@ export const OverviewHub: React.FC = () => {
         </div>
       </div>
 
-      {/* Row 1 — Headline Numbers (Three large tabular numerals only, no icons, no cards-with-icons, one hairline under) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 pb-8 border-b border-border">
+      {/* Row 1 — Headline Numbers */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-8 border-b border-border">
         <div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl sm:text-5xl font-mono font-bold tracking-tight tabular-nums text-ink">
@@ -127,7 +129,20 @@ export const OverviewHub: React.FC = () => {
             <span className="text-xl font-mono text-muted tabular-nums">/100</span>
           </div>
           <span className="text-xs font-mono text-muted uppercase tracking-wider block mt-1.5">
-            Current Risk Index · {bandDef.label}
+            Current Risk · {bandDef.label} {risk?.imd_grade ? `(IMD ${risk.imd_grade})` : ''}
+          </span>
+        </div>
+
+        <div>
+          <span className="text-4xl sm:text-5xl font-mono font-bold text-ink tracking-tight tabular-nums block">
+            {risk?.hours_to_threshold === 0
+              ? 'ACTIVE'
+              : risk?.hours_to_threshold !== null && risk?.hours_to_threshold !== undefined
+              ? `${risk.hours_to_threshold}h`
+              : '> 24h'}
+          </span>
+          <span className="text-xs font-mono text-muted uppercase tracking-wider block mt-1.5">
+            Warning Countdown
           </span>
         </div>
 
@@ -136,7 +151,7 @@ export const OverviewHub: React.FC = () => {
             {peakWindow}
           </span>
           <span className="text-xs font-mono text-muted uppercase tracking-wider block mt-1.5">
-            Diurnal Peak Thermal Window
+            Diurnal Peak Window
           </span>
         </div>
 
@@ -173,6 +188,7 @@ export const OverviewHub: React.FC = () => {
                 <th className="font-medium pl-1">Ward</th>
                 <th className="font-medium text-right pr-6">Risk Score</th>
                 <th className="font-medium pr-6">Severity Band</th>
+                <th className="font-medium text-right pr-6">Countdown</th>
                 <th className="font-medium text-right pr-6">Peak ISO WBGT</th>
                 <th className="font-medium text-right pr-2">Outdoor Workers</th>
               </tr>
@@ -203,6 +219,13 @@ export const OverviewHub: React.FC = () => {
                           {w.bandLabel}
                         </span>
                       </span>
+                    </td>
+                    <td className="text-right pr-6 font-mono tabular-nums text-ink">
+                      {w.hoursToThreshold === 0
+                        ? 'ACTIVE'
+                        : w.hoursToThreshold !== null && w.hoursToThreshold !== undefined
+                        ? `in ${w.hoursToThreshold}h`
+                        : 'Safe'}
                     </td>
                     <td className="text-right pr-6 font-mono tabular-nums text-ink">
                       {w.wbgt.toFixed(1)}°C

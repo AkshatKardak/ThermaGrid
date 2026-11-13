@@ -83,5 +83,33 @@
     "closed": "বন্ধ আছে",
     "hours_unknown": "সময় অজানা",
     "capacity": "ধারণক্ষমতা"
+  },
+  "worker": {
+    "clothing": "পোশাক (CAV)",
+    "clothing_light": "হালকা পোশাক (+0°C CAV)",
+    "clothing_normal": "মানক কাজের পোশাক (+1°C CAV)",
+    "clothing_heavy": "ভারী পিপিই স্যুট (+3°C CAV)",
+    "acclimatised": "গরমে অভ্যস্ত",
+    "unacclimatised": "অভ্যস্ত নয় (+2°C সীমা)",
+    "hydration_target": "জলপানের লক্ষ্যমাত্রা",
+    "heavy_work_window": "ভারী কাজের উপযুক্ত সময়",
+    "scheduled_breaks": "নির্ধারিত বিশ্রামের সময়"
+  },
+  "imd": {
+    "normal": "স্বাভাবিক (কোনো সতর্কতা নেই)",
+    "yellow": "তাপ সতর্কতা (নজর রাখুন)",
+    "orange": "তীব্র তাপ সতর্কতা (প্রস্তুত থাকুন)",
+    "red": "চরম তাপ জরুরি অবস্থা (পদক্ষেপ নিন)"
+  },
+  "countdown": {
+    "warning_active": "সতর্কতা সীমা অতিক্রান্ত (সক্রিয়)",
+    "warning_in": "সতর্কতা আসার বাকি:",
+    "safe_window": "নিরাপদ সময়সীমা"
+  },
+  "interventions": {
+    "optimal_plan": "অনুকূল পৌর সম্পদ বণ্টন পরিকল্পনা",
+    "budget_utilization": "বাজেট ব্যবহার",
+    "risk_reduced": "হ্রাসকৃত ঝুঁকি মাত্রা",
+    "population_protected": "সুরক্ষিত জনসংখ্যা"
   }
 }

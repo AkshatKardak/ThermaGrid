@@ -144,11 +144,23 @@ export const CitizenDashboard: React.FC = () => {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {risk?.imd_grade && (
+              <span className="px-2.5 py-1 rounded-[6px] text-xs font-mono font-bold bg-raised border border-border text-ink flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: risk.imd_grade === 'RED' ? '#C31D3C' : risk.imd_grade === 'ORANGE' ? '#D97706' : risk.imd_grade === 'YELLOW' ? '#E8C547' : '#2FA37C' }} />
+                IMD {risk.imd_grade}
+              </span>
+            )}
             <RiskBadge score={riskScore} size="lg" />
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[color-mix(in_srgb,var(--risk-4)_15%,var(--surface))] border border-[color-mix(in_srgb,var(--risk-4)_55%,var(--ink))] text-xs font-mono font-bold text-ink">
-              <Clock className="w-3.5 h-3.5 text-risk-4" />
-              <span>Peak: 13:00 – 16:00</span>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-raised border border-border text-xs font-mono font-semibold text-ink">
+              <Clock className="w-3.5 h-3.5 text-accent" />
+              <span>
+                {risk?.hours_to_threshold === 0
+                  ? 'Threshold Active (Warning)'
+                  : risk?.hours_to_threshold !== null && risk?.hours_to_threshold !== undefined
+                  ? `Threshold in ${risk.hours_to_threshold}h`
+                  : 'Safe Window'}
+              </span>
             </div>
           </div>
         </div>

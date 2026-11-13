@@ -23,6 +23,8 @@ export interface WorkerShiftCardResponse {
   end: string;
   met: number;
   exposure: string;
+  clothing?: string;
+  acclimatised?: boolean;
   water_ml_per_hour: number;
   heavy_work_after: string;
   recommended_heavy_work_window: string;
@@ -37,10 +39,12 @@ export function useWorkerShiftCard(
   met: number,
   exposure: string,
   start: string,
-  end: string
+  end: string,
+  clothing: string = 'normal',
+  acclimatised: boolean = true
 ) {
   return useQuery<WorkerShiftCardResponse>({
-    queryKey: ['worker-shift-card', locationId, met, exposure, start, end],
+    queryKey: ['worker-shift-card', locationId, met, exposure, start, end, clothing, acclimatised],
     queryFn: async () => {
       const res = await apiClient.get<WorkerShiftCardResponse>('/worker/shift-card', {
         params: {
@@ -49,6 +53,8 @@ export function useWorkerShiftCard(
           exposure,
           start,
           end,
+          clothing,
+          acclimatised,
         },
       });
       return res.data;

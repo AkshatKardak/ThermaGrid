@@ -83,5 +83,33 @@
     "closed": "बंद है",
     "hours_unknown": "समय अज्ञात",
     "capacity": "क्षमता"
+  },
+  "worker": {
+    "clothing": "पोशाक (CAV)",
+    "clothing_light": "हल्के कपड़े (+0°C CAV)",
+    "clothing_normal": "मानक कार्य पोशाक (+1°C CAV)",
+    "clothing_heavy": "भारी पीपीई किट (+3°C CAV)",
+    "acclimatised": "गर्मी के अभ्यस्त (अनुकूलित)",
+    "unacclimatised": "अनभ्यस्त (+2°C सीमा)",
+    "hydration_target": "जलयोजन लक्ष्य (पानी)",
+    "heavy_work_window": "भारी कार्य अनुशंसित समय",
+    "scheduled_breaks": "निर्धारित विश्राम अंतराल"
+  },
+  "imd": {
+    "normal": "सामान्य (कोई चेतावनी नहीं)",
+    "yellow": "गर्मी चेतावनी (निगरानी)",
+    "orange": "गंभीर गर्मी चेतावनी (तैयार रहें)",
+    "red": "अत्यधिक गर्मी आपातकाल (तुरंत कार्रवाई)"
+  },
+  "countdown": {
+    "warning_active": "चेतावनी सीमा पार (सक्रिय)",
+    "warning_in": "चेतावनी सीमा समय:",
+    "safe_window": "सुरक्षित अवधि"
+  },
+  "interventions": {
+    "optimal_plan": "इष्टतम नगरपालिका संसाधन योजना",
+    "budget_utilization": "बजट उपयोग",
+    "risk_reduced": "कम किए गए जोखिम अंक",
+    "population_protected": "संरक्षित जनसंख्या"
   }
 }

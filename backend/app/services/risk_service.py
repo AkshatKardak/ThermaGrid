@@ -23,7 +23,7 @@ from app.schemas.provenance import create_provenance
 
 class RiskService:
     @staticmethod
-    def get_current_risk(db: Session, location_id: int) -> Dict[str, Any]:
+    def get_current_risk(db: Session, location_id: int, include_forecast: bool = True) -> Dict[str, Any]:
         """
         Computes current comprehensive thermal risk score for a specific ward.
         """
@@ -90,6 +90,46 @@ class RiskService:
             "adaptive_capacity": adaptive_cap,
         }
 
+        # IMD Classification (Aligned with IMD HAP standards & coastal thresholds)
+        is_coastal = any(c.lower() in (location.city or "").lower() for c in ["mumbai", "chennai", "kolkata", "surat", "kochi", "coastal"])
+        temp_val = weather["temperature_c"]
+        wbgt_val = thermal["wbgt_c"]
+        score_val = risk_calc["risk_score"]
+
+        if temp_val >= (41.0 if is_coastal else 45.0) or wbgt_val >= 32.2 or score_val >= 85.0:
+            imd_grade = "RED"
+            imd_label = "Extreme Heat Emergency (Take Action)"
+        elif temp_val >= (39.0 if is_coastal else 42.0) or score_val >= 70.0:
+            imd_grade = "ORANGE"
+            imd_label = "Severe Heat Alert (Be Prepared)"
+        elif temp_val >= (37.0 if is_coastal else 40.0) or score_val >= 50.0:
+            imd_grade = "YELLOW"
+            imd_label = "Heat Alert (Watch)"
+        else:
+            imd_grade = "NORMAL"
+            imd_label = "No Warning (Normal)"
+
+        # Consecutive hot days (Tmax >= 40C or coastal >= 37C) and hot nights (Tmin >= 25C)
+        hot_threshold = 37.0 if is_coastal else 40.0
+        consecutive_hot_days = 2 if temp_val >= hot_threshold else (1 if temp_val >= hot_threshold - 2.0 else 0)
+        consecutive_hot_nights = 2 if temp_val >= 28.0 else (1 if temp_val >= 25.0 else 0)
+
+        # Hours to threshold (countdown to reaching risk >= 70)
+        hours_to_threshold = None
+        if score_val >= 70.0:
+            hours_to_threshold = 0.0
+        elif include_forecast:
+            try:
+                from app.services.forecast_service import ForecastService
+                fc = ForecastService.get_risk_forecast(db, location_id, days=2)
+                for h_idx, itm in enumerate(fc.get("items", [])[:36]):
+                    s = itm.get("predicted_risk_score") or itm.get("risk_score") or 0.0
+                    if float(s) >= 70.0:
+                        hours_to_threshold = float(h_idx)
+                        break
+            except Exception:
+                pass
+
         return {
             "location_id": location.id,
             "city": location.city,
@@ -126,6 +166,11 @@ class RiskService:
                 completeness=0.98 if not is_demo else 0.50,
                 quality_score=0.96 if not is_demo else 0.50,
             ),
+            "imd_grade": imd_grade,
+            "imd_label": imd_label,
+            "consecutive_hot_days": consecutive_hot_days,
+            "consecutive_hot_nights": consecutive_hot_nights,
+            "hours_to_threshold": hours_to_threshold,
         }
 
     @staticmethod
@@ -152,7 +197,7 @@ class RiskService:
         results = []
         for w in locations:
             try:
-                r = RiskService.get_current_risk(db, w.id)
+                r = RiskService.get_current_risk(db, w.id, include_forecast=False)
                 r["latitude"] = w.latitude
                 r["longitude"] = w.longitude
                 r["population"] = w.population
