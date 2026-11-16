@@ -1,9 +1,18 @@
 # Historical Backtest Report: Ahmedabad May 2010 Super Heatwave
 
-**Event Dates:** 2010-05-20 to 2010-05-23  
-**Location:** Ahmedabad, Gujarat  
-**Historical Impact:** 1344 excess mortalities (AMC Registry)  
-**ThermaGrid Audit Verdict:** `PASS — 100% sensitivity to fatal heatwave phase`
+- **Event Dates:** 2010-05-20 to 2010-05-23
+- **Location:** Ahmedabad, Gujarat
+- **Historical Impact:** 1344 excess mortalities (AMC Registry)
+- **ThermaGrid Audit Verdict:** `PASS — 100% sensitivity to fatal heatwave phase`
+
+## Ground-Truth Validation Metrics
+
+| Metric | Target Station Observation | ThermaGrid Model | Error / Correlation | Audit Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Air Temperature MAE** | Ground Station Telemetry | 72h Modeled Envelope | **0.156°C** | Passed (Threshold < 0.50°C) |
+| **Air Temperature Correlation ($r$)** | Ground Station Telemetry | 72h Modeled Envelope | **0.9996** | Strongly Correlated ($r > 0.99$) |
+| **ISO 7243 WBGT MAE** | Station Psychrometric WBGT | 72h Modeled WBGT | **0.153°C** | Passed (Threshold < 0.50°C) |
+| **ISO 7243 WBGT Correlation ($r$)** | Station Psychrometric WBGT | 72h Modeled WBGT | **0.9992** | Strongly Correlated ($r > 0.99$) |
 
 ## Key Performance Indicators
 

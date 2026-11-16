@@ -12,8 +12,18 @@
     "hours_extreme_alert_ge_85": 0,
     "mandatory_work_cessation_hours": 23,
     "first_red_trigger_hour": 11,
+    "warning_lead_time": "11h into simulation",
     "historical_excess_mortality": 1344,
-    "model_audit_verdict": "PASS \u2014 100% sensitivity to fatal heatwave phase"
+    "model_audit_verdict": "PASS \u2014 100% sensitivity to fatal heatwave phase",
+    "validation": {
+      "validated": true,
+      "sample_count": 72,
+      "temperature_mae_degc": 0.156,
+      "temperature_rmse_degc": 0.18,
+      "temperature_pearson_r": 0.9996,
+      "wbgt_mae_degc": 0.153,
+      "wbgt_pearson_r": 0.9992
+    }
   },
   "sample_progression": [
     {

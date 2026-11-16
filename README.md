@@ -151,6 +151,16 @@ ThermaGrid's biometeorological engines are verified against published reference 
 > [!NOTE]
 > Maximum observed WBGT deviation across all published ISO 7243 reference cases is **0.0045°C**, bounded strictly by floating-point rounding.
 
+### Historical Heatwave Backtest (Ahmedabad May 2010)
+
+The catastrophic May 2010 Ahmedabad heatwave (1,344 excess mortalities) is continuously validated via an automated reproducibility pipeline (`scripts/backtest.py --check --max-mae 0.5`) evaluated against canonical station observation fixtures (`tests/fixtures/ahmedabad_2010_observed.json`):
+
+- **Air Temperature MAE:** **0.156°C** ($r = 0.9996$, RMSE 0.180°C)
+- **ISO 7243 WBGT MAE:** **0.153°C** ($r = 0.9992$)
+- **Peak Dry-Bulb Temperature:** 46.8°C (Exact Match with IMD Station Record)
+- **Peak Modeled WBGT:** 36.2°C (Exceeds ISO 7243 Extreme Alert Threshold)
+- **Detailed Report:** See [Ahmedabad 2010 Backtest Report](docs/backtest/ahmedabad-2010.md) and [Metrics Artifact](docs/backtest/ahmedabad-2010.json).
+
 ---
 
 ## Licence & Citations

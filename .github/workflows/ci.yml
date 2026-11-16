@@ -65,6 +65,10 @@ jobs:
         run: |
           pytest --cov=backend/app --cov=analytics/src --cov-fail-under=70
 
+      - name: Run Ahmedabad 2010 Backtest Validation
+        run: |
+          python scripts/backtest.py --check --max-mae 0.5
+
   frontend:
     name: Frontend CI (Node 20, Typecheck, Lint, Vitest & Build)
     runs-on: ubuntu-latest
