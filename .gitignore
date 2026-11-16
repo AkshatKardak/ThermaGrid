@@ -72,9 +72,26 @@ heatsense_dev.db
 thermagrid_dev.db
 
 # Machine Learning & Large Artifacts
+*.csv
+*.parquet
+*.pt
+*.pth
+*.bin
+*.weights
+*.safetensors
 analytics/models/*.pkl
 analytics/models/*.joblib
 analytics/models/*.onnx
+
+# Raw GIS Shapefiles & Geospatial Dumps
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.geojson
+!frontend/src/assets/geo/*.json
+
 data/raw/*
 !data/raw/.gitkeep
 !data/raw/mumbai_wards_census_2011.json
