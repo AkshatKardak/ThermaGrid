@@ -187,6 +187,30 @@ python3 scripts/fetch_data.py --dataset all --force
 
 ---
 
+## Limitations
+
+While ThermaGrid bridges the gap between regional synoptic forecasting and municipal decision support, users and civil authorities should interpret outputs within the boundaries of the following physical and physiological modeling constraints:
+
+### 1. Indoor Ventilation & Air-Exchange Rates
+The indoor thermal phase lag model simulates diurnal temperature attenuation and nocturnal heat retention across representative structural archetypes (e.g., informal uninsulated corrugated tin vs. engineered reinforced cement concrete) using lumped thermal capacitance and empirical phase-delay parameters. The engine assumes nominal natural infiltration rates and does not model real-time Computational Fluid Dynamics (CFD), occupant-driven window operation, ceiling-fan airspeeds, or dynamic air changes per hour (ACH). In dense informal settlements, restricted cross-ventilation can yield indoor temperatures exceeding outdoor ambient conditions by $2\text{--}4^\circ\text{C}$ beyond baseline model predictions.
+
+### 2. Occupant Acclimatisation Dynamics
+Physiological thresholds (such as work-rest cycles and WBGT risk categories) are referenced against ISO 7243:2017 standards differentiating between acclimatised and unacclimatised cohorts under steady-state assumptions. The system does not capture the transient kinetics of human seasonal acclimatisation—particularly during early-season heat spikes (e.g., March or April) when urban populations have not yet acquired cardiovascular and sudomotor adaptations—or the heightened vulnerability of transient, unacclimatised interstate migrant labor forces.
+
+### 3. Individual Physiology & Clinical Heterogeneity
+Standardized biometeorological indices (Liljegren WBGT, UTCI, NOAA Heat Index) simulate thermal strain for an idealized reference human (a healthy 75 kg adult male, $1.8\,\text{m}^2$ body surface area, standard metabolic activity). These indices cannot capture individualized physiological variance arising from:
+- **Age extremes:** Infants with underdeveloped thermoregulatory mechanisms and elderly individuals with reduced sudomotor response and cardiovascular reserves.
+- **Clinical comorbidities:** Cardiovascular diseases, chronic kidney disease, hypertension, and diabetes mellitus.
+- **Pharmacological factors:** Consumption of diuretics, beta-blockers, anticholinergics, or antihypertensives that suppress peripheral vasodilation or sweating.
+- **Maternal health:** Pregnancy-induced metabolic strain and elevated susceptibility to heat stress.
+
+### 4. Ward-Level Spatial Resolution & Microclimatic Averaging
+Telemetry and vulnerability indices are aggregated to the municipal administrative ward boundary scale ($2\text{--}15\,\text{km}^2$) to align directly with municipal governance, resource staging, and emergency alert jurisdictions. This spatial averaging inherently smooths out microclimatic extremes:
+- **Urban Street Canyons:** Localized building height-to-width ($H/W$) ratios, vehicular heat corridors, and commercial HVAC condenser exhausts can generate intense localized thermal hotspots.
+- **Micro-Scale Refuges:** Pockets of localized vegetative canopy, pocket parks, and shaded pedestrian alleys that offer thermal relief are averaged into the broader ward-level mean radiant temperature ($T_\text{mrt}$).
+
+---
+
 ## Licence & Citations
 
 - Distributed under the [MIT Licence](LICENSE).
