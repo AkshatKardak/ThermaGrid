@@ -3,19 +3,20 @@ Clerk Authentication & Role-Based Authorization
 Verifies Clerk Session JWTs via RS256 JWKS key rotation.
 """
 
-import os
-from typing import Optional, Dict, Any
+from typing import Any
+
 import jwt
-from jwt import PyJWKClient
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt import PyJWKClient
+
 from app.core.config import get_settings
 
 bearer = HTTPBearer(auto_error=False)
-_jwks: Optional[PyJWKClient] = None
+_jwks: PyJWKClient | None = None
 
 
-def _jwks_client() -> Optional[PyJWKClient]:
+def _jwks_client() -> PyJWKClient | None:
     global _jwks
     if _jwks is not None:
         return _jwks
@@ -27,8 +28,8 @@ def _jwks_client() -> Optional[PyJWKClient]:
 
 
 def get_current_user(
-    creds: Optional[HTTPAuthorizationCredentials] = Depends(bearer),
-) -> Dict[str, Any]:
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> dict[str, Any]:
     """
     Validates a Clerk session JWT (RS256) against Clerk's JWKS.
     Fails closed: any token that cannot be verified is rejected.
@@ -57,7 +58,7 @@ def get_current_user(
 
     try:
         signing_key = jwks.get_signing_key_from_jwt(creds.credentials).key
-        decode_kwargs: Dict[str, Any] = {
+        decode_kwargs: dict[str, Any] = {
             "algorithms": ["RS256"],
             "options": {"verify_aud": False},
         }
@@ -85,7 +86,8 @@ def require_role(*allowed: str):
     """
     Role guard dependency. Raises 403 Forbidden if user role is not permitted.
     """
-    def dep(user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
+
+    def dep(user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
         user_role = user.get("role", "citizen")
         if user_role not in allowed:
             raise HTTPException(
@@ -93,4 +95,5 @@ def require_role(*allowed: str):
                 detail=f"Role '{user_role}' forbidden from accessing this resource. Required: {', '.join(allowed)}",
             )
         return user
+
     return dep

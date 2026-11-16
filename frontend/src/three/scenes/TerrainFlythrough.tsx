@@ -253,7 +253,7 @@ export const TerrainFlythrough: React.FC<TerrainFlythroughProps> = ({
     // --- 9. Animation Loop (12-Second Flight Cycle) ---
     const DURATION_SECONDS = 14.0;
     let rafId: number;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
 
     const animate = () => {
       rafId = requestAnimationFrame(animate);

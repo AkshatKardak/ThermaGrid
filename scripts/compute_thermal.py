@@ -3,26 +3,27 @@ Thermal index calculation pipeline script.
 Processes observations and outputs WBGT, UTCI, and Heat Index with ISO classifications.
 """
 
-import sys
-import os
 import json
-from datetime import datetime, timezone
+import os
+import sys
+from datetime import UTC, datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
-from src.thermal_indices.wbgt import calculate_wbgt
-from src.thermal_indices.utci import calculate_utci
 from src.thermal_indices.heat_index import calculate_heat_index
+from src.thermal_indices.utci import calculate_utci
+from src.thermal_indices.wbgt import calculate_wbgt
 
 
 def run_thermal_computation():
-    print(f"[{datetime.now(timezone.utc).isoformat()}] Computing thermal indices...")
+    print(f"[{datetime.now(UTC).isoformat()}] Computing thermal indices...")
     input_path = os.path.join(BASE_DIR, "data", "processed", "latest_observations.json")
 
     if not os.path.exists(input_path):
         print("Staged observations not found. Running ingestion first...")
         from scripts.ingest_data import run_ingestion
+
         run_ingestion()
 
     with open(input_path, "r", encoding="utf-8") as f:
@@ -39,15 +40,17 @@ def run_thermal_computation():
         utci_res = calculate_utci(t, rh, w, s)
         hi_res = calculate_heat_index(t, rh)
 
-        computed.append({
-            "ward_code": r["ward_code"],
-            "city": r["city"],
-            "timestamp": r["timestamp"],
-            "ambient_temp_c": t,
-            "wbgt": wbgt_res,
-            "utci": utci_res,
-            "heat_index": hi_res,
-        })
+        computed.append(
+            {
+                "ward_code": r["ward_code"],
+                "city": r["city"],
+                "timestamp": r["timestamp"],
+                "ambient_temp_c": t,
+                "wbgt": wbgt_res,
+                "utci": utci_res,
+                "heat_index": hi_res,
+            }
+        )
 
     output_path = os.path.join(BASE_DIR, "data", "processed", "thermal_indices.json")
     with open(output_path, "w", encoding="utf-8") as f:

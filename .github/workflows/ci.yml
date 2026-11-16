@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend CI (Python 3.12, PostGIS, Lint & Pytest)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: heatsense_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/heatsense_test
+      TESTING: "true"
+      APP_ENV: testing
+      DEBUG: "false"
+      SCHEDULER_ENABLED: "false"
+      ALLOW_SYNTHETIC_RISK: "true"
+      CLERK_SECRET_KEY: test_clerk_secret_key
+      RESEND_API_KEY: test_resend_api_key
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpq-dev gdal-bin libgeos-dev
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Ruff Lint & Format Check
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Run Pytest with Coverage
+        run: |
+          pytest --cov=backend/app --cov=analytics/src --cov-fail-under=70
+
+  frontend:
+    name: Frontend CI (Node 20, Typecheck, Lint, Vitest & Build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck TypeScript
+        run: npm run typecheck
+
+      - name: Lint with ESLint
+        run: npm run lint
+
+      - name: Run Unit Tests with Vitest
+        run: npx vitest --run
+
+      - name: Build Production Assets
+        run: npm run build

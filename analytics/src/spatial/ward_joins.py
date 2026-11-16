@@ -3,8 +3,8 @@ Spatial analytics module: Ward boundaries, point-in-polygon assignment,
 and spatial aggregation.
 """
 
-from typing import List, Dict, Any, Optional, Tuple
 import math
+from typing import Any
 
 
 def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -16,17 +16,14 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
     dphi = math.radians(lat2 - lat1)
     dlambda = math.radians(lon2 - lon1)
 
-    a = (
-        math.sin(dphi / 2.0) ** 2
-        + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2.0) ** 2
-    )
+    a = math.sin(dphi / 2.0) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2.0) ** 2
     c = 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
     return r * c
 
 
 def point_in_polygon_ray_casting(
-    point: Tuple[float, float],
-    polygon_coords: List[Tuple[float, float]],
+    point: tuple[float, float],
+    polygon_coords: list[tuple[float, float]],
 ) -> bool:
     """
     Standard Jordan curve theorem / ray casting algorithm to check if
@@ -55,9 +52,9 @@ def point_in_polygon_ray_casting(
 def find_nearest_cooling_centres(
     user_lat: float,
     user_lon: float,
-    centres: List[Dict[str, Any]],
+    centres: list[dict[str, Any]],
     limit: int = 5,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Finds and ranks nearest cooling centres/shelters to a given location.
     """

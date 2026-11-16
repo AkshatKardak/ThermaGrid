@@ -1,13 +1,14 @@
-import logging
 import hashlib
+import logging
 from contextlib import contextmanager
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
-from app.jobs.tasks import ingest_weather, compute_thermal, evaluate_alerts
+from app.jobs.tasks import compute_thermal, evaluate_alerts, ingest_weather
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +37,9 @@ def advisory_lock(db: Session, name: str):
 
     lock_id = _lock_id_from_name(name)
     try:
-        result = db.execute(text("SELECT pg_try_advisory_lock(:lock_id)"), {"lock_id": lock_id}).scalar()
+        result = db.execute(
+            text("SELECT pg_try_advisory_lock(:lock_id)"), {"lock_id": lock_id}
+        ).scalar()
         acquired = bool(result)
     except Exception as ex:
         log.warning(f"[SCHEDULER] Error testing advisory lock '{name}': {ex}")
@@ -55,13 +58,12 @@ def advisory_lock(db: Session, name: str):
 
 async def locked_job_runner(job_fn, name: str):
     """Executes job_fn only if this instance holds the advisory lock for the job."""
-    with SessionLocal() as db:
-        with advisory_lock(db, f"scheduler:{name}") as acquired:
-            if not acquired:
-                log.info(f"[SCHEDULER] Job '{name}' skipped: locked by another worker.")
-                return
-            log.info(f"[SCHEDULER] Acquired lock for job '{name}'. Starting execution.")
-            await job_fn()
+    with SessionLocal() as db, advisory_lock(db, f"scheduler:{name}") as acquired:
+        if not acquired:
+            log.info(f"[SCHEDULER] Job '{name}' skipped: locked by another worker.")
+            return
+        log.info(f"[SCHEDULER] Acquired lock for job '{name}'. Starting execution.")
+        await job_fn()
 
 
 def start_scheduler() -> None:
@@ -94,7 +96,9 @@ def start_scheduler() -> None:
             max_instances=1,
         )
         scheduler.start()
-        log.info("[SCHEDULER] APScheduler started successfully in Asia/Kolkata timezone with advisory locks.")
+        log.info(
+            "[SCHEDULER] APScheduler started successfully in Asia/Kolkata timezone with advisory locks."
+        )
     except Exception as e:
         log.warning(f"[SCHEDULER] Could not start APScheduler: {e}")
 

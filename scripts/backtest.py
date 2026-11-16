@@ -8,21 +8,20 @@ Usage:
     python scripts/backtest.py --event ahmedabad-2010
 """
 
+import argparse
+import json
 import os
 import sys
-import json
-import argparse
 from datetime import datetime, timedelta
 
 # Ensure analytics package is importable
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
-from src.thermal_indices.wbgt import calculate_wbgt
-from src.thermal_indices.utci import calculate_utci
-from src.thermal_indices.heat_index import calculate_heat_index
 from src.risk.scoring import compute_composite_risk
-
+from src.thermal_indices.heat_index import calculate_heat_index
+from src.thermal_indices.utci import calculate_utci
+from src.thermal_indices.wbgt import calculate_wbgt
 
 HISTORICAL_EVENTS = {
     "ahmedabad-2010": {
@@ -62,17 +61,24 @@ def simulate_event_hourly(event_key: str):
         else:
             min_t, max_t = 30.1, 45.4
 
-        # Solar & thermal curve
-        diurnal_factor = 0.5 * (1 - (math_cos := -1.0 * (((hour_of_day - 14) / 12) ** 2)))
         # Simplified diurnal curve
         import math
-        temp_c = min_t + (max_t - min_t) * max(0.0, math.sin(math.pi * (hour_of_day - 6) / 14)) if 6 <= hour_of_day <= 20 else min_t + (max_t - min_t) * 0.1 * math.exp(-((hour_of_day - 20) % 24) / 4)
+
+        temp_c = (
+            min_t + (max_t - min_t) * max(0.0, math.sin(math.pi * (hour_of_day - 6) / 14))
+            if 6 <= hour_of_day <= 20
+            else min_t + (max_t - min_t) * 0.1 * math.exp(-((hour_of_day - 20) % 24) / 4)
+        )
         temp_c = max(min_t, min(max_t, temp_c))
 
         # Relative humidity anti-correlated with temperature
         rh_pct = max(18.0, 55.0 - (temp_c - 28.0) * 1.8)
         wind_speed_ms = 1.2 + 0.8 * math.sin(hour_of_day / 4)
-        solar_wm2 = max(0.0, 950.0 * math.sin(math.pi * (hour_of_day - 6) / 12)) if 6 <= hour_of_day <= 18 else 0.0
+        solar_wm2 = (
+            max(0.0, 950.0 * math.sin(math.pi * (hour_of_day - 6) / 12))
+            if 6 <= hour_of_day <= 18
+            else 0.0
+        )
 
         wbgt_res = calculate_wbgt(temp_c, rh_pct, wind_speed_ms, solar_wm2, is_outdoor=True)
         utci_res = calculate_utci(temp_c, rh_pct, wind_speed_ms, solar_wm2)
@@ -92,19 +98,23 @@ def simulate_event_hourly(event_key: str):
             cooling_access_deficit=info["cooling_deficit"],
         )
 
-        hours.append({
-            "timestamp": t_current.isoformat(),
-            "hour": h,
-            "temp_c": round(temp_c, 1),
-            "rh_pct": round(rh_pct, 1),
-            "wbgt_c": round(wbgt_res["wbgt"], 1),
-            "utci_c": round(utci_res["utci"], 1),
-            "heat_index_c": round(hi_res["heat_index_c"], 1),
-            "risk_score": round(risk_res["risk_score"], 1),
-            "band": risk_res["band"],
-            "alert_grade": "Red" if risk_res["risk_score"] >= 70 else ("Extreme" if risk_res["risk_score"] >= 85 else "Orange"),
-            "work_stop": wbgt_res["wbgt"] >= 32.2,
-        })
+        hours.append(
+            {
+                "timestamp": t_current.isoformat(),
+                "hour": h,
+                "temp_c": round(temp_c, 1),
+                "rh_pct": round(rh_pct, 1),
+                "wbgt_c": round(wbgt_res["wbgt"], 1),
+                "utci_c": round(utci_res["utci"], 1),
+                "heat_index_c": round(hi_res["heat_index_c"], 1),
+                "risk_score": round(risk_res["risk_score"], 1),
+                "band": risk_res["band"],
+                "alert_grade": "Red"
+                if risk_res["risk_score"] >= 70
+                else ("Extreme" if risk_res["risk_score"] >= 85 else "Orange"),
+                "work_stop": wbgt_res["wbgt"] >= 32.2,
+            }
+        )
 
     return info, hours
 
@@ -142,6 +152,7 @@ def run_backtest(event_name: str = "ahmedabad-2010"):
             "hours_extreme_alert_ge_85": hours_extreme,
             "mandatory_work_cessation_hours": hours_work_stop,
             "first_red_trigger_hour": first_red_hour,
+            "warning_lead_time": lead_time_lead,
             "historical_excess_mortality": info["historical_excess_mortality"],
             "model_audit_verdict": "PASS — 100% sensitivity to fatal heatwave phase",
         },
@@ -158,12 +169,12 @@ def run_backtest(event_name: str = "ahmedabad-2010"):
         json.dump(summary, f, indent=2)
 
     # Markdown Report
-    md_content = f"""# Historical Backtest Report: {info['title']}
+    md_content = f"""# Historical Backtest Report: {info["title"]}
 
-**Event Dates:** {info['dates']}  
-**Location:** {info['city']}  
-**Historical Impact:** {info['historical_excess_mortality']} excess mortalities (AMC Registry)  
-**ThermaGrid Audit Verdict:** `{summary['metrics']['model_audit_verdict']}`
+- **Event Dates:** {info["dates"]}
+- **Location:** {info["city"]}
+- **Historical Impact:** {info["historical_excess_mortality"]} excess mortalities (AMC Registry)
+- **ThermaGrid Audit Verdict:** `{summary["metrics"]["model_audit_verdict"]}`
 
 ## Key Performance Indicators
 
@@ -205,7 +216,7 @@ def run_backtest(event_name: str = "ahmedabad-2010"):
     print(f" Mandatory Work Stop Hrs  : {hours_work_stop}h (ISO 7243 WBGT >= 32.2°C)")
     print(f" Verdict                  : {summary['metrics']['model_audit_verdict']}")
     print("-" * 76)
-    print(f" Emitted artifacts to:")
+    print(" Emitted artifacts to:")
     print(f"   -> {json_path}")
     print(f"   -> {md_path}")
     print("=" * 76)
@@ -213,6 +224,11 @@ def run_backtest(event_name: str = "ahmedabad-2010"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ThermaGrid Historical Heatwave Backtest")
-    parser.add_argument("--event", type=str, default="ahmedabad-2010", help="Event key (default: ahmedabad-2010)")
+    parser.add_argument(
+        "--event",
+        type=str,
+        default="ahmedabad-2010",
+        help="Event key (default: ahmedabad-2010)",
+    )
     args = parser.parse_args()
     run_backtest(args.event)

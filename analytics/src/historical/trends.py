@@ -2,15 +2,16 @@
 Climatological Trend Analysis: Sen's Slope and Mann-Kendall Non-Parametric Trend Test.
 """
 
-from typing import List, Dict, Any
+from typing import Any
+
 import numpy as np
 from scipy import stats
 
 
 def compute_trend(
-    values: List[float],
-    time_steps_years: List[float] = None,
-) -> Dict[str, Any]:
+    values: list[float],
+    time_steps_years: list[float] = None,
+) -> dict[str, Any]:
     """
     Computes Sen's Slope estimator and Mann-Kendall / Kendall tau trend statistics.
     Returns:
@@ -27,17 +28,17 @@ def compute_trend(
             "direction": "insufficient_data",
             "is_significant": False,
         }
-        
+
     x = np.arange(n) if time_steps_years is None else np.array(time_steps_years[:n])
     y = np.array(clean_vals)
-    
+
     # Theil-Sen robust slope
     res = stats.theil_sen(y, x)
     slope = float(res.slope)
-    
+
     # Kendall Tau
     tau, p_val = stats.kendalltau(x, y)
-    
+
     is_sig = bool(p_val < 0.05)
     if is_sig and slope > 0:
         direction = "warming"
@@ -45,7 +46,7 @@ def compute_trend(
         direction = "cooling"
     else:
         direction = "stable"
-        
+
     return {
         "slope_per_year": round(slope, 4),
         "slope_per_decade": round(slope * 10.0, 3),

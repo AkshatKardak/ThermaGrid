@@ -2,7 +2,8 @@
 Probabilistic Calibration Metrics: Pinball Loss and PICP (Prediction Interval Coverage).
 """
 
-from typing import Dict, Any, List
+from typing import Any
+
 import numpy as np
 
 
@@ -13,11 +14,11 @@ def pinball_loss(y_true: np.ndarray, y_pred: np.ndarray, alpha: float) -> float:
 
 
 def evaluate_interval_coverage(
-    y_true: List[float],
-    y_lower: List[float],
-    y_upper: List[float],
+    y_true: list[float],
+    y_lower: list[float],
+    y_upper: list[float],
     nominal_confidence: float = 0.80,  # 80% interval (0.10 to 0.90)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Computes Prediction Interval Coverage Probability (PICP)
     and Mean Prediction Interval Width (MPIW).
@@ -25,14 +26,14 @@ def evaluate_interval_coverage(
     yt = np.array(y_true, dtype=float)
     yl = np.array(y_lower, dtype=float)
     yu = np.array(y_upper, dtype=float)
-    
+
     covered = (yt >= yl) & (yt <= yu)
     picp = float(np.mean(covered))
     mpiw = float(np.mean(yu - yl))
-    
+
     # Well-calibrated if actual coverage matches nominal within +/- 6%
     is_calibrated = abs(picp - nominal_confidence) <= 0.06
-    
+
     return {
         "picp": round(picp, 3),
         "nominal_confidence": nominal_confidence,

@@ -6,7 +6,7 @@ to official NDMA / Municipal Heat Action Plan trigger directives.
 STRICT RULE: No LLMs for safety-critical heat wave advisories.
 """
 
-from typing import Dict, Any, List
+from typing import Any
 
 
 # Official NDMA 2020 Heat Action Plan Triggers & Standard Operating Procedures (SOPs)
@@ -15,7 +15,7 @@ def get_recommendations_for_risk(
     top_driver: str,
     is_worker: bool = False,
     is_authority: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Returns specific, actionable directives for Citizens, Workers, or Municipal Authorities.
     """
@@ -23,7 +23,9 @@ def get_recommendations_for_risk(
 
     if band in ["extreme", "veryhigh"]:
         alert_grade = "Red Alert (Severe Heat Emergency)"
-        summary = "Extreme thermal stress hazard. Critical risk of heat stroke under direct exposure."
+        summary = (
+            "Extreme thermal stress hazard. Critical risk of heat stroke under direct exposure."
+        )
         citizen_actions = [
             "Remain strictly indoors in shaded or air-cooled environments between 11:00 AM and 04:30 PM.",
             "Maintain continuous hydration: consume ORS, tender coconut water, buttermilk (chaas), and salted lemon water.",
@@ -103,7 +105,9 @@ def get_recommendations_for_risk(
     elif "elderly" in driver_lower:
         driver_specific_directive = "High senior citizen concentration: activate volunteer health visits and daily telephonic check-ins."
     else:
-        driver_specific_directive = "High ambient hazard: strictly observe peak sun avoidance intervals."
+        driver_specific_directive = (
+            "High ambient hazard: strictly observe peak sun avoidance intervals."
+        )
 
     return {
         "risk_band": band,

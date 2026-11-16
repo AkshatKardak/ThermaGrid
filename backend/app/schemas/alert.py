@@ -2,8 +2,8 @@
 Pydantic schemas for Alerts.
 """
 
-from typing import Optional
 from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -27,7 +27,7 @@ class AlertOut(BaseModel):
     channels: str
     is_active: bool
     dispatched_at: datetime
-    city: Optional[str] = None
-    ward_name: Optional[str] = None
+    city: str | None = None
+    ward_name: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

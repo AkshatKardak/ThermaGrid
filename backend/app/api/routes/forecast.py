@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.services.forecast_service import ForecastService
 from app.schemas.risk import RiskForecastOut
+from app.services.forecast_service import ForecastService
 
 router = APIRouter(prefix="/forecast", tags=["Forecast"])
 

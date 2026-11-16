@@ -2,37 +2,38 @@
 ThermaGrid - FastAPI Application Entry Point.
 """
 
+import logging
 import os
 import time
-import logging
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.routes.alerts import router as alerts_router
+from app.api.routes.analytics import router as analytics_router
+
+# Route imports
+from app.api.routes.auth import router as auth_router
+from app.api.routes.cooling_centres import router as cooling_centres_router
+from app.api.routes.data_sources import router as data_sources_router
+from app.api.routes.dependents import router as dependents_router
+from app.api.routes.forecast import router as forecast_router
+from app.api.routes.interventions import router as interventions_router
+from app.api.routes.locations import router as locations_router
+from app.api.routes.planner import router as planner_router
+from app.api.routes.reports import router as reports_router
+from app.api.routes.risk import router as risk_router
+from app.api.routes.subscriptions import router as subscriptions_router
+from app.api.routes.thermal import router as thermal_router
+from app.api.routes.weather import router as weather_router
+from app.api.routes.worker import router as worker_router
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.db.base import Base
 from app.db.session import engine
 from app.jobs.scheduler import start_scheduler, stop_scheduler
-
-# Route imports
-from app.api.routes.auth import router as auth_router
-from app.api.routes.locations import router as locations_router
-from app.api.routes.weather import router as weather_router
-from app.api.routes.thermal import router as thermal_router
-from app.api.routes.risk import router as risk_router
-from app.api.routes.analytics import router as analytics_router
-from app.api.routes.forecast import router as forecast_router
-from app.api.routes.interventions import router as interventions_router
-from app.api.routes.cooling_centres import router as cooling_centres_router
-from app.api.routes.alerts import router as alerts_router
-from app.api.routes.data_sources import router as data_sources_router
-from app.api.routes.planner import router as planner_router
-from app.api.routes.subscriptions import router as subscriptions_router
-from app.api.routes.dependents import router as dependents_router
-from app.api.routes.worker import router as worker_router
-from app.api.routes.reports import router as reports_router
 
 setup_logging()
 logger = logging.getLogger("thermagrid.main")
@@ -90,12 +91,15 @@ def create_application() -> FastAPI:
         response = await call_next(request)
         process_time = time.time() - start_time
         response.headers["X-Process-Time-Seconds"] = str(round(process_time, 4))
-        logger.info(f"{request.method} {request.url.path} completed in {process_time:.4f}s [status {response.status_code}]")
+        logger.info(
+            f"{request.method} {request.url.path} completed in {process_time:.4f}s [status {response.status_code}]"
+        )
         return response
 
     # Response caching middleware (TTL: 10m for observations, 1h for forecasts)
-    from app.core.cache import response_cache, get_cache_ttl
     from starlette.responses import Response as StarletteResponse
+
+    from app.core.cache import get_cache_ttl, response_cache
 
     @app.middleware("http")
     async def cache_middleware(request: Request, call_next):
@@ -114,7 +118,12 @@ def create_application() -> FastAPI:
             body, status_code, headers, media_type = cached
             res = StarletteResponse(content=body, status_code=status_code, media_type=media_type)
             for h_name, h_val in headers:
-                if h_name.lower() not in ["content-length", "content-type", "cache", "x-cache"]:
+                if h_name.lower() not in [
+                    "content-length",
+                    "content-type",
+                    "cache",
+                    "x-cache",
+                ]:
                     res.headers[h_name] = h_val
             res.headers["cache"] = "hit"
             res.headers["X-Cache"] = "hit"
@@ -126,7 +135,8 @@ def create_application() -> FastAPI:
             full_body = b"".join(body)
 
             headers_to_cache = [
-                (k, v) for k, v in response.headers.items()
+                (k, v)
+                for k, v in response.headers.items()
                 if k.lower() not in ["cache", "x-cache", "x-process-time-seconds"]
             ]
             response_cache.set(
@@ -155,6 +165,7 @@ def create_application() -> FastAPI:
 
     # Upstream data / weather outage exception handler
     from app.core.errors import DataSourceUnavailable
+
     @app.exception_handler(DataSourceUnavailable)
     async def weather_unavailable_handler(request: Request, exc: DataSourceUnavailable):
         logger.warning(f"Upstream outage at {request.url.path}: {exc}")
@@ -191,13 +202,16 @@ def create_application() -> FastAPI:
         logger.error(f"Unhandled exception at {request.url.path}: {exc}", exc_info=True)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"detail": "An internal server error occurred. Please contact system administrator."},
+            content={
+                "detail": "An internal server error occurred. Please contact system administrator."
+            },
         )
 
     # Health check endpoint (Render uses it to decide the service is live)
     @app.get("/health", tags=["Health"])
     def health_check():
         from sqlalchemy import text
+
         db_status = "down"
         try:
             with engine.connect() as conn:
@@ -207,7 +221,9 @@ def create_application() -> FastAPI:
             logger.error(f"Health check DB ping failed: {e}")
             db_status = "down"
 
-        status_code = status.HTTP_200_OK if db_status == "up" else status.HTTP_503_SERVICE_UNAVAILABLE
+        status_code = (
+            status.HTTP_200_OK if db_status == "up" else status.HTTP_503_SERVICE_UNAVAILABLE
+        )
         return JSONResponse(
             status_code=status_code,
             content={

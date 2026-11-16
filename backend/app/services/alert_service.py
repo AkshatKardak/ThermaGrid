@@ -1,13 +1,14 @@
 import logging
-from datetime import datetime, timezone, timedelta
-from typing import List, Optional, Dict, Any
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.models.alert import Alert
+from app.models.alert_dispatch import AlertDispatch
 from app.models.location import Location
 from app.models.subscription import Subscription
-from app.models.alert_dispatch import AlertDispatch
 from app.services.alerts.base import AlertChannel
 from app.services.alerts.email_resend import EmailChannel
 from app.services.alerts.whatsapp import WhatsAppChannel
@@ -40,7 +41,7 @@ def _band_from_score(score: float) -> str:
     return "extreme"
 
 
-def is_in_quiet_hours(quiet_hours: Optional[str], dt: Optional[datetime] = None) -> bool:
+def is_in_quiet_hours(quiet_hours: str | None, dt: datetime | None = None) -> bool:
     """
     Evaluates whether datetime dt falls within quiet hours (e.g. '22:00-06:00').
     Supports midnight wrap where start hour > end hour.
@@ -48,7 +49,7 @@ def is_in_quiet_hours(quiet_hours: Optional[str], dt: Optional[datetime] = None)
     if not quiet_hours or "-" not in quiet_hours:
         return False
     if dt is None:
-        dt = datetime.now(timezone.utc)
+        dt = datetime.now(UTC)
     try:
         start_str, end_str = quiet_hours.split("-")
         sh, sm = map(int, start_str.strip().split(":"))
@@ -69,6 +70,7 @@ def is_in_quiet_hours(quiet_hours: Optional[str], dt: Optional[datetime] = None)
 
 class _Noop:
     """No-operation alert channel for local development or disabled state."""
+
     async def send(self, to: str, subject: str, body: str) -> bool:
         logger.info(f"[ALERT DEMO] Simulated dispatch to {to} | {subject}")
         return True
@@ -109,7 +111,7 @@ async def dispatch_ward_alerts(
     db: Session,
     location: Location,
     risk_info: Any,
-) -> List[AlertDispatch]:
+) -> list[AlertDispatch]:
     """
     Evaluates all active subscriptions for a ward with multi-tier alert fatigue controls:
     1. Threshold filter: risk >= subscription.threshold
@@ -121,7 +123,7 @@ async def dispatch_ward_alerts(
     Persists audit trail to alert_dispatches with unique deduplication.
     """
     settings = get_settings()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if isinstance(risk_info, dict):
         score = float(risk_info.get("risk_score") or risk_info.get("score") or 0.0)
@@ -133,13 +135,13 @@ async def dispatch_ward_alerts(
     subscriptions = (
         db.query(Subscription)
         .filter(
-            Subscription.is_active == True,  # noqa: E712
+            Subscription.is_active.is_(True),
             (Subscription.ward_id == location.id) | (Subscription.ward_id.is_(None)),
         )
         .all()
     )
 
-    dispatches: List[AlertDispatch] = []
+    dispatches: list[AlertDispatch] = []
 
     for sub in subscriptions:
         # 1. Threshold check
@@ -225,7 +227,7 @@ async def dispatch_ward_alerts(
         if last_sent:
             last_dt = last_sent.triggered_at
             if last_dt.tzinfo is None:
-                last_dt = last_dt.replace(tzinfo=timezone.utc)
+                last_dt = last_dt.replace(tzinfo=UTC)
             elapsed_min = (now - last_dt).total_seconds() / 60.0
             if elapsed_min < settings.alert_cooldown_minutes:
                 # Check escalation: only bypass cooldown if risk band escalated
@@ -293,8 +295,8 @@ class AlertService:
     """
 
     @staticmethod
-    def get_active_alerts(db: Session, city: Optional[str] = None) -> List[Alert]:
-        query = db.query(Alert).filter(Alert.is_active == True)  # noqa: E712
+    def get_active_alerts(db: Session, city: str | None = None) -> list[Alert]:
+        query = db.query(Alert).filter(Alert.is_active.is_(True))
         if city:
             query = query.join(Location).filter(Location.city.ilike(f"%{city}%"))
         return query.order_by(Alert.dispatched_at.desc()).all()
@@ -309,7 +311,7 @@ class AlertService:
         action_directives: str,
         target_audience: str = "all",
     ) -> Alert:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         alert = Alert(
             location_id=location_id,
             alert_level=alert_level,

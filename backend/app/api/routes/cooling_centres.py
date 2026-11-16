@@ -2,10 +2,10 @@
 Cooling Centres endpoints.
 """
 
-import sys
-import os
 import math
-from typing import List, Optional
+import os
+import sys
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
@@ -13,9 +13,10 @@ from app.db.session import get_db
 from app.models.cooling_centre import CoolingCentre
 from app.schemas.cooling_centre import CoolingCentreOut
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
-from src.spatial.ward_joins import find_nearest_cooling_centres
 
 router = APIRouter(prefix="/cooling-centres", tags=["Cooling Centres"])
 
@@ -32,14 +33,14 @@ def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return round(R * c, 2)
 
 
-@router.get("", response_model=List[CoolingCentreOut])
+@router.get("", response_model=list[CoolingCentreOut])
 def list_cooling_centres(
-    city: Optional[str] = Query(None, description="City filter"),
-    lat: Optional[float] = Query(None, description="User latitude"),
-    lon: Optional[float] = Query(None, description="User longitude"),
-    near_lat: Optional[float] = Query(None, description="User latitude (alias)"),
-    near_lon: Optional[float] = Query(None, description="User longitude (alias)"),
-    open_now: Optional[bool] = Query(None, description="Filter for centres currently open"),
+    city: str | None = Query(None, description="City filter"),
+    lat: float | None = Query(None, description="User latitude"),
+    lon: float | None = Query(None, description="User longitude"),
+    near_lat: float | None = Query(None, description="User latitude (alias)"),
+    near_lon: float | None = Query(None, description="User longitude (alias)"),
+    open_now: bool | None = Query(None, description="Filter for centres currently open"),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
@@ -100,6 +101,8 @@ def list_cooling_centres(
         results.append(c_dict)
 
     if target_lat is not None and target_lon is not None:
-        results.sort(key=lambda x: x["distance_km"] if x["distance_km"] is not None else float("inf"))
+        results.sort(
+            key=lambda x: x["distance_km"] if x["distance_km"] is not None else float("inf")
+        )
 
     return [CoolingCentreOut(**item) for item in results[:limit]]

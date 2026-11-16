@@ -2,7 +2,6 @@
 Pydantic schemas for Data Sources and Provenance.
 """
 
-from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
@@ -17,6 +16,6 @@ class DataSourceOut(BaseModel):
     license: str
     variables: str
     update_frequency: str
-    description: Optional[str] = None
+    description: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

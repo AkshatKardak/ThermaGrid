@@ -3,26 +3,25 @@ Thermal Risk endpoints: current score, multi-day forecast, night-time risk, indo
 """
 
 import os
-import yaml
-from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, Query, HTTPException
+from typing import Any
+
+import yaml
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.services.risk_service import RiskService
-from app.services.forecast_service import ForecastService
-from app.services.weather_service import WeatherService
-from app.services.thermal_service import ThermalService
-from app.schemas.risk import RiskCurrentOut, RiskForecastOut
 from app.models.risk import WardRiskCurrent
+from app.schemas.risk import RiskCurrentOut, RiskForecastOut
+from app.services.forecast_service import ForecastService
+from app.services.risk_service import RiskService
+from app.services.thermal_service import ThermalService
+from app.services.weather_service import WeatherService
 
 router = APIRouter(prefix="/risk", tags=["Thermal Risk"])
 
 PROJECT_ROOT = os.path.dirname(
-    os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    )
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 ARCHETYPES_PATH = os.path.join(
     PROJECT_ROOT,
@@ -63,7 +62,7 @@ NIGHT_GUIDANCE_TEMPLATES = {
 }
 
 
-def _load_archetypes() -> Dict[str, Any]:
+def _load_archetypes() -> dict[str, Any]:
     if not os.path.exists(ARCHETYPES_PATH):
         raise FileNotFoundError(f"Archetypes configuration file not found at {ARCHETYPES_PATH}")
     with open(ARCHETYPES_PATH, "r") as f:
@@ -153,13 +152,15 @@ def get_night_risk(
                 else:
                     wbgt_val = None
 
-            overnight_samples.append({
-                "time": time_label,
-                "hour": h,
-                "temp_c": round(float(temp), 1),
-                "wbgt_c": round(float(wbgt_val), 1) if wbgt_val is not None else None,
-                "timestamp": ts,
-            })
+            overnight_samples.append(
+                {
+                    "time": time_label,
+                    "hour": h,
+                    "temp_c": round(float(temp), 1),
+                    "wbgt_c": round(float(wbgt_val), 1) if wbgt_val is not None else None,
+                    "timestamp": ts,
+                }
+            )
 
     if len(overnight_samples) < 4:
         return {
@@ -289,10 +290,12 @@ def get_risk_forecast(
     return ForecastService.get_risk_forecast(db, location_id, days=days)
 
 
-@router.get("/all", response_model=List[RiskCurrentOut])
+@router.get("/all", response_model=list[RiskCurrentOut])
 def get_all_wards_risk(
-    city: Optional[str] = Query(None, description="Filter by city, e.g. Mumbai"),
-    level: Optional[str] = Query(None, description="Filter by hierarchy level ('ward' | 'district' | 'state')"),
+    city: str | None = Query(None, description="Filter by city, e.g. Mumbai"),
+    level: str | None = Query(
+        None, description="Filter by hierarchy level ('ward' | 'district' | 'state')"
+    ),
     db: Session = Depends(get_db),
 ):
     """
@@ -315,40 +318,43 @@ def get_all_wards_risk(
     if rows:
         results = []
         for r in rows:
-            results.append({
-                "location_id": r.location_id,
-                "city": r.city,
-                "ward_name": r.ward_name,
-                "ward_code": r.ward_code,
-                "level": r.level,
-                "parent_code": r.parent_code,
-                "calculated_for": r.calculated_for,
-                "risk_score": r.risk_score,
-                "band": r.band,
-                "band_label": r.band_label,
-                "alert_color": r.alert_color,
-                "hazard_score": r.hazard_score,
-                "exposure_index": r.exposure_index,
-                "vulnerability_index": r.vulnerability_index,
-                "factor_breakdown": r.factor_breakdown_json,
-                "explanation": r.explanation,
-                "temperature_c": r.temperature_c,
-                "wbgt_c": r.wbgt_c,
-                "utci_c": r.utci_c,
-                "confidence": r.confidence,
-                "sub_scores": r.sub_scores_json,
-                "diagnostics": r.diagnostics_json,
-                "is_demo": r.is_demo,
-                "demo_label": r.demo_label,
-                "latitude": r.latitude,
-                "longitude": r.longitude,
-                "population": r.population,
-                "imd_grade": getattr(r, "imd_grade", "NORMAL") or "NORMAL",
-                "imd_label": getattr(r, "imd_label", "No Warning (Normal)") or "No Warning (Normal)",
-                "consecutive_hot_days": getattr(r, "consecutive_hot_days", 0) or 0,
-                "consecutive_hot_nights": getattr(r, "consecutive_hot_nights", 0) or 0,
-                "hours_to_threshold": getattr(r, "hours_to_threshold", None),
-            })
+            results.append(
+                {
+                    "location_id": r.location_id,
+                    "city": r.city,
+                    "ward_name": r.ward_name,
+                    "ward_code": r.ward_code,
+                    "level": r.level,
+                    "parent_code": r.parent_code,
+                    "calculated_for": r.calculated_for,
+                    "risk_score": r.risk_score,
+                    "band": r.band,
+                    "band_label": r.band_label,
+                    "alert_color": r.alert_color,
+                    "hazard_score": r.hazard_score,
+                    "exposure_index": r.exposure_index,
+                    "vulnerability_index": r.vulnerability_index,
+                    "factor_breakdown": r.factor_breakdown_json,
+                    "explanation": r.explanation,
+                    "temperature_c": r.temperature_c,
+                    "wbgt_c": r.wbgt_c,
+                    "utci_c": r.utci_c,
+                    "confidence": r.confidence,
+                    "sub_scores": r.sub_scores_json,
+                    "diagnostics": r.diagnostics_json,
+                    "is_demo": r.is_demo,
+                    "demo_label": r.demo_label,
+                    "latitude": r.latitude,
+                    "longitude": r.longitude,
+                    "population": r.population,
+                    "imd_grade": getattr(r, "imd_grade", "NORMAL") or "NORMAL",
+                    "imd_label": getattr(r, "imd_label", "No Warning (Normal)")
+                    or "No Warning (Normal)",
+                    "consecutive_hot_days": getattr(r, "consecutive_hot_days", 0) or 0,
+                    "consecutive_hot_nights": getattr(r, "consecutive_hot_nights", 0) or 0,
+                    "hours_to_threshold": getattr(r, "hours_to_threshold", None),
+                }
+            )
         return results
 
     return RiskService.get_all_wards_risk(db, city=city, level=level)

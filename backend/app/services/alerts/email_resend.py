@@ -1,4 +1,5 @@
 import httpx
+
 from app.core.config import get_settings
 
 
@@ -6,6 +7,7 @@ class EmailChannel:
     """
     Email notification dispatcher using Resend API.
     """
+
     async def send(self, to: str, subject: str, body: str) -> bool:
         s = get_settings()
         if not s.resend_api_key:

@@ -2,13 +2,13 @@
 Thermal Indices routes for WBGT, UTCI, and Heat Index.
 """
 
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from src.historical.store import HistoricalDataUnavailable
 
 from app.db.session import get_db
-from app.services.thermal_service import ThermalService
 from app.schemas.thermal import ThermalCurrentOut
-from src.historical.store import HistoricalDataUnavailable
+from app.services.thermal_service import ThermalService
 
 router = APIRouter(prefix="/thermal", tags=["Thermal Indices"])
 

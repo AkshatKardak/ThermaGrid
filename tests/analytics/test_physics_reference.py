@@ -4,17 +4,27 @@ Validates ThermaGrid biometeorological implementations (UTCI, WBGT, Heat Index)
 against the standard pythermalcomfort reference library.
 """
 
-import sys
 import os
-import pytest
-import numpy as np
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../analytics")))
 
-from pythermalcomfort.models import utci as py_utci, heat_index_rothfusz as py_hi, wbgt as py_wbgt
-from src.thermal_indices.utci import calculate_utci
-from src.thermal_indices.wbgt import calculate_wbgt, calculate_wet_bulb_stull, estimate_globe_temperature
+from pythermalcomfort.models import (
+    heat_index_rothfusz as py_hi,
+)
+from pythermalcomfort.models import (
+    utci as py_utci,
+)
+from pythermalcomfort.models import (
+    wbgt as py_wbgt,
+)
 from src.thermal_indices.heat_index import calculate_heat_index
+from src.thermal_indices.utci import calculate_utci
+from src.thermal_indices.wbgt import (
+    calculate_wbgt,
+    calculate_wet_bulb_stull,
+    estimate_globe_temperature,
+)
 
 
 def test_utci_vs_pythermalcomfort_reference():
@@ -103,7 +113,9 @@ def test_iso7243_wbgt_vs_pythermalcomfort_reference():
         ref_outdoor = py_wbgt(twb=tw, tg=tg, tdb=temp, with_solar_load=True, round_output=False)
         our_outdoor = calculate_wbgt(temp, rh, wind, solar, is_outdoor=True)
         diff_out = abs(float(ref_outdoor.wbgt) - our_outdoor["wbgt"])
-        assert diff_out <= 0.10, f"Outdoor WBGT mismatch: {ref_outdoor.wbgt} vs {our_outdoor['wbgt']}"
+        assert diff_out <= 0.10, (
+            f"Outdoor WBGT mismatch: {ref_outdoor.wbgt} vs {our_outdoor['wbgt']}"
+        )
 
         # Indoor validation
         ref_indoor = py_wbgt(twb=tw, tg=tg, with_solar_load=False, round_output=False)

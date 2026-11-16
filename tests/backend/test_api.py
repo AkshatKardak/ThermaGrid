@@ -2,9 +2,9 @@
 FastAPI Backend integration tests using TestClient.
 """
 
-import sys
 import os
-import pytest
+import sys
+
 from fastapi.testclient import TestClient
 
 # Set PYTHONPATH
@@ -12,26 +12,30 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 sys.path.insert(0, os.path.join(BASE_DIR, "backend"))
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
-from app.main import app
-from app.db.seed import seed_database
-from app.services.alert_service import maybe_alert
 import app.core.auth as auth_module
 import jwt
+from app.db.seed import seed_database
+from app.main import app
+from app.services.alert_service import maybe_alert
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 # Setup real RS256 token signer for integration tests
 _TEST_PRIVATE_KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 _TEST_PUBLIC_KEY = _TEST_PRIVATE_KEY.public_key()
 
+
 class _MockSigningKey:
     def __init__(self, key):
         self.key = key
+
 
 class _MockJWKSClient:
     def get_signing_key_from_jwt(self, token: str):
         return _MockSigningKey(_TEST_PUBLIC_KEY)
 
+
 auth_module._jwks = _MockJWKSClient()
+
 
 def mint_test_jwt(sub: str, role: str) -> str:
     payload = {
@@ -41,6 +45,7 @@ def mint_test_jwt(sub: str, role: str) -> str:
         "is_demo": True,
     }
     return jwt.encode(payload, _TEST_PRIVATE_KEY, algorithm="RS256")
+
 
 # Ensure database is seeded for test runs
 seed_database()
@@ -96,7 +101,6 @@ def test_get_current_risk():
     assert "factor_breakdown" in data
     assert len(data["factor_breakdown"]) >= 3
     assert "explanation" in data
-
 
 
 def test_cooling_centres_list():
@@ -168,13 +172,18 @@ def test_authority_view_role_guard():
 
 import asyncio
 
+
 def test_alert_threshold_dispatch():
     # Below threshold (e.g. 50 < 80) -> returns False
-    did_alert_low = asyncio.run(maybe_alert("test@mcgm.gov.in", risk=50.0, ward="Ward A", peak="14:00"))
+    did_alert_low = asyncio.run(
+        maybe_alert("test@mcgm.gov.in", risk=50.0, ward="Ward A", peak="14:00")
+    )
     assert did_alert_low is False
 
     # Above threshold (e.g. 85 >= 80) -> dispatches via active channel
-    did_alert_high = asyncio.run(maybe_alert("test@mcgm.gov.in", risk=85.0, ward="Ward M/East", peak="14:00"))
+    did_alert_high = asyncio.run(
+        maybe_alert("test@mcgm.gov.in", risk=85.0, ward="Ward M/East", peak="14:00")
+    )
     assert did_alert_high is True
 
 
@@ -193,7 +202,9 @@ def test_safe_windows_planner():
         assert w["peak_risk"] < threshold
 
     # 90 min exercise window
-    res90 = client.get("/api/v1/planner/safe-windows?location_id=1&activity=exercise&duration_min=90")
+    res90 = client.get(
+        "/api/v1/planner/safe-windows?location_id=1&activity=exercise&duration_min=90"
+    )
     assert res90.status_code == 200
     data90 = res90.json()
     thresh_ex = data90["threshold"]
@@ -298,7 +309,9 @@ def test_dependents_care_circle_scoping():
 
 
 def test_worker_shift_card():
-    res = client.get("/api/v1/worker/shift-card?location_id=1&met=6&exposure=sun&start=09:00&end=18:00")
+    res = client.get(
+        "/api/v1/worker/shift-card?location_id=1&met=6&exposure=sun&start=09:00&end=18:00"
+    )
     assert res.status_code == 200
     data = res.json()
     assert "breaks" in data

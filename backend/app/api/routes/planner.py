@@ -4,13 +4,13 @@ Computes safe physical activity intervals across the 24-hour diurnal risk curve.
 Thresholds are dynamically loaded from analytics/config/weights.yaml.
 """
 
-import os
-import sys
-import yaml
 import math
-from typing import List, Dict, Any, Optional
+import os
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, Query, HTTPException
+from typing import Any
+
+import yaml
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -19,9 +19,7 @@ from app.services.forecast_service import ForecastService
 router = APIRouter(prefix="/planner", tags=["Planner"])
 
 PROJECT_ROOT = os.path.dirname(
-    os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    )
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 )
 CONFIG_PATH = os.path.join(
     PROJECT_ROOT,
@@ -31,7 +29,7 @@ CONFIG_PATH = os.path.join(
 )
 
 
-def _load_thresholds() -> Dict[str, Any]:
+def _load_thresholds() -> dict[str, Any]:
     if not os.path.exists(CONFIG_PATH):
         raise FileNotFoundError(f"Configuration file not found at {CONFIG_PATH}")
     with open(CONFIG_PATH, "r") as f:
@@ -62,7 +60,9 @@ def _generate_why(band: str, hour: int) -> str:
     elif band in ("safe", "moderate"):
         return "Acceptable biometeorological conditions with manageable ambient thermal strain"
     else:
-        return "Sub-optimal window with elevated ambient thermal load — maintain continuous hydration"
+        return (
+            "Sub-optimal window with elevated ambient thermal load — maintain continuous hydration"
+        )
 
 
 @router.get("/safe-windows")
@@ -111,7 +111,9 @@ def get_safe_windows(
                 return float(item["predicted_risk_score"])
             if "risk_score" in item and item["risk_score"] is not None:
                 return float(item["risk_score"])
-            raise KeyError("Missing required risk score key ('predicted_risk_score') in forecast item")
+            raise KeyError(
+                "Missing required risk score key ('predicted_risk_score') in forecast item"
+            )
 
         # max risk across every hourly sample in the window
         peak_risk = max(_get_item_risk(w) for w in window_slice)
@@ -182,13 +184,15 @@ def get_safe_windows(
     worst = all_evaluated_windows[0] if all_evaluated_windows else None
     avoid = []
     if worst:
-        avoid.append({
-            "start": worst["start"],
-            "end": worst["end"],
-            "peak_risk": worst["peak_risk"],
-            "band": worst["band"],
-            "why": "Peak solar radiation and acute multi-factorial thermal hazard",
-        })
+        avoid.append(
+            {
+                "start": worst["start"],
+                "end": worst["end"],
+                "peak_risk": worst["peak_risk"],
+                "band": worst["band"],
+                "why": "Peak solar radiation and acute multi-factorial thermal hazard",
+            }
+        )
 
     no_safe_window_message = None
     best = distinct_windows[0] if distinct_windows else None

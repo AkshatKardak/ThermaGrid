@@ -2,8 +2,10 @@
 Weather observations and forecasts ORM models.
 """
 
-from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, Float, DateTime, String, Boolean, ForeignKey
+from datetime import UTC, datetime
+
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
+
 from app.db.base import Base
 
 
@@ -20,7 +22,7 @@ class WeatherObservation(Base):
     apparent_temperature_c = Column(Float, nullable=True)
     source_name = Column(String(100), default="Open-Meteo ECMWF/GFS")
     is_demo = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
 
 
 class WeatherForecast(Base):
@@ -35,4 +37,4 @@ class WeatherForecast(Base):
     solar_radiation_wm2 = Column(Float, default=0.0)
     source_name = Column(String(100), default="Open-Meteo Seamless")
     is_demo = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))

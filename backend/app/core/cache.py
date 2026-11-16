@@ -4,17 +4,14 @@ Provides fast response times and sets 'cache: hit | miss' headers.
 """
 
 import time
-from typing import Dict, Tuple, Optional
-from fastapi import Request
-from starlette.responses import Response as StarletteResponse
 
 
 class ResponseCache:
     def __init__(self):
         # key -> (body_bytes, status_code, headers_list, media_type, expire_at)
-        self._store: Dict[str, Tuple[bytes, int, list, Optional[str], float]] = {}
+        self._store: dict[str, tuple[bytes, int, list, str | None, float]] = {}
 
-    def get(self, key: str) -> Optional[Tuple[bytes, int, list, Optional[str]]]:
+    def get(self, key: str) -> tuple[bytes, int, list, str | None] | None:
         item = self._store.get(key)
         if not item:
             return None
@@ -30,10 +27,16 @@ class ResponseCache:
         body: bytes,
         status_code: int,
         headers: list,
-        media_type: Optional[str],
+        media_type: str | None,
         ttl_seconds: int,
     ) -> None:
-        self._store[key] = (body, status_code, headers, media_type, time.time() + ttl_seconds)
+        self._store[key] = (
+            body,
+            status_code,
+            headers,
+            media_type,
+            time.time() + ttl_seconds,
+        )
 
     def clear(self) -> None:
         self._store.clear()
@@ -52,7 +55,7 @@ CACHE_ROUTES = {
 }
 
 
-def get_cache_ttl(path: str) -> Optional[int]:
+def get_cache_ttl(path: str) -> int | None:
     clean_path = path.rstrip("/")
     for route_prefix, ttl in CACHE_ROUTES.items():
         if clean_path.endswith(route_prefix):

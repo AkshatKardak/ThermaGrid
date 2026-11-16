@@ -3,9 +3,7 @@ Worker Safety & Shift Card API route.
 Computes ISO 7243 work-rest intervals, hydration targets, and printable shift cards.
 """
 
-from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -85,7 +83,7 @@ def get_worker_shift_card(
                 else:
                     raise KeyError("Forecast item missing WBGT and temperature")
             wbgt = float(wbgt)
-            
+
             # ISO 7243 Clothing Adjustment Value (CAV)
             clothing_clean = (clothing or "normal").lower().strip()
             if clothing_clean == "heavy":
@@ -105,7 +103,9 @@ def get_worker_shift_card(
             acclim_break_extra = 0 if acclimatised else 15
 
             # Direct sun adds ~1.5°C effective thermal load if exposed
-            eff_wbgt = wbgt + (1.5 if exposure.lower() == "sun" else 0.0) + cav + acclim_wbgt_penalty
+            eff_wbgt = (
+                wbgt + (1.5 if exposure.lower() == "sun" else 0.0) + cav + acclim_wbgt_penalty
+            )
 
             temp_val = it.get("temperature_c")
             if temp_val is None:
@@ -117,13 +117,15 @@ def get_worker_shift_card(
             if risk_val is None:
                 raise KeyError("Forecast item missing risk score")
 
-            shift_items.append({
-                "hour": h,
-                "time": f"{h:02d}:00",
-                "wbgt_c": round(eff_wbgt, 1),
-                "temperature_c": round(float(temp_val), 1),
-                "risk_score": round(float(risk_val), 1),
-            })
+            shift_items.append(
+                {
+                    "hour": h,
+                    "time": f"{h:02d}:00",
+                    "wbgt_c": round(eff_wbgt, 1),
+                    "temperature_c": round(float(temp_val), 1),
+                    "risk_score": round(float(risk_val), 1),
+                }
+            )
 
     if not shift_items:
         raise HTTPException(
@@ -145,7 +147,9 @@ def get_worker_shift_card(
 
     met_bonus = int(max(0.0, met - 2.0) * 40)
     sun_bonus = 150 if exposure.lower() == "sun" else 0
-    water_ml_per_hour = min(1800, base_water + met_bonus + sun_bonus + clothing_water + acclim_water)
+    water_ml_per_hour = min(
+        1800, base_water + met_bonus + sun_bonus + clothing_water + acclim_water
+    )
 
     # Determine recommended heavy work window
     heavy_work_after = "17:00"
@@ -155,37 +159,55 @@ def get_worker_shift_card(
             break
 
     # Build ISO 7243 rest schedule intervals adjusted for metabolic rate, clothing, and acclimatisation
-    breaks: List[Dict[str, str]] = []
+    breaks: list[dict[str, str]] = []
     # Morning break
     m_hour = min(start_h + 2, 11)
     m_dur = (30 if (met >= 7.0 or max_shift_wbgt >= 30.0) else 20) + acclim_break_extra
-    breaks.append({
-        "start": f"{m_hour:02d}:00",
-        "end": f"{m_hour:02d}:{m_dur:02d}",
-        "duration": f"{m_dur} min",
-        "reason": "Mid-morning hydration & physiological recovery" + (" (extended: unacclimatised/heavy exertion)" if (met >= 7.0 or not acclimatised) else ""),
-    })
+    breaks.append(
+        {
+            "start": f"{m_hour:02d}:00",
+            "end": f"{m_hour:02d}:{m_dur:02d}",
+            "duration": f"{m_dur} min",
+            "reason": "Mid-morning hydration & physiological recovery"
+            + (
+                " (extended: unacclimatised/heavy exertion)"
+                if (met >= 7.0 or not acclimatised)
+                else ""
+            ),
+        }
+    )
 
     # Peak afternoon break
-    p_dur = (90 if (met >= 7.0 or exposure.lower() == "sun" or max_shift_wbgt >= 32.0) else 75) + acclim_break_extra
+    p_dur = (
+        90 if (met >= 7.0 or exposure.lower() == "sun" or max_shift_wbgt >= 32.0) else 75
+    ) + acclim_break_extra
     p_end_min = (15 + (p_dur - 75)) % 60
     p_end_hr = 14 + ((15 + (p_dur - 75)) // 60)
-    breaks.append({
-        "start": "13:00",
-        "end": f"{p_end_hr:02d}:{p_end_min:02d}",
-        "duration": f"{p_dur} min",
-        "reason": "Peak diurnal solar irradiance suspension" + (" (extended for sun exposure / PPE / unacclimatised)" if (met >= 7.0 or exposure.lower() == "sun" or not acclimatised) else ""),
-    })
+    breaks.append(
+        {
+            "start": "13:00",
+            "end": f"{p_end_hr:02d}:{p_end_min:02d}",
+            "duration": f"{p_dur} min",
+            "reason": "Peak diurnal solar irradiance suspension"
+            + (
+                " (extended for sun exposure / PPE / unacclimatised)"
+                if (met >= 7.0 or exposure.lower() == "sun" or not acclimatised)
+                else ""
+            ),
+        }
+    )
 
     # Late afternoon break
     if end_h >= 16:
         a_dur = (30 if (met >= 7.0 or max_shift_wbgt >= 30.0) else 20) + acclim_break_extra
-        breaks.append({
-            "start": "15:45",
-            "end": f"16:{5 + (a_dur - 20):02d}",
-            "duration": f"{a_dur} min",
-            "reason": "Afternoon electrolytic replenishment",
-        })
+        breaks.append(
+            {
+                "start": "15:45",
+                "end": f"16:{5 + (a_dur - 20):02d}",
+                "duration": f"{a_dur} min",
+                "reason": "Afternoon electrolytic replenishment",
+            }
+        )
 
     return {
         "location_id": location_id,

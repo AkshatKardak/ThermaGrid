@@ -5,15 +5,15 @@ Thermal indices package containing reference implementations for:
 - Heat Index (HI) via Rothfusz (1990) & Steadman (1979)
 """
 
-from .wbgt import calculate_wbgt, calculate_wet_bulb_stull, estimate_globe_temperature
-from .utci import calculate_utci, estimate_mean_radiant_temperature
 from .heat_index import calculate_heat_index
+from .utci import calculate_utci, estimate_mean_radiant_temperature
+from .wbgt import calculate_wbgt, calculate_wet_bulb_stull, estimate_globe_temperature
 
 __all__ = [
+    "calculate_heat_index",
+    "calculate_utci",
     "calculate_wbgt",
     "calculate_wet_bulb_stull",
     "estimate_globe_temperature",
-    "calculate_utci",
     "estimate_mean_radiant_temperature",
-    "calculate_heat_index",
 ]

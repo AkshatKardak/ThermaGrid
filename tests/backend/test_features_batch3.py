@@ -1,8 +1,8 @@
-from fastapi.testclient import TestClient
 from app.main import app
-import pytest
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
+
 
 def test_risk_current_imd_and_countdown_fields():
     resp = client.get("/api/v1/risk/current?location_id=1")
@@ -35,7 +35,9 @@ def test_cooling_centre_gap_analysis():
 
 
 def test_worker_shift_card_with_clothing_and_acclimatisation():
-    resp = client.get("/api/v1/worker/shift-card?location_id=1&activity=heavy&exposure=direct_sun&clothing=heavy&acclimatised=false")
+    resp = client.get(
+        "/api/v1/worker/shift-card?location_id=1&activity=heavy&exposure=direct_sun&clothing=heavy&acclimatised=false"
+    )
     assert resp.status_code == 200
     data = resp.json()
     assert data["clothing"] == "heavy"
@@ -50,7 +52,7 @@ def test_intervention_plan_greedy_and_outcomes():
         "budget_inr": 500000,
         "available_cooling_buses": 3,
         "mist_canons": 2,
-        "cool_roof_paint_sqm": 2000
+        "cool_roof_paint_sqm": 2000,
     }
     resp = client.post("/api/v1/interventions/plan", json=payload)
     assert resp.status_code == 200

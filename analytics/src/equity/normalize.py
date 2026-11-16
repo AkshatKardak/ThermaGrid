@@ -2,15 +2,13 @@
 Feature Normalization for Composite Equity Indexing.
 """
 
-from typing import List, Optional
 import numpy as np
 
 
-def min_max_normalize(values: List[Optional[float]], default: float = 0.5) -> List[float]:
+def min_max_normalize(values: list[float | None], default: float = 0.5) -> list[float]:
     """Scales a list of floats to [0, 1]. Replaces None/NaN with default (0.5), returns 0.5 if range is zero."""
     clean_vals = [
-        float(v) if (v is not None and not np.isnan(float(v))) else default
-        for v in values
+        float(v) if (v is not None and not np.isnan(float(v))) else default for v in values
     ]
     if not clean_vals:
         return []

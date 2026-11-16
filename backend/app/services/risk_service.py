@@ -4,26 +4,32 @@ Composes Hazard, Exposure, and Vulnerability using the analytics risk package.
 Generates deterministic factor breakdown and natural-language explanations.
 """
 
-import sys
 import os
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timezone
+import sys
+from datetime import UTC, datetime
+from typing import Any
+
 from sqlalchemy.orm import Session
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
 from src.risk.scoring import compute_composite_risk
-from app.services.thermal_service import ThermalService
-from app.services.weather_service import WeatherService
+
 from app.models.location import Location
 from app.models.risk import RiskConfig
 from app.schemas.provenance import create_provenance
+from app.services.thermal_service import ThermalService
+from app.services.weather_service import WeatherService
 
 
 class RiskService:
     @staticmethod
-    def get_current_risk(db: Session, location_id: int, include_forecast: bool = True) -> Dict[str, Any]:
+    def get_current_risk(
+        db: Session, location_id: int, include_forecast: bool = True
+    ) -> dict[str, Any]:
         """
         Computes current comprehensive thermal risk score for a specific ward.
         """
@@ -41,10 +47,20 @@ class RiskService:
         w_exposure = config.weight_exposure if config else 0.25
         w_vulnerability = config.weight_vulnerability if config else 0.25
 
-        canopy = location.tree_canopy_fraction if location.tree_canopy_fraction is not None else 0.15
-        informal = location.informal_settlement_ratio if location.informal_settlement_ratio is not None else 0.30
-        cooling = location.cooling_access_deficit if location.cooling_access_deficit is not None else 0.40
-        outdoor = location.outdoor_worker_ratio if location.outdoor_worker_ratio is not None else 0.25
+        canopy = (
+            location.tree_canopy_fraction if location.tree_canopy_fraction is not None else 0.15
+        )
+        informal = (
+            location.informal_settlement_ratio
+            if location.informal_settlement_ratio is not None
+            else 0.30
+        )
+        cooling = (
+            location.cooling_access_deficit if location.cooling_access_deficit is not None else 0.40
+        )
+        outdoor = (
+            location.outdoor_worker_ratio if location.outdoor_worker_ratio is not None else 0.25
+        )
         elderly = location.elderly_ratio if location.elderly_ratio is not None else 0.08
         children = location.children_ratio if location.children_ratio is not None else 0.07
 
@@ -91,7 +107,10 @@ class RiskService:
         }
 
         # IMD Classification (Aligned with IMD HAP standards & coastal thresholds)
-        is_coastal = any(c.lower() in (location.city or "").lower() for c in ["mumbai", "chennai", "kolkata", "surat", "kochi", "coastal"])
+        is_coastal = any(
+            c.lower() in (location.city or "").lower()
+            for c in ["mumbai", "chennai", "kolkata", "surat", "kochi", "coastal"]
+        )
         temp_val = weather["temperature_c"]
         wbgt_val = thermal["wbgt_c"]
         score_val = risk_calc["risk_score"]
@@ -111,7 +130,9 @@ class RiskService:
 
         # Consecutive hot days (Tmax >= 40C or coastal >= 37C) and hot nights (Tmin >= 25C)
         hot_threshold = 37.0 if is_coastal else 40.0
-        consecutive_hot_days = 2 if temp_val >= hot_threshold else (1 if temp_val >= hot_threshold - 2.0 else 0)
+        consecutive_hot_days = (
+            2 if temp_val >= hot_threshold else (1 if temp_val >= hot_threshold - 2.0 else 0)
+        )
         consecutive_hot_nights = 2 if temp_val >= 28.0 else (1 if temp_val >= 25.0 else 0)
 
         # Hours to threshold (countdown to reaching risk >= 70)
@@ -121,6 +142,7 @@ class RiskService:
         elif include_forecast:
             try:
                 from app.services.forecast_service import ForecastService
+
                 fc = ForecastService.get_risk_forecast(db, location_id, days=2)
                 for h_idx, itm in enumerate(fc.get("items", [])[:36]):
                     s = itm.get("predicted_risk_score") or itm.get("risk_score") or 0.0
@@ -137,7 +159,7 @@ class RiskService:
             "ward_code": location.ward_code,
             "level": location.level or "ward",
             "parent_code": location.parent_code,
-            "calculated_for": datetime.now(timezone.utc),
+            "calculated_for": datetime.now(UTC),
             "risk_score": risk_calc["risk_score"],
             "band": risk_calc["band"],
             "band_label": risk_calc["band_label"],
@@ -152,11 +174,14 @@ class RiskService:
             "utci_c": thermal["utci_c"],
             "confidence": confidence,
             "sub_scores": sub_scores,
-            "diagnostics": risk_calc.get("diagnostics", {
-                "utci_c": thermal["utci_c"],
-                "heat_index_c": thermal.get("heat_index_c", 0.0),
-                "temperature_c": weather["temperature_c"],
-            }),
+            "diagnostics": risk_calc.get(
+                "diagnostics",
+                {
+                    "utci_c": thermal["utci_c"],
+                    "heat_index_c": thermal.get("heat_index_c", 0.0),
+                    "temperature_c": weather["temperature_c"],
+                },
+            ),
             "is_demo": risk_calc["is_demo"],
             "demo_label": weather["demo_label"],
             "provenance": create_provenance(
@@ -175,8 +200,8 @@ class RiskService:
 
     @staticmethod
     def get_all_wards_risk(
-        db: Session, city: Optional[str] = None, level: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+        db: Session, city: str | None = None, level: str | None = None
+    ) -> list[dict[str, Any]]:
         """
         Retrieves current risk ranking across locations.
         Never mixes levels inside one aggregate.

@@ -2,7 +2,8 @@
 Pydantic schemas for Cooling Centres.
 """
 
-from typing import List, Optional, Any, Dict
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -11,25 +12,25 @@ class CoolingCentreOut(BaseModel):
     name: str
     facility_type: str
     city: str
-    ward_name: Optional[str] = None
+    ward_name: str | None = None
     address: str
     latitude: float
     longitude: float
     capacity_persons: int
-    capacity: Optional[int] = None
+    capacity: int | None = None
     current_occupancy: int
-    amenities: Optional[List[str]] = None
+    amenities: list[str] | None = None
     operating_hours: str
-    opening_hours: Optional[Dict[str, Any]] = None
+    opening_hours: dict[str, Any] | None = None
     contact_phone: str
-    phone: Optional[str] = None
+    phone: str | None = None
     current_status: str = "open"  # open | closed | unknown
     is_open_now: bool = True
     is_free: bool = True
-    distance_km: Optional[float] = None
-    walk_minutes: Optional[int] = None
-    directions_url: Optional[str] = None
+    distance_km: float | None = None
+    walk_minutes: int | None = None
+    directions_url: str | None = None
     is_demo: bool = False
-    demo_label: Optional[str] = None
+    demo_label: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

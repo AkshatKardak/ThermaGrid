@@ -12,7 +12,7 @@ Citations:
    Heat Index Equation and Guidelines.
 """
 
-from typing import Dict, Any
+from typing import Any
 
 
 def celsius_to_fahrenheit(c: float) -> float:
@@ -28,7 +28,7 @@ def fahrenheit_to_celsius(f: float) -> float:
 def calculate_heat_index(
     temp_c: float,
     rel_humidity_pct: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Calculates the NWS Heat Index (apparent temperature) in °C using the Rothfusz regression.
 
@@ -119,7 +119,9 @@ def calculate_heat_index(
     elif 41.0 <= hi_c < 54.0:
         category = "Danger"
         risk_level = "veryhigh"
-        warning = "Heat cramps or exhaustion likely, and heat stroke possible with continued exposure."
+        warning = (
+            "Heat cramps or exhaustion likely, and heat stroke possible with continued exposure."
+        )
     else:
         category = "Extreme Danger"
         risk_level = "extreme"

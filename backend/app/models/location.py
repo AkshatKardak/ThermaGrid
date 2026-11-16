@@ -3,8 +3,10 @@ Location and Ward ORM models with demographic, built-environment,
 and vulnerability attributes.
 """
 
-from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text, JSON, Index
+from datetime import UTC, datetime
+
+from sqlalchemy import JSON, Column, DateTime, Float, Index, Integer, String, Text
+
 from app.db.base import Base
 
 
@@ -26,7 +28,7 @@ class Location(Base):
     max_lat = Column(Float, nullable=True, index=True)
     min_lng = Column(Float, nullable=True, index=True)
     max_lng = Column(Float, nullable=True, index=True)
-    
+
     # Hierarchy Tier: 'state' | 'district' | 'ward'
     level = Column(String(20), nullable=False, default="ward", server_default="ward", index=True)
     parent_code = Column(String(50), nullable=True, index=True)
@@ -46,7 +48,7 @@ class Location(Base):
     # GeoJSON Boundary (Polygon or MultiPolygon)
     geometry_geojson = Column(JSON, nullable=True)
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
 
     __table_args__ = (
         Index("idx_locations_spatial_bbox", "min_lat", "max_lat", "min_lng", "max_lng"),

@@ -2,22 +2,21 @@
 Data validation and physical quality control module.
 """
 
-from typing import Dict, Any, Tuple, Optional
-
+from typing import Any
 
 # Physical realistic bounds for meteorological variables in India
 PHYSICAL_BOUNDS = {
-    "temperature_c": (-5.0, 56.0),         # Lowest recorded plains vs highest Phalodi 51.0°C
+    "temperature_c": (-5.0, 56.0),  # Lowest recorded plains vs highest Phalodi 51.0°C
     "rel_humidity_pct": (0.0, 100.0),
-    "wind_speed_ms": (0.0, 65.0),          # Up to severe cyclonic gusts
-    "solar_radiation_wm2": (0.0, 1400.0),   # Solar constant upper bound
+    "wind_speed_ms": (0.0, 65.0),  # Up to severe cyclonic gusts
+    "solar_radiation_wm2": (0.0, 1400.0),  # Solar constant upper bound
     "pressure_hpa": (850.0, 1060.0),
     "wbgt_c": (0.0, 48.0),
     "utci_c": (-20.0, 65.0),
 }
 
 
-def validate_weather_observation(obs: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+def validate_weather_observation(obs: dict[str, Any]) -> tuple[bool, str | None]:
     """
     Validates that a weather observation record adheres to physical conservation laws
     and meteorological bounds.
@@ -26,12 +25,15 @@ def validate_weather_observation(obs: Dict[str, Any]) -> Tuple[bool, Optional[st
         if key in obs and obs[key] is not None:
             val = float(obs[key])
             if val < min_val or val > max_val:
-                return False, f"Variable '{key}' value {val} out of physical bounds [{min_val}, {max_val}]"
+                return (
+                    False,
+                    f"Variable '{key}' value {val} out of physical bounds [{min_val}, {max_val}]",
+                )
 
     return True, None
 
 
-def clean_and_impute_observation(obs: Dict[str, Any]) -> Dict[str, Any]:
+def clean_and_impute_observation(obs: dict[str, Any]) -> dict[str, Any]:
     """
     Cleans observation dictionary, clamping edge values and enforcing types.
     """

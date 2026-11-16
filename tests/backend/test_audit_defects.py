@@ -3,18 +3,21 @@ Audit Defect Regression Tests.
 Verifies all P0/P1 audit fixes described in specification.
 """
 
-import sys
 import os
-import pytest
+import sys
 from unittest.mock import patch
+
+import pytest
 from fastapi.testclient import TestClient
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(BASE_DIR, "backend"))
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
-from app.main import app
+from datetime import UTC
+
 from app.db.seed import seed_database
+from app.main import app
 from app.services.forecast_service import ForecastService
 
 seed_database()
@@ -27,15 +30,17 @@ def test_planner_safe_windows_filters_high_risk_hours():
     for h in range(24):
         # 14:00 is high risk (72.0), others are safe (30.0)
         risk = 72.0 if h == 14 else 30.0
-        mock_items.append({
-            "time": f"2026-05-15T{h:02d}:00:00",
-            "predicted_risk_score": risk,
-            "lower_bound": risk - 5.0,
-            "upper_bound": risk + 5.0,
-            "band": "extreme" if risk > 70 else "safe",
-            "predicted_wbgt": 33.0 if risk > 70 else 24.0,
-            "temperature_c": 38.0 if risk > 70 else 29.0,
-        })
+        mock_items.append(
+            {
+                "time": f"2026-05-15T{h:02d}:00:00",
+                "predicted_risk_score": risk,
+                "lower_bound": risk - 5.0,
+                "upper_bound": risk + 5.0,
+                "band": "extreme" if risk > 70 else "safe",
+                "predicted_wbgt": 33.0 if risk > 70 else 24.0,
+                "temperature_c": 38.0 if risk > 70 else 29.0,
+            }
+        )
 
     mock_forecast = {
         "location_id": 1,
@@ -47,14 +52,15 @@ def test_planner_safe_windows_filters_high_risk_hours():
 
     with patch.object(ForecastService, "get_risk_forecast", return_value=mock_forecast):
         # Activity with threshold 50.0 and 2-hour duration
-        resp = client.get("/api/v1/planner/safe-windows?location_id=1&activity=outdoor_run&duration_min=120&threshold=50.0")
+        resp = client.get(
+            "/api/v1/planner/safe-windows?location_id=1&activity=outdoor_run&duration_min=120&threshold=50.0"
+        )
         assert resp.status_code == 200
         data = resp.json()
         windows = data["windows"]
         # Ensure no window covers 14:00
         for w in windows:
             start_h = w["start_hour"]
-            end_h = (start_h + 2) % 24
             # If 14:00 is inside window, fail
             assert not (start_h <= 14 < start_h + 2)
             assert w["peak_risk"] < 50.0
@@ -83,7 +89,9 @@ def test_planner_no_safe_window_branch():
     }
 
     with patch.object(ForecastService, "get_risk_forecast", return_value=mock_forecast):
-        resp = client.get("/api/v1/planner/safe-windows?location_id=1&activity=outdoor_run&duration_min=60&threshold=50.0")
+        resp = client.get(
+            "/api/v1/planner/safe-windows?location_id=1&activity=outdoor_run&duration_min=60&threshold=50.0"
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert len(data["windows"]) == 0
@@ -108,8 +116,12 @@ def test_night_time_risk_returns_real_data():
 
 def test_worker_shift_card_different_met_and_exposure():
     """1.3: Worker shift card must produce different outputs for different MET and exposure."""
-    resp_shade = client.get("/api/v1/worker/shift-plan?location_id=1&met=2.0&exposure=shade&start=09:00&end=17:00")
-    resp_sun = client.get("/api/v1/worker/shift-plan?location_id=1&met=11.0&exposure=sun&start=09:00&end=17:00")
+    resp_shade = client.get(
+        "/api/v1/worker/shift-plan?location_id=1&met=2.0&exposure=shade&start=09:00&end=17:00"
+    )
+    resp_sun = client.get(
+        "/api/v1/worker/shift-plan?location_id=1&met=11.0&exposure=sun&start=09:00&end=17:00"
+    )
     assert resp_shade.status_code == 200
     assert resp_sun.status_code == 200
     d_shade = resp_shade.json()
@@ -156,10 +168,14 @@ def test_auth_test_token_backdoor_eliminated():
 
 def test_weather_outage_returns_503():
     """3.5a: Upstream weather outage returns 503 with retry_after header, not 500."""
-    from app.services.weather_service import WeatherService
     from app.core.errors import WeatherUnavailableError
+    from app.services.weather_service import WeatherService
 
-    with patch.object(WeatherService, "get_current_weather", side_effect=WeatherUnavailableError("Open-Meteo API unreachable")):
+    with patch.object(
+        WeatherService,
+        "get_current_weather",
+        side_effect=WeatherUnavailableError("Open-Meteo API unreachable"),
+    ):
         resp = client.get("/api/v1/weather/current?location_id=1")
         assert resp.status_code == 503
         data = resp.json()
@@ -193,13 +209,16 @@ def test_no_location_claims_ward_level_without_polygon():
         if loc.get("level") == "ward":
             geom = loc.get("geometry_geojson")
             assert geom is not None, f"Ward {loc['ward_code']} missing geometry"
-            assert geom.get("type") in ["Polygon", "MultiPolygon"], f"Ward {loc['ward_code']} invalid geometry type"
+            assert geom.get("type") in ["Polygon", "MultiPolygon"], (
+                f"Ward {loc['ward_code']} invalid geometry type"
+            )
             assert len(geom.get("coordinates", [])) > 0
 
 
 def test_synthetic_data_rejected_when_not_allowed_in_dev():
     """3.2: Synthetic data must be rejected for live risk unless explicitly allowed."""
     from app.core.config import get_settings
+
     settings = get_settings()
     orig = settings.allow_synthetic_risk
     try:
@@ -246,13 +265,14 @@ def test_risk_all_does_not_mix_levels():
 @pytest.mark.anyio
 async def test_background_jobs_persist_rows():
     """4.0: Scheduled jobs must persist rows to DB with correct column names (score, dispatched_at)."""
+    from datetime import datetime
+
     from app.db.session import SessionLocal
-    from app.jobs.tasks import ingest_weather, compute_thermal, evaluate_alerts
-    from app.models.weather import WeatherObservation
-    from app.models.thermal import ThermalIndex
-    from app.models.risk import RiskScore, WardRiskCurrent
+    from app.jobs.tasks import compute_thermal, evaluate_alerts, ingest_weather
     from app.models.alert import Alert
-    from datetime import datetime, timezone
+    from app.models.risk import RiskScore, WardRiskCurrent
+    from app.models.thermal import ThermalIndex
+    from app.models.weather import WeatherObservation
 
     # 1. Test ingest_weather persists at least one row
     await ingest_weather()
@@ -274,7 +294,7 @@ async def test_background_jobs_persist_rows():
     with SessionLocal() as db:
         high_risk = RiskScore(
             location_id=1,
-            calculated_for=datetime.now(timezone.utc),
+            calculated_for=datetime.now(UTC),
             score=88.5,  # >= 80.0 alert threshold
             band="extreme",
             band_label="Extreme Emergency",
@@ -282,7 +302,9 @@ async def test_background_jobs_persist_rows():
             hazard_score=90.0,
             exposure_index=0.85,
             vulnerability_index=0.80,
-            factor_breakdown_json=[{"name": "Thermal Stress", "share_pct": 80.0, "value_unit": "WBGT 34°C"}],
+            factor_breakdown_json=[
+                {"name": "Thermal Stress", "share_pct": 80.0, "value_unit": "WBGT 34°C"}
+            ],
             explanation="Extreme emergency heat risk test.",
             confidence=0.95,
             is_demo=False,
@@ -323,6 +345,7 @@ def test_spatial_index_point_in_polygon_lookup():
 def test_response_caching_hit_and_miss_headers():
     """7.3: Cached endpoints return cache: 'hit' | 'miss' headers with TTL caching."""
     from app.core.cache import response_cache
+
     response_cache.clear()
 
     # 1. Observation endpoint: /weather/current

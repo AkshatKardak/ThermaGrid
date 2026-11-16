@@ -2,18 +2,16 @@
 Unit tests for thermal indices (WBGT, UTCI, Heat Index) and Risk scoring model.
 """
 
-import sys
 import os
-import pytest
-import math
+import sys
 
 # Add root and analytics to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../analytics")))
 
-from src.thermal_indices.wbgt import calculate_wbgt, calculate_wet_bulb_stull
-from src.thermal_indices.utci import calculate_utci
-from src.thermal_indices.heat_index import calculate_heat_index
 from src.risk.scoring import compute_composite_risk
+from src.thermal_indices.heat_index import calculate_heat_index
+from src.thermal_indices.utci import calculate_utci
+from src.thermal_indices.wbgt import calculate_wbgt, calculate_wet_bulb_stull
 
 
 def test_stull_wet_bulb_known_values():
@@ -75,7 +73,12 @@ def test_utci_stress_scaling():
     Verify UTCI scales appropriately with temperature and radiation.
     At 40°C air temperature with 700 W/m² radiation, UTCI must indicate strong/extreme heat stress.
     """
-    res = calculate_utci(temp_c=40.0, rel_humidity_pct=50.0, wind_speed_10m_ms=1.5, solar_radiation_wm2=700.0)
+    res = calculate_utci(
+        temp_c=40.0,
+        rel_humidity_pct=50.0,
+        wind_speed_10m_ms=1.5,
+        solar_radiation_wm2=700.0,
+    )
     assert res["utci"] >= 38.0
     assert res["risk_level"] in ["veryhigh", "extreme"]
 
@@ -125,4 +128,7 @@ def test_two_wards_same_temperature_different_risk():
     assert risk_govandi["band"] in ["veryhigh", "extreme"]
     assert risk_colaba["band"] in ["moderate", "high"]
     assert len(risk_govandi["factor_breakdown"]) >= 5
-    assert "informal" in risk_govandi["explanation"].lower() or "thermal" in risk_govandi["explanation"].lower()
+    assert (
+        "informal" in risk_govandi["explanation"].lower()
+        or "thermal" in risk_govandi["explanation"].lower()
+    )

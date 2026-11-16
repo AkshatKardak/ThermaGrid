@@ -3,21 +3,22 @@ Care Circle (Dependents) routes.
 Allows users to register loved ones and watch their ward's thermal stress.
 """
 
-from typing import List, Dict, Any
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.db.session import get_db
 from app.core.auth import get_current_user
+from app.db.session import get_db
 from app.models.dependent import Dependent
 from app.models.location import Location
-from app.services.risk_service import RiskService
 from app.schemas.dependent import DependentCreate, DependentOut
+from app.services.risk_service import RiskService
 
 router = APIRouter(prefix="/dependents", tags=["Care Circle"])
 
 
-def _enrich_dependent(dep: Dependent, db: Session) -> Dict[str, Any]:
+def _enrich_dependent(dep: Dependent, db: Session) -> dict[str, Any]:
     ward_name = None
     risk_score = None
     band = "moderate"
@@ -52,7 +53,7 @@ def _enrich_dependent(dep: Dependent, db: Session) -> Dict[str, Any]:
 @router.post("", response_model=DependentOut, status_code=status.HTTP_201_CREATED)
 def create_dependent(
     payload: DependentCreate,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -60,11 +61,16 @@ def create_dependent(
     """
     user_id = current_user.get("sub")
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session token"
+        )
 
     name = payload.name.strip()
     if not name:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Name cannot be empty")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Name cannot be empty",
+        )
 
     new_dep = Dependent(
         clerk_user_id=user_id,
@@ -80,9 +86,9 @@ def create_dependent(
     return _enrich_dependent(new_dep, db)
 
 
-@router.get("", response_model=List[DependentOut])
+@router.get("", response_model=list[DependentOut])
 def list_my_dependents(
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -90,7 +96,9 @@ def list_my_dependents(
     """
     user_id = current_user.get("sub")
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session token"
+        )
 
     deps = db.query(Dependent).filter(Dependent.clerk_user_id == user_id).all()
     return [_enrich_dependent(d, db) for d in deps]
@@ -99,7 +107,7 @@ def list_my_dependents(
 @router.delete("/{dependent_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_dependent(
     dependent_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -116,4 +124,3 @@ def delete_dependent(
 
     db.delete(dep)
     db.commit()
-    return None

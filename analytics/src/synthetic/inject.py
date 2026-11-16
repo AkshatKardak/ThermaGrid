@@ -2,17 +2,18 @@
 Synthetic Anomaly, Heatwave, and Sensor Fault Injector for Data Quality Stress Testing.
 """
 
-from typing import List, Dict, Any
 import copy
+from typing import Any
+
 import numpy as np
 
 
 def inject_heatwave_spell(
-    records: List[Dict[str, Any]],
+    records: list[dict[str, Any]],
     start_index: int = 48,
     duration_hours: int = 72,
     temp_boost_c: float = 4.5,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Injects a multi-day heatwave spell into a series."""
     series = copy.deepcopy(records)
     end = min(len(series), start_index + duration_hours)
@@ -23,11 +24,11 @@ def inject_heatwave_spell(
 
 
 def inject_sensor_spikes(
-    records: List[Dict[str, Any]],
+    records: list[dict[str, Any]],
     count: int = 3,
     spike_magnitude_c: float = 16.0,
     seed: int = 999,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Injects unphysical sensor spikes into telemetry."""
     series = copy.deepcopy(records)
     rng = np.random.default_rng(seed)
@@ -39,10 +40,10 @@ def inject_sensor_spikes(
 
 
 def inject_sensor_flatline(
-    records: List[Dict[str, Any]],
+    records: list[dict[str, Any]],
     start_index: int = 30,
     duration_hours: int = 14,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Injects a frozen/flatlined sensor reading."""
     series = copy.deepcopy(records)
     end = min(len(series), start_index + duration_hours)
@@ -54,10 +55,10 @@ def inject_sensor_flatline(
 
 
 def inject_missing_gaps(
-    records: List[Dict[str, Any]],
+    records: list[dict[str, Any]],
     start_index: int = 12,
     duration_hours: int = 6,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Simulates communication outage / data dropouts."""
     series = copy.deepcopy(records)
     end = min(len(series), start_index + duration_hours)

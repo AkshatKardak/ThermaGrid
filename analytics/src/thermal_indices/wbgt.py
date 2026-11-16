@@ -16,8 +16,8 @@ Citations:
    50(4), 267-278.
 """
 
-from typing import Dict, Any, Optional
 import math
+from typing import Any
 
 
 def calculate_wet_bulb_stull(temp_c: float, rel_humidity_pct: float) -> float:
@@ -63,7 +63,7 @@ def estimate_globe_temperature(
     temp_c: float,
     wind_speed_ms: float,
     solar_radiation_wm2: float = 0.0,
-    zenith_angle_deg: Optional[float] = None,
+    zenith_angle_deg: float | None = None,
 ) -> float:
     """
     Estimates black globe temperature Tg (°C) using a documented approximation of
@@ -113,7 +113,7 @@ def calculate_wbgt(
     solar_radiation_wm2: float = 0.0,
     is_outdoor: bool = True,
     clothing_adjustment: float = 0.0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Calculates Wet Bulb Globe Temperature (WBGT) following ISO 7243:2017.
 
@@ -163,19 +163,27 @@ def calculate_wbgt(
         risk_level = "safe"
     elif 26.0 <= effective_wbgt < 28.0:
         category = "Caution"
-        work_rest_guidance = "75% work / 25% rest cycle (45 min work / 15 min rest). Hydrate 500ml/hr."
+        work_rest_guidance = (
+            "75% work / 25% rest cycle (45 min work / 15 min rest). Hydrate 500ml/hr."
+        )
         risk_level = "moderate"
     elif 28.0 <= effective_wbgt < 30.0:
         category = "High Risk"
-        work_rest_guidance = "50% work / 50% rest cycle (30 min work / 30 min rest). Mandatory shaded rest."
+        work_rest_guidance = (
+            "50% work / 50% rest cycle (30 min work / 30 min rest). Mandatory shaded rest."
+        )
         risk_level = "high"
     elif 30.0 <= effective_wbgt < 32.2:
         category = "Very High Risk"
-        work_rest_guidance = "25% work / 75% rest cycle (15 min work / 45 min rest). Active cooling required."
+        work_rest_guidance = (
+            "25% work / 75% rest cycle (15 min work / 45 min rest). Active cooling required."
+        )
         risk_level = "veryhigh"
     else:
         category = "Extreme / Stop Work"
-        work_rest_guidance = "Cease outdoor heavy physical work. Heat stroke imminent under sustained exposure."
+        work_rest_guidance = (
+            "Cease outdoor heavy physical work. Heat stroke imminent under sustained exposure."
+        )
         risk_level = "extreme"
 
     return {

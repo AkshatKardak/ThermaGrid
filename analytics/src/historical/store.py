@@ -2,37 +2,39 @@
 Historical Time-Series Store Interface.
 """
 
-from typing import List, Dict, Any, Optional
 from datetime import datetime
+from typing import Any
+
 import pandas as pd
 
 
 class HistoricalDataUnavailable(Exception):
     """Raised when no historical observations exist for a queried location/timerange."""
-    pass
 
 
 class HistoricalStore:
     """In-memory and cached repository for historical weather records."""
-    
+
     def __init__(self, db: Any = None):
-        self._records: Dict[str, List[Dict[str, Any]]] = {}
+        self._records: dict[str, list[dict[str, Any]]] = {}
         self.db = db
-        
-    def add_records(self, location_id: str, records: List[Dict[str, Any]]) -> None:
+
+    def add_records(self, location_id: str, records: list[dict[str, Any]]) -> None:
         if location_id not in self._records:
             self._records[location_id] = []
         self._records[location_id].extend(records)
-        
+
     def get_records(
         self,
         location_id: str,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-    ) -> List[Dict[str, Any]]:
+        start_date: str | None = None,
+        end_date: str | None = None,
+    ) -> list[dict[str, Any]]:
         recs = self._records.get(location_id, [])
         if not recs:
-            raise HistoricalDataUnavailable(f"No historical records found for location {location_id}")
+            raise HistoricalDataUnavailable(
+                f"No historical records found for location {location_id}"
+            )
         return recs
 
     def read_range(self, location_id: int, start: datetime, end: datetime) -> pd.DataFrame:
@@ -45,7 +47,9 @@ class HistoricalStore:
 
         from app.models.weather import WeatherObservation
 
-        start_naive = start.replace(tzinfo=None) if hasattr(start, "tzinfo") and start.tzinfo else start
+        start_naive = (
+            start.replace(tzinfo=None) if hasattr(start, "tzinfo") and start.tzinfo else start
+        )
         end_naive = end.replace(tzinfo=None) if hasattr(end, "tzinfo") and end.tzinfo else end
 
         col = getattr(WeatherObservation, "observed_at", None)
@@ -79,13 +83,15 @@ class HistoricalStore:
             if is_syn is None:
                 is_syn = getattr(r, "is_demo", False)
 
-            data.append({
-                "observed_at": obs_time,
-                "temperature_c": r.temperature_c,
-                "relative_humidity_pct": rh,
-                "wind_speed_ms": r.wind_speed_ms,
-                "solar_radiation_wm2": r.solar_radiation_wm2,
-                "is_synthetic": is_syn,
-            })
+            data.append(
+                {
+                    "observed_at": obs_time,
+                    "temperature_c": r.temperature_c,
+                    "relative_humidity_pct": rh,
+                    "wind_speed_ms": r.wind_speed_ms,
+                    "solar_radiation_wm2": r.solar_radiation_wm2,
+                    "is_synthetic": is_syn,
+                }
+            )
 
         return pd.DataFrame(data)

@@ -14,8 +14,8 @@ Citations:
    Universal Thermal Climate Index (UTCI). Geographia Polonica, 86(1), 5-10.
 """
 
-from typing import Dict, Any, Optional
 import math
+from typing import Any
 
 
 def calculate_vapor_pressure_hpa(temp_c: float, rel_humidity_pct: float) -> float:
@@ -61,8 +61,8 @@ def calculate_utci(
     rel_humidity_pct: float,
     wind_speed_10m_ms: float = 1.0,
     solar_radiation_wm2: float = 0.0,
-    mean_radiant_temp_c: Optional[float] = None,
-) -> Dict[str, Any]:
+    mean_radiant_temp_c: float | None = None,
+) -> dict[str, Any]:
     """
     Calculates the Universal Thermal Climate Index (UTCI) using the Bröde et al. (2012)
     operational polynomial approximation of the UTCI-Fiala multi-node thermoregulation model.
@@ -134,15 +134,21 @@ def calculate_utci(
     if utci_val > 46.0:
         category = "Extreme heat stress"
         risk_level = "extreme"
-        physiological_impact = "Acute risk of hyperthermia and heat stroke; core body temperature increases rapidly."
+        physiological_impact = (
+            "Acute risk of hyperthermia and heat stroke; core body temperature increases rapidly."
+        )
     elif 38.0 < utci_val <= 46.0:
         category = "Very strong heat stress"
         risk_level = "veryhigh"
-        physiological_impact = "Severe cardiovascular strain; profuse sweating and thermal discomfort."
+        physiological_impact = (
+            "Severe cardiovascular strain; profuse sweating and thermal discomfort."
+        )
     elif 32.0 < utci_val <= 38.0:
         category = "Strong heat stress"
         risk_level = "high"
-        physiological_impact = "Moderate to heavy sweating; elevated physiological strain during physical exertion."
+        physiological_impact = (
+            "Moderate to heavy sweating; elevated physiological strain during physical exertion."
+        )
     elif 26.0 < utci_val <= 32.0:
         category = "Moderate heat stress"
         risk_level = "moderate"

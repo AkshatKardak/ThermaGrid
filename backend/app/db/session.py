@@ -3,11 +3,13 @@ Database engine and session management with PostgreSQL/PostGIS support
 and graceful SQLite fallback for local development without active Docker container.
 """
 
-import os
 import logging
-from typing import Generator
+import os
+from collections.abc import Generator
+
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
+
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -40,6 +42,7 @@ else:
     except Exception as e:
         if settings.app_env == "production" and not settings.allow_sqlite_fallback:
             import urllib.parse
+
             parsed = urllib.parse.urlparse(db_url)
             host = parsed.hostname or "unknown-host"
             logger.critical(

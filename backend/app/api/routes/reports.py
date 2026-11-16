@@ -2,8 +2,8 @@
 Reports and compliance exports API route.
 """
 
-from typing import Optional
-from fastapi import APIRouter, Query, Response, status
+from fastapi import APIRouter, Query, Response
+
 from app.services.reports.hap_report import generate_hap_compliance_pdf
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
@@ -11,8 +11,12 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 
 @router.get("/hap")
 def get_hap_compliance_report(
-    from_date: Optional[str] = Query(None, alias="from", description="Start date YYYY-MM-DD or DD Month YYYY"),
-    to_date: Optional[str] = Query(None, alias="to", description="End date YYYY-MM-DD or DD Month YYYY"),
+    from_date: str | None = Query(
+        None, alias="from", description="Start date YYYY-MM-DD or DD Month YYYY"
+    ),
+    to_date: str | None = Query(
+        None, alias="to", description="End date YYYY-MM-DD or DD Month YYYY"
+    ),
     city: str = Query("Mumbai", description="City municipal corporation"),
 ):
     """

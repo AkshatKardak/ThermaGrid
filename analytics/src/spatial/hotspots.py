@@ -2,14 +2,15 @@
 Spatial hotspot clustering and Getis-Ord Gi* / local Moran's I statistics.
 """
 
-from typing import List, Dict, Any
+from typing import Any
+
 import numpy as np
 
 
 def compute_ward_hotspots(
-    wards_data: List[Dict[str, Any]],
+    wards_data: list[dict[str, Any]],
     score_key: str = "risk_score",
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Identifies statistically significant spatial thermal risk hotspots
     among wards within an urban agglomeration.
@@ -29,7 +30,7 @@ def compute_ward_hotspots(
     for w in wards_data:
         score = float(w.get(score_key, 0.0))
         z = (score - mean_val) / std_val
-        
+
         if z >= 1.65:
             classification = "Hotspot (90%+ Confidence)"
             is_hotspot = True

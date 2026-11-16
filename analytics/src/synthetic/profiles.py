@@ -3,9 +3,9 @@ Deterministic Climate Profiles and Archetypes for Synthetic Weather Generation.
 Calibrated to Indian meteorological sub-climates.
 """
 
-from typing import Dict, Any
+from typing import Any
 
-CLIMATE_PROFILES: Dict[str, Dict[str, Any]] = {
+CLIMATE_PROFILES: dict[str, dict[str, Any]] = {
     "hot_dry": {
         "name": "Hot Semi-Arid / Inland Plains (e.g. Ahmedabad, Nagpur)",
         "t_base": 31.0,

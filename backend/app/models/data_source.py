@@ -3,8 +3,10 @@ Data Provenance and Source Registry ORM model.
 Tracks official provenance, resolution, update frequency, and licenses for all datasets.
 """
 
-from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from datetime import UTC, datetime
+
+from sqlalchemy import Column, DateTime, Integer, String, Text
+
 from app.db.base import Base
 
 
@@ -22,4 +24,4 @@ class DataSource(Base):
     variables = Column(Text, nullable=False)
     update_frequency = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))

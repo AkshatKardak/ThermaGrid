@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.services.weather_service import WeatherService
 from app.schemas.weather import WeatherCurrentOut, WeatherForecastOut
+from app.services.weather_service import WeatherService
 
 router = APIRouter(prefix="/weather", tags=["Weather"])
 

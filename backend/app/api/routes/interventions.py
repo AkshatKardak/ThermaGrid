@@ -2,17 +2,16 @@
 Heat Action Plan interventions, greedy resource optimization, and outcome tracking.
 """
 
-from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.models.location import Location
 from app.models.intervention_outcome import InterventionOutcome
-from app.services.risk_service import RiskService
+from app.models.location import Location
 from app.services.recommendation_service import get_recommendations_for_risk
+from app.services.risk_service import RiskService
 
 router = APIRouter(prefix="/interventions", tags=["Interventions"])
 
@@ -54,8 +53,8 @@ INTERVENTION_CATALOG = [
 
 class InterventionPlanRequest(BaseModel):
     budget_inr: float = Field(default=1000000.0, ge=50000.0, description="Total budget in INR")
-    city: Optional[str] = Field(default="Mumbai", description="Target municipal corporation")
-    target_ward_ids: Optional[List[int]] = Field(default=None, description="Optional target ward IDs")
+    city: str | None = Field(default="Mumbai", description="Target municipal corporation")
+    target_ward_ids: list[int] | None = Field(default=None, description="Optional target ward IDs")
 
 
 @router.post("/plan")
@@ -88,12 +87,14 @@ def create_optimal_intervention_plan(
     for loc in candidate_locations:
         try:
             r = RiskService.get_current_risk(db, loc.id, include_forecast=False)
-            ward_profiles.append({
-                "location": loc,
-                "pre_score": r["risk_score"],
-                "current_score": r["risk_score"],
-                "units_allocated": {item["type"]: 0 for item in INTERVENTION_CATALOG},
-            })
+            ward_profiles.append(
+                {
+                    "location": loc,
+                    "pre_score": r["risk_score"],
+                    "current_score": r["risk_score"],
+                    "units_allocated": {item["type"]: 0 for item in INTERVENTION_CATALOG},
+                }
+            )
         except Exception:
             continue
 
@@ -138,7 +139,9 @@ def create_optimal_intervention_plan(
         total_allocated += cost
         total_risk_delta += delta
         best_candidate["units_allocated"][itype] += 1
-        best_candidate["current_score"] = max(10.0, round(best_candidate["current_score"] - delta, 1))
+        best_candidate["current_score"] = max(
+            10.0, round(best_candidate["current_score"] - delta, 1)
+        )
 
         loc = best_candidate["location"]
         pop = loc.population or 100000
@@ -158,15 +161,17 @@ def create_optimal_intervention_plan(
             status="deployed",
         )
         db.add(outcome)
-        deployed_records.append({
-            "ward_id": loc.id,
-            "ward_name": loc.ward_name,
-            "intervention": best_action["name"],
-            "intervention_type": itype,
-            "cost_inr": cost,
-            "risk_reduction_pts": delta,
-            "new_projected_risk": best_candidate["current_score"],
-        })
+        deployed_records.append(
+            {
+                "ward_id": loc.id,
+                "ward_name": loc.ward_name,
+                "intervention": best_action["name"],
+                "intervention_type": itype,
+                "cost_inr": cost,
+                "risk_reduction_pts": delta,
+                "new_projected_risk": best_candidate["current_score"],
+            }
+        )
 
     db.commit()
 
@@ -187,8 +192,8 @@ def create_optimal_intervention_plan(
 @router.get("/outcomes")
 def get_intervention_outcomes(
     limit: int = Query(50, ge=1, le=200),
-    city: Optional[str] = Query(None),
-    state: Optional[str] = Query(None),
+    city: str | None = Query(None),
+    state: str | None = Query(None),
     db: Session = Depends(get_db),
 ):
     """
@@ -203,12 +208,7 @@ def get_intervention_outcomes(
         if state:
             query = query.filter(func.lower(Location.state) == state.strip().lower())
 
-    records = (
-        query
-        .order_by(InterventionOutcome.created_at.desc())
-        .limit(limit)
-        .all()
-    )
+    records = query.order_by(InterventionOutcome.created_at.desc()).limit(limit).all()
 
     total_spent = sum(r.cost_inr for r in records)
     total_delta = sum(r.risk_delta for r in records)
@@ -249,7 +249,11 @@ def get_interventions_for_location(location_id: int, db: Session = Depends(get_d
     current risk band and dominant vulnerability drivers.
     """
     risk_info = RiskService.get_current_risk(db, location_id)
-    top_driver = risk_info["factor_breakdown"][0]["name"] if risk_info["factor_breakdown"] else "Thermal Hazard"
+    top_driver = (
+        risk_info["factor_breakdown"][0]["name"]
+        if risk_info["factor_breakdown"]
+        else "Thermal Hazard"
+    )
 
     recs = get_recommendations_for_risk(
         risk_band=risk_info["band"],

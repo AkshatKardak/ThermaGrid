@@ -5,18 +5,18 @@ computes true validation metrics (MAE, RMSE, R²), compares against baseline,
 and saves model artifact and metrics.json.
 """
 
-import sys
 import os
-import math
+import sys
+
 import numpy as np
 
 # Ensure analytics package is on path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
-from src.thermal_indices.wbgt import calculate_wbgt
 from src.forecasting.baseline import ThermalBaselineModel
-from src.forecasting.model import ThermalForecastPipeline, FEATURE_NAMES
+from src.forecasting.model import ThermalForecastPipeline
+from src.thermal_indices.wbgt import calculate_wbgt
 
 
 def generate_empirical_training_dataset(num_samples: int = 1500) -> tuple:
@@ -26,7 +26,7 @@ def generate_empirical_training_dataset(num_samples: int = 1500) -> tuple:
     Ground-truth WBGT is calculated using the rigorous ISO 7243 & Stull formulas.
     """
     np.random.seed(42)
-    
+
     # Simulating hours across months March - June (day 60 to 180)
     days = np.random.uniform(60, 180, num_samples)
     hours = np.random.uniform(0, 24, num_samples)
@@ -71,7 +71,7 @@ def generate_empirical_training_dataset(num_samples: int = 1500) -> tuple:
             is_outdoor=True,
         )
         y_wbgt.append(res["wbgt"])
-        
+
         # Lag WBGT
         res_lag = calculate_wbgt(
             temp_c=temp_lags[i],
@@ -89,20 +89,22 @@ def generate_empirical_training_dataset(num_samples: int = 1500) -> tuple:
     # ["temp_c", "rel_humidity_pct", "wind_speed_ms", "solar_radiation_wm2",
     #  "hour_sin", "hour_cos", "day_of_year_sin", "day_of_year_cos",
     #  "uhi_excess_c", "temp_lag1", "rh_lag1", "wbgt_lag1"]
-    X = np.column_stack([
-        temps_effective,
-        rhs,
-        winds,
-        solars,
-        hour_sin,
-        hour_cos,
-        doy_sin,
-        doy_cos,
-        uhi_deltas,
-        temp_lags,
-        rh_lags,
-        wbgt_lags,
-    ])
+    X = np.column_stack(
+        [
+            temps_effective,
+            rhs,
+            winds,
+            solars,
+            hour_sin,
+            hour_cos,
+            doy_sin,
+            doy_cos,
+            uhi_deltas,
+            temp_lags,
+            rh_lags,
+            wbgt_lags,
+        ]
+    )
 
     return X, y_wbgt, wbgt_lags
 
@@ -122,12 +124,16 @@ def main():
     # 1. Evaluate Persistence Baseline
     baseline = ThermalBaselineModel()
     persistence_metrics = baseline.evaluate_persistence(y_test, y_lag_test)
-    print(f"Baseline Persistence -> MAE: {persistence_metrics['mae']:.3f}°C, RMSE: {persistence_metrics['rmse']:.3f}°C, R²: {persistence_metrics['r2']:.3f}")
+    print(
+        f"Baseline Persistence -> MAE: {persistence_metrics['mae']:.3f}°C, RMSE: {persistence_metrics['rmse']:.3f}°C, R²: {persistence_metrics['r2']:.3f}"
+    )
 
     # 2. Fit and Evaluate Linear Regression Baseline
     baseline.fit_linear_baseline(X_train, y_train)
     linear_metrics = baseline.evaluate_linear_baseline(X_test, y_test)
-    print(f"Baseline Linear Model -> MAE: {linear_metrics['mae']:.3f}°C, RMSE: {linear_metrics['rmse']:.3f}°C, R²: {linear_metrics['r2']:.3f}")
+    print(
+        f"Baseline Linear Model -> MAE: {linear_metrics['mae']:.3f}°C, RMSE: {linear_metrics['rmse']:.3f}°C, R²: {linear_metrics['r2']:.3f}"
+    )
 
     # 3. Fit and Evaluate Gradient Boosting Pipeline
     pipeline = ThermalForecastPipeline()
@@ -142,8 +148,12 @@ def main():
         },
     )
 
-    print(f"Gradient Boosting Model -> MAE: {metrics['metrics']['mae']:.3f}°C, RMSE: {metrics['metrics']['rmse']:.3f}°C, R²: {metrics['metrics']['r2']:.3f}")
-    print(f"Improvement over persistence baseline: {metrics['improvement_over_baseline']['mae_reduction_pct']}% error reduction.")
+    print(
+        f"Gradient Boosting Model -> MAE: {metrics['metrics']['mae']:.3f}°C, RMSE: {metrics['metrics']['rmse']:.3f}°C, R²: {metrics['metrics']['r2']:.3f}"
+    )
+    print(
+        f"Improvement over persistence baseline: {metrics['improvement_over_baseline']['mae_reduction_pct']}% error reduction."
+    )
 
     # 4. Save Model Artifact and Metrics
     artifact_path = os.path.join(BASE_DIR, "analytics", "models", "forecast_model.pkl")

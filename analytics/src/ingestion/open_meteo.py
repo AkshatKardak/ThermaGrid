@@ -4,16 +4,15 @@ Fetches surface hourly weather: temperature, relative humidity,
 wind speed, direct normal irradiance, shortwave radiation, cloud cover.
 """
 
-from typing import Dict, Any, List, Optional
 import datetime
-import urllib.request
-import urllib.parse
 import json
+import urllib.parse
+import urllib.request
+from typing import Any
 
 
 class WeatherUnavailableError(Exception):
     """Raised when upstream meteorological data source is unreachable or fails."""
-    pass
 
 
 class OpenMeteoClient:
@@ -31,7 +30,7 @@ class OpenMeteoClient:
         forecast_days: int = 5,
         timeout_seconds: int = 6,
         allow_synthetic: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Retrieves hourly meteorological forecast from Open-Meteo.
         Variables requested:
@@ -54,6 +53,7 @@ class OpenMeteoClient:
         url = f"{self.base_url}/forecast?{urllib.parse.urlencode(params)}"
 
         import os
+
         if os.environ.get("PYTEST_CURRENT_TEST") or os.environ.get("TESTING") == "true":
             # Fast-path for unit tests to avoid 6s network timeouts per location
             fallback = self._generate_fallback_forecast(latitude, longitude, forecast_days)
@@ -74,7 +74,9 @@ class OpenMeteoClient:
                 return data
         except Exception as e:
             if not allow_synthetic:
-                raise WeatherUnavailableError(f"Open-Meteo meteorological feed unavailable: {e}") from e
+                raise WeatherUnavailableError(
+                    f"Open-Meteo meteorological feed unavailable: {e}"
+                ) from e
             # Generate fallback clearly flagged as synthetic with is_demo=True
             fallback = self._generate_fallback_forecast(latitude, longitude, forecast_days)
             fallback["is_demo"] = True
@@ -84,19 +86,19 @@ class OpenMeteoClient:
 
     def _generate_fallback_forecast(
         self, latitude: float, longitude: float, forecast_days: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Calibrated offline fallback data clearly flagged as DEMO DATA.
         """
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now(datetime.UTC)
         start_hour = now.replace(minute=0, second=0, microsecond=0)
 
-        times: List[str] = []
-        temps: List[float] = []
-        rhs: List[float] = []
-        winds: List[float] = []
-        radiations: List[float] = []
-        apparent_temps: List[float] = []
+        times: list[str] = []
+        temps: list[float] = []
+        rhs: list[float] = []
+        winds: list[float] = []
+        radiations: list[float] = []
+        apparent_temps: list[float] = []
 
         total_hours = forecast_days * 24
         # Latitude base adjustments: northern inland hotter than coastal
@@ -157,6 +159,7 @@ class OpenMeteoClient:
 def math_sin_hour(hour: int) -> float:
     """Returns 0 to 1 daylight curve for hour 6 to 18, 0 at night."""
     import math
+
     if 6 <= hour <= 18:
         fraction = (hour - 6) / 12.0
         return math.sin(fraction * math.pi)

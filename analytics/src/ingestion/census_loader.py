@@ -3,8 +3,7 @@ Demographic and socio-economic vulnerability data loader.
 Sources: Census of India, NFHS-5, Slum Rehabilitation Authority, Municipal Corporations.
 """
 
-from typing import Dict, Any, List, Optional
-
+from typing import Any
 
 # Representative ward benchmarks for key Indian metropolitan areas
 METROPOLITAN_WARD_BENCHMARKS = [
@@ -125,12 +124,12 @@ METROPOLITAN_WARD_BENCHMARKS = [
 ]
 
 
-def get_ward_demographics(ward_code: str) -> Optional[Dict[str, Any]]:
+def get_ward_demographics(ward_code: str) -> dict[str, Any] | None:
     for w in METROPOLITAN_WARD_BENCHMARKS:
         if w["ward_code"] == ward_code:
             return w
     return None
 
 
-def list_all_wards() -> List[Dict[str, Any]]:
+def list_all_wards() -> list[dict[str, Any]]:
     return METROPOLITAN_WARD_BENCHMARKS

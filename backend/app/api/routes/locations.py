@@ -2,7 +2,6 @@
 Location and Ward endpoints.
 """
 
-from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -13,10 +12,10 @@ from app.schemas.location import LocationOut
 router = APIRouter(prefix="/locations", tags=["Locations"])
 
 
-@router.get("", response_model=List[LocationOut])
+@router.get("", response_model=list[LocationOut])
 def list_locations(
-    city: Optional[str] = Query(None, description="Filter by city, e.g. Mumbai or Delhi"),
-    state: Optional[str] = Query(None, description="Filter by state"),
+    city: str | None = Query(None, description="Filter by city, e.g. Mumbai or Delhi"),
+    state: str | None = Query(None, description="Filter by state"),
     db: Session = Depends(get_db),
 ):
     """Lists all registered urban wards with geometry and demographic vulnerability parameters."""
@@ -40,17 +39,21 @@ def lookup_location_by_coordinates(
     then executes exact geometric point-in-polygon containment.
     Falls back to nearest centroid if point lies outside known polygons.
     """
-    from shapely.geometry import shape, Point
+    from shapely.geometry import Point, shape
 
     pt = Point(lng, lat)
 
     # 1. Spatial bounding box index query
-    candidates = db.query(Location).filter(
-        Location.min_lat <= lat,
-        Location.max_lat >= lat,
-        Location.min_lng <= lng,
-        Location.max_lng >= lng,
-    ).all()
+    candidates = (
+        db.query(Location)
+        .filter(
+            Location.min_lat <= lat,
+            Location.max_lat >= lat,
+            Location.min_lng <= lng,
+            Location.max_lng >= lng,
+        )
+        .all()
+    )
 
     # 2. Exact polygon containment test
     for cand in candidates:
@@ -64,6 +67,7 @@ def lookup_location_by_coordinates(
 
     # 3. If point is not contained in any polygon, return nearest location by centroid
     from analytics.src.spatial.ward_joins import haversine_distance_km
+
     all_locs = db.query(Location).all()
     if not all_locs:
         raise HTTPException(status_code=404, detail="No locations found in database")

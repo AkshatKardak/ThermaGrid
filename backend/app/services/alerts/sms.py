@@ -5,9 +5,10 @@ Never wired to automated scheduler dispatch.
 Target phone number lives strictly in .env (DEMO_ALERT_PHONE).
 """
 
-import time
 import logging
-from typing import Dict, Any, Optional
+import time
+from typing import Any
+
 import httpx
 
 from app.core.config import get_settings
@@ -21,17 +22,17 @@ _SMS_MIN_INTERVAL_SECONDS: float = 60.0
 
 class SmsRateLimitExceeded(Exception):
     """Raised when SMS dispatch is called faster than 1/minute."""
-    pass
 
 
 class SmsChannel:
     """
     Direct SMS dispatch via Textbelt HTTP API.
     """
+
     def __init__(self):
         self.settings = get_settings()
 
-    async def send(self, to: Optional[str] = None, message: str = "") -> Dict[str, Any]:
+    async def send(self, to: str | None = None, message: str = "") -> dict[str, Any]:
         global _LAST_SMS_TIMESTAMP
         now = time.time()
         elapsed = now - _LAST_SMS_TIMESTAMP
@@ -59,7 +60,9 @@ class SmsChannel:
                 logger.info(f"Textbelt SMS dispatch response: {data}")
                 return {
                     "success": data.get("success", False),
-                    "phone": target_phone[:3] + "..." + target_phone[-4:] if len(target_phone) > 7 else "***",
+                    "phone": target_phone[:3] + "..." + target_phone[-4:]
+                    if len(target_phone) > 7
+                    else "***",
                     "quota_remaining": data.get("quotaRemaining"),
                     "text_id": data.get("textId"),
                     "error": data.get("error"),

@@ -3,21 +3,25 @@ Weather service orchestrator.
 Fetches surface meteorology from Open-Meteo client or cached database observations.
 """
 
-import sys
 import os
-from typing import Dict, Any, Optional
-from datetime import datetime, timezone
+import sys
+from datetime import UTC, datetime
+from typing import Any
+
 from sqlalchemy.orm import Session
 
 # Add analytics package to sys.path
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
 from src.ingestion.open_meteo import OpenMeteoClient
-from app.models.location import Location
-from app.models.weather import WeatherObservation
+
 from app.core.config import get_settings
 from app.core.errors import DataSourceUnavailable, WeatherUnavailableError
+from app.models.location import Location
+from app.models.weather import WeatherObservation
 
 settings = get_settings()
 open_meteo_client = OpenMeteoClient(base_url=settings.OPEN_METEO_BASE_URL)
@@ -35,7 +39,9 @@ def assert_risk_inputs(obs: dict, settings) -> None:
 
 class WeatherService:
     @staticmethod
-    def get_current_weather(db: Session, location_id: int, for_risk: bool = False) -> Dict[str, Any]:
+    def get_current_weather(
+        db: Session, location_id: int, for_risk: bool = False
+    ) -> dict[str, Any]:
         """
         Retrieves current surface weather for a specific location/ward.
         """
@@ -43,10 +49,14 @@ class WeatherService:
         if not location:
             raise ValueError(f"Location ID {location_id} not found.")
 
-        allow_synth = bool(
-            getattr(settings, "allow_synthetic_risk", False)
-            or settings.app_env in ["development", "testing"]
-        ) if not for_risk else bool(getattr(settings, "allow_synthetic_risk", False))
+        allow_synth = (
+            bool(
+                getattr(settings, "allow_synthetic_risk", False)
+                or settings.app_env in ["development", "testing"]
+            )
+            if not for_risk
+            else bool(getattr(settings, "allow_synthetic_risk", False))
+        )
 
         try:
             weather_data = open_meteo_client.fetch_current_and_forecast(
@@ -66,8 +76,8 @@ class WeatherService:
             if last_obs and last_obs.recorded_at:
                 rec_at = last_obs.recorded_at
                 if rec_at.tzinfo is None:
-                    rec_at = rec_at.replace(tzinfo=timezone.utc)
-                age_minutes = int((datetime.now(timezone.utc) - rec_at).total_seconds() / 60)
+                    rec_at = rec_at.replace(tzinfo=UTC)
+                age_minutes = int((datetime.now(UTC) - rec_at).total_seconds() / 60)
                 if age_minutes <= getattr(settings, "max_observation_age_min", 180):
                     return {
                         "location_id": location.id,
@@ -124,7 +134,7 @@ class WeatherService:
             "ward_name": location.ward_name,
             "latitude": location.latitude,
             "longitude": location.longitude,
-            "recorded_at": datetime.now(timezone.utc),
+            "recorded_at": datetime.now(UTC),
             "temperature_c": float(temp),
             "rel_humidity_pct": float(rh),
             "wind_speed_ms": float(wind),
@@ -145,7 +155,7 @@ class WeatherService:
         return obs_dict
 
     @staticmethod
-    def get_weather_forecast(db: Session, location_id: int, days: int = 5) -> Dict[str, Any]:
+    def get_weather_forecast(db: Session, location_id: int, days: int = 5) -> dict[str, Any]:
         """
         Retrieves multi-day hourly forecast for a ward.
         """
@@ -182,13 +192,21 @@ class WeatherService:
 
         items = []
         for i in range(len(times)):
-            items.append({
-                "time": times[i],
-                "temperature_c": float(temps[i]),
-                "rel_humidity_pct": float(rhs[i]) if (rhs and i < len(rhs) and rhs[i] is not None) else None,
-                "wind_speed_ms": float(winds[i]) if (winds and i < len(winds) and winds[i] is not None) else None,
-                "solar_radiation_wm2": float(sols[i]) if (sols and i < len(sols) and sols[i] is not None) else None,
-            })
+            items.append(
+                {
+                    "time": times[i],
+                    "temperature_c": float(temps[i]),
+                    "rel_humidity_pct": float(rhs[i])
+                    if (rhs and i < len(rhs) and rhs[i] is not None)
+                    else None,
+                    "wind_speed_ms": float(winds[i])
+                    if (winds and i < len(winds) and winds[i] is not None)
+                    else None,
+                    "solar_radiation_wm2": float(sols[i])
+                    if (sols and i < len(sols) and sols[i] is not None)
+                    else None,
+                }
+            )
 
         is_demo = data.get("is_demo", False)
         return {

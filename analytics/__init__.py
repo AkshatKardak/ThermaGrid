@@ -2,14 +2,22 @@
 ThermaGrid Analytics Package Root.
 """
 
-from .src import thermal_indices, spatial, risk, forecasting, ingestion, cleaning, evaluation
+from .src import (
+    cleaning,
+    evaluation,
+    forecasting,
+    ingestion,
+    risk,
+    spatial,
+    thermal_indices,
+)
 
 __all__ = [
-    "thermal_indices",
-    "spatial",
-    "risk",
-    "forecasting",
-    "ingestion",
     "cleaning",
     "evaluation",
+    "forecasting",
+    "ingestion",
+    "risk",
+    "spatial",
+    "thermal_indices",
 ]

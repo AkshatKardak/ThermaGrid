@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 import jwt
 from cryptography.hazmat.primitives.asymmetric import rsa
 
@@ -26,10 +27,12 @@ class _MockJWKSClient:
 auth_module._jwks = _MockJWKSClient()
 
 from app.core.config import get_settings
+
 get_settings().allow_synthetic_risk = True
 
-from app.core.cache import response_cache
 import pytest
+from app.core.cache import response_cache
+
 
 @pytest.fixture(autouse=True)
 def clear_response_cache_fixture():

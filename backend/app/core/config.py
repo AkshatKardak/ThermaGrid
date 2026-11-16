@@ -3,9 +3,9 @@ Application configuration management using pydantic-settings.
 Reads environment variables strictly from .env and system environment.
 """
 
-from functools import lru_cache
-from typing import List
 import os
+from functools import lru_cache
+
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -75,11 +75,15 @@ class Settings(BaseSettings):
     # ML Artifacts
     model_artifact_path: str = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-        "analytics", "models", "forecast_model.pkl"
+        "analytics",
+        "models",
+        "forecast_model.pkl",
     )
     model_metrics_path: str = os.path.join(
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-        "analytics", "models", "metrics.json"
+        "analytics",
+        "models",
+        "metrics.json",
     )
 
     # Thermal Defaults
@@ -87,62 +91,113 @@ class Settings(BaseSettings):
     default_clothing_insulation: float = 0.5
 
     @property
-    def cors_origin_list(self) -> List[str]:
+    def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
     # Backward-compatibility uppercase properties
     @property
-    def APP_NAME(self) -> str: return self.app_name
+    def APP_NAME(self) -> str:
+        return self.app_name
+
     @property
-    def APP_ENV(self) -> str: return self.app_env
+    def APP_ENV(self) -> str:
+        return self.app_env
+
     @property
-    def DEBUG(self) -> bool: return self.debug
+    def DEBUG(self) -> bool:
+        return self.debug
+
     @property
-    def SCHEDULER_ENABLED(self) -> bool: return self.scheduler_enabled
+    def SCHEDULER_ENABLED(self) -> bool:
+        return self.scheduler_enabled
+
     @property
-    def ALLOW_SQLITE_FALLBACK(self) -> bool: return self.allow_sqlite_fallback
+    def ALLOW_SQLITE_FALLBACK(self) -> bool:
+        return self.allow_sqlite_fallback
+
     @property
-    def API_V1_PREFIX(self) -> str: return self.api_prefix
+    def API_V1_PREFIX(self) -> str:
+        return self.api_prefix
+
     @property
-    def API_PREFIX(self) -> str: return self.api_prefix
+    def API_PREFIX(self) -> str:
+        return self.api_prefix
+
     @property
-    def LOG_LEVEL(self) -> str: return self.log_level
+    def LOG_LEVEL(self) -> str:
+        return self.log_level
+
     @property
-    def DATABASE_URL(self) -> str: return self.database_url
+    def DATABASE_URL(self) -> str:
+        return self.database_url
+
     @property
-    def FALLBACK_SQLITE_URL(self) -> str: return self.fallback_sqlite_url
+    def FALLBACK_SQLITE_URL(self) -> str:
+        return self.fallback_sqlite_url
+
     @property
-    def CORS_ORIGINS(self) -> str: return self.cors_origins
+    def CORS_ORIGINS(self) -> str:
+        return self.cors_origins
+
     @property
-    def cors_origins_list(self) -> List[str]: return self.cors_origin_list
+    def cors_origins_list(self) -> list[str]:
+        return self.cors_origin_list
+
     @property
-    def ALERT_PROVIDER(self) -> str: return self.alert_provider
+    def ALERT_PROVIDER(self) -> str:
+        return self.alert_provider
+
     @property
-    def ALERT_THRESHOLD(self) -> float: return self.alert_threshold
+    def ALERT_THRESHOLD(self) -> float:
+        return self.alert_threshold
+
     @property
-    def ALERT_COOLDOWN_MINUTES(self) -> int: return self.alert_cooldown_minutes
+    def ALERT_COOLDOWN_MINUTES(self) -> int:
+        return self.alert_cooldown_minutes
+
     @property
-    def ALERT_MAX_PER_DAY(self) -> int: return self.alert_max_per_day
+    def ALERT_MAX_PER_DAY(self) -> int:
+        return self.alert_max_per_day
+
     @property
-    def ALERT_SEASON_BUDGET(self) -> int: return self.alert_season_budget
+    def ALERT_SEASON_BUDGET(self) -> int:
+        return self.alert_season_budget
+
     @property
-    def SMS_ENABLED(self) -> bool: return self.sms_enabled
+    def SMS_ENABLED(self) -> bool:
+        return self.sms_enabled
+
     @property
-    def TEXTBELT_KEY(self) -> str: return self.textbelt_key
+    def TEXTBELT_KEY(self) -> str:
+        return self.textbelt_key
+
     @property
-    def DEMO_ALERT_PHONE(self) -> str: return self.demo_alert_phone
+    def DEMO_ALERT_PHONE(self) -> str:
+        return self.demo_alert_phone
+
     @property
-    def OPEN_METEO_BASE_URL(self) -> str: return self.open_meteo_base_url
+    def OPEN_METEO_BASE_URL(self) -> str:
+        return self.open_meteo_base_url
+
     @property
-    def OPEN_METEO_ARCHIVE_URL(self) -> str: return self.open_meteo_archive_url
+    def OPEN_METEO_ARCHIVE_URL(self) -> str:
+        return self.open_meteo_archive_url
+
     @property
-    def MODEL_ARTIFACT_PATH(self) -> str: return self.model_artifact_path
+    def MODEL_ARTIFACT_PATH(self) -> str:
+        return self.model_artifact_path
+
     @property
-    def MODEL_METRICS_PATH(self) -> str: return self.model_metrics_path
+    def MODEL_METRICS_PATH(self) -> str:
+        return self.model_metrics_path
+
     @property
-    def WBGT_METHOD(self) -> str: return self.wbgt_method
+    def WBGT_METHOD(self) -> str:
+        return self.wbgt_method
+
     @property
-    def DEFAULT_CLOTHING_INSULATION(self) -> float: return self.default_clothing_insulation
+    def DEFAULT_CLOTHING_INSULATION(self) -> float:
+        return self.default_clothing_insulation
 
 
 @lru_cache

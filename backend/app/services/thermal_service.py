@@ -3,25 +3,30 @@ Thermal Index Service orchestrator.
 Calls pure calculation functions in analytics package for WBGT, UTCI, and Heat Index.
 """
 
-import sys
 import os
-from typing import Dict, Any, List
-from datetime import datetime, timezone
+import sys
+from datetime import UTC, datetime
+from typing import Any
+
 from sqlalchemy.orm import Session
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
-from src.thermal_indices.wbgt import calculate_wbgt
-from src.thermal_indices.utci import calculate_utci
 from src.thermal_indices.heat_index import calculate_heat_index
+from src.thermal_indices.utci import calculate_utci
+from src.thermal_indices.wbgt import calculate_wbgt
+
 from app.services.weather_service import WeatherService
-from app.models.location import Location
 
 
 class ThermalService:
     @staticmethod
-    def get_current_thermal_indices(db: Session, location_id: int, for_risk: bool = False) -> Dict[str, Any]:
+    def get_current_thermal_indices(
+        db: Session, location_id: int, for_risk: bool = False
+    ) -> dict[str, Any]:
         """
         Computes current WBGT, UTCI, and Heat Index for a ward using current weather.
         """
@@ -55,7 +60,7 @@ class ThermalService:
             "location_id": weather["location_id"],
             "city": weather["city"],
             "ward_name": weather["ward_name"],
-            "calculated_for": datetime.now(timezone.utc),
+            "calculated_for": datetime.now(UTC),
             "wbgt_c": wbgt_res["wbgt"],
             "wet_bulb_c": wbgt_res["wet_bulb"],
             "globe_temp_c": wbgt_res["globe_temp"],
@@ -73,19 +78,20 @@ class ThermalService:
         }
 
     @staticmethod
-    def get_thermal_history(db: Session, location_id: int, days: int = 2) -> Dict[str, Any]:
+    def get_thermal_history(db: Session, location_id: int, days: int = 2) -> dict[str, Any]:
         """
         Hourly thermal indices computed from STORED OBSERVATIONS only.
         Never derives history from forecasts.
         """
-        from datetime import datetime, timedelta, timezone
-        from src.historical.store import HistoricalStore, HistoricalDataUnavailable
+        from datetime import datetime, timedelta
 
-        end = datetime.now(timezone.utc)
+        from src.historical.store import HistoricalDataUnavailable, HistoricalStore
+
+        end = datetime.now(UTC)
         start = end - timedelta(days=days)
 
         store = HistoricalStore(db)
-        obs = store.read_range(location_id, start, end)      # DataFrame
+        obs = store.read_range(location_id, start, end)  # DataFrame
 
         if obs is None or obs.empty:
             raise HistoricalDataUnavailable(
@@ -94,14 +100,21 @@ class ThermalService:
 
         items = []
         for row in obs.itertuples():
-            t, rh, w, s = row.temperature_c, row.relative_humidity_pct, row.wind_speed_ms, row.solar_radiation_wm2
-            items.append({
-                "time": row.observed_at.isoformat(),
-                "temperature_c": t,
-                "wbgt_c": calculate_wbgt(t, rh, w, s)["wbgt"],
-                "utci_c": calculate_utci(t, rh, w, s)["utci"],
-                "heat_index_c": calculate_heat_index(t, rh)["heat_index_c"],
-            })
+            t, rh, w, s = (
+                row.temperature_c,
+                row.relative_humidity_pct,
+                row.wind_speed_ms,
+                row.solar_radiation_wm2,
+            )
+            items.append(
+                {
+                    "time": row.observed_at.isoformat(),
+                    "temperature_c": t,
+                    "wbgt_c": calculate_wbgt(t, rh, w, s)["wbgt"],
+                    "utci_c": calculate_utci(t, rh, w, s)["utci"],
+                    "heat_index_c": calculate_heat_index(t, rh)["heat_index_c"],
+                }
+            )
 
         return {
             "location_id": location_id,

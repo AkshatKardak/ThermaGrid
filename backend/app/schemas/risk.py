@@ -2,9 +2,10 @@
 Pydantic schemas for Risk scores and forecasts.
 """
 
-from typing import List, Dict, Any, Optional
 from datetime import datetime
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel
+
 from app.schemas.provenance import ProvenanceEnvelope
 
 
@@ -19,8 +20,8 @@ class RiskCurrentOut(BaseModel):
     city: str
     ward_name: str
     ward_code: str
-    level: Optional[str] = "ward"
-    parent_code: Optional[str] = None
+    level: str | None = "ward"
+    parent_code: str | None = None
     calculated_for: datetime
     risk_score: float
     band: str
@@ -29,22 +30,22 @@ class RiskCurrentOut(BaseModel):
     hazard_score: float
     exposure_index: float
     vulnerability_index: float
-    factor_breakdown: List[FactorContribution]
+    factor_breakdown: list[FactorContribution]
     explanation: str
     temperature_c: float
     wbgt_c: float
     utci_c: float
     confidence: float
-    sub_scores: Optional[Dict[str, Optional[float]]] = None
-    diagnostics: Optional[Dict[str, float]] = None
+    sub_scores: dict[str, float | None] | None = None
+    diagnostics: dict[str, float] | None = None
     is_demo: bool = False
-    demo_label: Optional[str] = None
-    provenance: Optional[ProvenanceEnvelope] = None
-    imd_grade: Optional[str] = "NORMAL"
-    imd_label: Optional[str] = "No Warning (Normal)"
-    consecutive_hot_days: Optional[int] = 0
-    consecutive_hot_nights: Optional[int] = 0
-    hours_to_threshold: Optional[float] = None
+    demo_label: str | None = None
+    provenance: ProvenanceEnvelope | None = None
+    imd_grade: str | None = "NORMAL"
+    imd_label: str | None = "No Warning (Normal)"
+    consecutive_hot_days: int | None = 0
+    consecutive_hot_nights: int | None = 0
+    hours_to_threshold: float | None = None
 
 
 class HourlyRiskForecastItem(BaseModel):
@@ -62,11 +63,11 @@ class RiskForecastOut(BaseModel):
     city: str
     ward_name: str
     forecast_days: int
-    items: List[HourlyRiskForecastItem]
-    model_name: Optional[str] = None
-    method: Optional[str] = None
+    items: list[HourlyRiskForecastItem]
+    model_name: str | None = None
+    method: str | None = None
     is_model_backed: bool = False
-    interval_kind: Optional[str] = None
+    interval_kind: str | None = None
     is_demo: bool = False
-    demo_label: Optional[str] = None
-    provenance: Optional[ProvenanceEnvelope] = None
+    demo_label: str | None = None
+    provenance: ProvenanceEnvelope | None = None

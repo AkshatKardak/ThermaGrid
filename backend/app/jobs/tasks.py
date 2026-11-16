@@ -6,20 +6,19 @@ Background scheduled tasks for ThermaGrid:
 """
 
 import logging
-from datetime import datetime, timezone
-from sqlalchemy.orm import Session
+from datetime import UTC, datetime
 
-from app.db.session import SessionLocal
-from app.models.location import Location
-from app.models.weather import WeatherObservation
-from app.models.thermal import ThermalIndex
-from app.models.risk import RiskScore, WardRiskCurrent
-from app.models.alert import Alert
 from app.core.config import get_settings
-from app.services.alert_service import maybe_alert, dispatch_ward_alerts
-from app.services.weather_service import WeatherService
-from app.services.thermal_service import ThermalService
+from app.db.session import SessionLocal
+from app.models.alert import Alert
+from app.models.location import Location
+from app.models.risk import RiskScore, WardRiskCurrent
+from app.models.thermal import ThermalIndex
+from app.models.weather import WeatherObservation
+from app.services.alert_service import dispatch_ward_alerts, maybe_alert
 from app.services.risk_service import RiskService
+from app.services.thermal_service import ThermalService
+from app.services.weather_service import WeatherService
 
 log = logging.getLogger(__name__)
 
@@ -36,9 +35,9 @@ async def ingest_weather() -> None:
             for loc in locations:
                 try:
                     obs = WeatherService.get_current_weather(db, loc.id, for_risk=False)
-                    rec_at = obs.get("recorded_at", datetime.now(timezone.utc))
+                    rec_at = obs.get("recorded_at", datetime.now(UTC))
                     if rec_at.tzinfo is None:
-                        rec_at = rec_at.replace(tzinfo=timezone.utc)
+                        rec_at = rec_at.replace(tzinfo=UTC)
                     w_row = WeatherObservation(
                         location_id=loc.id,
                         recorded_at=rec_at,
@@ -74,7 +73,7 @@ async def compute_thermal() -> None:
                     th = ThermalService.get_current_thermal_indices(db, loc.id, for_risk=False)
                     t_row = ThermalIndex(
                         location_id=loc.id,
-                        calculated_for=datetime.now(timezone.utc),
+                        calculated_for=datetime.now(UTC),
                         wbgt_c=th["wbgt_c"],
                         wet_bulb_c=th.get("wet_bulb_c"),
                         globe_temp_c=th.get("globe_temp_c"),
@@ -90,7 +89,7 @@ async def compute_thermal() -> None:
                     r = RiskService.get_current_risk(db, loc.id)
                     risk_row = RiskScore(
                         location_id=loc.id,
-                        calculated_for=datetime.now(timezone.utc),
+                        calculated_for=datetime.now(UTC),
                         score=r["risk_score"],
                         band=r["band"],
                         band_label=r["band_label"],
@@ -106,7 +105,11 @@ async def compute_thermal() -> None:
                     db.add(risk_row)
 
                     # Maintain precomputed ward_risk_current snapshot for dashboard
-                    w_curr = db.query(WardRiskCurrent).filter(WardRiskCurrent.location_id == loc.id).first()
+                    w_curr = (
+                        db.query(WardRiskCurrent)
+                        .filter(WardRiskCurrent.location_id == loc.id)
+                        .first()
+                    )
                     if not w_curr:
                         w_curr = WardRiskCurrent(location_id=loc.id)
                         db.add(w_curr)
@@ -140,12 +143,14 @@ async def compute_thermal() -> None:
                     w_curr.consecutive_hot_days = r.get("consecutive_hot_days", 0)
                     w_curr.consecutive_hot_nights = r.get("consecutive_hot_nights", 0)
                     w_curr.hours_to_threshold = r.get("hours_to_threshold")
-                    w_curr.calculated_for = r.get("calculated_for", datetime.now(timezone.utc))
-                    w_curr.updated_at = datetime.now(timezone.utc)
+                    w_curr.calculated_for = r.get("calculated_for", datetime.now(UTC))
+                    w_curr.updated_at = datetime.now(UTC)
 
                     db.commit()
                 except Exception as ex:
-                    log.warning(f"[JOB:compute_thermal] Calculation warning for {loc.ward_name}: {ex}")
+                    log.warning(
+                        f"[JOB:compute_thermal] Calculation warning for {loc.ward_name}: {ex}"
+                    )
         log.info("[JOB:compute_thermal] Thermal indices recomputed and synchronized.")
     except Exception as e:
         log.error(f"[JOB:compute_thermal] Thermal calculation error: {e}")
@@ -157,7 +162,9 @@ async def evaluate_alerts() -> None:
     and dispatches emergency warnings via Resend / WhatsApp, persisting Alert records.
     """
     s = get_settings()
-    log.info(f"[JOB:evaluate_alerts] Evaluating emergency triggers (Threshold >= {s.alert_threshold})...")
+    log.info(
+        f"[JOB:evaluate_alerts] Evaluating emergency triggers (Threshold >= {s.alert_threshold})..."
+    )
     try:
         with SessionLocal() as db:
             high_risk_entries = (
@@ -173,14 +180,16 @@ async def evaluate_alerts() -> None:
 
                 alert_row = Alert(
                     location_id=item.location_id,
-                    alert_level="Extreme" if item.score >= 85 else ("Red" if item.score >= 70 else "Orange"),
+                    alert_level="Extreme"
+                    if item.score >= 85
+                    else ("Red" if item.score >= 70 else "Orange"),
                     title=f"Heat Emergency Trigger: {ward_name}",
                     message=f"Thermal risk score reached {int(item.score)}/100.",
                     action_directives="Suspend outdoor labor, activate misting hydration points, open municipal cooling shelters.",
                     target_audience="all",
                     channels="web,sms,whatsapp",
                     is_active=True,
-                    dispatched_at=datetime.now(timezone.utc),
+                    dispatched_at=datetime.now(UTC),
                 )
                 db.add(alert_row)
                 db.commit()

@@ -2,12 +2,11 @@
 Telemetry Data Quality Metrics: Completeness, Validity, Uniqueness, Freshness.
 """
 
-from typing import List, Dict, Any
-from datetime import datetime, timezone
-import numpy as np
+from datetime import UTC, datetime
+from typing import Any
 
 
-def compute_completeness(records: List[Dict[str, Any]], expected_count: int) -> float:
+def compute_completeness(records: list[dict[str, Any]], expected_count: int) -> float:
     """Calculates data completeness ratio (0.0 to 1.0)."""
     if expected_count <= 0:
         return 1.0
@@ -15,7 +14,7 @@ def compute_completeness(records: List[Dict[str, Any]], expected_count: int) -> 
     return round(float(min(1.0, valid_count / expected_count)), 3)
 
 
-def compute_validity(records: List[Dict[str, Any]]) -> float:
+def compute_validity(records: list[dict[str, Any]]) -> float:
     """Checks physical atmospheric plausibility: -10°C <= Temp <= 60°C, 0% <= RH <= 100%."""
     if not records:
         return 1.0
@@ -35,7 +34,7 @@ def compute_freshness_seconds(latest_timestamp_iso: str) -> int:
     """Calculates seconds elapsed since the most recent telemetry observation."""
     try:
         dt = datetime.fromisoformat(latest_timestamp_iso.replace("Z", "+00:00"))
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         delta = (now - dt).total_seconds()
         return max(0, int(delta))
     except Exception:

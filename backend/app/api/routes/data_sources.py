@@ -2,7 +2,6 @@
 Data Sources and Provenance Registry endpoints.
 """
 
-from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -13,7 +12,7 @@ from app.schemas.data_source import DataSourceOut
 router = APIRouter(prefix="/data-sources", tags=["Data Sources"])
 
 
-@router.get("", response_model=List[DataSourceOut])
+@router.get("", response_model=list[DataSourceOut])
 def list_data_sources(db: Session = Depends(get_db)):
     """
     Returns full metadata and provenance for all meteorological, demographic,

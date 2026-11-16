@@ -11,7 +11,7 @@ Citations:
 3. WHO/WMO (2015): Heatwaves and Health: Guidance on Warning-System Development.
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Any
 
 
 def compute_thermal_hazard_score(wbgt_c: float) -> float:
@@ -45,11 +45,11 @@ def compute_exposure_index(
 
 
 def compute_vulnerability_index(
-    elderly_ratio: float,           # fraction age >= 65
-    children_ratio: float,          # fraction age <= 5
-    informal_settlement_ratio: float, # slum / tin-roof / poorly insulated housing
+    elderly_ratio: float,  # fraction age >= 65
+    children_ratio: float,  # fraction age <= 5
+    informal_settlement_ratio: float,  # slum / tin-roof / poorly insulated housing
     vegetation_deficit_ratio: float,  # 1.0 - NDVI or tree canopy cover deficit
-    cooling_access_deficit: float,    # fraction of ward lacking AC / cooling center proximity
+    cooling_access_deficit: float,  # fraction of ward lacking AC / cooling center proximity
 ) -> float:
     """
     Computes vulnerability index (0.0 - 1.0) combining physiological vulnerability,
@@ -57,19 +57,16 @@ def compute_vulnerability_index(
     """
     # Age vulnerability (0.0 to ~0.35 in Indian urban demographics)
     demo_vuln = min(1.0, (elderly_ratio * 3.5) + (children_ratio * 2.5))
-    
+
     # Built-environment & microclimate vulnerability
     housing_vuln = min(1.0, max(0.0, informal_settlement_ratio))
     veg_deficit = min(1.0, max(0.0, vegetation_deficit_ratio))
-    
+
     # Adaptive capacity deficit
     cool_deficit = min(1.0, max(0.0, cooling_access_deficit))
 
     vulnerability = (
-        (0.25 * demo_vuln)
-        + (0.35 * housing_vuln)
-        + (0.20 * veg_deficit)
-        + (0.20 * cool_deficit)
+        (0.25 * demo_vuln) + (0.35 * housing_vuln) + (0.20 * veg_deficit) + (0.20 * cool_deficit)
     )
     return round(vulnerability, 4)
 
@@ -90,14 +87,14 @@ def compute_composite_risk(
     weight_exposure: float = 0.25,
     weight_vulnerability: float = 0.25,
     is_demo: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Evaluates comprehensive ward-level human thermal risk score (0 - 100),
     computes factor contribution percentages, and constructs an evidence-based
     deterministic natural-language explanation.
     """
     # utci_c, heat_index_c, temp_c retained for diagnostics only — not part of the composite.
-    hazard = compute_thermal_hazard_score(wbgt_c)      # WBGT only
+    hazard = compute_thermal_hazard_score(wbgt_c)  # WBGT only
     exposure = compute_exposure_index(population_density_per_km2, outdoor_worker_ratio)
     vulnerability = compute_vulnerability_index(
         elderly_ratio,
@@ -113,9 +110,7 @@ def compute_composite_risk(
     vuln_100 = vulnerability * 100.0
 
     raw_score = (
-        (weight_hazard * hazard)
-        + (weight_exposure * exp_100)
-        + (weight_vulnerability * vuln_100)
+        (weight_hazard * hazard) + (weight_exposure * exp_100) + (weight_vulnerability * vuln_100)
     )
     score = round(max(0.0, min(100.0, raw_score)), 1)
 
@@ -150,21 +145,74 @@ def compute_composite_risk(
 
     # Granular factor breakdown
     factor_thermal = round((h_component / total_component) * 100.0, 1)
-    factor_worker_exposure = round(((weight_exposure * (outdoor_worker_ratio * 45.0)) / total_component) * 100.0, 1)
-    factor_pop_density = round(((weight_exposure * (min(1.0, population_density_per_km2 / 50000.0) * 55.0)) / total_component) * 100.0, 1)
-    factor_housing = round(((weight_vulnerability * (informal_settlement_ratio * 35.0)) / total_component) * 100.0, 1)
-    factor_vegetation = round(((weight_vulnerability * (vegetation_deficit_ratio * 20.0)) / total_component) * 100.0, 1)
-    factor_demographics = round(((weight_vulnerability * (min(1.0, elderly_ratio*3.5 + children_ratio*2.5) * 25.0)) / total_component) * 100.0, 1)
-    factor_cooling_deficit = round(((weight_vulnerability * (cooling_access_deficit * 20.0)) / total_component) * 100.0, 1)
+    factor_worker_exposure = round(
+        ((weight_exposure * (outdoor_worker_ratio * 45.0)) / total_component) * 100.0, 1
+    )
+    factor_pop_density = round(
+        (
+            (weight_exposure * (min(1.0, population_density_per_km2 / 50000.0) * 55.0))
+            / total_component
+        )
+        * 100.0,
+        1,
+    )
+    factor_housing = round(
+        ((weight_vulnerability * (informal_settlement_ratio * 35.0)) / total_component) * 100.0,
+        1,
+    )
+    factor_vegetation = round(
+        ((weight_vulnerability * (vegetation_deficit_ratio * 20.0)) / total_component) * 100.0,
+        1,
+    )
+    factor_demographics = round(
+        (
+            (weight_vulnerability * (min(1.0, elderly_ratio * 3.5 + children_ratio * 2.5) * 25.0))
+            / total_component
+        )
+        * 100.0,
+        1,
+    )
+    factor_cooling_deficit = round(
+        ((weight_vulnerability * (cooling_access_deficit * 20.0)) / total_component) * 100.0,
+        1,
+    )
 
     factors_list = [
-        {"name": "Thermal Stress (WBGT / UTCI)", "share_pct": factor_thermal, "value_unit": f"WBGT {wbgt_c:.1f}°C"},
-        {"name": "Outdoor Labor Exposure", "share_pct": factor_worker_exposure, "value_unit": f"{outdoor_worker_ratio*100:.0f}% workforce"},
-        {"name": "Informal / Tin-Roof Housing", "share_pct": factor_housing, "value_unit": f"{informal_settlement_ratio*100:.0f}% informal"},
-        {"name": "Population Density", "share_pct": factor_pop_density, "value_unit": f"{population_density_per_km2:,.0f}/km²"},
-        {"name": "Canopy / Green Cover Deficit", "share_pct": factor_vegetation, "value_unit": f"{vegetation_deficit_ratio*100:.0f}% deficit"},
-        {"name": "Elderly & Child Population", "share_pct": factor_demographics, "value_unit": f"{(elderly_ratio+children_ratio)*100:.0f}% vulnerable"},
-        {"name": "Cooling Shelter Deficit", "share_pct": factor_cooling_deficit, "value_unit": f"{cooling_access_deficit*100:.0f}% unserved"},
+        {
+            "name": "Thermal Stress (WBGT / UTCI)",
+            "share_pct": factor_thermal,
+            "value_unit": f"WBGT {wbgt_c:.1f}°C",
+        },
+        {
+            "name": "Outdoor Labor Exposure",
+            "share_pct": factor_worker_exposure,
+            "value_unit": f"{outdoor_worker_ratio * 100:.0f}% workforce",
+        },
+        {
+            "name": "Informal / Tin-Roof Housing",
+            "share_pct": factor_housing,
+            "value_unit": f"{informal_settlement_ratio * 100:.0f}% informal",
+        },
+        {
+            "name": "Population Density",
+            "share_pct": factor_pop_density,
+            "value_unit": f"{population_density_per_km2:,.0f}/km²",
+        },
+        {
+            "name": "Canopy / Green Cover Deficit",
+            "share_pct": factor_vegetation,
+            "value_unit": f"{vegetation_deficit_ratio * 100:.0f}% deficit",
+        },
+        {
+            "name": "Elderly & Child Population",
+            "share_pct": factor_demographics,
+            "value_unit": f"{(elderly_ratio + children_ratio) * 100:.0f}% vulnerable",
+        },
+        {
+            "name": "Cooling Shelter Deficit",
+            "share_pct": factor_cooling_deficit,
+            "value_unit": f"{cooling_access_deficit * 100:.0f}% unserved",
+        },
     ]
     # Sort factors by impact
     factors_list.sort(key=lambda x: x["share_pct"], reverse=True)
@@ -172,7 +220,7 @@ def compute_composite_risk(
     # Deterministic natural-language explanation generated from real factors
     top_driver_1 = factors_list[0]["name"]
     top_driver_2 = factors_list[1]["name"]
-    
+
     if band in ["extreme", "veryhigh"]:
         explanation = (
             f"{band_label} thermal risk ({score}/100) driven predominantly by severe {top_driver_1.lower()} "

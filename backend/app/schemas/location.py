@@ -2,7 +2,8 @@
 Pydantic schemas for Locations and Wards.
 """
 
-from typing import Optional, Any, Dict
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -14,28 +15,28 @@ class LocationBase(BaseModel):
     ward_name: str
     latitude: float
     longitude: float
-    area_sq_km: Optional[float] = None
-    min_lat: Optional[float] = None
-    max_lat: Optional[float] = None
-    min_lng: Optional[float] = None
-    max_lng: Optional[float] = None
+    area_sq_km: float | None = None
+    min_lat: float | None = None
+    max_lat: float | None = None
+    min_lng: float | None = None
+    max_lng: float | None = None
     population: int
     population_density_per_km2: float
-    outdoor_worker_ratio: Optional[float] = None
-    informal_settlement_ratio: Optional[float] = None
-    tree_canopy_fraction: Optional[float] = None
-    elderly_ratio: Optional[float] = None
-    children_ratio: Optional[float] = None
-    cooling_access_deficit: Optional[float] = None
-    hospital_count: Optional[int] = None
-    drinking_water_deficit: Optional[float] = None
+    outdoor_worker_ratio: float | None = None
+    informal_settlement_ratio: float | None = None
+    tree_canopy_fraction: float | None = None
+    elderly_ratio: float | None = None
+    children_ratio: float | None = None
+    cooling_access_deficit: float | None = None
+    hospital_count: int | None = None
+    drinking_water_deficit: float | None = None
     level: str = "ward"
-    parent_code: Optional[str] = None
-    description: Optional[str] = None
+    parent_code: str | None = None
+    description: str | None = None
 
 
 class LocationOut(LocationBase):
     id: int
-    geometry_geojson: Optional[Dict[str, Any]] = None
+    geometry_geojson: dict[str, Any] | None = None
 
     model_config = ConfigDict(from_attributes=True)

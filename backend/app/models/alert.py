@@ -2,8 +2,10 @@
 Heat Action Plan Early-Warning Alert ORM model.
 """
 
-from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, ForeignKey
+from datetime import UTC, datetime
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+
 from app.db.base import Base
 
 
@@ -19,6 +21,6 @@ class Alert(Base):
     target_audience = Column(String(100), default="all")  # all, workers, elderly, schools
     channels = Column(String(100), default="web,sms,whatsapp")
     is_active = Column(Boolean, default=True)
-    dispatched_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    dispatched_at = Column(DateTime, default=lambda: datetime.now(UTC))
     expires_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))

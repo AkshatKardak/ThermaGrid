@@ -4,21 +4,24 @@ Fetches surface meteorology from Open-Meteo for configured metropolitan wards,
 validates against physical boundaries, and stages into data/processed/.
 """
 
-import sys
-import os
 import json
-from datetime import datetime, timezone
+import os
+import sys
+from datetime import UTC, datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
 
-from src.ingestion.open_meteo import OpenMeteoClient
+from src.cleaning.validator import (
+    clean_and_impute_observation,
+    validate_weather_observation,
+)
 from src.ingestion.census_loader import list_all_wards
-from src.cleaning.validator import validate_weather_observation, clean_and_impute_observation
+from src.ingestion.open_meteo import OpenMeteoClient
 
 
 def run_ingestion():
-    print(f"[{datetime.now(timezone.utc).isoformat()}] Starting meteorological data ingestion...")
+    print(f"[{datetime.now(UTC).isoformat()}] Starting meteorological data ingestion...")
     client = OpenMeteoClient()
     wards = list_all_wards()
 
@@ -41,7 +44,7 @@ def run_ingestion():
         obs = {
             "ward_code": w["ward_code"],
             "city": w["city"],
-            "timestamp": curr.get("time", datetime.now(timezone.utc).isoformat()),
+            "timestamp": curr.get("time", datetime.now(UTC).isoformat()),
             "temperature_c": temp,
             "rel_humidity_pct": 58.0,
             "wind_speed_ms": wind,

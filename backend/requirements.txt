@@ -57,6 +57,7 @@ pyogrio==0.13.0
 pyparsing==3.3.3
 pyproj==3.8.0
 pytest==9.2.0
+pytest-cov==7.1.0
 python-dateutil==3.0.0
 python-dotenv==1.2.4
 python-multipart==0.0.32
@@ -65,6 +66,7 @@ rasterio==1.5.2
 requests==2.34.2
 rich==15.0.0
 rich-toolkit==0.20.6
+ruff==0.15.5
 scikit-learn==1.9.1
 scipy==1.18.1
 shapely==2.2.0

@@ -10,7 +10,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.core.config import get_settings
 from app.db.base import Base
 from app.db.session import engine
-import app.models  # ensure models are registered
 
 config = context.config
 settings = get_settings()
@@ -40,9 +39,7 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
     with engine.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

@@ -2,27 +2,25 @@
 Heat Emergency Alert management endpoints.
 """
 
-from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.schemas.alert import AlertCreate, AlertOut
 from app.services.alert_service import AlertService
 from app.services.alerts.sms import SmsChannel, SmsRateLimitExceeded
-from app.schemas.alert import AlertCreate, AlertOut
-from app.api.deps import RoleChecker
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
 
 class TestSmsRequest(BaseModel):
-    phone: Optional[str] = None
-    message: Optional[str] = None
+    phone: str | None = None
+    message: str | None = None
 
 
 @router.post("/test-sms")
-async def send_test_sms(payload: Optional[TestSmsRequest] = None):
+async def send_test_sms(payload: TestSmsRequest | None = None):
     """
     Dedicated test endpoint for SMS channel verification.
     Rate limited to 1 message per minute.
@@ -43,9 +41,9 @@ async def send_test_sms(payload: Optional[TestSmsRequest] = None):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.get("", response_model=List[AlertOut])
+@router.get("", response_model=list[AlertOut])
 def get_alerts(
-    city: Optional[str] = Query(None, description="City filter"),
+    city: str | None = Query(None, description="City filter"),
     db: Session = Depends(get_db),
 ):
     """Retrieves active early-warning heat alerts."""

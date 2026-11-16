@@ -4,7 +4,7 @@ Estimates local temperature anomaly (°C) based on built density,
 vegetation cover (NDVI proxy), and albedo.
 """
 
-from typing import Dict, Any
+from typing import Any
 
 
 def estimate_uhi_intensity(
@@ -12,7 +12,7 @@ def estimate_uhi_intensity(
     tree_canopy_fraction: float,
     building_height_avg_m: float = 12.0,
     albedo_avg: float = 0.18,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Estimates the localized microclimatic thermal excess (delta T in °C)
     relative to rural baseline due to Urban Heat Island effects.

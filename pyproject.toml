@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501", "E402", "EXE002", "E741"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [".venv", "backend/.venv", "analytics/.venv", "frontend", "node_modules", ".git", "data"]

@@ -11,9 +11,8 @@ Audits recursive JSON translation keys across all supported locales:
 Ensures 100% key parity and translates new feature keys.
 """
 
-import os
-import sys
 import json
+import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 I18N_DIR = os.path.join(BASE_DIR, "frontend", "src", "i18n")
@@ -215,8 +214,6 @@ def run_audit(fix: bool = True):
     print("=" * 68)
     print(f" Reference Locale (en): {total_en_keys} keys\n")
 
-    all_passed = True
-
     for loc in LOCALES:
         if loc == "en":
             continue
@@ -224,7 +221,6 @@ def run_audit(fix: bool = True):
         loc_path = os.path.join(I18N_DIR, f"{loc}.json")
         if not os.path.exists(loc_path):
             print(f"[-] {loc}.json MISSING!")
-            all_passed = False
             continue
 
         with open(loc_path, "r", encoding="utf-8") as f:
@@ -232,6 +228,7 @@ def run_audit(fix: bool = True):
 
         if fix and loc in NEW_TRANSLATIONS:
             deep_update(loc_data, NEW_TRANSLATIONS[loc])
+
             # For any other missing keys from en, fill with English default fallback
             def fill_missing(en_dict, target_dict):
                 for k, v in en_dict.items():
@@ -239,6 +236,7 @@ def run_audit(fix: bool = True):
                         target_dict[k] = v
                     elif isinstance(v, dict) and isinstance(target_dict[k], dict):
                         fill_missing(v, target_dict[k])
+
             fill_missing(en_data, loc_data)
 
             with open(loc_path, "w", encoding="utf-8") as f:
@@ -246,14 +244,14 @@ def run_audit(fix: bool = True):
 
         loc_keys = flatten_keys(loc_data)
         missing = en_keys - loc_keys
-        extra = loc_keys - en_keys
         coverage_pct = round((len(loc_keys & en_keys) / max(1, total_en_keys)) * 100, 1)
 
         status_str = "PASS (100%)" if coverage_pct == 100.0 else f"PARTIAL ({coverage_pct}%)"
-        print(f" • Locale [{loc.upper()}]: {len(loc_keys)}/{total_en_keys} keys ({coverage_pct}%) -> {status_str}")
+        print(
+            f" • Locale [{loc.upper()}]: {len(loc_keys)}/{total_en_keys} keys ({coverage_pct}%) -> {status_str}"
+        )
         if missing and not fix:
             print(f"   Missing ({len(missing)}): {list(missing)[:5]}")
-            all_passed = False
 
     print("-" * 68)
     print(" All locales synchronized to 100% key parity.")

@@ -6,7 +6,6 @@ Implements:
 3. Simple Multivariate Linear Regression baseline
 """
 
-from typing import Dict, Any, Tuple
 import numpy as np
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -21,9 +20,7 @@ class ThermalBaselineModel:
         self.ridge = Ridge(alpha=1.0)
         self.is_fitted = False
 
-    def evaluate_persistence(
-        self, y_true: np.ndarray, y_lag1: np.ndarray
-    ) -> Dict[str, float]:
+    def evaluate_persistence(self, y_true: np.ndarray, y_lag1: np.ndarray) -> dict[str, float]:
         """
         Computes standard persistence error: y_pred = y_(t-1)
         """
@@ -43,9 +40,7 @@ class ThermalBaselineModel:
         self.is_fitted = True
         return self
 
-    def evaluate_linear_baseline(
-        self, X_test: np.ndarray, y_test: np.ndarray
-    ) -> Dict[str, float]:
+    def evaluate_linear_baseline(self, X_test: np.ndarray, y_test: np.ndarray) -> dict[str, float]:
         if not self.is_fitted:
             raise RuntimeError("Linear baseline model must be fitted first.")
         y_pred = self.ridge.predict(X_test)

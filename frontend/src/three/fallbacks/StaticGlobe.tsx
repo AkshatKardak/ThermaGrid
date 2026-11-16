@@ -121,7 +121,9 @@ export const StaticGlobe: React.FC<StaticGlobeProps> = ({
                 aria-label={`${city.name}: Risk score ${formatNumber(city.risk * 100, 0)}, Temperature ${city.temp || '--'}°C`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    onCitySelect && onCitySelect(city.name);
+                    if (onCitySelect) {
+                      onCitySelect(city.name);
+                    }
                   }
                 }}
               >

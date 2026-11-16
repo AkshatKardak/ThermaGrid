@@ -2,11 +2,11 @@
 Analytics routes: Trends, spatial hotspots, exposure distribution, and vulnerability analysis.
 """
 
-import sys
-import os
 import math
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, Query
+import os
+import sys
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -14,15 +14,17 @@ from app.models.location import Location
 from app.services.risk_service import RiskService
 from app.services.thermal_service import ThermalService
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 sys.path.insert(0, os.path.join(BASE_DIR, "analytics"))
-from src.spatial.hotspots import compute_ward_hotspots
-from src.historical import compute_trend, detect_heatwave_spells, compute_yoy_anomalies
 from src.equity import compute_heat_equity_index, evaluate_weight_sensitivity
 from src.explainability import decompose_risk_score, generate_risk_narrative
+from src.historical import compute_trend, compute_yoy_anomalies, detect_heatwave_spells
 from src.monitoring import generate_quality_report
-from src.synthetic import generate_synthetic_rasters, generate_hourly_weather
-from src.remote_sensing import compute_uhi_intensity
+from src.spatial.hotspots import compute_ward_hotspots
+from src.synthetic import generate_hourly_weather, generate_synthetic_rasters
+
 from app.schemas.provenance import create_provenance
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
@@ -40,7 +42,7 @@ def get_thermal_trends(
 
 @router.get("/hotspots")
 def get_spatial_hotspots(
-    city: Optional[str] = Query("Mumbai", description="City to analyze"),
+    city: str | None = Query("Mumbai", description="City to analyze"),
     db: Session = Depends(get_db),
 ):
     """
@@ -58,7 +60,7 @@ def get_spatial_hotspots(
 
 @router.get("/exposure")
 def get_exposure_analytics(
-    city: Optional[str] = Query("Mumbai"),
+    city: str | None = Query("Mumbai"),
     db: Session = Depends(get_db),
 ):
     """Returns comparative population density and outdoor workforce exposure statistics."""
@@ -71,15 +73,17 @@ def get_exposure_analytics(
         workers = int(w.population * w.outdoor_worker_ratio)
         total_workers_at_risk += workers
         total_population += w.population
-        records.append({
-            "ward_id": w.id,
-            "ward_name": w.ward_name,
-            "ward_code": w.ward_code,
-            "population": w.population,
-            "population_density": w.population_density_per_km2,
-            "outdoor_workers": workers,
-            "outdoor_worker_ratio": w.outdoor_worker_ratio,
-        })
+        records.append(
+            {
+                "ward_id": w.id,
+                "ward_name": w.ward_name,
+                "ward_code": w.ward_code,
+                "population": w.population,
+                "population_density": w.population_density_per_km2,
+                "outdoor_workers": workers,
+                "outdoor_worker_ratio": w.outdoor_worker_ratio,
+            }
+        )
 
     return {
         "city": city,
@@ -91,7 +95,7 @@ def get_exposure_analytics(
 
 @router.get("/vulnerability")
 def get_vulnerability_analytics(
-    city: Optional[str] = Query("Mumbai"),
+    city: str | None = Query("Mumbai"),
     db: Session = Depends(get_db),
 ):
     """Returns structural and demographic vulnerability factors by ward."""
@@ -100,7 +104,9 @@ def get_vulnerability_analytics(
     for w in wards:
         reasons = {}
         if w.informal_settlement_ratio is None:
-            reasons["informal_settlement_pct"] = "unavailable: no ward-level informal settlement dataset"
+            reasons["informal_settlement_pct"] = (
+                "unavailable: no ward-level informal settlement dataset"
+            )
         if w.tree_canopy_fraction is None:
             reasons["tree_canopy_pct"] = "unavailable: no high-resolution canopy dataset"
             reasons["canopy_deficit_pct"] = "unavailable: requires tree canopy fraction"
@@ -111,18 +117,32 @@ def get_vulnerability_analytics(
         if w.hospital_count is None:
             reasons["hospitals_count"] = "unavailable: facility registry not linked"
 
-        records.append({
-            "ward_id": w.id,
-            "ward_name": w.ward_name,
-            "ward_code": w.ward_code,
-            "informal_settlement_pct": round(w.informal_settlement_ratio * 100, 1) if w.informal_settlement_ratio is not None else None,
-            "tree_canopy_pct": round(w.tree_canopy_fraction * 100, 1) if w.tree_canopy_fraction is not None else None,
-            "canopy_deficit_pct": round((1.0 - w.tree_canopy_fraction) * 100, 1) if w.tree_canopy_fraction is not None else None,
-            "elderly_children_pct": round(((w.elderly_ratio or 0.0) + (w.children_ratio or 0.0)) * 100, 1) if (w.elderly_ratio is not None and w.children_ratio is not None) else None,
-            "cooling_deficit_pct": round(w.cooling_access_deficit * 100, 1) if w.cooling_access_deficit is not None else None,
-            "hospitals_count": w.hospital_count,
-            "unavailable_reasons": reasons if reasons else None,
-        })
+        records.append(
+            {
+                "ward_id": w.id,
+                "ward_name": w.ward_name,
+                "ward_code": w.ward_code,
+                "informal_settlement_pct": round(w.informal_settlement_ratio * 100, 1)
+                if w.informal_settlement_ratio is not None
+                else None,
+                "tree_canopy_pct": round(w.tree_canopy_fraction * 100, 1)
+                if w.tree_canopy_fraction is not None
+                else None,
+                "canopy_deficit_pct": round((1.0 - w.tree_canopy_fraction) * 100, 1)
+                if w.tree_canopy_fraction is not None
+                else None,
+                "elderly_children_pct": round(
+                    ((w.elderly_ratio or 0.0) + (w.children_ratio or 0.0)) * 100, 1
+                )
+                if (w.elderly_ratio is not None and w.children_ratio is not None)
+                else None,
+                "cooling_deficit_pct": round(w.cooling_access_deficit * 100, 1)
+                if w.cooling_access_deficit is not None
+                else None,
+                "hospitals_count": w.hospital_count,
+                "unavailable_reasons": reasons if reasons else None,
+            }
+        )
 
     return {
         "city": city,
@@ -132,12 +152,25 @@ def get_vulnerability_analytics(
 
 @router.get("/historical/trends")
 def get_historical_climatological_trends(
-    city: Optional[str] = Query("Mumbai"),
+    city: str | None = Query("Mumbai"),
     db: Session = Depends(get_db),
 ):
     """Computes long-term Sen's slope and Mann-Kendall warming trend analysis."""
     # Historical summer temperatures baseline
-    temps_sample = [31.2, 31.5, 31.8, 32.1, 32.0, 32.6, 32.9, 33.2, 33.1, 33.8, 34.0, 34.4]
+    temps_sample = [
+        31.2,
+        31.5,
+        31.8,
+        32.1,
+        32.0,
+        32.6,
+        32.9,
+        33.2,
+        33.1,
+        33.8,
+        34.0,
+        34.4,
+    ]
     trend_result = compute_trend(temps_sample)
     return {
         "city": city,
@@ -150,7 +183,7 @@ def get_historical_climatological_trends(
 
 @router.get("/extremes")
 def get_extreme_heatwaves(
-    city: Optional[str] = Query("Mumbai"),
+    city: str | None = Query("Mumbai"),
     threshold_c: float = Query(38.0),
 ):
     """Detects multi-day heatwave spells against climatological thresholds."""
@@ -158,7 +191,9 @@ def get_extreme_heatwaves(
         {"date": f"2026-05-{d:02d}", "t_max_c": 36.0 + (3.5 if 10 <= d <= 14 else 0.5)}
         for d in range(1, 25)
     ]
-    spells = detect_heatwave_spells(daily_sample, climatological_p95_c=threshold_c, min_consecutive_days=3)
+    spells = detect_heatwave_spells(
+        daily_sample, climatological_p95_c=threshold_c, min_consecutive_days=3
+    )
     return {
         "city": city,
         "threshold_c": threshold_c,
@@ -169,7 +204,7 @@ def get_extreme_heatwaves(
 
 
 @router.get("/yoy")
-def get_year_over_year_anomalies(city: Optional[str] = Query("Mumbai")):
+def get_year_over_year_anomalies(city: str | None = Query("Mumbai")):
     """Returns annual temperature anomalies against 2000-2020 normal."""
     yearly_data = [
         {"year": 2018, "t_mean_c": 28.6, "heatwave_days": 4},
@@ -191,7 +226,7 @@ def get_year_over_year_anomalies(city: Optional[str] = Query("Mumbai")):
 
 
 @router.get("/uhi")
-def get_urban_heat_island_analysis(city: Optional[str] = Query("Mumbai")):
+def get_urban_heat_island_analysis(city: str | None = Query("Mumbai")):
     """Calculates Surface Urban Heat Island (SUHI) intensity and spatial thermal bloom."""
     rasters = generate_synthetic_rasters(shape=(50, 50), base_temp_c=33.5, uhi_intensity_c=5.8)
     return {
@@ -202,13 +237,15 @@ def get_urban_heat_island_analysis(city: Optional[str] = Query("Mumbai")):
         "mean_ndvi": rasters["mean_ndvi"],
         "mean_imperviousness": rasters["mean_imperviousness"],
         "is_synthetic": True,
-        "provenance": create_provenance(source="synthetic", is_synthetic=True, is_model_backed=False),
+        "provenance": create_provenance(
+            source="synthetic", is_synthetic=True, is_model_backed=False
+        ),
     }
 
 
 @router.get("/equity")
 def get_heat_equity_analytics(
-    city: Optional[str] = Query("Mumbai"),
+    city: str | None = Query("Mumbai"),
     db: Session = Depends(get_db),
 ):
     """Computes Heat Equity Index (HEI) and prioritized interventions for underserved wards."""
@@ -255,7 +292,7 @@ def get_heat_equity_analytics(
 
 @router.get("/sensitivity")
 def get_weight_sensitivity_analytics(
-    city: Optional[str] = Query("Mumbai"),
+    city: str | None = Query("Mumbai"),
     db: Session = Depends(get_db),
 ):
     """Evaluates rank invariance and Spearman rho under +/- 20% weight perturbation."""
@@ -275,7 +312,9 @@ def get_weight_sensitivity_analytics(
     return {
         "city": city,
         "sensitivity": sensitivity,
-        "provenance": create_provenance(source="synthetic", is_synthetic=False, is_model_backed=True),
+        "provenance": create_provenance(
+            source="synthetic", is_synthetic=False, is_model_backed=True
+        ),
     }
 
 
@@ -296,7 +335,10 @@ def get_ward_risk_explanation(
         ward_name=risk["ward_name"],
         composite_score=risk["risk_score"],
         decomposition=decomp,
-        weather_summary={"temperature_c": risk["temperature_c"], "wbgt_c": risk["wbgt_c"]},
+        weather_summary={
+            "temperature_c": risk["temperature_c"],
+            "wbgt_c": risk["wbgt_c"],
+        },
     )
     return {
         "ward_id": ward_id,
@@ -316,7 +358,11 @@ def get_telemetry_quality():
     return {
         "telemetry_stream": "National Automated Synoptic Network",
         "audit_timestamp": report,
-        "provenance": create_provenance(source="observed", completeness=report["completeness"], quality_score=report["quality_score"]),
+        "provenance": create_provenance(
+            source="observed",
+            completeness=report["completeness"],
+            quality_score=report["quality_score"],
+        ),
     }
 
 
@@ -334,8 +380,8 @@ def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 @router.get("/cooling-gap")
 def get_cooling_centre_gap_analysis(
-    location_id: Optional[int] = Query(None, description="Optional ward location ID"),
-    city: Optional[str] = Query("Mumbai", description="City filter"),
+    location_id: int | None = Query(None, description="Optional ward location ID"),
+    city: str | None = Query("Mumbai", description="City filter"),
     db: Session = Depends(get_db),
 ):
     """
@@ -344,6 +390,7 @@ def get_cooling_centre_gap_analysis(
     and flags critical cooling desert wards.
     """
     from app.models.cooling_centre import CoolingCentre
+
     city_str = str(city) if (city and not hasattr(city, "default")) else "Mumbai"
 
     centres_query = db.query(CoolingCentre).filter(CoolingCentre.is_active == 1)
@@ -372,8 +419,7 @@ def get_cooling_centre_gap_analysis(
             }
 
         distances = [
-            (c, _haversine_km(w.latitude, w.longitude, c.latitude, c.longitude))
-            for c in centres
+            (c, _haversine_km(w.latitude, w.longitude, c.latitude, c.longitude)) for c in centres
         ]
         distances.sort(key=lambda x: x[1])
         nearest_c, nearest_dist = distances[0]
@@ -401,13 +447,13 @@ def get_cooling_centre_gap_analysis(
         return {
             "city": city_str,
             **res,
-            "provenance": create_provenance(source="observed", completeness=1.0, quality_score=0.98),
+            "provenance": create_provenance(
+                source="observed", completeness=1.0, quality_score=0.98
+            ),
         }
 
     wards = (
-        db.query(Location)
-        .filter(Location.city.ilike(f"%{city_str}%") if city_str else True)
-        .all()
+        db.query(Location).filter(Location.city.ilike(f"%{city_str}%") if city_str else True).all()
     )
     if not wards:
         wards = db.query(Location).filter(Location.level == "ward").all()

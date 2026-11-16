@@ -4,19 +4,17 @@ Produces a dense, institutional one-page audit PDF compliant with national guide
 """
 
 import io
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import inch
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
 def generate_hap_compliance_pdf(
-    from_date: Optional[str] = None,
-    to_date: Optional[str] = None,
+    from_date: str | None = None,
+    to_date: str | None = None,
     city: str = "Mumbai",
 ) -> bytes:
     """
@@ -34,7 +32,7 @@ def generate_hap_compliance_pdf(
     )
 
     styles = getSampleStyleSheet()
-    
+
     # Custom styles
     header_style = ParagraphStyle(
         "HAPHeader",
@@ -44,7 +42,7 @@ def generate_hap_compliance_pdf(
         leading=18,
         textColor=colors.HexColor("#1A1E1C"),
     )
-    
+
     subhead_style = ParagraphStyle(
         "HAPSubhead",
         parent=styles["Normal"],
@@ -82,7 +80,7 @@ def generate_hap_compliance_pdf(
         textColor=colors.HexColor("#2FA37C"),
     )
 
-    now_str = datetime.now(timezone.utc).strftime("%d %b %Y, %H:%M UTC")
+    now_str = datetime.now(UTC).strftime("%d %b %Y, %H:%M UTC")
     period_str = f"{from_date or '01 May 2026'} – {to_date or '15 June 2026'}"
 
     story = []
@@ -90,7 +88,12 @@ def generate_hap_compliance_pdf(
     # Title & Subtitle
     story.append(Paragraph("MUNICIPAL HEAT ACTION PLAN (HAP) COMPLIANCE AUDIT", header_style))
     story.append(Spacer(1, 2))
-    story.append(Paragraph(f"NATIONAL CLIMATE EARLY-WARNING INITIATIVE · JURISDICTION: {city.upper()}", subhead_style))
+    story.append(
+        Paragraph(
+            f"NATIONAL CLIMATE EARLY-WARNING INITIATIVE · JURISDICTION: {city.upper()}",
+            subhead_style,
+        )
+    )
     story.append(Spacer(1, 8))
 
     # Audit Metadata Table
@@ -100,46 +103,74 @@ def generate_hap_compliance_pdf(
             Paragraph("<b>Audit Date:</b> " + now_str, body_style),
         ],
         [
-            Paragraph("<b>Regulatory Authority:</b> National Disaster Management Authority (NDMA)", body_style),
+            Paragraph(
+                "<b>Regulatory Authority:</b> National Disaster Management Authority (NDMA)",
+                body_style,
+            ),
             Paragraph("<b>Standard:</b> ISO 7243 & IMD Heatwave Framework", body_style),
         ],
     ]
     t_meta = Table(meta_data, colWidths=[260, 260])
-    t_meta.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EAE5DA")),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 4),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-        ("LEFTPADDING", (0, 0), (-1, -1), 6),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-    ]))
+    t_meta.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EAE5DA")),
+                ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ]
+        )
+    )
     story.append(t_meta)
     story.append(Spacer(1, 10))
 
     # Executive KPI Summary Grid (4 Cards)
     kpi_data = [
         [
-            Paragraph("<b>74 WARDS</b><br/><font color='#5E645F'>Active Telemetry Coverage</font>", body_style),
-            Paragraph("<b>48 HOURS</b><br/><font color='#5E645F'>Validated Warning Lead Time</font>", body_style),
-            Paragraph("<b>100% ON-TIME</b><br/><font color='#5E645F'>Alert Threshold Sensitivity</font>", body_style),
-            Paragraph("<b>ISO 7243</b><br/><font color='#5E645F'>Physiological Labor Standard</font>", body_style),
+            Paragraph(
+                "<b>74 WARDS</b><br/><font color='#5E645F'>Active Telemetry Coverage</font>",
+                body_style,
+            ),
+            Paragraph(
+                "<b>48 HOURS</b><br/><font color='#5E645F'>Validated Warning Lead Time</font>",
+                body_style,
+            ),
+            Paragraph(
+                "<b>100% ON-TIME</b><br/><font color='#5E645F'>Alert Threshold Sensitivity</font>",
+                body_style,
+            ),
+            Paragraph(
+                "<b>ISO 7243</b><br/><font color='#5E645F'>Physiological Labor Standard</font>",
+                body_style,
+            ),
         ]
     ]
     t_kpi = Table(kpi_data, colWidths=[130, 130, 130, 130])
-    t_kpi.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FBF9F4")),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
-        ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-    ]))
+    t_kpi.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FBF9F4")),
+                ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
+                ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ]
+        )
+    )
     story.append(t_kpi)
     story.append(Spacer(1, 10))
 
     # Statutory Directive Verification Matrix
-    story.append(Paragraph("<b>STATUTORY HAP DIRECTIVES & INTERVENTION COMPLIANCE VERIFICATION</b>", subhead_style))
+    story.append(
+        Paragraph(
+            "<b>STATUTORY HAP DIRECTIVES & INTERVENTION COMPLIANCE VERIFICATION</b>",
+            subhead_style,
+        )
+    )
     story.append(Spacer(1, 4))
 
     table_data = [
@@ -194,16 +225,20 @@ def generate_hap_compliance_pdf(
     ]
 
     t_matrix = Table(table_data, colWidths=[120, 160, 170, 70])
-    t_matrix.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EAE5DA")),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
-        ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
-        ("TOPPADDING", (0, 0), (-1, -1), 4),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-        ("LEFTPADDING", (0, 0), (-1, -1), 5),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    ]))
+    t_matrix.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EAE5DA")),
+                ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
+                ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CFC8B8")),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ]
+        )
+    )
     story.append(t_matrix)
     story.append(Spacer(1, 10))
 
@@ -222,15 +257,25 @@ def generate_hap_compliance_pdf(
     # Formal Institutional Signoff Block (2 Signatures)
     sig_data = [
         [
-            Paragraph("<b>MUNICIPAL COMMISSIONER / HEALTH OFFICER</b><br/>Brihanmumbai Municipal Corporation (BMC)<br/><i>Certified for Operational HAP Execution</i>", body_style),
-            Paragraph("<b>DIRECTOR OF STATE DISASTER MANAGEMENT</b><br/>State Disaster Management Authority (SDMA)<br/><i>Validated Under National Heatwave Guidelines</i>", body_style),
+            Paragraph(
+                "<b>MUNICIPAL COMMISSIONER / HEALTH OFFICER</b><br/>Brihanmumbai Municipal Corporation (BMC)<br/><i>Certified for Operational HAP Execution</i>",
+                body_style,
+            ),
+            Paragraph(
+                "<b>DIRECTOR OF STATE DISASTER MANAGEMENT</b><br/>State Disaster Management Authority (SDMA)<br/><i>Validated Under National Heatwave Guidelines</i>",
+                body_style,
+            ),
         ]
     ]
     t_sig = Table(sig_data, colWidths=[260, 260])
-    t_sig.setStyle(TableStyle([
-        ("LINEABOVE", (0, 0), (-1, 0), 1, colors.HexColor("#1F3A5F")),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-    ]))
+    t_sig.setStyle(
+        TableStyle(
+            [
+                ("LINEABOVE", (0, 0), (-1, 0), 1, colors.HexColor("#1F3A5F")),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ]
+        )
+    )
     story.append(t_sig)
 
     doc.build(story)

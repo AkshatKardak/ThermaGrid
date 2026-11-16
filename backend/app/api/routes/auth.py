@@ -2,8 +2,9 @@
 Authentication routes: Clerk profile verification, session info, and role check.
 """
 
-from typing import Dict, Any
-from fastapi import APIRouter, Depends, status
+from typing import Any
+
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.core.auth import get_current_user, require_role
@@ -19,7 +20,7 @@ class AuthMeResponse(BaseModel):
 
 
 @router.get("/me", response_model=AuthMeResponse)
-def get_me(user: Dict[str, Any] = Depends(get_current_user)):
+def get_me(user: dict[str, Any] = Depends(get_current_user)):
     """
     Returns profile for currently authenticated Clerk user.
     """
@@ -31,8 +32,10 @@ def get_me(user: Dict[str, Any] = Depends(get_current_user)):
     )
 
 
-@router.get("/authority-only", response_model=Dict[str, Any])
-def authority_guard_check(user: Dict[str, Any] = Depends(require_role("authority", "admin"))):
+@router.get("/authority-only", response_model=dict[str, Any])
+def authority_guard_check(
+    user: dict[str, Any] = Depends(require_role("authority", "admin")),
+):
     """
     Enforces that only 'authority' or 'admin' roles can access this endpoint.
     Used for 403 authorization guard verification.
@@ -41,12 +44,12 @@ def authority_guard_check(user: Dict[str, Any] = Depends(require_role("authority
         "status": "authorized",
         "user_id": user.get("sub"),
         "role": user.get("role"),
-        "message": "Authority authorization verified."
+        "message": "Authority authorization verified.",
     }
 
 
-@router.get("/authority-guard", response_model=Dict[str, Any])
-def authority_view_role_guard(user: Dict[str, Any] = Depends(get_current_user)):
+@router.get("/authority-guard", response_model=dict[str, Any])
+def authority_view_role_guard(user: dict[str, Any] = Depends(get_current_user)):
     """
     Server-side role guard on authority routes.
     Returns a polite 'this view is for municipal authorities' card response
