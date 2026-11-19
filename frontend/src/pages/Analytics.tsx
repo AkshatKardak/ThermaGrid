@@ -9,8 +9,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
   Cell,
   Legend,
 } from 'recharts';
@@ -154,23 +152,37 @@ export const Analytics: React.FC = () => {
     { month: 'Jun', Safe: 4, Moderate: 11, High: 10, VeryHigh: 4, Extreme: 1 },
   ];
 
-  // 4. Donut: Wards by Band
-  const donutData = useMemo(() => {
-    if (!allRisk || allRisk.length === 0) return [];
-    const counts: Record<string, { name: string; count: number; color: string }> = {
-      Safe: { name: 'Safe', count: 0, color: RISK_SCALE.risk1 },
-      Moderate: { name: 'Moderate', count: 0, color: RISK_SCALE.risk2 },
-      High: { name: 'High', count: 0, color: RISK_SCALE.risk3 },
-      'Very High': { name: 'Very High', count: 0, color: RISK_SCALE.risk4 },
-      Extreme: { name: 'Extreme', count: 0, color: RISK_SCALE.risk5 },
-    };
+  // 4. Distribution: 5 Bands horizontal breakdown
+  const distributionData = useMemo(() => {
+    const records = allRisk || [];
+    const total = records.length;
 
-    allRisk.forEach((r) => {
-      const b = getRiskBand(r.risk_score).label;
-      if (counts[b]) counts[b].count += 1;
+    const bands = [
+      { key: 'risk1', name: 'Safe', color: RISK_SCALE.risk1, count: 0 },
+      { key: 'risk2', name: 'Moderate', color: RISK_SCALE.risk2, count: 0 },
+      { key: 'risk3', name: 'High', color: RISK_SCALE.risk3, count: 0 },
+      { key: 'risk4', name: 'Very High', color: RISK_SCALE.risk4, count: 0 },
+      { key: 'risk5', name: 'Extreme', color: RISK_SCALE.risk5, count: 0 },
+    ];
+
+    records.forEach((r) => {
+      const score = Number(r.risk_score ?? 0);
+      const bandInfo = getRiskBand(score);
+      const found =
+        bands.find((b) => b.name.toLowerCase() === bandInfo.label.toLowerCase()) ||
+        bands.find((b) => b.color === bandInfo.color);
+      if (found) {
+        found.count += 1;
+      }
     });
 
-    return Object.values(counts).filter((c) => c.count > 0);
+    return {
+      total,
+      rows: bands.map((b) => ({
+        ...b,
+        percentage: total > 0 ? Math.round((b.count / total) * 100) : 0,
+      })),
+    };
   }, [allRisk]);
 
   return (
@@ -433,7 +445,7 @@ export const Analytics: React.FC = () => {
 
       {/* 4. Donut Chart & Heat Calendar */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Donut Chart: Wards Distribution by Risk Band (4 cols) */}
+        {/* Wards Distribution by Risk Band (4 cols) */}
         <Card className="lg:col-span-4 p-5 space-y-4">
           <div className="border-b border-border pb-3">
             <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-ink">
@@ -444,49 +456,54 @@ export const Analytics: React.FC = () => {
             </span>
           </div>
 
-          <div className="h-64 w-full flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={donutData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={55}
-                  outerRadius={85}
-                  paddingAngle={2}
-                  dataKey="count"
-                >
-                  {donutData.map((entry, index) => (
-                    <Cell key={`donut-${index}`} fill={entry.color} stroke={TOKENS.raised} strokeWidth={2} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: TOKENS.raised,
-                    borderColor: TOKENS.border,
-                    borderRadius: '6px',
-                    fontFamily: 'monospace',
-                    fontSize: '11px',
-                  }}
-                  formatter={(val: any, name: any) => [`${val} Wards`, name]}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="space-y-1.5 pt-2 border-t border-border">
-            {donutData.map((d) => (
-              <div key={d.name} className="flex items-center justify-between text-xs font-mono">
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
-                  <span className="text-muted">{d.name}</span>
-                </span>
-                <span className="font-bold text-ink">{d.count} Wards</span>
+          {distributionData.total === 0 ? (
+            <div className="h-64 w-full flex flex-col items-center justify-center p-6 text-center space-y-2 rounded-[6px] bg-raised/40 border border-dashed border-border">
+              <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center border border-border">
+                <MapPin className="w-4 h-4 text-muted" />
               </div>
-            ))}
-          </div>
+              <div className="text-sm font-semibold text-ink font-display">
+                No ward data for this city
+              </div>
+              <div className="text-xs text-muted font-mono">
+                {selectedCity || selection.cityCode || 'Selected Region'} · District-level data only
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3 pt-1">
+              <div className="space-y-2.5">
+                {distributionData.rows.map((row) => (
+                  <div key={row.name} className="space-y-1 text-xs font-mono">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: row.color }} />
+                        <span className="font-medium text-ink">{row.name}</span>
+                      </span>
+                      <span className="font-bold text-ink tabular-nums">
+                        {row.count} {row.count === 1 ? 'ward' : 'wards'} ({row.percentage}%)
+                      </span>
+                    </div>
+                    <div className="w-full bg-raised rounded-full h-2.5 overflow-hidden border border-border/50">
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${row.percentage}%`,
+                          backgroundColor: row.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-2 border-t border-border flex items-center justify-between text-[10px] font-mono text-muted">
+                <span>Total: <strong className="text-ink">{distributionData.total} Wards</strong></span>
+                <span>Unit: Ward Count</span>
+              </div>
+            </div>
+          )}
+
           <div className="pt-2 border-t border-border text-[10px] font-mono text-muted text-center">
-            Source: Live Municipal Telemetry · Unit: Ward Count
+            Source: Live Municipal Telemetry · Scale: Risk Bands 1–5
           </div>
         </Card>
 

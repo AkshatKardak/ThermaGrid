@@ -4,6 +4,7 @@ import {
   Line,
   BarChart,
   Bar,
+  LabelList,
   XAxis,
   YAxis,
   Tooltip,
@@ -174,28 +175,30 @@ export const ReportsTab: React.FC = () => {
 
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyWardsCovered} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+              <BarChart data={monthlyWardsCovered} margin={{ top: 20, right: 20, left: 0, bottom: 10 }}>
                 <XAxis
                   dataKey="month"
                   stroke={TOKENS.border}
-                  tick={{ fill: TOKENS.ink, fontSize: 11, fontFamily: 'IBM Plex Mono' }}
+                  tick={{ fill: TOKENS.ink, fontSize: 11, fontFamily: 'monospace' }}
                 />
                 <YAxis
-                  domain={[0, 26]}
+                  domain={[0, 28]}
                   stroke={TOKENS.border}
-                  tick={{ fill: TOKENS.muted, fontSize: 10, fontFamily: 'IBM Plex Mono' }}
+                  tick={{ fill: TOKENS.muted, fontSize: 10, fontFamily: 'monospace' }}
                 />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: TOKENS.surface,
                     borderColor: TOKENS.border,
                     borderRadius: '6px',
-                    fontFamily: 'IBM Plex Mono',
+                    fontFamily: 'monospace',
                     fontSize: '11px',
                   }}
                   formatter={(val: any) => [`${val} wards`, 'Surveillance Reach']}
                 />
-                <Bar dataKey="wards" name="Wards Covered" fill={TOKENS.border} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="wards" name="Wards Covered" fill={TOKENS.accent} radius={[4, 4, 0, 0]}>
+                  <LabelList dataKey="wards" position="top" fill={TOKENS.ink} fontSize={11} fontFamily="monospace" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>

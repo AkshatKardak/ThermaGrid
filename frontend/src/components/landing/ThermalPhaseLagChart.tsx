@@ -22,7 +22,7 @@ const ARCHETYPES: Record<ArchetypeKey, ArchetypeConfig> = {
     label: 'Informal Tin-Roof',
     sublabel: 'Corrugated sheet, no insulation, rapid nocturnal cooling',
     lagHours: 0.9,
-    lagLabel: 'Indoor peak 55m after outdoor peak',
+    lagLabel: 'Tin, +55m lag',
     damping: 1.18,
     solarOffset: 3.4,
   },
@@ -31,7 +31,7 @@ const ARCHETYPES: Record<ArchetypeKey, ArchetypeConfig> = {
     label: 'Engineered RCC Concrete',
     sublabel: 'Heavy thermal mass envelope, 2–3h late-afternoon phase delay',
     lagHours: 2.5,
-    lagLabel: 'Indoor peak 2h 30m after outdoor peak',
+    lagLabel: 'RCC, +2.5h lag',
     damping: 0.72,
     solarOffset: 0.8,
   },
@@ -40,7 +40,7 @@ const ARCHETYPES: Record<ArchetypeKey, ArchetypeConfig> = {
     label: 'Air Conditioned Home',
     sublabel: 'Air conditioning eliminates heat spikes and night heat traps',
     lagHours: 0.2,
-    lagLabel: 'Active climate regulation (steady cool)',
+    lagLabel: 'AC, steady',
     damping: 0.15,
     solarOffset: -6.5,
   },
@@ -287,26 +287,42 @@ export const ThermalPhaseLagChart: React.FC = () => {
           <circle cx={markerX} cy={getY(nowIndoor)} r={4} fill={TOKENS.ink} />
           <circle cx={markerX} cy={getY(nowOutdoor)} r={3.5} fill={TOKENS.muted} />
 
-          {/* Marker Top Pill Label */}
-          <g transform={`translate(${Math.min(width - padRight - 150, Math.max(padLeft, markerX - 60))}, ${padTop - 24})`}>
-            <rect
-              x={0}
-              y={0}
-              width={130}
-              height={18}
-              rx={3}
-              fill={TOKENS.raised}
-              stroke={TOKENS.border}
-            />
-            <text
-              x={65}
-              y={12}
-              textAnchor="middle"
-              className="fill-ink font-mono text-[9px] font-bold"
-            >
-              NOW · {config.lagLabel.split('after')[0].trim()}
-            </text>
-          </g>
+          {/* Marker Tooltip / Pill Label: max 18 chars, 8px offset, flips below within 40px of top edge */}
+          {(() => {
+            const rawLabel = `Now: ${config.lagLabel}`;
+            const fullText = `Now (${formatNumber(nowHour, 1)}h) · ${config.label}: ${config.lagLabel}`;
+            const displayLabel = rawLabel.length > 18 ? `${rawLabel.slice(0, 17)}…` : rawLabel;
+            const pillW = 126;
+            const pillH = 18;
+            const pillX = Math.min(width - padRight - pillW, Math.max(padLeft, markerX - pillW / 2));
+            // padTop is 32. Above placement (padTop - 24 = 8px) is within 40px of top edge (< 40px).
+            // Flip below with 8px offset when within 40px of card's top edge
+            const isNearTopEdge = padTop - 24 < 40;
+            const tooltipY = isNearTopEdge ? padTop + 8 : padTop - 26;
+
+            return (
+              <g transform={`translate(${pillX}, ${tooltipY})`} className="cursor-help">
+                <rect
+                  x={0}
+                  y={0}
+                  width={pillW}
+                  height={pillH}
+                  rx={3}
+                  fill={TOKENS.raised}
+                  stroke={TOKENS.border}
+                />
+                <text
+                  x={pillW / 2}
+                  y={12}
+                  textAnchor="middle"
+                  className="fill-ink font-mono text-[9px] font-bold"
+                >
+                  {displayLabel}
+                </text>
+                <title>{fullText}</title>
+              </g>
+            );
+          })()}
         </svg>
       </div>
 

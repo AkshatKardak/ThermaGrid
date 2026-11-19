@@ -200,24 +200,31 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
 
   return (
     <div className={containerClasses} style={style}>
+      <style>{`
+        .leaflet-tile-pane { z-index: 0 !important; }
+        .leaflet-overlay-pane { z-index: 1 !important; }
+        .leaflet-marker-pane, .leaflet-tooltip-pane { z-index: 2 !important; }
+        .leaflet-tooltip { white-space: nowrap !important; }
+      `}</style>
+
       {/* Top Floating Control Bar */}
-      <div className="absolute top-3 left-3 right-3 z-[1000] pointer-events-none flex items-center justify-between gap-3">
-        {/* Left Status & Breadcrumb */}
-        <div className="pointer-events-auto bg-surface/95 backdrop-blur-md px-3.5 py-1.5 rounded-[8px] border border-border shadow-md flex items-center gap-2.5 text-xs font-mono">
-          <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
+      <div className="absolute top-4 left-4 right-4 z-[2] pointer-events-none flex flex-wrap items-start justify-between gap-3">
+        {/* Left Status & Breadcrumb (Padded down on desktop to clear the top-left KPI strip exclusion zone) */}
+        <div className="pointer-events-auto bg-raised border border-border px-3.5 py-1.5 rounded-[8px] shadow-sm flex items-center gap-2.5 text-xs font-mono whitespace-nowrap mt-0 lg:mt-[96px] z-[2]">
+          <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse shrink-0" />
           <span className="font-bold text-ink hidden sm:inline">
             National Heat Early Warning Map
           </span>
           <span className="text-muted hidden sm:inline">•</span>
-          <span className="text-ink font-semibold">
+          <span className="text-ink font-semibold whitespace-nowrap">
             {activeViewMode === 'india'
               ? '🇮🇳 Pan-India National Telemetry'
               : `🎯 ${selectedWard?.ward_name || (wards && wards.length > 0 ? wards[0]?.ward_name : 'Active Sector')}`}
           </span>
         </div>
 
-        {/* Right Action Buttons */}
-        <div className="pointer-events-auto flex items-center gap-1.5 bg-surface/95 backdrop-blur-md p-1 rounded-[8px] border border-border shadow-md">
+        {/* Right Action Buttons (Positioned with right margin on desktop to clear Alert Composer) */}
+        <div className="pointer-events-auto flex items-center gap-1.5 bg-raised p-1 rounded-[8px] border border-border shadow-sm z-[2] lg:mr-[396px]">
           {/* View Toggles */}
           <button
             type="button"
@@ -226,7 +233,7 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
             className={`px-2.5 py-1 rounded-[6px] text-xs font-mono font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
               activeViewMode === 'india'
                 ? 'bg-accent text-on-accent shadow-sm'
-                : 'text-muted hover:text-ink hover:bg-raised'
+                : 'text-muted hover:text-ink hover:bg-surface'
             }`}
           >
             <span>Whole India</span>
@@ -239,7 +246,7 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
             className={`px-2.5 py-1 rounded-[6px] text-xs font-mono font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
               activeViewMode === 'ward'
                 ? 'bg-accent text-on-accent shadow-sm'
-                : 'text-muted hover:text-ink hover:bg-raised'
+                : 'text-muted hover:text-ink hover:bg-surface'
             }`}
           >
             <span>Ward Focus</span>
@@ -252,7 +259,7 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             title={isExpanded ? 'Minimize Map (Esc)' : 'Maximize Map (Full Screen)'}
-            className="p-1.5 rounded-[6px] text-muted hover:text-ink hover:bg-raised transition-colors cursor-pointer flex items-center justify-center"
+            className="p-1.5 rounded-[6px] text-muted hover:text-ink hover:bg-surface transition-colors cursor-pointer flex items-center justify-center"
           >
             {isExpanded ? (
               <Minimize2 className="w-4 h-4 text-ink" />
@@ -263,16 +270,16 @@ export const LeafletBaseMap: React.FC<LeafletBaseMapProps> = ({
         </div>
       </div>
 
-      {/* Sovereign National Territory Tag (Bottom Left, like NagarWatch) */}
-      <div className="absolute bottom-3 left-3 z-[1000] pointer-events-auto bg-surface/95 backdrop-blur-md px-3 py-1.5 rounded-[6px] text-[11px] font-mono text-muted border border-border flex items-center gap-2 shadow-sm">
+      {/* Sovereign National Territory Tag (Bottom Center-Left, clear of Intervention Queue) */}
+      <div className="absolute bottom-4 left-4 lg:left-[524px] z-[2] pointer-events-auto bg-raised px-3 py-1.5 rounded-[8px] text-[11px] font-mono text-muted border border-border flex items-center gap-2 shadow-sm whitespace-nowrap">
         <span className="w-2 h-2 rounded-full bg-accent" />
         <span className="font-semibold text-ink">Republic of India</span>
         <span className="text-border">|</span>
-        <span>OpenStreetMap Highways &amp; Localities · Survey of India Boundary</span>
+        <span className="hidden sm:inline">OpenStreetMap Highways &amp; Localities · Survey of India Boundary</span>
       </div>
 
-      {/* 5-Band Risk Scale Legend (Bottom Right) */}
-      <div className="absolute bottom-3 right-3 z-[1000] pointer-events-auto p-2.5 rounded-[6px] bg-surface/95 backdrop-blur-md border border-border text-ink space-y-1 shadow-sm font-mono text-[10px]">
+      {/* 5-Band Risk Scale Legend (Bottom Right, 16px gutter) */}
+      <div className="absolute bottom-4 right-4 z-[2] pointer-events-auto p-2.5 rounded-[8px] bg-raised border border-border text-ink space-y-1 shadow-sm font-mono text-[10px]">
         <span className="text-[10px] text-muted uppercase font-bold block">
           HTSI Risk Scale
         </span>

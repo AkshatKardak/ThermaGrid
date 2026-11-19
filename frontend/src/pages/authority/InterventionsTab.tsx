@@ -1,22 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
 import { ShieldCheck, Plus, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { apiClient } from '../../lib/api';
 import { useWards } from '../../hooks/useWards';
 import { useAllWardsRisk } from '../../hooks/useRisk';
 import { useAppStore } from '../../store/useAppStore';
-import { TOKENS } from '../../theme/tokens';
+import { TOKENS, getRiskBand } from '../../theme/tokens';
 import { Card } from '../../components/ui/Card';
 import { formatNumber } from '../../utils/format';
+
+interface PairedBarItem {
+  name: string;
+  before: number;
+  after: number;
+  delta: number;
+  bandColor: string;
+  bandLabel: string;
+}
 
 export const InterventionsTab: React.FC = () => {
   const { selectedCity } = useAppStore();
@@ -129,16 +129,24 @@ export const InterventionsTab: React.FC = () => {
   }, [outcomesData, riskData, wardsData]);
 
   // Chart data: paired bar per intervention (before vs after)
-  const pairedBarData = useMemo(() => {
+  const pairedBarData = useMemo<PairedBarItem[]>(() => {
     return queueItems
       .filter((item: any) => typeof item.risk_before === 'number' && typeof item.risk_after === 'number')
       .slice(0, 8)
-      .map((item: any) => ({
-        name: item.ward_name,
-        before: Number(formatNumber(item.risk_before, 1, '0')),
-        after: Number(formatNumber(item.risk_after, 1, '0')),
-        delta: Number(formatNumber(item.risk_before - item.risk_after, 1, '0')),
-      }));
+      .map((item: any) => {
+        const before = Number(formatNumber(item.risk_before, 1, '0'));
+        const after = Number(formatNumber(item.risk_after, 1, '0'));
+        const delta = Number(formatNumber(before - after, 1, '0'));
+        const band = getRiskBand(before);
+        return {
+          name: item.ward_name,
+          before,
+          after,
+          delta,
+          bandColor: band.color,
+          bandLabel: band.label,
+        };
+      });
   }, [queueItems]);
 
   return (
@@ -162,56 +170,106 @@ export const InterventionsTab: React.FC = () => {
       </div>
 
       {/* Paired Bar Chart: Before vs After per Intervention */}
-      <Card className="p-5 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+      <Card className="p-5 space-y-4 bg-surface border border-border">
+        {/* Card Header Row with Title on Left and Legend on Right */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
           <div>
             <h3 className="text-sm font-bold font-display text-ink">
               Heat Danger Before vs After Cooling Action
             </h3>
             <span className="text-xs text-muted font-sans">
-              Measured danger reduction (0–100 scale) labeled as <em className="text-ink not-italic font-medium">cooling drop from field action</em>
+              Measured danger reduction (0–100 scale) per target municipal ward
             </span>
           </div>
-          <div className="text-xs font-mono text-muted bg-surface px-2.5 py-1 rounded-[4px] border border-border">
-            Scale: 0–100 Heat Danger · Source: City Action Registry
+
+          {/* Legend OUTSIDE the plotting area, top-right of card header */}
+          <div className="flex items-center gap-4 text-xs font-mono shrink-0">
+            <span className="flex items-center gap-1.5" title="Colored by ward risk band">
+              <span className="w-3 h-2.5 rounded-[2px] bg-risk-4" />
+              <span className="text-muted">Risk Before</span>
+            </span>
+            <span className="flex items-center gap-1.5" title="One step lighter in the same hue">
+              <span className="w-3 h-2.5 rounded-[2px] bg-risk-4/50 border border-border" />
+              <span className="text-muted">Risk After</span>
+            </span>
+            <span className="flex items-center gap-1.5" title="Net measured cooling drop">
+              <span className="text-accent font-semibold">(-Δ pts)</span>
+            </span>
           </div>
         </div>
 
         {pairedBarData.length > 0 ? (
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pairedBarData} margin={{ top: 12, right: 12, left: -10, bottom: 20 }}>
-                <XAxis
-                  dataKey="name"
-                  stroke={TOKENS.border}
-                  tick={{ fill: TOKENS.muted, fontSize: 11, fontFamily: 'monospace' }}
-                  angle={-15}
-                  textAnchor="end"
-                />
-                <YAxis
-                  stroke={TOKENS.border}
-                  tick={{ fill: TOKENS.muted, fontSize: 11, fontFamily: 'monospace' }}
-                  domain={[0, 100]}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: TOKENS.raised,
-                    borderColor: TOKENS.border,
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                  }}
-                  formatter={(val: any, name: any) => [
-                    `${val} pts`,
-                    name === 'before' ? 'Before Action' : 'After Action',
-                  ]}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: '11px', fontFamily: 'monospace', paddingTop: '8px' }}
-                />
-                <Bar dataKey="before" name="Risk Before Action" fill={TOKENS.error} radius={[3, 3, 0, 0]} />
-                <Bar dataKey="after" name="Risk After Action" fill={TOKENS.accent} radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="space-y-3 pt-1">
+            {/* Horizontal Bar Chart Body */}
+            <div className="space-y-2.5">
+              {pairedBarData.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-3 text-xs font-mono group">
+                  {/* Left Ward Name Label: 180px fixed width, straight, never rotated, with tooltip */}
+                  <div
+                    className="w-[180px] shrink-0 text-right font-medium text-ink truncate cursor-help"
+                    title={item.name}
+                  >
+                    {item.name.length > 22 ? `${item.name.slice(0, 21)}…` : item.name}
+                  </div>
+
+                  {/* Horizontal Bar Pair Container (4px apart) */}
+                  <div className="flex-1 space-y-1">
+                    {/* Before Bar */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-raised/70 rounded-[2px] h-[13px] relative overflow-hidden">
+                        <div
+                          className="h-full rounded-[2px] transition-all duration-300"
+                          style={{
+                            width: `${Math.min(Math.max(item.before, 5), 100)}%`,
+                            backgroundColor: item.bandColor,
+                          }}
+                        />
+                      </div>
+                      <span className="w-8 text-[11px] font-mono text-ink text-right tabular-nums shrink-0">
+                        {item.before}
+                      </span>
+                    </div>
+
+                    {/* After Bar (4px below Before bar, in same hue one step lighter) */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-raised/70 rounded-[2px] h-[13px] relative overflow-hidden">
+                        <div
+                          className="h-full rounded-[2px] transition-all duration-300"
+                          style={{
+                            width: `${Math.min(Math.max(item.after, 5), 100)}%`,
+                            backgroundColor: `color-mix(in srgb, ${item.bandColor} 45%, var(--surface))`,
+                            border: `1px solid color-mix(in srgb, ${item.bandColor} 80%, transparent)`,
+                          }}
+                        />
+                      </div>
+                      <span className="w-8 text-[11px] font-mono text-muted text-right tabular-nums shrink-0">
+                        {item.after}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Delta Printed at End of Pair */}
+                  <div className="w-16 shrink-0 text-right">
+                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-accent/15 text-accent border border-accent/30 tabular-nums">
+                      -{item.delta}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Scale Axis Row */}
+            <div className="flex items-center gap-3 pt-2 border-t border-border/60 text-[10px] font-mono text-muted">
+              <div className="w-[180px] shrink-0 text-right pr-1">Scale (0–100):</div>
+              <div className="flex-1 flex justify-between px-1">
+                <span>0</span>
+                <span>25</span>
+                <span>50</span>
+                <span>75</span>
+                <span>100 pts</span>
+              </div>
+              <div className="w-16 shrink-0 text-right">Cooling Drop</div>
+            </div>
           </div>
         ) : (
           <div className="h-48 flex items-center justify-center text-xs font-mono text-muted border border-border rounded-[6px] bg-surface">

@@ -10,6 +10,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import type { HourlyRiskForecastItem } from '../../types';
+import { TOKENS } from '../../theme/tokens';
 
 interface ForecastConfidenceChartProps {
   items: HourlyRiskForecastItem[];
@@ -39,27 +40,27 @@ export const ForecastConfidenceChart: React.FC<ForecastConfidenceChartProps> = (
     <div className="w-full h-72">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#CFC8B8" />
+          <CartesianGrid strokeDasharray="3 3" stroke={TOKENS.border} />
           <XAxis
             dataKey="time"
-            stroke="#5E645F"
+            stroke={TOKENS.muted}
             fontSize={10}
             tickLine={false}
           />
           <YAxis
             dataKey="risk"
-            stroke="#5E645F"
+            stroke={TOKENS.muted}
             fontSize={11}
             domain={[0, 100]}
             tickLine={false}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#FBF9F4',
-              borderColor: '#CFC8B8',
+              backgroundColor: TOKENS.surface,
+              borderColor: TOKENS.border,
               borderRadius: '8px',
               fontSize: '11px',
-              color: '#1A1E1C',
+              color: TOKENS.ink,
             }}
           />
           {/* Shaded 80% Confidence Interval Band */}
@@ -67,7 +68,7 @@ export const ForecastConfidenceChart: React.FC<ForecastConfidenceChartProps> = (
             type="monotone"
             dataKey="confidenceBand"
             stroke="none"
-            fill="#FF704F"
+            fill={TOKENS.accent}
             fillOpacity={0.15}
             name="80% Confidence Band"
           />
@@ -75,7 +76,7 @@ export const ForecastConfidenceChart: React.FC<ForecastConfidenceChartProps> = (
           <Line
             type="monotone"
             dataKey="risk"
-            stroke="#FF704F"
+            stroke={TOKENS.accent}
             strokeWidth={2}
             dot={false}
             name="Predicted Risk Score"

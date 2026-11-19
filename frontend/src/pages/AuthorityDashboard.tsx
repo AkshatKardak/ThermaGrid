@@ -341,13 +341,14 @@ export const AuthorityDashboard: React.FC = () => {
 
           {/* Desktop Floating Panels (Anchored 16px from edges) */}
           {/* Below 1080px (lg): panels stack into a scrollable column under a 40vh map */}
-          <div className="relative lg:static w-full h-full pointer-events-none z-10 flex flex-col lg:block overflow-y-auto lg:overflow-hidden p-4 lg:p-0 space-y-4 lg:space-y-0">
+          <div className="relative lg:static w-full h-full pointer-events-none z-[3] flex flex-col lg:block overflow-y-auto lg:overflow-hidden p-4 lg:p-0 space-y-4 lg:space-y-0">
             {/* 1. TOP-LEFT ANCHOR: KPI Strip (Four numerals in one row, hairline separators) */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: MOTION.base.duration, ease: MOTION.base.ease }}
-              className="lg:absolute lg:top-4 lg:left-4 pointer-events-auto rounded-[10px] bg-surface border border-border p-3 sm:p-4 w-full lg:w-auto"
+              className="lg:absolute lg:top-4 lg:left-4 pointer-events-auto rounded-[8px] bg-raised border border-border p-3 sm:p-4 w-full lg:w-auto shadow-md z-[3]"
+              style={{ backgroundColor: 'var(--raised)' }}
             >
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-border">
                 {/* 1. Wards Very High */}
