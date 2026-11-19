@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.models.location import Location
 from app.models.risk import WardRiskCurrent
 from app.schemas.risk import RiskCurrentOut, RiskForecastOut
 from app.services.forecast_service import ForecastService
@@ -293,6 +294,7 @@ def get_risk_forecast(
 @router.get("/all", response_model=list[RiskCurrentOut])
 def get_all_wards_risk(
     city: str | None = Query(None, description="Filter by city, e.g. Mumbai"),
+    state: str | None = Query(None, description="Filter by state, e.g. Maharashtra"),
     level: str | None = Query(
         None, description="Filter by hierarchy level ('ward' | 'district' | 'state')"
     ),
@@ -304,6 +306,10 @@ def get_all_wards_risk(
     Never mixes hierarchy tiers in a single aggregate.
     """
     query = db.query(WardRiskCurrent)
+    if state:
+        query = query.join(Location, WardRiskCurrent.location_id == Location.id).filter(
+            Location.state.ilike(f"%{state}%")
+        )
     if level:
         query = query.filter(WardRiskCurrent.level == level)
     elif city:
@@ -311,7 +317,7 @@ def get_all_wards_risk(
         first_row = query.first()
         if first_row:
             query = query.filter(WardRiskCurrent.level == first_row.level)
-    else:
+    elif not state:
         query = query.filter(WardRiskCurrent.level == "ward")
 
     rows = query.order_by(WardRiskCurrent.risk_score.desc()).all()

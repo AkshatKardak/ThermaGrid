@@ -7,7 +7,7 @@ export const InterventionQueue: React.FC = () => {
     {
       id: 1,
       type: 'Water Tanker Deployment',
-      target: 'Ward M/East (Shivaji Nagar Sector 4)',
+      target: 'Ward M-East (Shivaji Nagar Sector 4)',
       status: 'Dispatched',
       priority: 'High',
       icon: Truck,

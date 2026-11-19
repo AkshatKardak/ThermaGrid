@@ -28,7 +28,7 @@ import { getRiskHex } from '../components/landing3d/palette';
 import { formatNumber, roundNumber } from '../utils/format';
 
 export const Analytics: React.FC = () => {
-  const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
+  const { selection, setSelection, selectedCity, selectedLocationId } = useAppStore();
   const { data: wards } = useWards(selectedCity);
   const { data: history } = useThermalHistory(selectedLocationId, 3);
   const { data: allRisk } = useAllWardsRisk(selectedCity);
@@ -187,7 +187,7 @@ export const Analytics: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-muted mt-1 leading-relaxed max-w-2xl">
-            Hyperlocal neighborhood patterns, Heat Stress Index (HTSI) exposure maps, and cross-ward comparisons for {selectedCity}.
+            Hyperlocal neighborhood patterns, Heat Stress Index (HTSI) exposure maps, and cross-ward comparisons for {selectedWard?.city || selection.cityCode || 'Selected Region'}.
           </p>
         </div>
 
@@ -215,7 +215,7 @@ export const Analytics: React.FC = () => {
         </span>
         <select
           value={selectedLocationId}
-          onChange={(e) => setSelectedLocationId(Number(e.target.value))}
+          onChange={(e) => setSelection({ wardId: Number(e.target.value) })}
           className="bg-raised text-ink text-xs font-mono px-3 py-1.5 rounded-[6px] border border-border outline-none cursor-pointer focus:border-accent"
         >
           {wards?.map((w) => (

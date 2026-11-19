@@ -95,10 +95,10 @@ export const LocationDetails: React.FC = () => {
           <div>
             <div className="flex items-center gap-3">
               <span className="text-xs font-mono text-ink font-bold px-2 py-0.5 rounded bg-surface border border-border">
-                {ward?.ward_code || 'WARD M/E'}
+                {ward?.ward_code || 'WARD'}
               </span>
               <h1 className={`${TYPOGRAPHY.h1} text-ink`}>
-                {ward?.ward_name || 'Ward M/East (Govandi)'}
+                {ward?.ward_name || 'Select a ward'}
               </h1>
               {risk?.is_demo && <DemoBadge label={risk.demo_label} />}
             </div>

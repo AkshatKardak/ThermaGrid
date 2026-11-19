@@ -33,7 +33,8 @@ import { getRiskBand } from '../theme/tokens';
 import { TYPOGRAPHY } from '../theme/typography';
 
 export const CitizenDashboard: React.FC = () => {
-  const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
+  const { selection, setSelection, selectedCity, selectedLocationId } = useAppStore();
+  const activeCity = selection.cityCode || selectedCity;
   const { data: wards } = useWards(selectedCity);
   const { data: risk } = useCurrentRisk(selectedLocationId);
   const { data: thermal } = useCurrentThermal(selectedLocationId);
@@ -80,7 +81,7 @@ export const CitizenDashboard: React.FC = () => {
                   <button
                     key={w.id}
                     onClick={() => {
-                      setSelectedLocationId(w.id);
+                      setSelection({ wardId: w.id });
                       setSearchQuery('');
                     }}
                     className="w-full px-3.5 py-2 text-left text-xs font-mono hover:bg-surface text-ink flex items-center justify-between cursor-pointer"
@@ -97,7 +98,7 @@ export const CitizenDashboard: React.FC = () => {
           <button
             type="button"
             onClick={() => {
-              if (wards && wards.length > 0) setSelectedLocationId(wards[0].id);
+              if (wards && wards.length > 0) setSelection({ wardId: wards[0].id });
             }}
             className="w-full md:w-auto px-4 py-2.5 rounded-[8px] bg-raised hover:bg-surface border border-border text-xs font-mono text-ink flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
@@ -114,7 +115,7 @@ export const CitizenDashboard: React.FC = () => {
           {recentWards.map((w) => (
             <button
               key={w.id}
-              onClick={() => setSelectedLocationId(w.id)}
+              onClick={() => setSelection({ wardId: w.id })}
               className={`px-2.5 py-1 rounded-[6px] text-xs font-mono transition-all cursor-pointer ${
                 w.id === selectedLocationId
                   ? 'bg-accent text-on-accent border border-accent font-semibold'
@@ -357,7 +358,7 @@ export const CitizenDashboard: React.FC = () => {
 
       {/* 8. P1-7 Feature: Usable Cooling Centres */}
       <section className="space-y-4">
-        <CoolingCentresList city={selectedCity} />
+        <CoolingCentresList city={activeCity} />
       </section>
     </div>
   );

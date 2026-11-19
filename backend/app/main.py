@@ -250,7 +250,9 @@ def create_application() -> FastAPI:
         app.include_router(data_sources_router, prefix=prefix)
         app.include_router(planner_router, prefix=prefix)
         app.include_router(subscriptions_router, prefix=prefix)
-        app.include_router(dependents_router, prefix=prefix)
+        # Omit dependents on /api/v1 version
+        if prefix != "/api/v1":
+            app.include_router(dependents_router, prefix=prefix)
         app.include_router(worker_router, prefix=prefix)
         app.include_router(reports_router, prefix=prefix)
 

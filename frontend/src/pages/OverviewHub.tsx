@@ -8,20 +8,50 @@ import { useSubscriptions } from '../hooks/useSubscriptions';
 import { HourlyStrip } from '../components/risk/HourlyStrip';
 import { TonightCard } from '../components/risk/TonightCard';
 import { IndoorHeatCard } from '../components/risk/IndoorHeatCard';
-import { CareCircleStrip } from '../components/care/CareCircleStrip';
 import { getRiskBand } from '../theme/tokens';
 import { formatNumber } from '../utils/format';
 
 export const OverviewHub: React.FC = () => {
-  const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
+  const { selection, setSelection } = useAppStore();
 
-  const activeId = selectedLocationId || 1;
-  const { data: ward } = useWardDetails(activeId);
+  const activeId = selection.wardId;
+  const { data: ward, isLoading: isWardLoading } = useWardDetails(activeId);
   const { data: risk } = useCurrentRisk(activeId);
   const { data: forecast } = useRiskForecast(activeId);
-  const { data: allWardsRisk } = useAllWardsRisk(selectedCity);
-  const { data: wardsList } = useWards(selectedCity);
+  const { data: allWardsRisk } = useAllWardsRisk(
+    selection.cityCode || undefined,
+    selection.stateCode || undefined
+  );
+  const { data: wardsList, isLoading: isWardsLoading } = useWards(
+    selection.cityCode || undefined,
+    selection.stateCode || undefined
+  );
   const { data: subscriptions } = useSubscriptions();
+
+  // Defensive invariant check: if fetched ward disagrees with selected city, reject & log
+  const isMismatch = Boolean(
+    ward &&
+    selection.cityCode &&
+    ward.city.toLowerCase() !== selection.cityCode.toLowerCase() &&
+    ward.ward_code.toLowerCase() !== selection.cityCode.toLowerCase()
+  );
+
+  if (import.meta.env.DEV && isMismatch) {
+    console.error('Ward/city mismatch', { ward: ward?.city, sel: selection.cityCode });
+  }
+
+  const validFetchedWard = isMismatch ? null : ward;
+  const cityDistrictFallback =
+    !validFetchedWard &&
+    wardsList &&
+    wardsList.length > 0 &&
+    wardsList[0].city.toLowerCase() === (selection.cityCode || '').toLowerCase()
+      ? wardsList[0]
+      : null;
+  const effectiveWard = validFetchedWard || cityDistrictFallback;
+  const isDistrictTier =
+    effectiveWard?.level === 'district' ||
+    Boolean(wardsList && wardsList.length > 0 && wardsList.every((w) => w.level === 'district'));
 
   const riskScore = Math.round(risk?.risk_score ?? 68);
   const bandDef = getRiskBand(riskScore);
@@ -46,8 +76,8 @@ export const OverviewHub: React.FC = () => {
   }, [forecast]);
 
   const populationExposed = React.useMemo(() => {
-    return (ward?.population || 845000).toLocaleString();
-  }, [ward]);
+    return (effectiveWard?.population || 845000).toLocaleString();
+  }, [effectiveWard]);
 
   // Combine risk telemetry with demographic workers
   const wardsTableData = React.useMemo(() => {
@@ -96,9 +126,29 @@ export const OverviewHub: React.FC = () => {
       {/* Context Bar: Location & Quick Links (Zero icons) */}
       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-4 border-b border-border">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold font-display text-ink tracking-tight">
-            {ward?.ward_name || 'Active Ward'} · {selectedCity}
-          </h1>
+          {effectiveWard ? (
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-bold font-display text-ink tracking-tight">
+                {effectiveWard.ward_name} · {effectiveWard.city}
+              </h1>
+              {isDistrictTier && (
+                <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono uppercase bg-raised text-muted border border-border">
+                  District-level data only
+                </span>
+              )}
+            </div>
+          ) : isWardLoading || isWardsLoading ? (
+            <div className="h-8 w-64 bg-raised/70 animate-pulse rounded-[4px]" />
+          ) : (
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-bold font-display text-ink tracking-tight">
+                Select a ward
+              </h1>
+              <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-mono uppercase bg-raised text-muted border border-border">
+                District-level data only
+              </span>
+            </div>
+          )}
           <span className="text-xs font-mono text-muted mt-0.5 block">
             Hyperlocal heat danger and real-time ward safety monitoring
           </span>
@@ -175,7 +225,7 @@ export const OverviewHub: React.FC = () => {
       <div className="space-y-3 pb-8 border-b border-border">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono uppercase tracking-wider text-muted">
-            Wards at Risk ({selectedCity})
+            Wards at Risk ({effectiveWard?.city || selection.cityCode || 'Active Region'})
           </span>
           <span className="text-[11px] font-mono text-muted">
             Sorted by physiological thermal risk
@@ -196,11 +246,11 @@ export const OverviewHub: React.FC = () => {
             </thead>
             <tbody>
               {wardsTableData.map((w) => {
-                const isSelected = w.id === activeId;
+                const isSelected = w.id === (effectiveWard?.id || activeId);
                 return (
                   <tr
                     key={w.id}
-                    onClick={() => setSelectedLocationId(w.id)}
+                    onClick={() => setSelection({ wardId: w.id })}
                     className={`h-8 border-b border-border text-xs cursor-pointer transition-colors ${
                       isSelected
                         ? 'bg-surface text-ink font-medium'
@@ -242,15 +292,15 @@ export const OverviewHub: React.FC = () => {
         </div>
       </div>
 
-      {/* Row 4 — Two Columns (Left: Tonight + Indoor cards; Right: Subscriptions + Care Circle) */}
+      {/* Row 4 — Two Columns (Left: Tonight + Indoor cards; Right: Subscriptions) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* Left Column: Tonight + Indoor Cards */}
         <div className="space-y-6">
-          <TonightCard locationId={activeId} />
-          <IndoorHeatCard locationId={activeId} />
+          <TonightCard locationId={effectiveWard?.id || activeId || 1} />
+          <IndoorHeatCard locationId={effectiveWard?.id || activeId || 1} />
         </div>
 
-        {/* Right Column: Subscriptions + Care Circle */}
+        {/* Right Column: Subscriptions */}
         <div className="space-y-6">
           <div className="p-6 rounded-[14px] bg-surface border border-border space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-border">
@@ -298,8 +348,6 @@ export const OverviewHub: React.FC = () => {
               </div>
             )}
           </div>
-
-          <CareCircleStrip />
         </div>
       </div>
     </div>

@@ -283,9 +283,13 @@ def test_dependents_care_circle_scoping():
     user1_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_authority', 'authority')}"}
     user2_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_citizen', 'citizen')}"}
 
-    # User 1 adds a dependent
+    # Verify v1 version GET /api/v1/dependents is removed (returns 404)
+    v1_get = client.get("/api/v1/dependents", headers=user2_headers)
+    assert v1_get.status_code == 404
+
+    # User 1 adds a dependent on /api/dependents
     dep_res = client.post(
-        "/api/v1/dependents",
+        "/api/dependents",
         headers=user1_headers,
         json={
             "name": "Amma",
@@ -299,12 +303,12 @@ def test_dependents_care_circle_scoping():
     dep_id = dep_res.json()["id"]
 
     # User 2 lists dependents - should NOT see User 1's dependent
-    user2_deps = client.get("/api/v1/dependents", headers=user2_headers)
+    user2_deps = client.get("/api/dependents", headers=user2_headers)
     assert user2_deps.status_code == 200
     assert dep_id not in [d["id"] for d in user2_deps.json()]
 
     # Clean up
-    del_dep = client.delete(f"/api/v1/dependents/{dep_id}", headers=user1_headers)
+    del_dep = client.delete(f"/api/dependents/{dep_id}", headers=user1_headers)
     assert del_dep.status_code == 204
 
 

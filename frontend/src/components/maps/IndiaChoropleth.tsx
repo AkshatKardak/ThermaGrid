@@ -69,7 +69,7 @@ const DEFAULT_ZOOM = 1;
 
 export const IndiaChoropleth: React.FC = () => {
   const navigate = useNavigate();
-  const { setSelectedState } = useAppStore();
+  const { setSelection } = useAppStore();
   const { data: wardsRisk } = useAllWardsRisk();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -111,7 +111,7 @@ export const IndiaChoropleth: React.FC = () => {
   }, [isExpanded]);
 
   const handleStateClick = (stateName: string) => {
-    setSelectedState(stateName);
+    setSelection({ stateCode: stateName });
     navigate(`/app/wards?state=${encodeURIComponent(stateName)}`);
   };
 
@@ -378,7 +378,7 @@ export const IndiaChoropleth: React.FC = () => {
                   }}
                   onMouseLeave={() => setTooltip(null)}
                   onClick={() => {
-                    setSelectedState(hub.state);
+                    setSelection({ stateCode: hub.state });
                     navigate(`/app/wards?city=${encodeURIComponent(hub.name)}`);
                   }}
                   style={{ cursor: 'pointer' }}

@@ -21,7 +21,7 @@ type Exposure = 'sun' | 'partial' | 'shade';
 type ShiftDuration = '4h' | '6h' | '8h';
 
 export const WorkerRisk: React.FC = () => {
-  const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
+  const { selectedCity, selectedLocationId, setSelection } = useAppStore();
   const { data: wards } = useWards(selectedCity);
   const { data: thermal } = useCurrentThermal(selectedLocationId);
   const { data: risk } = useCurrentRisk(selectedLocationId);
@@ -62,7 +62,7 @@ export const WorkerRisk: React.FC = () => {
             {thermal?.is_demo && <DemoBadge label={thermal.demo_label} />}
           </div>
           <p className={TYPOGRAPHY.bodyL}>
-            Calibrated ISO 7243 screening models for outdoor physical labourers, Gig-workers, and construction trades in {selectedWard?.ward_name || selectedCity}.
+            Calibrated ISO 7243 screening models for outdoor physical labourers, Gig-workers, and construction trades in {selectedWard?.ward_name || selectedWard?.city || 'Monitored Region'}.
           </p>
         </div>
 
@@ -74,7 +74,7 @@ export const WorkerRisk: React.FC = () => {
           <select
             id="worker-ward"
             value={selectedLocationId}
-            onChange={(e) => setSelectedLocationId(Number(e.target.value))}
+            onChange={(e) => setSelection({ wardId: Number(e.target.value) })}
             className="bg-surface text-ink text-xs font-mono px-3 py-2 rounded-[8px] border border-border outline-none cursor-pointer focus:border-accent"
           >
             {wards?.map((w) => (

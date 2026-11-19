@@ -1,22 +1,23 @@
 import React from 'react';
 import { evaluateThermalLag } from '../../lib/thermalLag';
 import { getRiskHex } from './palette';
-import { formatNumber } from '../../utils/format';
+import { formatNumber, roundNumber } from '../../utils/format';
 
 export const ThermalLagStaticFallback: React.FC = () => {
-  const dayState = evaluateThermalLag(15.0); // 15:00 Day Peak
+  const dayState = evaluateThermalLag(14.5); // 14:30 Tin Roof Peak
   const nightState = evaluateThermalLag(3.0); // 03:00 Night Cooldown
+  const nightDelta = roundNumber(nightState.rccIndoorTemp - nightState.tinIndoorTemp, 1);
 
   return (
     <div className="w-full space-y-6 select-none">
-      {/* 2-Panel Comparison: Midday Peak vs Nocturnal Heat Retention */}
+      {/* 2-Panel Comparison: 14:30 Peak vs 03:00 Nocturnal Heat Retention */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Panel 1: 15:00 Daily Peak */}
+        {/* Panel 1: 14:30 Tin Peak */}
         <div className="p-6 rounded-[8px] bg-surface border border-border space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-accent" />
-              <span className="text-xs font-mono font-medium text-ink">15:00 DAILY PEAK</span>
+              <span className="text-xs font-mono font-medium text-ink">14:30 TIN ROOF PEAK</span>
             </div>
             <span className="text-xs font-mono text-muted">
               Outdoor Ambient: <strong className="text-ink">{formatNumber(dayState.outdoorTemp, 1)}°C</strong>
@@ -39,7 +40,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
                   {formatNumber(dayState.tinIndoorTemp, 1)}°C
                 </span>
                 <span className="inline-flex items-center gap-1 text-[10px] uppercase font-mono text-ink">
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getRiskHex(80) }} />
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getRiskHex(85) }} />
                   {dayState.tinAlertGrade}
                 </span>
               </div>
@@ -68,7 +69,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
           </div>
 
           <p className="text-xs font-mono text-muted pt-1">
-            ● At 15:00: Tin indoor spikes +2.4°C above outdoor ambient, while concrete envelope buffers indoor heat.
+            ● At 14:30: Tin indoor spikes to {formatNumber(dayState.tinIndoorTemp, 1)}°C ({formatNumber(dayState.tinIndoorTemp - dayState.outdoorTemp, 1)}°C above ambient), while concrete envelope buffers indoor heat.
           </p>
         </div>
 
@@ -129,7 +130,7 @@ export const ThermalLagStaticFallback: React.FC = () => {
           </div>
 
           <p className="text-xs font-mono text-muted pt-1">
-            ● At 03:00: Concrete slab acts as a nocturnal thermal battery (+3.1°C), preventing core physiological recovery.
+            ● At 03:00, concrete is +{formatNumber(nightDelta, 1)} °C warmer than tin, disrupting physiological recovery.
           </p>
         </div>
       </div>

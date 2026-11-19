@@ -1,5 +1,11 @@
 import { create } from 'zustand';
-import { getCitiesForState, getStateForCity } from '../config/indiaGeo';
+import {
+  firstCityOf,
+  firstWardOf,
+  getStateByCodeOrName,
+  getStateForCity,
+  wardBelongsToCity,
+} from '../config/indiaGeo';
 
 export interface LayerState {
   heatField: boolean;
@@ -14,16 +20,26 @@ export interface TimeRangeState {
   to: string;
 }
 
-interface AppState {
+export type Selection = {
+  stateCode: string | null;
+  cityCode: string | null;
+  wardId: number | null; // derived, never set independently of cityCode
+};
+
+export interface AppState {
+  selection: Selection;
+  // Convenience read fields for backward compatibility
   selectedState: string;
   selectedCity: string;
   selectedLocationId: number;
   timeRange: TimeRangeState;
   activeLayers: LayerState;
 
-  setSelectedState: (state: string) => void;
-  setSelectedCity: (city: string) => void;
-  setSelectedLocationId: (id: number) => void;
+  setSelection: (action: {
+    stateCode?: string | null;
+    cityCode?: string | null;
+    wardId?: number | null;
+  }) => void;
   setTimeRange: (range: TimeRangeState) => void;
   toggleLayer: (layer: keyof LayerState) => void;
   setLayers: (layers: Partial<LayerState>) => void;
@@ -39,6 +55,8 @@ function syncToUrl(
 
   if (wardId) {
     url.searchParams.set('ward', String(wardId));
+  } else {
+    url.searchParams.delete('ward');
   }
   if (timeRange?.from) {
     url.searchParams.set('from', timeRange.from);
@@ -110,38 +128,141 @@ function getInitialParams() {
 
 const initial = getInitialParams();
 
+const initialSelection: Selection = {
+  stateCode: 'MH',
+  cityCode: 'Mumbai',
+  wardId: initial.wardId,
+};
+
 export const useAppStore = create<AppState>((set, get) => ({
+  selection: initialSelection,
   selectedState: 'Maharashtra',
   selectedCity: 'Mumbai',
   selectedLocationId: initial.wardId,
   timeRange: { from: initial.from, to: initial.to },
   activeLayers: initial.layers,
 
-  setSelectedState: (stateName: string) => {
-    const cities = getCitiesForState(stateName);
-    const firstCity = cities[0]?.name || 'Mumbai';
-    set({
-      selectedState: stateName,
-      selectedCity: firstCity,
-    });
-  },
+  setSelection: (action) => {
+    const current = get().selection;
 
-  setSelectedCity: (city: string) => {
-    const matchedState = getStateForCity(city);
-    set({
-      selectedCity: city,
-      ...(matchedState ? { selectedState: matchedState.name } : {}),
-    });
-  },
+    // Case 1: State explicitly changed alone
+    if (action.stateCode !== undefined && action.cityCode === undefined && action.wardId === undefined) {
+      const matchedState = getStateByCodeOrName(action.stateCode);
+      const resolvedStateCode = matchedState ? matchedState.code : action.stateCode;
+      const cityCode = firstCityOf(resolvedStateCode);
+      const wardId = firstWardOf(cityCode);
+      const nextSelection: Selection = {
+        stateCode: resolvedStateCode,
+        cityCode,
+        wardId,
+      };
+      set({
+        selection: nextSelection,
+        selectedState: matchedState?.name || resolvedStateCode || '',
+        selectedCity: cityCode || '',
+        selectedLocationId: wardId || 0,
+      });
+      syncToUrl(wardId ?? undefined, get().timeRange, get().activeLayers);
+      return;
+    }
 
-  setSelectedLocationId: (id: number) => {
-    set({ selectedLocationId: id });
-    syncToUrl(id, get().timeRange, get().activeLayers);
+    // Case 2: City explicitly changed alone
+    if (action.cityCode !== undefined && action.stateCode === undefined && action.wardId === undefined) {
+      const matchedState = getStateForCity(action.cityCode || '');
+      const stateCode = matchedState?.code || current.stateCode;
+      const wardId = firstWardOf(action.cityCode);
+      const nextSelection: Selection = {
+        stateCode,
+        cityCode: action.cityCode,
+        wardId,
+      };
+      set({
+        selection: nextSelection,
+        selectedState: matchedState?.name || current.stateCode || '',
+        selectedCity: action.cityCode || '',
+        selectedLocationId: wardId || 0,
+      });
+      syncToUrl(wardId ?? undefined, get().timeRange, get().activeLayers);
+      return;
+    }
+
+    // Case 3: Ward explicitly changed alone
+    if (action.wardId !== undefined && action.stateCode === undefined && action.cityCode === undefined) {
+      if (action.wardId === null) {
+        const nextSelection: Selection = {
+          ...current,
+          wardId: null,
+        };
+        set({
+          selection: nextSelection,
+          selectedLocationId: 0,
+        });
+        syncToUrl(undefined, get().timeRange, get().activeLayers);
+        return;
+      }
+
+      if (!wardBelongsToCity(action.wardId, current.cityCode)) {
+        if (import.meta.env.DEV) {
+          console.warn('Rejecting wardId: ward does not belong to current cityCode', {
+            wardId: action.wardId,
+            cityCode: current.cityCode,
+          });
+        }
+        return; // Reject without mutation
+      }
+
+      const nextSelection: Selection = {
+        ...current,
+        wardId: action.wardId,
+      };
+      set({
+        selection: nextSelection,
+        selectedLocationId: action.wardId,
+      });
+      syncToUrl(action.wardId, get().timeRange, get().activeLayers);
+      return;
+    }
+
+    // Case 4: Multiple or complete selection provided
+    const stateCode = action.stateCode !== undefined ? action.stateCode : current.stateCode;
+    let cityCode = action.cityCode !== undefined ? action.cityCode : current.cityCode;
+    let wardId = action.wardId !== undefined ? action.wardId : current.wardId;
+
+    if (action.stateCode && !action.cityCode) {
+      cityCode = firstCityOf(stateCode);
+      wardId = firstWardOf(cityCode);
+    } else if (action.cityCode && action.wardId === undefined) {
+      wardId = firstWardOf(cityCode);
+    }
+
+    if (wardId !== null && wardId !== undefined && !wardBelongsToCity(wardId, cityCode)) {
+      if (import.meta.env.DEV) {
+        console.warn('Rejecting wardId: ward does not belong to current cityCode', {
+          wardId,
+          cityCode,
+        });
+      }
+      wardId = null;
+    }
+
+    const matchedState = getStateByCodeOrName(stateCode);
+    const nextSelection: Selection = {
+      stateCode: matchedState?.code || stateCode,
+      cityCode,
+      wardId: wardId ?? null,
+    };
+    set({
+      selection: nextSelection,
+      selectedState: matchedState?.name || stateCode || '',
+      selectedCity: cityCode || '',
+      selectedLocationId: wardId || 0,
+    });
+    syncToUrl(wardId ?? undefined, get().timeRange, get().activeLayers);
   },
 
   setTimeRange: (range: TimeRangeState) => {
     set({ timeRange: range });
-    syncToUrl(get().selectedLocationId, range, get().activeLayers);
+    syncToUrl(get().selection.wardId ?? undefined, range, get().activeLayers);
   },
 
   toggleLayer: (layer) => {
@@ -150,7 +271,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       [layer]: !get().activeLayers[layer],
     };
     set({ activeLayers: newLayers });
-    syncToUrl(get().selectedLocationId, get().timeRange, newLayers);
+    syncToUrl(get().selection.wardId ?? undefined, get().timeRange, newLayers);
   },
 
   setLayers: (updated) => {
@@ -159,14 +280,19 @@ export const useAppStore = create<AppState>((set, get) => ({
       ...updated,
     };
     set({ activeLayers: newLayers });
-    syncToUrl(get().selectedLocationId, get().timeRange, newLayers);
+    syncToUrl(get().selection.wardId ?? undefined, get().timeRange, newLayers);
   },
 }));
 
 if (typeof window !== 'undefined') {
   window.addEventListener('popstate', () => {
     const p = getInitialParams();
+    const current = useAppStore.getState().selection;
     useAppStore.setState({
+      selection: {
+        ...current,
+        wardId: p.wardId,
+      },
       selectedLocationId: p.wardId,
       timeRange: { from: p.from, to: p.to },
       activeLayers: p.layers,

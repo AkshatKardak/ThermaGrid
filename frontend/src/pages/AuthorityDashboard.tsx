@@ -31,7 +31,7 @@ export const AuthorityDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const { isLoaded: isRoleLoaded, isAuthority, role } = useRole();
-  const { selectedCity, selectedLocationId, setSelectedLocationId } = useAppStore();
+  const { selectedCity, selectedLocationId, setSelection } = useAppStore();
 
   const { data: wardsData } = useWards(selectedCity);
   const { data: wardsRiskData } = useAllWardsRisk(selectedCity);
@@ -276,7 +276,7 @@ export const AuthorityDashboard: React.FC = () => {
               <div className="relative">
                 <select
                   value={activeWard?.id || 1}
-                  onChange={(e) => setSelectedLocationId(Number(e.target.value))}
+                  onChange={(e) => setSelection({ wardId: Number(e.target.value) })}
                   className="bg-raised border border-border hover:border-accent rounded-[6px] px-3 py-1.5 text-xs font-mono text-ink focus:outline-none focus:ring-1 focus:ring-accent appearance-none pr-8 cursor-pointer"
                 >
                   {wards.map((w) => (
@@ -332,7 +332,7 @@ export const AuthorityDashboard: React.FC = () => {
               wardsRisk={wardsRiskData || []}
               selectedLocationId={activeWard?.id}
               onSelectLocation={(id) => {
-                setSelectedLocationId(id);
+                setSelection({ wardId: id });
                 setPeekOpen(true);
               }}
               className="w-full h-full"

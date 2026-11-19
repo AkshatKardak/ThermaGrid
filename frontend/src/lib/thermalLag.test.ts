@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { evaluateThermalLag, getOutdoorTemp } from './thermalLag.ts';
+import { evaluateThermalLag, getOutdoorTemp, getWavefrontMetrics } from './thermalLag.ts';
 import { formatNumber } from '../utils/format.ts';
 
 test('thermalLag model is deterministic', () => {
@@ -52,3 +52,23 @@ test('nocturnal indoor temp of RCC stays higher than tin at 03:00', () => {
   // Verify difference is significant (at least 1.5°C retention)
   expect(stateAt03.rccIndoorTemp - stateAt03.tinIndoorTemp).toBeGreaterThan(1.5);
 });
+
+test('wavefront depth curves derive from config: tin peaks early and retracts, RCC peaks late and plateaus at night', () => {
+  const day1430 = getWavefrontMetrics(14.5);
+  const day1715 = getWavefrontMetrics(17.25);
+  const night03 = getWavefrontMetrics(3.0);
+
+  // Tin depth is highest around 14:30 and collapses by 03:00
+  expect(day1430.tinDepth).toBeGreaterThan(0.9);
+  expect(night03.tinDepth).toBeLessThan(0.15);
+
+  // RCC depth is delayed, peaking around 17:15, and stays warm/plateaus at night
+  expect(day1715.rccDepth).toBeGreaterThan(0.8);
+  expect(night03.rccDepth).toBeGreaterThan(0.3);
+  expect(night03.rccDepth).toBeGreaterThan(night03.tinDepth);
+
+  // Dynamic delta at 03:00 is positive (concrete warmer than tin)
+  expect(night03.deltaAt03).toBeGreaterThan(2.0);
+  expect(night03.isRccWarmer).toBe(true);
+});
+

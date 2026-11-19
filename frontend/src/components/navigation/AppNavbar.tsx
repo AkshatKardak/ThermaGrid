@@ -45,7 +45,7 @@ const ALL_NAV_ITEMS: NavItemConfig[] = [
 export const AppNavbar: React.FC = () => {
   const location = useLocation();
   const { isAuthority, role } = useRole();
-  const { selectedState, setSelectedState, selectedCity, setSelectedCity } = useAppStore();
+  const { selection, setSelection, selectedState, selectedCity } = useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Available cities for selected state
@@ -114,7 +114,7 @@ export const AppNavbar: React.FC = () => {
               {/* State Select */}
               <select
                 value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
+                onChange={(e) => setSelection({ stateCode: e.target.value })}
                 className="bg-transparent text-ink font-mono font-medium outline-none cursor-pointer text-xs max-w-[90px] sm:max-w-[125px] truncate"
                 aria-label="Select State"
                 title={`State: ${selectedState}`}
@@ -131,7 +131,7 @@ export const AppNavbar: React.FC = () => {
               {/* City Select */}
               <select
                 value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
+                onChange={(e) => setSelection({ cityCode: e.target.value })}
                 className="bg-transparent text-ink font-mono font-medium outline-none cursor-pointer text-xs max-w-[85px] sm:max-w-[115px] truncate"
                 aria-label="Select City or District"
                 title={`City: ${selectedCity}`}
@@ -211,7 +211,7 @@ export const AppNavbar: React.FC = () => {
                       <label className="text-[10px] font-mono text-muted block mb-1">State</label>
                       <select
                         value={selectedState}
-                        onChange={(e) => setSelectedState(e.target.value)}
+                        onChange={(e) => setSelection({ stateCode: e.target.value })}
                         className="w-full bg-surface border border-border rounded-[4px] p-1.5 text-xs font-mono text-ink"
                       >
                         {INDIAN_STATES.map((s) => (
@@ -225,7 +225,7 @@ export const AppNavbar: React.FC = () => {
                       <label className="text-[10px] font-mono text-muted block mb-1">City / District</label>
                       <select
                         value={selectedCity}
-                        onChange={(e) => setSelectedCity(e.target.value)}
+                        onChange={(e) => setSelection({ cityCode: e.target.value })}
                         className="w-full bg-surface border border-border rounded-[4px] p-1.5 text-xs font-mono text-ink"
                       >
                         {availableCities.map((c) => (

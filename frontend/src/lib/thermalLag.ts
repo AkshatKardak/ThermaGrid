@@ -123,3 +123,49 @@ export function evaluateThermalLag(t: number, config: ThermalConfig = THERMAL_CO
     lagHours: 2.3, // ~2.3 hours nominal phase shift
   };
 }
+
+/**
+ * Normalized daytime solar flux intensity (0.0 to 1.0) peaking at 12:00.
+ */
+export function getSolarIntensity(t: number): number {
+  if (t < 6 || t > 18) return 0;
+  const solarAngle = ((t - 6) / 12) * Math.PI;
+  return Math.sin(solarAngle);
+}
+
+export interface WavefrontMetrics {
+  tinDepth: number; // 0.0 to 1.0
+  rccDepth: number; // 0.0 to 1.0
+  solarIntensity: number; // 0.0 to 1.0
+  isRccWarmer: boolean;
+  deltaAtCurrent: number;
+  deltaAt03: number;
+}
+
+export function getWavefrontMetrics(
+  t: number,
+  config: ThermalConfig = THERMAL_CONFIG
+): WavefrontMetrics {
+  const state = evaluateThermalLag(t, config);
+  const stateAt03 = evaluateThermalLag(3.0, config);
+
+  // Tin: rapid penetration peaking around 14:30 (~41.2°C), retracting quickly after sunset to ~25°C baseline
+  const tinNorm = Math.max(0, Math.min(1, (state.tinIndoorTemp - 25.0) / (41.2 - 25.0)));
+  const tinDepth = roundNumber(0.04 + 0.92 * tinNorm, 3);
+
+  // RCC: high thermal mass delaying peak to ~17:15 (~37.1°C), retracting slowly, plateaus at ~0.36 overnight
+  const rccNorm = Math.max(0, Math.min(1, (state.rccIndoorTemp - 28.0) / (37.1 - 28.0)));
+  const rccDepth = roundNumber(0.35 + 0.53 * rccNorm, 3);
+
+  const deltaAt03 = roundNumber(stateAt03.rccIndoorTemp - stateAt03.tinIndoorTemp, 1);
+  const deltaAtCurrent = roundNumber(state.rccIndoorTemp - state.tinIndoorTemp, 1);
+
+  return {
+    tinDepth,
+    rccDepth,
+    solarIntensity: getSolarIntensity(state.hour),
+    isRccWarmer: state.rccIndoorTemp > state.tinIndoorTemp,
+    deltaAtCurrent,
+    deltaAt03,
+  };
+}
