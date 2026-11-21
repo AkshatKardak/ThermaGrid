@@ -2,7 +2,7 @@
 """
 Historical Heatwave Event Backtester.
 Evaluates ThermaGrid biometeorological physics and composite risk triggers
-against canonical historical heatwave disasters (e.g. Ahmedabad May 2010).
+against synthetic diurnal benchmark profiles (e.g. Ahmedabad May 2010 scenario).
 
 Usage:
     python scripts/backtest.py --event ahmedabad-2010
@@ -123,7 +123,7 @@ def simulate_event_hourly(event_key: str):
 
 
 def evaluate_against_fixture(series: list[dict], fixture_path: str) -> dict:
-    """Computes MAE, RMSE, and Pearson correlation against historical station fixture."""
+    """Computes MAE, RMSE, and Pearson correlation against synthetic benchmark fixture."""
     if not os.path.exists(fixture_path):
         return {
             "validated": False,
@@ -241,20 +241,24 @@ def run_backtest(
 - **Historical Impact:** {info["historical_excess_mortality"]} excess mortalities (AMC Registry)
 - **ThermaGrid Audit Verdict:** `{summary["metrics"]["model_audit_verdict"]}`
 
-## Ground-Truth Validation Metrics
+> [!NOTE]
+> **Synthetic Sanity Check Disclaimer:**
+> The observation series (`{info.get("fixture_file", "tests/fixtures/ahmedabad_2010_observed.json")}`) is a synthetic diurnal sinusoid with bounded noise (±0.30°C), designed to verify internal consistency and ensure the model correctly reproduces diurnal cycles and thermal stress transitions. It is a synthetic sanity check, not a comparison against IMD weather station observations.
 
-| Metric | Target Station Observation | ThermaGrid Model | Error / Correlation | Audit Status |
+## Synthetic Sanity Check Validation Metrics
+
+| Metric | Synthetic Benchmark Fixture | ThermaGrid Model | Error / Correlation | Audit Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **Air Temperature MAE** | Ground Station Telemetry | 72h Modeled Envelope | **{mae_t_str}** | Passed (Threshold < 0.50°C) |
-| **Air Temperature Correlation ($r$)** | Ground Station Telemetry | 72h Modeled Envelope | **{r_t_str}** | Strongly Correlated ($r > 0.99$) |
-| **ISO 7243 WBGT MAE** | Station Psychrometric WBGT | 72h Modeled WBGT | **{mae_wbgt_str}** | Passed (Threshold < 0.50°C) |
-| **ISO 7243 WBGT Correlation ($r$)** | Station Psychrometric WBGT | 72h Modeled WBGT | **{r_wbgt_str}** | Strongly Correlated ($r > 0.99$) |
+| **Air Temperature MAE** | Synthetic Benchmark Series | 72h Modeled Envelope | **{mae_t_str}** | Passed (Threshold < 0.50°C) |
+| **Air Temperature Correlation ($r$)** | Synthetic Benchmark Series | 72h Modeled Envelope | **{r_t_str}** | Strongly Correlated ($r > 0.99$) |
+| **ISO 7243 WBGT MAE** | Benchmark Fixture WBGT | 72h Modeled WBGT | **{mae_wbgt_str}** | Passed (Threshold < 0.50°C) |
+| **ISO 7243 WBGT Correlation ($r$)** | Benchmark Fixture WBGT | 72h Modeled WBGT | **{r_wbgt_str}** | Strongly Correlated ($r > 0.99$) |
 
 ## Key Performance Indicators
 
-| Metric | Historical / Target | ThermaGrid Evaluated | Status |
+| Metric | Benchmark / Target | ThermaGrid Evaluated | Status |
 | :--- | :--- | :--- | :--- |
-| **Peak Dry-Bulb Temperature** | 46.8°C | {peak_temp}°C | Exact Match |
+| **Peak Dry-Bulb Temperature** | 47.0°C (Fixture Peak) | {peak_temp}°C | Diurnal Peak |
 | **Peak ISO 7243 WBGT** | > 34.0°C | {peak_wbgt}°C | Extreme Alert |
 | **Peak UTCI (Biometeorology)** | > 48.0°C | {peak_utci}°C | Extreme Heat Stress |
 | **Peak Composite Risk Score** | > 85.0 / 100 | {peak_risk} / 100 | Tier 5 (Extreme) |
@@ -329,7 +333,7 @@ if __name__ == "__main__":
         "--fixture",
         type=str,
         default=None,
-        help="Optional path to custom station observation fixture",
+        help="Optional path to custom synthetic observation fixture",
     )
     args = parser.parse_args()
     run_backtest(

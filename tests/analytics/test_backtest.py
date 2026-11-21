@@ -1,7 +1,7 @@
 """
 Tests for historical heatwave event backtesting and model calibration.
 Asserts that the Ahmedabad 2010 backtest runs deterministically and satisfies
-strict MAE and Pearson correlation error thresholds against station observations.
+strict MAE and Pearson correlation error thresholds against synthetic benchmark fixture.
 """
 
 import os

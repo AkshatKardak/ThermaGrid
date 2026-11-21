@@ -5,20 +5,24 @@
 - **Historical Impact:** 1344 excess mortalities (AMC Registry)
 - **ThermaGrid Audit Verdict:** `PASS — 100% sensitivity to fatal heatwave phase`
 
-## Ground-Truth Validation Metrics
+> [!NOTE]
+> **Synthetic Sanity Check Disclaimer:**
+> The observation series (`tests/fixtures/ahmedabad_2010_observed.json`) is a synthetic diurnal sinusoid with bounded noise (±0.30°C), designed to verify internal consistency and ensure the model correctly reproduces diurnal cycles and thermal stress transitions. It is a synthetic sanity check, not a comparison against IMD weather station observations.
 
-| Metric | Target Station Observation | ThermaGrid Model | Error / Correlation | Audit Status |
+## Synthetic Sanity Check Validation Metrics
+
+| Metric | Synthetic Benchmark Fixture | ThermaGrid Model | Error / Correlation | Audit Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **Air Temperature MAE** | Ground Station Telemetry | 72h Modeled Envelope | **0.156°C** | Passed (Threshold < 0.50°C) |
-| **Air Temperature Correlation ($r$)** | Ground Station Telemetry | 72h Modeled Envelope | **0.9996** | Strongly Correlated ($r > 0.99$) |
-| **ISO 7243 WBGT MAE** | Station Psychrometric WBGT | 72h Modeled WBGT | **0.153°C** | Passed (Threshold < 0.50°C) |
-| **ISO 7243 WBGT Correlation ($r$)** | Station Psychrometric WBGT | 72h Modeled WBGT | **0.9992** | Strongly Correlated ($r > 0.99$) |
+| **Air Temperature MAE** | Synthetic Benchmark Series | 72h Modeled Envelope | **0.156°C** | Passed (Threshold < 0.50°C) |
+| **Air Temperature Correlation ($r$)** | Synthetic Benchmark Series | 72h Modeled Envelope | **0.9996** | Strongly Correlated ($r > 0.99$) |
+| **ISO 7243 WBGT MAE** | Benchmark Fixture WBGT | 72h Modeled WBGT | **0.153°C** | Passed (Threshold < 0.50°C) |
+| **ISO 7243 WBGT Correlation ($r$)** | Benchmark Fixture WBGT | 72h Modeled WBGT | **0.9992** | Strongly Correlated ($r > 0.99$) |
 
 ## Key Performance Indicators
 
-| Metric | Historical / Target | ThermaGrid Evaluated | Status |
+| Metric | Benchmark / Target | ThermaGrid Evaluated | Status |
 | :--- | :--- | :--- | :--- |
-| **Peak Dry-Bulb Temperature** | 46.8°C | 46.8°C | Exact Match |
+| **Peak Dry-Bulb Temperature** | 47.0°C (Fixture Peak) | 46.8°C | Diurnal Peak |
 | **Peak ISO 7243 WBGT** | > 34.0°C | 36.2°C | Extreme Alert |
 | **Peak UTCI (Biometeorology)** | > 48.0°C | 50.5°C | Extreme Heat Stress |
 | **Peak Composite Risk Score** | > 85.0 / 100 | 71.4 / 100 | Tier 5 (Extreme) |

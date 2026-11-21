@@ -151,13 +151,17 @@ ThermaGrid's biometeorological engines are verified against published reference 
 > [!NOTE]
 > Maximum observed WBGT deviation across all published ISO 7243 reference cases is **0.3300°C**, reflecting empirical Stull wet-bulb approximation against thermodynamic psychrometric tables.
 
-### Historical Heatwave Backtest (Ahmedabad May 2010)
+### Synthetic Diurnal Sanity Backtest (Ahmedabad May 2010 Scenario)
 
-The catastrophic May 2010 Ahmedabad heatwave (1,344 excess mortalities) is continuously validated via an automated reproducibility pipeline (`scripts/backtest.py --check --max-mae 0.5`) evaluated against canonical station observation fixtures (`tests/fixtures/ahmedabad_2010_observed.json`):
+The May 2010 Ahmedabad heatwave scenario is audited via an automated reproducibility pipeline (`scripts/backtest.py --check --max-mae 0.5`) evaluated against a synthetic diurnal benchmark fixture (`tests/fixtures/ahmedabad_2010_observed.json`).
+
+> [!NOTE]
+> **Synthetic Sanity Check Disclaimer:**
+> The observation series (`tests/fixtures/ahmedabad_2010_observed.json`) is a synthetic diurnal sinusoid with bounded noise ($\pm 0.30^\circ\text{C}$), designed to verify internal consistency and ensure the model correctly reproduces diurnal cycles and thermal stress transitions. It is a synthetic sanity check, not a comparison against IMD weather station observations.
 
 - **Air Temperature MAE:** **0.156°C** ($r = 0.9996$, RMSE 0.180°C)
 - **ISO 7243 WBGT MAE:** **0.153°C** ($r = 0.9992$)
-- **Peak Dry-Bulb Temperature:** 46.8°C (Exact Match with IMD Station Record)
+- **Peak Dry-Bulb Temperature:** 46.8°C modeled (synthetic fixture peaks at 47.0°C)
 - **Peak Modeled WBGT:** 36.2°C (Exceeds ISO 7243 Extreme Alert Threshold)
 - **Detailed Report:** See [Ahmedabad 2010 Backtest Report](docs/backtest/ahmedabad-2010.md) and [Metrics Artifact](docs/backtest/ahmedabad-2010.json).
 
@@ -183,7 +187,7 @@ python3 scripts/fetch_data.py --dataset all --force
 |---|---|---|---|
 | **India State & UT Boundaries** | 35 States & Union Territories vector boundaries | [DataMeet Maps (Admin2 GeoJSON)](https://github.com/datameet/maps) · Open Data Commons ODbL | `frontend/src/assets/geo/india-states.json` |
 | **Mumbai Ward Census 2011** | Demographics, slum density, and housing roof materials | [DataMeet Mumbai Wards](https://github.com/datameet/mumbai-ward-boundaries) · Public Domain | `data/raw/mumbai_wards_census_2011.json` |
-| **Ahmedabad 2010 Heatwave** | 72-hour station telemetry (May 20-22, 2010) | IMD Ahmedabad Station Observations / Azhar et al. (2014) | `tests/fixtures/ahmedabad_2010_observed.json` |
+| **Ahmedabad 2010 Scenario Fixture** | 72-hour synthetic diurnal progression (May 20-22, 2010 scenario) | Synthetic diurnal sinusoid with bounded noise (internal sanity check) | `tests/fixtures/ahmedabad_2010_observed.json` |
 
 ---
 
