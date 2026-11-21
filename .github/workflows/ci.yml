@@ -34,6 +34,7 @@ jobs:
       ALLOW_SYNTHETIC_RISK: "true"
       CLERK_SECRET_KEY: test_clerk_secret_key
       RESEND_API_KEY: test_resend_api_key
+      DEMO_ALERT_PHONE: "+919876543210"
 
     steps:
       - name: Checkout repository
