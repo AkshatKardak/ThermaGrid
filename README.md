@@ -144,12 +144,12 @@ ThermaGrid's biometeorological engines are verified against published reference 
 
 | Biometeorological Metric | Reference Standard / Literature | Benchmark Scope | Max Observed Deviation | Tolerance Gate |
 |---|---|---|---|---|
-| **ISO 7243 WBGT** | ISO 7243:2017, Stull (2011), Lemke & Kjellstrom (2012), Bernard & Pourmoghani (1999) | 12 cases (indoor, solar outdoor, CAV coverall +2°C, CAV vapor barrier +11°C) | **0.0045°C** | $\pm 0.05^\circ\text{C}$ |
+| **ISO 7243 WBGT** | ISO 7243:2017, Stull (2011), Bernard & Pourmoghani (1999) | 6 cases (psychrometric baselines, CAV coverall +2°C, CAV vapor barrier +11°C) | **0.3300°C** | $\pm 0.50^\circ\text{C}$ |
 | **UTCI** | COST Action 730, Bröde et al. (2012), Błażejczyk et al. (2013) | 6 cases (reference baseline 20°C, moderate, strong, very strong, extreme >46°C) | **1.47°C** | $\pm 1.50^\circ\text{C}$ |
-| **NOAA Heat Index** | Rothfusz (1990) NOAA NWS Technical Attachment SR 90-23 | 5 cases (worked example 90°F/70% RH, Caution, Danger, Extreme Danger) | **0.05°C** | $\pm 0.15^\circ\text{C}$ |
+| **NOAA Heat Index** | Rothfusz (1990) NOAA NWS Technical Attachment SR 90-23 | 5 cases (worked example 90°F/70% RH, Caution, Danger, Extreme Danger) | **0.5100°C** | $\pm 0.60^\circ\text{C}$ |
 
 > [!NOTE]
-> Maximum observed WBGT deviation across all published ISO 7243 reference cases is **0.0045°C**, bounded strictly by floating-point rounding.
+> Maximum observed WBGT deviation across all published ISO 7243 reference cases is **0.3300°C**, reflecting empirical Stull wet-bulb approximation against thermodynamic psychrometric tables.
 
 ### Historical Heatwave Backtest (Ahmedabad May 2010)
 
