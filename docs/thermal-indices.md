@@ -7,7 +7,7 @@
 ### Citation & Standard
 - **ISO 7243:2017:** Ergonomics of the thermal environment — Assessment of heat stress using the WBGT index. International Organization for Standardization, Geneva.
 - **Stull, R. (2011):** Wet-bulb temperature from relative humidity and air temperature. *Journal of Applied Meteorology and Climatology*, 50(11), 2267–2269.
-- **Liljegren, J. C., et al. (2008):** Modeling the wet bulb globe temperature using standard meteorological measurements. *JOEH*, 5(10), 645–655.
+- **Lemke, B., & Kjellstrom, T. (2012):** Calculating workplace WBGT from meteorological data. *Industrial Health*, 50(4), 267–278.
 
 ### Governing Formula
 - **Outdoor with Direct Solar Radiation (ISO 7243 §5.1):**

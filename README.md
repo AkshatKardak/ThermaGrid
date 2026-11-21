@@ -32,7 +32,7 @@ The system computes physiological heat stress indices (ISO 7243 WBGT, UTCI, NOAA
 
 ```mermaid
 flowchart LR
-    A["React SPA\n(Vite + Tailwind + Recharts)"] -->|HTTPS / REST API| B["FastAPI Backend\n(Liljegren WBGT + Risk Engine)"]
+    A["React SPA\n(Vite + Tailwind + Recharts)"] -->|HTTPS / REST API| B["FastAPI Backend\n(ISO 7243 WBGT + Risk Engine)"]
     B -->|SQLAlchemy 2.0| C["PostgreSQL + PostGIS\n(Spatial Wards & Telemetry)"]
     B -->|Hourly Ingestion| D["External Telemetry\n(Open-Meteo & IMD AWS)"]
 ```
@@ -45,7 +45,7 @@ The composite ward thermal stress score is formulated across four normalized dim
 
 $$R = w_h H + w_e E + w_v V - w_a A$$
 
-- **Hazard ($H$):** Dynamic biometeorological stress derived via Liljegren (2008) Wet-Bulb Globe Temperature (WBGT), Universal Thermal Climate Index (UTCI), and NOAA Heat Index.
+- **Hazard ($H$):** Dynamic biometeorological stress derived via ISO 7243:2017 Wet-Bulb Globe Temperature (WBGT with Stull 2011 wet-bulb and empirical globe temperature), Universal Thermal Climate Index (UTCI), and NOAA Heat Index.
 - **Exposure ($E$):** Population density, child/elderly age dependency ratios, and outdoor labor fractions.
 - **Vulnerability ($V$):** Uninsulated corrugated tin/asbestos roof fraction, informal housing density, and baseline disease burden.
 - **Adaptive Capacity ($A$):** Urban tree canopy fraction, municipal cooling centre proximity, and hospital bed availability.
@@ -144,7 +144,7 @@ ThermaGrid's biometeorological engines are verified against published reference 
 
 | Biometeorological Metric | Reference Standard / Literature | Benchmark Scope | Max Observed Deviation | Tolerance Gate |
 |---|---|---|---|---|
-| **ISO 7243 WBGT** | ISO 7243:2017, Liljegren (2008), Lemke & Kjellstrom (2012), Bernard & Pourmoghani (1999) | 12 cases (indoor, solar outdoor, CAV coverall +2°C, CAV vapor barrier +11°C) | **0.0045°C** | $\pm 0.05^\circ\text{C}$ |
+| **ISO 7243 WBGT** | ISO 7243:2017, Stull (2011), Lemke & Kjellstrom (2012), Bernard & Pourmoghani (1999) | 12 cases (indoor, solar outdoor, CAV coverall +2°C, CAV vapor barrier +11°C) | **0.0045°C** | $\pm 0.05^\circ\text{C}$ |
 | **UTCI** | COST Action 730, Bröde et al. (2012), Błażejczyk et al. (2013) | 6 cases (reference baseline 20°C, moderate, strong, very strong, extreme >46°C) | **1.47°C** | $\pm 1.50^\circ\text{C}$ |
 | **NOAA Heat Index** | Rothfusz (1990) NOAA NWS Technical Attachment SR 90-23 | 5 cases (worked example 90°F/70% RH, Caution, Danger, Extreme Danger) | **0.05°C** | $\pm 0.15^\circ\text{C}$ |
 
@@ -198,7 +198,7 @@ The indoor thermal phase lag model simulates diurnal temperature attenuation and
 Physiological thresholds (such as work-rest cycles and WBGT risk categories) are referenced against ISO 7243:2017 standards differentiating between acclimatised and unacclimatised cohorts under steady-state assumptions. The system does not capture the transient kinetics of human seasonal acclimatisation—particularly during early-season heat spikes (e.g., March or April) when urban populations have not yet acquired cardiovascular and sudomotor adaptations—or the heightened vulnerability of transient, unacclimatised interstate migrant labor forces.
 
 ### 3. Individual Physiology & Clinical Heterogeneity
-Standardized biometeorological indices (Liljegren WBGT, UTCI, NOAA Heat Index) simulate thermal strain for an idealized reference human (a healthy 75 kg adult male, $1.8\,\text{m}^2$ body surface area, standard metabolic activity). These indices cannot capture individualized physiological variance arising from:
+Standardized biometeorological indices (ISO 7243 / Stull WBGT, UTCI, NOAA Heat Index) simulate thermal strain for an idealized reference human (a healthy 75 kg adult male, $1.8\,\text{m}^2$ body surface area, standard metabolic activity). These indices cannot capture individualized physiological variance arising from:
 - **Age extremes:** Infants with underdeveloped thermoregulatory mechanisms and elderly individuals with reduced sudomotor response and cardiovascular reserves.
 - **Clinical comorbidities:** Cardiovascular diseases, chronic kidney disease, hypertension, and diabetes mellitus.
 - **Pharmacological factors:** Consumption of diuretics, beta-blockers, anticholinergics, or antihypertensives that suppress peripheral vasodilation or sweating.
@@ -214,5 +214,5 @@ Telemetry and vulnerability indices are aggregated to the municipal administrati
 ## Licence & Citations
 
 - Distributed under the [MIT Licence](LICENSE).
-- Meteorological calculations implement the Liljegren et al. (2008) Wet-Bulb Globe Temperature formulation and Rothfusz (1990) National Weather Service Heat Index algorithms.
+- Meteorological calculations implement ISO 7243:2017 Wet-Bulb Globe Temperature (using Stull (2011) wet-bulb temperature with empirical globe temperature estimation) and Rothfusz (1990) National Weather Service Heat Index algorithms.
 - Boundary geometries conform to official Survey of India administrative boundary standards.

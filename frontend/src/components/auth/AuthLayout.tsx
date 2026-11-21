@@ -94,7 +94,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ title, subtitle, childre
             {/* Left Footer Reference with Signature Live Indicator */}
             <div className="relative z-10 text-xs font-mono text-raised/70 hidden sm:flex items-center gap-2 pt-4 border-t border-border/30">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" style={{ backgroundColor: '#8FB3D9' }} />
-              <span>IMD AWS · Liljegren ISO 7243 · Open-Meteo Synoptic Grid</span>
+              <span>IMD AWS · ISO 7243 WBGT · Open-Meteo Synoptic Grid</span>
             </div>
           </div>
 

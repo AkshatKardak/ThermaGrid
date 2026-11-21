@@ -106,7 +106,7 @@ export const Footer: React.FC = () => {
                   rel="noreferrer"
                   className="text-muted hover:text-ink flex items-center gap-1.5 transition-colors"
                 >
-                  Liljegren ISO 7243 WBGT <ExternalLink className="w-3 h-3 text-muted" />
+                  ISO 7243 WBGT <ExternalLink className="w-3 h-3 text-muted" />
                 </a>
               </li>
             </ul>

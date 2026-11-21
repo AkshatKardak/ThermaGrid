@@ -342,7 +342,7 @@ export const ThermalPhaseLagChart: React.FC = () => {
           </span>
         </div>
         <div>
-          <span>Model: First-Order Envelope Conduction (ISO 13786 / Liljegren)</span>
+          <span>Model: First-Order Envelope Conduction (ISO 13786 / ISO 7243)</span>
         </div>
       </div>
     </div>

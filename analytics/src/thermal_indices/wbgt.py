@@ -8,10 +8,7 @@ Citations:
 2. Stull, R. (2011). Wet-bulb temperature from relative humidity and air
    temperature. Journal of Applied Meteorology and Climatology, 50(11), 2267-2269.
    DOI: 10.1175/JAMC-D-11-0143.1
-3. Liljegren, J. C., Carhart, R. A., Lawday, P., Tschopp, S., & Sharp, R. (2008).
-   Modeling the wet bulb globe temperature using standard meteorological
-   measurements. Journal of Occupational and Environmental Hygiene, 5(10), 645-655.
-4. Lemke, B., & Kjellstrom, T. (2012). Calculating workplace WBGT from
+3. Lemke, B., & Kjellstrom, T. (2012). Calculating workplace WBGT from
    meteorological data: a tool for climate change assessment. Industrial Health,
    50(4), 267-278.
 """
@@ -66,8 +63,8 @@ def estimate_globe_temperature(
     zenith_angle_deg: float | None = None,
 ) -> float:
     """
-    Estimates black globe temperature Tg (°C) using a documented approximation of
-    the black globe heat balance (Liljegren et al., 2008 / Lemke & Kjellstrom, 2012).
+    Estimates black globe temperature Tg (°C) using a simplified empirical
+    approximation of the black globe radiative heat balance (Lemke & Kjellstrom, 2012).
 
     Heat Balance:
         q_rad_in (direct + diffuse solar) = q_conv_out + q_rad_out (infra-red to ambient)
