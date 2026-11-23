@@ -235,26 +235,29 @@ def create_application() -> FastAPI:
             },
         )
 
-    # Mount API Routers on /api/v1, /api, and root
-    for prefix in ["/api/v1", "/api", ""]:
-        app.include_router(auth_router, prefix=prefix)
-        app.include_router(locations_router, prefix=prefix)
-        app.include_router(weather_router, prefix=prefix)
-        app.include_router(thermal_router, prefix=prefix)
-        app.include_router(risk_router, prefix=prefix)
-        app.include_router(analytics_router, prefix=prefix)
-        app.include_router(forecast_router, prefix=prefix)
-        app.include_router(interventions_router, prefix=prefix)
-        app.include_router(cooling_centres_router, prefix=prefix)
-        app.include_router(alerts_router, prefix=prefix)
-        app.include_router(data_sources_router, prefix=prefix)
-        app.include_router(planner_router, prefix=prefix)
-        app.include_router(subscriptions_router, prefix=prefix)
-        # Omit dependents on /api/v1 version
-        if prefix != "/api/v1":
-            app.include_router(dependents_router, prefix=prefix)
-        app.include_router(worker_router, prefix=prefix)
-        app.include_router(reports_router, prefix=prefix)
+    # Mount API Routers canonically on /api/v1, plus /api as a deprecated alias
+    api_routers = [
+        auth_router,
+        locations_router,
+        weather_router,
+        thermal_router,
+        risk_router,
+        analytics_router,
+        forecast_router,
+        interventions_router,
+        cooling_centres_router,
+        alerts_router,
+        data_sources_router,
+        planner_router,
+        subscriptions_router,
+        dependents_router,
+        worker_router,
+        reports_router,
+    ]
+
+    for prefix in ["/api/v1", "/api"]:
+        for router in api_routers:
+            app.include_router(router, prefix=prefix)
 
     return app
 

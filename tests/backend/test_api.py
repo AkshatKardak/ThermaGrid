@@ -72,6 +72,14 @@ def test_list_locations():
     assert "population_density_per_km2" in first_ward
 
 
+def test_root_prefix_removed_and_alias_preserved():
+    """Verify root mount is dropped (404), while /api/v1 and /api respond (200), and /health is root."""
+    assert client.get("/locations").status_code == 404
+    assert client.get("/api/v1/locations").status_code == 200
+    assert client.get("/api/locations").status_code == 200
+    assert client.get("/health").status_code == 200
+
+
 def test_get_current_weather():
     response = client.get("/api/v1/weather/current?location_id=1")
     assert response.status_code == 200
@@ -283,13 +291,13 @@ def test_dependents_care_circle_scoping():
     user1_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_authority', 'authority')}"}
     user2_headers = {"Authorization": f"Bearer {mint_test_jwt('user_test_citizen', 'citizen')}"}
 
-    # Verify v1 version GET /api/v1/dependents is removed (returns 404)
+    # Verify canonical /api/v1/dependents answers
     v1_get = client.get("/api/v1/dependents", headers=user2_headers)
-    assert v1_get.status_code == 404
+    assert v1_get.status_code == 200
 
-    # User 1 adds a dependent on /api/dependents
+    # User 1 adds a dependent on /api/v1/dependents
     dep_res = client.post(
-        "/api/dependents",
+        "/api/v1/dependents",
         headers=user1_headers,
         json={
             "name": "Amma",
@@ -303,12 +311,16 @@ def test_dependents_care_circle_scoping():
     dep_id = dep_res.json()["id"]
 
     # User 2 lists dependents - should NOT see User 1's dependent
-    user2_deps = client.get("/api/dependents", headers=user2_headers)
+    user2_deps = client.get("/api/v1/dependents", headers=user2_headers)
     assert user2_deps.status_code == 200
     assert dep_id not in [d["id"] for d in user2_deps.json()]
 
+    # Also verify deprecated /api alias works
+    alias_deps = client.get("/api/dependents", headers=user2_headers)
+    assert alias_deps.status_code == 200
+
     # Clean up
-    del_dep = client.delete(f"/api/dependents/{dep_id}", headers=user1_headers)
+    del_dep = client.delete(f"/api/v1/dependents/{dep_id}", headers=user1_headers)
     assert del_dep.status_code == 204
 
 

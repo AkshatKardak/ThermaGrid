@@ -111,30 +111,62 @@ The authority command console (`/app/authority`) provides ward-level risk rankin
 
 ## Deployment
 
-### Netlify (Frontend)
+ThermaGrid uses a decoupled cloud architecture:
+- **Frontend:** [Netlify](https://www.netlify.com/) static SPA (React 19 + Vite 8).
+- **Backend:** [Render](https://render.com/) Web Service (Python 3.12 / FastAPI / Uvicorn).
+- **Database:** External PostgreSQL (e.g., [Neon](https://neon.tech/) or [Supabase](https://supabase.com/) free tier, or paid Render PostgreSQL). Plain `postgresql://` connection strings work directly with SQLAlchemy 2.1.6 and psycopg v3 without PostGIS extensions.
 
-The repository root contains `netlify.toml` configured for automated SPA builds:
+For a step-by-step first-deploy walkthrough, see the [Deployment Checklist](docs/deployment.md).
 
-- **Build Base:** `frontend`
-- **Build Command:** `npm ci && npm run build`
-- **Publish Directory:** `dist`
-- **Environment Variables Required:**
-  - `VITE_API_BASE_URL` (points to the Render backend, e.g., `https://thermagrid-api.onrender.com/api/v1`)
-  - `VITE_CLERK_PUBLISHABLE_KEY` (Clerk publishable key)
+### Platform Environment Variables
 
-### Render (Backend)
+#### Netlify (Frontend)
+Configure these variables in the Netlify Dashboard (**Site configuration > Environment variables**), never in `netlify.toml`:
 
-The repository root includes `render.yaml` defining a web service:
+| Variable | Description | Example / Required Value |
+| :--- | :--- | :--- |
+| `VITE_API_BASE_URL` | Canonical backend API endpoint | `https://<api-host>.onrender.com/api/v1` |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key for user authentication | `pk_live_...` or `pk_test_...` |
 
-- **Runtime:** Python 3.12
-- **Build Command:** `pip install -r backend/requirements.txt`
-- **Start Command:** `cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1`
-- **Health Check Path:** `/health`
-- **Environment Variables Required:**
-  - `DATABASE_URL` (PostgreSQL connection string)
-  - `ALLOW_SQLITE_FALLBACK` (`false` in production)
-  - `SCHEDULER_ENABLED` (`true` for scheduled ingestion)
-  - `CORS_ORIGINS` (comma-separated allowed origins, e.g., `https://thermagrid.netlify.app`)
+#### Render (Backend)
+Configured via the [`render.yaml`](render.yaml) blueprint and Render Dashboard (**Environment**):
+
+| Variable | Description | Required Setting / Note |
+| :--- | :--- | :--- |
+| `DATABASE_URL` | External PostgreSQL connection string | External host (Neon / Supabase / paid Render Postgres) |
+| `CORS_ORIGINS` | Allowed origins (**must be the exact Netlify origin**) | `https://<site>.netlify.app` *(localhost fails in production)* |
+| `CLERK_SECRET_KEY` | Clerk backend authentication secret | `sk_live_...` or `sk_test_...` |
+| `CLERK_JWKS_URL` | Clerk JWKS public key endpoint for JWT validation | `https://<domain>.clerk.accounts.dev/.well-known/jwks.json` |
+| `CLERK_ISSUER` | Clerk authentication token issuer URL | `https://<domain>.clerk.accounts.dev` |
+| `RESEND_API_KEY` | Resend API key for early warning dispatch | `re_...` |
+| `ALLOW_SYNTHETIC_RISK` | Permit synthetic risk calculation during stale data | `"true"` for demo; `"false"` for strict operations |
+| `SCHEDULER_ENABLED` | Background APScheduler cron execution | `"false"` on free tier; `"true"` on paid instances |
+| `ALLOW_SQLITE_FALLBACK`| Fallback to local SQLite when Postgres drops | `"false"` in production |
+
+### Free-Tier Operational Constraints
+
+- **Instance Memory (512 MB):** Free Render instances provide 512 MB RAM against an idle application RSS of **~348 MB**. Single-worker Uvicorn (`--workers 1`) is required to avoid memory exhaustion (OOM).
+- **Inactivity Spin-Down:** Free instances spin down after **15 minutes** of inactivity. The first request after sleep incurs a 30–50 second cold-start delay.
+- **Background Cron Jobs:** `SCHEDULER_ENABLED` is set to `"false"` in `render.yaml` because idle spin-down terminates background cron execution. Continuous weather telemetry ingestion requires an upgraded persistent instance.
+- **Database Expiration:** Do **not** provision a free-tier Render PostgreSQL database. Free Render databases expire and are deleted 30 days after creation (256 MB RAM, 1 GB storage, no backups). Use an external managed instance (Neon or Supabase free tiers) or paid Render Postgres.
+
+### Post-Deploy Verification Step
+
+The blueprint `startCommand` automatically runs database migrations and seeds municipal ward census data:
+```bash
+cd backend && alembic upgrade head && python ../scripts/seed_database.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+```
+If deploying manually or overriding the start command without the seeder:
+1. Open the **Render Shell** for your service.
+2. Run the idempotent database seeder:
+   ```bash
+   python scripts/seed_database.py
+   ```
+3. Verify live service health and data rows:
+   ```bash
+   curl -I https://<api-host>.onrender.com/health
+   curl https://<api-host>.onrender.com/api/v1/locations
+   ```
 
 ---
 

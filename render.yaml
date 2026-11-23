@@ -1,10 +1,16 @@
+# DATABASE_URL must be an external Postgres (Neon or Supabase free tier, or a paid Render Postgres).
+# Do NOT add a databases: block that provisions a free Render Postgres — those expire 30 days
+# after creation (256 MB RAM, 1 GB storage, no backups), which would silently destroy the demo data.
+
 services:
   - type: web
     name: thermagrid-api
     runtime: python
     plan: free
+    branch: main
+    autoDeploy: true
     buildCommand: "pip install -r backend/requirements.txt"
-    startCommand: "cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1"
+    startCommand: "cd backend && alembic upgrade head && python ../scripts/seed_database.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1"
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
@@ -13,10 +19,14 @@ services:
         value: production
       - key: DEBUG
         value: "false"
+      # Free Render instances spin down after 15 idle minutes; scheduled ingestion needs a paid instance.
       - key: SCHEDULER_ENABLED
         value: "false"
       - key: ALLOW_SQLITE_FALLBACK
         value: "false"
+      # Set to "true" for the demo; set to "false" for real operational data.
+      - key: ALLOW_SYNTHETIC_RISK
+        value: "true"
       - key: DATABASE_URL
         sync: false
       - key: CORS_ORIGINS
@@ -26,4 +36,6 @@ services:
       - key: CLERK_JWKS_URL
         sync: false
       - key: CLERK_ISSUER
+        sync: false
+      - key: RESEND_API_KEY
         sync: false
