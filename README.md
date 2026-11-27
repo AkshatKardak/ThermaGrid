@@ -2,6 +2,12 @@
   <img src="frontend/public/thermagrid-logo.png" alt="ThermaGrid Logo" width="220" />
 </p>
 
+# ThermaGrid
+
+Hyperlocal urban heat-stress intelligence and municipal decision-support system for Indian cities.
+
+**Live Deployment**: [https://thermagrid.netlify.app/](https://thermagrid.netlify.app/)
+
 <p align="center">
   <a href="#problem-statement">Problem Statement</a> ·
   <a href="#solution">Solution</a> ·
@@ -13,10 +19,6 @@
   <a href="#how-to-clone-and-run">How to Clone and Run</a> ·
   <a href="#environment-variables">Environment Variables</a>
 </p>
-
-# ThermaGrid
-
-Hyperlocal urban heat-stress intelligence and municipal decision-support system for Indian cities.
 
 ---
 
@@ -51,18 +53,18 @@ The automated operational flow executes across four structured stages:
 
 ## Core Features
 
-- Per-Ward Risk Scoring (`/api/v1/risk`): Computes composite ward-level human thermal risk scores (0-100), factor breakdown attribution, and deterministic severity explanations.
-- Biophysical Thermal Indices (`/api/v1/thermal`): Evaluates ISO 7243 WBGT, UTCI, NOAA Heat Index, and Humidex across current and historical observation windows.
-- Multi-Day Risk Forecasting (`/api/v1/risk/forecast`): Generates 3 to 5-day predictive risk trajectories with upper and lower statistical confidence intervals.
-- Cooling Centre Registry (`/api/v1/cooling-centres`): Inventories verified municipal hydration and cooling shelters with geodesic nearest-facility distance calculations and directions.
-- Alert Notification Dispatch (`/api/v1/alerts`, `/api/v1/subscriptions`): Dispatches verified emergency heat advisories to citizen email subscribers based on custom risk thresholds.
-- Occupational Shift Advisories (`/api/v1/worker`): Produces worker safety cards, hydration volume requirements (mL/hr), and work-rest ratios calibrated to metabolic work rates.
-- Activity Safe-Window Planner (`/api/v1/planner`): Convolves diurnal risk curves against activity-specific exertion thresholds to find safe daily time intervals.
-- Heat Action Plan (HAP) Reporting (`/api/v1/reports`): Compiles and generates official Heat Action Plan (HAP) executive audit PDF documents.
-- Care-Circle Dependents (`/api/v1/dependents`): Scopes multi-ward thermal risk tracking for elderly family members and vulnerable individuals.
-- Municipal Authority Console (`/api/v1/authority`): Provides executive mission-control overview, ward risk rankings, intervention queue dispatching, and jurisdiction scoping.
-- Administrative Locations Registry (`/api/v1/locations`): Manages spatial boundaries, demographic attributes, and topological hierarchy mappings across wards and districts.
-- State and city coverage: the location selector spans every state and union territory, with city-level (district) analytics where ward boundaries are not available and ward-level drill-down for Mumbai and Delhi.
+- Per-Ward Risk Scoring: Computes composite ward-level human thermal risk scores (0-100), factor breakdown attribution, and deterministic severity explanations.
+- Biophysical Thermal Indices: Evaluates ISO 7243 WBGT, UTCI, NOAA Heat Index, and Humidex across current and historical observation windows.
+- Multi-Day Risk Forecasting: Generates 3 to 5-day predictive risk trajectories with upper and lower statistical confidence intervals.
+- Cooling Centre Registry: Inventories verified municipal hydration and cooling shelters with geodesic nearest-facility distance calculations and directions.
+- Alert Notification Dispatch: Dispatches verified emergency heat advisories to citizen email subscribers based on custom risk thresholds.
+- Occupational Shift Advisories: Produces worker safety cards, hydration volume requirements (mL/hr), and work-rest ratios calibrated to metabolic work rates.
+- Activity Safe-Window Planner: Convolves diurnal risk curves against activity-specific exertion thresholds to find safe daily time intervals.
+- Heat Action Plan (HAP) Reporting: Compiles and generates official Heat Action Plan executive audit PDF documents.
+- Care-Circle Dependents: Scopes multi-ward thermal risk tracking for elderly family members and vulnerable individuals.
+- Municipal Authority Console: Provides executive mission-control overview, ward risk rankings, intervention queue dispatching, and jurisdiction scoping.
+- Administrative Locations Registry: Manages spatial boundaries, demographic attributes, and topological hierarchy mappings across wards and districts.
+- State and City Coverage: Spans every Indian state and union territory across 92 distinct cities, providing city-level (district) analytics where ward boundaries are unavailable and ward-level drill-down for Mumbai and Delhi.
 
 ---
 
@@ -109,6 +111,7 @@ ThermaGrid/
 │       ├── hooks/          # TanStack Query data-fetching hooks
 │       ├── pages/          # Citizen dashboard and Authority control views
 │       └── store/          # Zustand application state management
+├── screenshots/            # UI application view captures
 ├── scripts/                # Database seeding, backtesting, and data fetch CLI tools
 └── tests/                  # Integration test suite and physics benchmarks
 ```
@@ -117,15 +120,31 @@ ThermaGrid/
 
 ## Screenshots
 
-<!-- TODO: Add screenshots once the deployment URL is live -->
+Live Application: [https://thermagrid.netlify.app/](https://thermagrid.netlify.app/)
 
-| View | Description | Status |
-|---|---|---|
-| Citizen Dashboard | Real-time ward thermal risk overview, biophysical metrics, and life-safety advisories | _pending_ |
-| Authority Decision Console | Mission-control spatial command deck, intervention queue, and ward rankings | _pending_ |
-| Safe-Window Planner | Diurnal sliding-window activity planner and outdoor exposure recommendations | _pending_ |
+### 1. Interactive Landing Page and 3D Microclimate Explorer
+![ThermaGrid Landing Page](screenshots/Landing_Section.png)
+*Real-time urban heat index overview, live temperature strips, city switcher, and 3D microclimate architectural models.*
 
-_Screenshots will be captured and added following production deployment._
+### 2. Municipal Authority Mission-Control Console
+![Authority Decision Console](screenshots/Authority_Dashboard.png)
+*Executive command deck featuring interactive choropleth ward heat maps, critical threshold alarms, and automated ward prioritization.*
+
+### 3. Hyperlocal Heat Risk Diagnostics and Thermal Lag
+![Heat Risk Diagnostics](screenshots/heat_risk.png)
+*Biometeorological hazard card calculating ISO 7243 WBGT, UTCI, NOAA Heat Index, and building archetype thermal wavefront delay.*
+
+### 4. Occupational Health and Worker Shift Planning
+![Worker Shift Advisory](screenshots/worker_section.png)
+*Metabolic work-rate calibrated shift planner delivering hourly WBGT projections, required work-rest intervals, and hydration quotas.*
+
+### 5. Municipal Interventions and Rapid Response Dispatch
+![Intervention Queue](screenshots/Intervention.png)
+*Intervention command center dispatching mobile water tankers, opening cooling shelters, and monitoring operational mitigation impacts.*
+
+### 6. Vulnerability Analytics and Cross-Ward Benchmarking
+![Ward Vulnerability Analytics](screenshots/Analysis.png)
+*Comparative ward distribution charts, Census 2011 vulnerability factors, and canopy deficit metrics.*
 
 ---
 
@@ -141,6 +160,8 @@ _Screenshots will be captured and added following production deployment._
 ---
 
 ## How to Clone and Run
+
+Experience the live deployed system at [https://thermagrid.netlify.app/](https://thermagrid.netlify.app/) or run locally:
 
 1. Clone repository
    ```bash
@@ -181,7 +202,7 @@ _Screenshots will be captured and added following production deployment._
    ```bash
    cd ..
    pytest --cov=backend/app --cov=analytics/src --cov-fail-under=70
-   cd frontend && npm test -- --run
+   cd frontend && npm test
    python scripts/backtest.py --check
    ```
 
@@ -189,43 +210,58 @@ _Screenshots will be captured and added following production deployment._
 
 ## Environment Variables
 
-### Backend
+### Backend (`backend/.env`)
 
-| Variable | Purpose |
-|---|---|
-| POSTGRES_USER | Database superuser username |
-| POSTGRES_PASSWORD | Database superuser password |
-| POSTGRES_DB | Target PostgreSQL database name |
-| POSTGRES_PORT | PostgreSQL listening network port |
-| DATABASE_URL | Primary PostgreSQL connection string |
-| APP_ENV | Operational environment identifier |
-| DEBUG | Debugging and diagnostic log toggle |
-| API_V1_PREFIX | Routing prefix for version 1 API endpoints |
-| CORS_ORIGINS | Permitted client browser origins |
-| ALLOW_SQLITE_FALLBACK | Local SQLite fallback enablement |
-| SCHEDULER_ENABLED | Background cron job execution toggle |
-| ALLOW_SYNTHETIC_RISK | Synthetic fallback telemetry generator toggle |
-| CLERK_SECRET_KEY | Server-side Clerk authentication secret |
-| CLERK_JWKS_URL | JSON Web Key Set signature validation endpoint |
-| CLERK_ISSUER | Expected JWT token issuer claim |
-| CLERK_AUTHORIZED_PARTIES | Permitted client party authentication origins |
-| RESEND_API_KEY | Resend email dispatch integration key |
+| Variable | Description / Purpose | Example / Default |
+|---|---|---|
+| `DATABASE_URL` | PostgreSQL connection string using psycopg v3 driver | `postgresql+psycopg://heatsense:...@localhost:5432/heatsense` |
+| `APP_NAME` | Service name identifier displayed in API telemetry | `ThermaGrid API` |
+| `APP_ENV` | Operational environment mode (`development`, `production`, `testing`) | `development` |
+| `DEBUG` | Verbose debug logging and interactive OpenAPI schema toggle | `true` |
+| `API_V1_PREFIX` | Version 1 API routing namespace prefix | `/api/v1` |
+| `LOG_LEVEL` | Application logging verbosity (`DEBUG`, `INFO`, `WARNING`, `ERROR`) | `INFO` |
+| `CORS_ORIGINS` | Comma-separated whitelist of allowed client browser origins | `http://localhost:5173,https://thermagrid.netlify.app` |
+| `ALLOW_SQLITE_FALLBACK` | Permitted automatic fallback to local SQLite when DATABASE_URL is unset | `true` |
+| `SCHEDULER_ENABLED` | Scheduled background hourly weather ingestion and risk indexing toggle | `false` |
+| `ALLOW_SYNTHETIC_RISK` | Allow calibrated fallback telemetry when live weather API is down (demo only) | `false` |
+| `CLERK_SECRET_KEY` | Server-side secret key for verifying Clerk JWT session tokens | `sk_test_...` |
+| `CLERK_JWKS_URL` | JWKS endpoint URL for asymmetric JWT cryptographic verification | `https://<domain>/.well-known/jwks.json` |
+| `CLERK_ISSUER` | Expected JWT issuer claim identifying the Clerk authentication instance | `https://<domain>` |
+| `CLERK_AUTHORIZED_PARTIES` | Permitted origins allowed in the `azp` JWT claims | `http://localhost:5173,https://thermagrid.netlify.app` |
+| `RESEND_API_KEY` | Resend API token for automated emergency heat advisory email dispatch | `re_...` |
+| `ALERT_FROM_EMAIL` | Sender email address for outgoing citizen thermal advisories | `ThermaGrid <onboarding@resend.dev>` |
+| `ALERT_PROVIDER` | Emergency alert notification dispatcher backend (`resend` or `none`) | `resend` |
+| `ALERT_THRESHOLD` | Composite risk score threshold (0-100) that triggers emergency dispatch | `80` |
+| `ALERT_COOLDOWN_MINUTES` | Minimum cooldown between successive ward alert dispatches | `180` |
+| `ALERT_MAX_PER_DAY` | Maximum emergency alerts allowed per ward per calendar day | `2` |
+| `ALERT_SEASON_BUDGET` | Maximum cumulative alerts per ward for the entire summer heat season | `40` |
+| `OPEN_METEO_BASE_URL` | Open-Meteo live numerical weather forecast API endpoint | `https://api.open-meteo.com/v1` |
+| `OPEN_METEO_ARCHIVE_URL` | Open-Meteo historical ERA5 reanalysis archive API endpoint | `https://archive-api.open-meteo.com/v1` |
+| `MODEL_ARTIFACT_PATH` | File path to pre-trained biometeorological forecasting model pickle | `../analytics/models/forecast_model.pkl` |
 
-### Frontend
+### Frontend (`frontend/.env`)
 
-| Variable | Purpose |
-|---|---|
-| VITE_API_BASE_URL | Backend API endpoint base URL |
-| VITE_CLERK_PUBLISHABLE_KEY | Client-side Clerk publishable key |
-| VITE_MAP_STYLE_URL | Basemap tile layer style definition |
-| VITE_MAPBOX_TOKEN | Mapbox mapping service access token |
-| VITE_APP_NAME | Application display brand title |
-| VITE_ENABLE_3D | Three-dimensional map feature toggle |
-| VITE_ENABLE_ANALYTICS | Client telemetry and analytics toggle |
-| VITE_DEFAULT_CITY | Initial municipal city loaded on boot |
+| Variable | Description / Purpose | Example / Default |
+|---|---|---|
+| `VITE_API_BASE_URL` | Base URL of the backend FastAPI REST endpoint | `https://thermagrid.onrender.com/api/v1` |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Public authentication key for Clerk user accounts and role verification | `pk_test_...` |
+| `VITE_MAP_STYLE_URL` | Vector/raster basemap tile style specification JSON | `https://tiles.openfreemap.org/styles/positron` |
+| `VITE_MAPBOX_TOKEN` | Optional Mapbox API access token for custom raster satellite layers | *(optional)* |
+| `VITE_APP_NAME` | Application title presented in browser header and metadata | `ThermaGrid` |
+| `VITE_ENABLE_3D` | Enable WebGL 3D urban heat island skyline and thermal lag buildings | `true` |
+| `VITE_ENABLE_ANALYTICS` | Enable advanced historical heat calendar and scatter plots | `true` |
+| `VITE_DEFAULT_CITY` | Default focal city selected on application initial load | `Mumbai` |
 
 ---
 
-<p align="center">
-  Built by <a href="https://github.com/AkshatKardak">Akshat Kardak</a> · Released under the MIT Licence
-</p>
+<div align="center">
+
+### Empowering Climate-Resilient Cities Across India
+
+ThermaGrid bridges atmospheric science and municipal emergency response — converting complex thermodynamic physics into lifesaving, ward-level interventions for every citizen.
+
+**[Launch Live Application](https://thermagrid.netlify.app/)** · **[Explore Repository](https://github.com/AkshatKardak/ThermaGrid)** · **[Report Feedback](https://github.com/AkshatKardak/ThermaGrid/issues)**
+
+Architected and engineered with dedication by [Akshat Kardak](https://github.com/AkshatKardak) · Released under the [MIT License](LICENSE)
+
+</div>
