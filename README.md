@@ -17,6 +17,7 @@ Hyperlocal urban heat-stress intelligence and municipal decision-support system 
   <a href="#screenshots">Screenshots</a> ·
   <a href="#tech-stack">Tech Stack</a> ·
   <a href="#how-to-clone-and-run">How to Clone and Run</a> ·
+  <a href="#authority-console-access">Authority Console Access</a> ·
   <a href="#environment-variables">Environment Variables</a>
 </p>
 
@@ -205,6 +206,52 @@ Experience the live deployed system at [https://thermagrid.netlify.app/](https:/
    cd frontend && npm test
    python scripts/backtest.py --check
    ```
+
+---
+
+## Authority Console Access
+
+The Municipal Authority Console (`/app/authority`) delivers executive disaster management decision-support, rapid intervention queue management, and emergency alert broadcast dispatching. To prevent unauthorized operational actions, authority routes are role-gated via Clerk authentication (`role: "authority"` or `"admin"`).
+
+By default, newly registered user accounts receive the least-privilege `citizen` role.
+
+### Step-by-Step Provisioning Guide
+
+1. **Register User Account**:
+   Sign up or sign in on the live application at [https://thermagrid.netlify.app/](https://thermagrid.netlify.app/) (or your local environment).
+
+2. **Open Clerk Dashboard**:
+   Navigate to the [Clerk Dashboard](https://dashboard.clerk.com/) for your instance and select **Users**.
+
+3. **Assign Authority Role**:
+   Click on the target user, scroll down to the **Metadata** panel, click **Edit** on **Public Metadata**, and enter:
+   ```json
+   {
+     "role": "authority"
+   }
+   ```
+   *(Note: Setting `"role": "admin"` also grants full authority access).*
+
+4. **Verify Session Token Claims**:
+   In Clerk Dashboard under **Configure** -> **Sessions** (or **JWT Templates**), ensure your default session token includes the `role` claim:
+   ```json
+   {
+     "role": "{{user.public_metadata.role}}"
+   }
+   ```
+   *ThermaGrid automatically extracts the user role from `sessionClaims.role` or `sessionClaims.public_metadata.role`.*
+
+5. **Refresh Session**:
+   Sign out of ThermaGrid and sign back in to refresh your cryptographic JWT session token claims.
+
+6. **Access Unlocked**:
+   The municipal console navigation will immediately unlock in the top navigation bar, granting access to:
+   - **Mission Control** (`/app/authority`): Real-time spatial risk command deck, critical threshold alarms, and automated ward prioritization
+   - **Wards Overview** (`/app/wards`): High-resolution ward biometeorological ranking and vulnerability analysis
+   - **Interventions** (`/app/interventions`): Operational dispatching for mobile water tankers and cooling centers
+   - **Emergency Alerts** (`/app/alerts`): Heat Action Plan (HAP) threshold evaluation and citizen broadcast history
+   - **Executive Reports** (`/app/reports`): Automated Heat Action Plan audit reports
+   - **Analytics** (`/app/analytics`): Multi-ward heat distribution and cross-ward comparative analysis
 
 ---
 
