@@ -13,6 +13,7 @@ import {
   ChevronDown,
   X,
   ExternalLink,
+  MapPin,
 } from 'lucide-react';
 import { useUser, UserButton } from '@clerk/clerk-react';
 import { useRole } from '../hooks/useRole';
@@ -22,6 +23,7 @@ import { useAllWardsRisk } from '../hooks/useRisk';
 import { useCoolingCentres } from '../hooks/useCoolingCentres';
 import { useEquity } from '../hooks/useEquity';
 import { useAppStore } from '../store/useAppStore';
+import { INDIAN_STATES, getCitiesForState } from '../config/indiaGeo';
 import { apiClient } from '../lib/api';
 import { getRiskBand, MOTION } from '../theme/tokens';
 import { formatNumber } from '../utils/format';
@@ -31,10 +33,10 @@ export const AuthorityDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const { isLoaded: isRoleLoaded, isAuthority, role } = useRole();
-  const { selectedCity, selectedLocationId, setSelection } = useAppStore();
+  const { selectedState, selectedCity, selectedLocationId, setSelection } = useAppStore();
 
-  const { data: wardsData } = useWards(selectedCity);
-  const { data: wardsRiskData } = useAllWardsRisk(selectedCity);
+  const { data: wardsData } = useWards(selectedCity, selectedState);
+  const { data: wardsRiskData } = useAllWardsRisk(selectedCity, selectedState);
   const { data: coolingCentres } = useCoolingCentres(selectedCity);
   const { data: equityData } = useEquity(selectedCity);
   const [queueTab, setQueueTab] = useState<'queue' | 'equity'>('queue');
@@ -43,6 +45,14 @@ export const AuthorityDashboard: React.FC = () => {
   const wards: Location[] = useMemo(() => {
     return wardsData || [];
   }, [wardsData]);
+
+  // Data-driven location resolver when selection is null
+  useEffect(() => {
+    if (selectedLocationId == null && wards.length > 0) {
+      const preferred = wards.find((l) => l.level === 'ward') ?? wards[0];
+      setSelection({ wardId: preferred.id });
+    }
+  }, [selectedLocationId, wards, setSelection]);
 
   // Selected ward
   const activeWard = useMemo(() => {
@@ -265,23 +275,60 @@ export const AuthorityDashboard: React.FC = () => {
 
       {/* 2. Main Mission Control Deck */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* Top Bar: Ward filter · Date · Live Telemetry · User */}
+        {/* Top Bar: Jurisdiction · Ward/District filter · Date · Live Telemetry · User */}
         <header className="h-14 bg-surface border-b border-border px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
-          <div className="flex items-center gap-4 sm:gap-6">
-            {/* Ward Selector Dropdown */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Dual State / City Selector */}
+            <div className="flex items-center gap-1.5 bg-raised px-2 sm:px-2.5 py-1.5 rounded-[6px] border border-border text-xs">
+              <MapPin className="w-3.5 h-3.5 text-accent shrink-0" />
+
+              {/* State Select */}
+              <select
+                value={selectedState}
+                onChange={(e) => setSelection({ stateCode: e.target.value })}
+                className="bg-transparent text-ink font-mono font-medium outline-none cursor-pointer text-xs max-w-[90px] sm:max-w-[125px] truncate"
+                aria-label="Select State"
+                title={`State: ${selectedState}`}
+              >
+                {INDIAN_STATES.map((s) => (
+                  <option key={s.name} value={s.name} className="bg-surface text-ink">
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+
+              <span className="text-border">/</span>
+
+              {/* City Select */}
+              <select
+                value={selectedCity}
+                onChange={(e) => setSelection({ cityCode: e.target.value })}
+                className="bg-transparent text-ink font-mono font-medium outline-none cursor-pointer text-xs max-w-[85px] sm:max-w-[115px] truncate"
+                aria-label="Select City or District"
+                title={`City: ${selectedCity}`}
+              >
+                {getCitiesForState(selectedState).map((c) => (
+                  <option key={c.name} value={c.name} className="bg-surface text-ink">
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Ward / District Selector Dropdown */}
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono uppercase text-muted tracking-wider hidden sm:inline">
-                SECTOR
+                {activeWard?.level === 'district' ? 'DISTRICT' : 'SECTOR'}
               </span>
               <div className="relative">
                 <select
-                  value={activeWard?.id || 1}
+                  value={activeWard?.id || ''}
                   onChange={(e) => setSelection({ wardId: Number(e.target.value) })}
                   className="bg-raised border border-border hover:border-accent rounded-[6px] px-3 py-1.5 text-xs font-mono text-ink focus:outline-none focus:ring-1 focus:ring-accent appearance-none pr-8 cursor-pointer"
                 >
                   {wards.map((w) => (
                     <option key={w.id} value={w.id} className="bg-surface text-ink">
-                      {w.ward_name} ({w.ward_code})
+                      {w.level === 'district' ? `${w.ward_name} (District)` : `${w.ward_name} (${w.ward_code})`}
                     </option>
                   ))}
                 </select>

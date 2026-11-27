@@ -44,7 +44,7 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({ alerts }) => {
 
       <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
         <span className="text-[11px] font-mono text-muted">
-          Broadcast: SMS & WhatsApp Active
+          Email alerts active
         </span>
       </div>
     </div>

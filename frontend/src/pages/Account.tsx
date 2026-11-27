@@ -12,7 +12,6 @@ import {
   Plus,
   Shield,
   Moon,
-  Smartphone,
   Mail,
 } from 'lucide-react';
 import { useSubscriptions, CreateSubscriptionPayload } from '../hooks/useSubscriptions';
@@ -51,7 +50,7 @@ export const Account: React.FC = () => {
   } = useDependents();
 
   // Subscription form state
-  const [channel, setChannel] = useState<'whatsapp' | 'email'>('whatsapp');
+  const [channel] = useState<'email'>('email');
   const [destination, setDestination] = useState('');
   const [subWardId, setSubWardId] = useState<number>(selectedLocationId || 1);
   const [threshold, setThreshold] = useState<number>(70);
@@ -189,7 +188,7 @@ export const Account: React.FC = () => {
             <Bell className="w-4 h-4 text-accent" />
             <span>Self-Serve Threshold Alerts</span>
           </div>
-          <h3 className={`${TYPOGRAPHY.h3} text-ink`}>WhatsApp & Email Subscriptions</h3>
+          <h3 className={`${TYPOGRAPHY.h3} text-ink`}>Email Alert Subscriptions</h3>
           <p className="text-xs text-muted">
             Receive automated early-warning alerts when your ward breaches critical heat thresholds.
           </p>
@@ -221,31 +220,11 @@ export const Account: React.FC = () => {
               <label className="text-[11px] font-mono uppercase text-muted block mb-1">
                 Notification Channel
               </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setChannel('whatsapp')}
-                  className={`p-2 rounded-lg border text-xs font-mono flex items-center justify-center gap-1.5 cursor-pointer ${
-                    channel === 'whatsapp'
-                      ? 'bg-accent text-on-accent border-accent font-bold'
-                      : 'bg-raised border-border text-muted hover:text-ink'
-                  }`}
-                >
-                  <Smartphone className="w-3.5 h-3.5" />
-                  <span>WhatsApp</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setChannel('email')}
-                  className={`p-2 rounded-lg border text-xs font-mono flex items-center justify-center gap-1.5 cursor-pointer ${
-                    channel === 'email'
-                      ? 'bg-accent text-on-accent border-accent font-bold'
-                      : 'bg-raised border-border text-muted hover:text-ink'
-                  }`}
-                >
+              <div className="flex items-center">
+                <div className="p-2 rounded-lg border text-xs font-mono flex items-center justify-center gap-1.5 bg-accent text-on-accent border-accent font-bold w-full">
                   <Mail className="w-3.5 h-3.5" />
                   <span>Email</span>
-                </button>
+                </div>
               </div>
             </div>
           </div>
@@ -254,11 +233,11 @@ export const Account: React.FC = () => {
             {/* Destination */}
             <div>
               <label className="text-[11px] font-mono uppercase text-muted block mb-1">
-                {channel === 'whatsapp' ? 'Phone Number (E.164)' : 'Email Destination'}
+                Email Address
               </label>
               <input
-                type={channel === 'whatsapp' ? 'tel' : 'email'}
-                placeholder={channel === 'whatsapp' ? '+919876543210' : 'citizen@example.com'}
+                type="email"
+                placeholder="citizen@example.com"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 required

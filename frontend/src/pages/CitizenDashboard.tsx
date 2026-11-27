@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Crosshair,
@@ -33,9 +33,9 @@ import { getRiskBand } from '../theme/tokens';
 import { TYPOGRAPHY } from '../theme/typography';
 
 export const CitizenDashboard: React.FC = () => {
-  const { selection, setSelection, selectedCity, selectedLocationId } = useAppStore();
+  const { selection, setSelection, selectedState, selectedCity, selectedLocationId } = useAppStore();
   const activeCity = selection.cityCode || selectedCity;
-  const { data: wards } = useWards(selectedCity);
+  const { data: wards } = useWards(selectedCity, selectedState);
   const { data: risk } = useCurrentRisk(selectedLocationId);
   const { data: thermal } = useCurrentThermal(selectedLocationId);
   const { data: forecast } = useRiskForecast(selectedLocationId);
@@ -43,6 +43,15 @@ export const CitizenDashboard: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const selectedWard = wards?.find((w) => w.id === selectedLocationId) || wards?.[0];
+  const isDistrict = selectedWard?.level === 'district';
+
+  // Data-driven location resolver when selection is null
+  useEffect(() => {
+    if (selectedLocationId == null && wards && wards.length > 0) {
+      const preferred = wards.find((l) => l.level === 'ward') ?? wards[0];
+      setSelection({ wardId: preferred.id });
+    }
+  }, [selectedLocationId, wards, setSelection]);
 
   const filteredWards = wards?.filter((w) =>
     w.ward_name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -110,7 +119,7 @@ export const CitizenDashboard: React.FC = () => {
         {/* Recent Ward Chips */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
           <span className="text-[11px] font-mono uppercase tracking-[0.10em] text-muted">
-            Recent Wards:
+            {isDistrict ? 'District Scope:' : 'Recent Wards:'}
           </span>
           {recentWards.map((w) => (
             <button
@@ -137,7 +146,7 @@ export const CitizenDashboard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono text-muted uppercase tracking-[0.10em]">
-                {selectedWard?.ward_name || 'Municipal Ward Evaluation'}
+                {selectedWard?.ward_name || (isDistrict ? 'District Heat Evaluation' : 'Municipal Ward Evaluation')}
               </span>
               {risk?.is_demo && <DemoBadge label={risk.demo_label} />}
             </div>
@@ -342,7 +351,7 @@ export const CitizenDashboard: React.FC = () => {
           <Card
             tier="l1"
             title="Biophysical Factor Attribution"
-            subtitle="Why this ward experiences acute thermal amplification"
+            subtitle={isDistrict ? 'Why this district experiences acute thermal amplification' : 'Why this ward experiences acute thermal amplification'}
             className="h-full"
           >
             {risk?.factor_breakdown ? (

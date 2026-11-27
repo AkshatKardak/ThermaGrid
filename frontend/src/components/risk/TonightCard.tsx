@@ -8,7 +8,7 @@ import { RISK_SCALE } from '../../theme/tokens';
 import { formatNumber } from '../../utils/format';
 
 interface TonightCardProps {
-  locationId: number;
+  locationId?: number | null;
 }
 
 export const TonightCard: React.FC<TonightCardProps> = ({ locationId }) => {

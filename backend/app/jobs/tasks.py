@@ -159,7 +159,7 @@ async def compute_thermal() -> None:
 async def evaluate_alerts() -> None:
     """
     Scheduled Task: Identifies wards where risk exceeds ALERT_THRESHOLD
-    and dispatches emergency warnings via Resend / WhatsApp, persisting Alert records.
+    and dispatches emergency warnings via Resend (email), persisting Alert records.
     """
     s = get_settings()
     log.info(
@@ -187,7 +187,7 @@ async def evaluate_alerts() -> None:
                     message=f"Thermal risk score reached {int(item.score)}/100.",
                     action_directives="Suspend outdoor labor, activate misting hydration points, open municipal cooling shelters.",
                     target_audience="all",
-                    channels="web,sms,whatsapp",
+                    channels="web,email",
                     is_active=True,
                     dispatched_at=datetime.now(UTC),
                 )

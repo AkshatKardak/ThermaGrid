@@ -19,7 +19,7 @@ export interface NightRiskResponse {
   hourly_overnight: OvernightHourly[];
 }
 
-export function useNightRisk(locationId: number) {
+export function useNightRisk(locationId: number | null | undefined) {
   return useQuery<NightRiskResponse>({
     queryKey: ['night-risk', locationId],
     queryFn: async () => {
@@ -28,6 +28,7 @@ export function useNightRisk(locationId: number) {
       });
       return res.data;
     },
+    enabled: Number.isFinite(locationId) && (locationId as number) > 0,
     staleTime: 60 * 1000,
   });
 }

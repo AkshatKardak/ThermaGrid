@@ -19,7 +19,7 @@ class Alert(Base):
     message = Column(Text, nullable=False)
     action_directives = Column(Text, nullable=False)
     target_audience = Column(String(100), default="all")  # all, workers, elderly, schools
-    channels = Column(String(100), default="web,sms,whatsapp")
+    channels = Column(String(100), default="web,email")
     is_active = Column(Boolean, default=True)
     dispatched_at = Column(DateTime, default=lambda: datetime.now(UTC))
     expires_at = Column(DateTime, nullable=True)

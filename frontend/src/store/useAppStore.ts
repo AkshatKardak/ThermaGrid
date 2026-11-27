@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import {
   firstCityOf,
-  firstWardOf,
   getStateByCodeOrName,
   getStateForCity,
   wardBelongsToCity,
@@ -31,7 +30,7 @@ export interface AppState {
   // Convenience read fields for backward compatibility
   selectedState: string;
   selectedCity: string;
-  selectedLocationId: number;
+  selectedLocationId: number | null;
   timeRange: TimeRangeState;
   activeLayers: LayerState;
 
@@ -150,19 +149,18 @@ export const useAppStore = create<AppState>((set, get) => ({
       const matchedState = getStateByCodeOrName(action.stateCode);
       const resolvedStateCode = matchedState ? matchedState.code : action.stateCode;
       const cityCode = firstCityOf(resolvedStateCode);
-      const wardId = firstWardOf(cityCode);
       const nextSelection: Selection = {
         stateCode: resolvedStateCode,
         cityCode,
-        wardId,
+        wardId: null,
       };
       set({
         selection: nextSelection,
         selectedState: matchedState?.name || resolvedStateCode || '',
         selectedCity: cityCode || '',
-        selectedLocationId: wardId || 0,
+        selectedLocationId: null,
       });
-      syncToUrl(wardId ?? undefined, get().timeRange, get().activeLayers);
+      syncToUrl(undefined, get().timeRange, get().activeLayers);
       return;
     }
 
@@ -170,19 +168,18 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (action.cityCode !== undefined && action.stateCode === undefined && action.wardId === undefined) {
       const matchedState = getStateForCity(action.cityCode || '');
       const stateCode = matchedState?.code || current.stateCode;
-      const wardId = firstWardOf(action.cityCode);
       const nextSelection: Selection = {
         stateCode,
         cityCode: action.cityCode,
-        wardId,
+        wardId: null,
       };
       set({
         selection: nextSelection,
         selectedState: matchedState?.name || current.stateCode || '',
         selectedCity: action.cityCode || '',
-        selectedLocationId: wardId || 0,
+        selectedLocationId: null,
       });
-      syncToUrl(wardId ?? undefined, get().timeRange, get().activeLayers);
+      syncToUrl(undefined, get().timeRange, get().activeLayers);
       return;
     }
 
@@ -195,7 +192,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         };
         set({
           selection: nextSelection,
-          selectedLocationId: 0,
+          selectedLocationId: null,
         });
         syncToUrl(undefined, get().timeRange, get().activeLayers);
         return;
@@ -230,9 +227,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     if (action.stateCode && !action.cityCode) {
       cityCode = firstCityOf(stateCode);
-      wardId = firstWardOf(cityCode);
+      wardId = null;
     } else if (action.cityCode && action.wardId === undefined) {
-      wardId = firstWardOf(cityCode);
+      wardId = null;
     }
 
     if (wardId !== null && wardId !== undefined && !wardBelongsToCity(wardId, cityCode)) {
@@ -255,7 +252,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       selection: nextSelection,
       selectedState: matchedState?.name || stateCode || '',
       selectedCity: cityCode || '',
-      selectedLocationId: wardId || 0,
+      selectedLocationId: wardId ?? null,
     });
     syncToUrl(wardId ?? undefined, get().timeRange, get().activeLayers);
   },

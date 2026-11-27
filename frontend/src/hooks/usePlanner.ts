@@ -22,7 +22,11 @@ export interface PlannerResponse {
   no_safe_window_message: string | null;
 }
 
-export function useSafeWindows(locationId: number, activity: string, durationMin: number) {
+export function useSafeWindows(
+  locationId: number | null | undefined,
+  activity: string,
+  durationMin: number
+) {
   return useQuery<PlannerResponse>({
     queryKey: ['safe-windows', locationId, activity, durationMin],
     queryFn: async () => {
@@ -35,6 +39,7 @@ export function useSafeWindows(locationId: number, activity: string, durationMin
       });
       return res.data;
     },
+    enabled: Number.isFinite(locationId) && (locationId as number) > 0,
     staleTime: 60 * 1000,
   });
 }

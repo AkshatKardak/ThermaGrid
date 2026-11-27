@@ -173,7 +173,7 @@ export const AlertsTab: React.FC = () => {
             City Heat Alerts &amp; Broadcast History
           </h1>
           <p className="text-xs text-muted mt-0.5">
-            Official heat warnings sent across SMS, WhatsApp, and emergency speakers in local languages.
+            Official heat warnings sent across email advisories and web consoles in local languages.
           </p>
         </div>
       </div>
@@ -411,7 +411,7 @@ export const AlertsTab: React.FC = () => {
               Recent Directive Delivery Audit Log
             </h3>
             <span className="text-[11px] text-muted">
-              Authoritative delivery receipts from SMS and WhatsApp telemetry
+              Authoritative delivery receipts from dispatch telemetry
             </span>
           </div>
         </div>

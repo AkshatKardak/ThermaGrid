@@ -7,7 +7,7 @@ import { getRiskBand } from '../../theme/tokens';
 import { TYPOGRAPHY } from '../../theme/typography';
 
 interface SafeWindowCardProps {
-  locationId: number;
+  locationId?: number | null;
 }
 
 const ACTIVITIES = [

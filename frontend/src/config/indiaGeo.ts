@@ -358,34 +358,12 @@ export function stateOfCity(cityName: string | null): string | null {
   return st?.code || null;
 }
 
-export const CITY_FIRST_WARD: Record<string, number | null> = {
-  Mumbai: 1,
-  Delhi: 25,
-};
-
-export const WARD_CITY_MAP: Record<number, string> = {
-  1: 'Mumbai', 2: 'Mumbai', 3: 'Mumbai', 4: 'Mumbai', 5: 'Mumbai', 6: 'Mumbai',
-  7: 'Mumbai', 8: 'Mumbai', 9: 'Mumbai', 10: 'Mumbai', 11: 'Mumbai', 12: 'Mumbai',
-  13: 'Mumbai', 14: 'Mumbai', 15: 'Mumbai', 16: 'Mumbai', 17: 'Mumbai', 18: 'Mumbai',
-  19: 'Mumbai', 20: 'Mumbai', 21: 'Mumbai', 22: 'Mumbai', 23: 'Mumbai', 24: 'Mumbai',
-  25: 'Delhi', 26: 'Delhi',
-};
-
-export function firstWardOf(cityName: string | null): number | null {
-  if (!cityName) return null;
-  const key = Object.keys(CITY_FIRST_WARD).find(
-    (k) => k.toLowerCase() === cityName.trim().toLowerCase()
-  );
-  if (key && CITY_FIRST_WARD[key] !== undefined) {
-    return CITY_FIRST_WARD[key];
-  }
+export function firstWardOf(_cityName: string | null): number | null {
   return null;
 }
 
-export function wardBelongsToCity(wardId: number, cityName: string | null): boolean {
+export function wardBelongsToCity(_wardId: number, cityName: string | null): boolean {
   if (!cityName) return false;
-  const mappedCity = WARD_CITY_MAP[wardId];
-  if (!mappedCity) return true; // dynamic / custom location
-  return mappedCity.toLowerCase() === cityName.trim().toLowerCase();
+  return true;
 }
 

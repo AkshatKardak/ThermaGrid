@@ -5,7 +5,7 @@ import { Card } from '../ui/Card';
 import { formatNumber } from '../../utils/format';
 
 interface IndoorHeatCardProps {
-  locationId: number;
+  locationId?: number | null;
 }
 
 const ARCHETYPES = [
@@ -42,9 +42,9 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
   const delta = (data?.indoor_now_c ?? 38.0) - (data?.outdoor_now_c ?? 32.0);
 
   return (
-    <Card className="p-4 sm:p-5 space-y-4">
+    <Card className="p-3 sm:p-4 space-y-3">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-border">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-border">
         <div>
           <div className="flex items-center gap-1.5 mb-0.5">
             <Home className="w-3.5 h-3.5 text-accent" />
@@ -68,7 +68,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
       </div>
 
       {/* Archetype Picker */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <span className="text-[11px] font-mono uppercase tracking-wider text-muted font-medium block">
           Select Housing &amp; Roof Archetype
         </span>
@@ -81,7 +81,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
                 key={arch.id}
                 type="button"
                 onClick={() => setArchetype(arch.id)}
-                className={`p-2.5 rounded-[6px] border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                className={`p-2 rounded-[6px] border text-left transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
                     ? 'bg-raised border-accent ring-1 ring-accent text-ink font-semibold'
                     : 'bg-surface border-border text-muted hover:text-ink hover:bg-raised'
@@ -110,11 +110,11 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
       {isLoading ? (
         <div className="h-28 bg-border/30 rounded-[6px] animate-pulse" />
       ) : (
-        <div className="space-y-3.5">
+        <div className="space-y-3">
           {/* Dual Numerals Comparison */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Outdoor Ambient Box */}
-            <div className="p-3.5 rounded-[6px] bg-raised border border-border space-y-2">
+            <div className="p-2.5 sm:p-3 rounded-[6px] bg-raised border border-border space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-muted font-medium">
                   Outdoor Ambient
@@ -131,14 +131,14 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
                 <span className="text-xs font-mono text-muted">Dry Bulb</span>
               </div>
 
-              <div className="pt-2 border-t border-border/50 text-[11px] text-muted flex items-center gap-1.5">
+              <div className="pt-1.5 border-t border-border/50 text-[11px] text-muted flex items-center gap-1.5">
                 <Sun className="w-3.5 h-3.5 text-muted shrink-0" />
                 <span>Ground-truth observation</span>
               </div>
             </div>
 
             {/* Indoor Estimated Box */}
-            <div className="p-3.5 rounded-[6px] bg-raised border border-border space-y-2">
+            <div className="p-2.5 sm:p-3 rounded-[6px] bg-raised border border-border space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-muted font-medium">
                   Indoor Estimated
@@ -161,7 +161,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
                 <span className="text-xs font-mono text-muted">Effective</span>
               </div>
 
-              <div className="pt-2 border-t border-border/50 text-[11px] text-muted flex items-center justify-between">
+              <div className="pt-1.5 border-t border-border/50 text-[11px] text-muted flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
                   <Thermometer className="w-3.5 h-3.5 text-muted shrink-0" />
                   Indoor WBGT:
@@ -174,7 +174,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
           </div>
 
           {/* Thermal Lag Insight Banner */}
-          <div className="p-3 rounded-[6px] bg-surface border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="p-2.5 rounded-[6px] bg-surface border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5">
               <Clock className="w-4 h-4 text-accent shrink-0" />
               <div>
@@ -191,7 +191,7 @@ export const IndoorHeatCard: React.FC<IndoorHeatCardProps> = ({ locationId }) =>
           </div>
 
           {/* Methodology Basis Footer */}
-          <div className="pt-2 border-t border-border flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-muted">
+          <div className="pt-1.5 border-t border-border flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-muted">
             <div className="flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
               <span>Calc: {data?.method}</span>

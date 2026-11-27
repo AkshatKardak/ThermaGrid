@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/api';
 import type { ThermalCurrent, ThermalHistory } from '../types';
 
-export function useCurrentThermal(locationId: number) {
+export function useCurrentThermal(locationId: number | null | undefined) {
   return useQuery({
     queryKey: ['thermal', 'current', locationId],
     queryFn: async () => {
@@ -11,11 +11,11 @@ export function useCurrentThermal(locationId: number) {
       });
       return data;
     },
-    enabled: !!locationId,
+    enabled: Number.isFinite(locationId) && (locationId as number) > 0,
   });
 }
 
-export function useThermalHistory(locationId: number, days: number = 3) {
+export function useThermalHistory(locationId: number | null | undefined, days: number = 3) {
   return useQuery({
     queryKey: ['thermal', 'history', locationId, days],
     queryFn: async () => {
@@ -24,6 +24,6 @@ export function useThermalHistory(locationId: number, days: number = 3) {
       });
       return data;
     },
-    enabled: !!locationId,
+    enabled: Number.isFinite(locationId) && (locationId as number) > 0,
   });
 }

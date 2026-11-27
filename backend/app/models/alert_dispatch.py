@@ -25,7 +25,7 @@ class AlertDispatch(Base):
     id = Column(Integer, primary_key=True, index=True)
     subscription_id = Column(String(36), ForeignKey("subscriptions.id"), nullable=False, index=True)
     triggered_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), index=True)
-    channel = Column(String(20), nullable=False)  # 'whatsapp' | 'email' | 'sms'
+    channel = Column(String(20), nullable=False)  # 'email' | 'sms' | 'web'
     status = Column(String(20), default="sent", nullable=False)  # 'sent' | 'failed' | 'throttled'
     reason = Column(String(255), nullable=True)
     risk_score = Column(Float, nullable=False)

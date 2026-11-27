@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.auth import get_current_user
+from app.core.config import get_settings
 from app.db.session import get_db
 from app.models.location import Location
 from app.models.subscription import Subscription
@@ -17,7 +18,6 @@ from app.schemas.subscription import (
     SubscriptionOut,
     SubscriptionUpdate,
 )
-from app.services.alert_service import get_channel
 
 router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 
@@ -143,7 +143,13 @@ def update_subscription(
     if payload.destination is not None:
         sub.destination = payload.destination.strip()
     if payload.channel is not None:
-        sub.channel = payload.channel.strip().lower()
+        clean_channel = payload.channel.strip().lower()
+        if clean_channel != "email":
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Channel must be 'email'",
+            )
+        sub.channel = "email"
     if payload.threshold is not None:
         sub.threshold = payload.threshold
     if payload.language is not None:
@@ -200,7 +206,15 @@ async def send_test_alert(
     if not sub:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
 
-    channel = get_channel()
+    provider = get_settings().alert_provider.lower().strip()
+    if not provider or provider == "none":
+        return {
+            "status": "not_sent",
+            "reason": "alert provider not configured",
+            "destination": sub.destination,
+            "channel": sub.channel,
+        }
+
     subject = "ThermaGrid Test Alert — Early Warning System"
     body = (
         f"<b>ThermaGrid Alert Test</b><br>"
@@ -208,7 +222,18 @@ async def send_test_alert(
         f"Channel: {sub.channel.upper()} · Trigger Threshold: {sub.threshold}/100 · Language: {sub.language.upper()}."
     )
 
-    success = await channel.send(sub.destination, subject, body)
+    if sub.channel == "email" and provider == "resend":
+        from app.services.alerts.email_resend import EmailChannel
+
+        success = await EmailChannel().send(sub.destination, subject, body)
+    else:
+        return {
+            "status": "not_sent",
+            "reason": "alert provider not configured",
+            "destination": sub.destination,
+            "channel": sub.channel,
+        }
+
     return {
         "status": "sent" if success else "failed",
         "destination": sub.destination,

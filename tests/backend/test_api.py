@@ -351,3 +351,61 @@ def test_cooling_centres_usable_details():
     assert "google.com/maps/dir" in c["directions_url"]
     assert "is_open_now" in c
     assert "current_status" in c
+
+
+def test_india_cities_raw_coverage():
+    """Assert a Location exists in DB for every city in data/raw/india_cities.json and distinct counts match."""
+    import json
+
+    from app.db.session import SessionLocal
+    from app.models.location import Location
+
+    cities_file = os.path.join(BASE_DIR, "data", "raw", "india_cities.json")
+    with open(cities_file, "r", encoding="utf-8") as f:
+        cities_data = json.load(f)
+
+    db = SessionLocal()
+    try:
+        distinct_db_cities = {c[0] for c in db.query(Location.city).distinct().all() if c[0]}
+        file_cities = {entry["city"] for entry in cities_data}
+
+        assert len(distinct_db_cities) == len(file_cities)
+        for city in file_cities:
+            loc = db.query(Location).filter(Location.city == city).first()
+            assert loc is not None, f"Location missing for city: {city}"
+    finally:
+        db.close()
+
+
+def test_all_indian_states_present_in_locations_api():
+    """Assert no city listed in frontend INDIAN_STATES is missing from /api/v1/locations."""
+    import json
+
+    cities_file = os.path.join(BASE_DIR, "data", "raw", "india_cities.json")
+    with open(cities_file, "r", encoding="utf-8") as f:
+        cities_data = json.load(f)
+
+    res = client.get("/api/v1/locations")
+    assert res.status_code == 200
+    locations = res.json()
+    api_cities = {loc["city"] for loc in locations if loc.get("city")}
+
+    for entry in cities_data:
+        assert entry["city"] in api_cities, f"City {entry['city']} missing from /api/v1/locations"
+
+
+def test_invalid_location_id_returns_422():
+    """Assert location_id <= 0 returns 422 with validation error detail."""
+    routes = [
+        "/api/v1/risk/current?location_id=0",
+        "/api/v1/risk/night?location_id=0",
+        "/api/v1/risk/indoor?location_id=0",
+        "/api/v1/risk/forecast?location_id=0",
+        "/api/v1/risk/0",
+        "/api/v1/planner/safe-windows?location_id=0&activity=walk&duration_min=45",
+    ]
+    for url in routes:
+        res = client.get(url)
+        assert res.status_code == 422, f"Expected 422 for {url}, got {res.status_code}: {res.text}"
+        data = res.json()
+        assert data.get("detail") == "location_id must be a positive integer"

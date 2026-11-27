@@ -78,6 +78,8 @@ def get_safe_windows(
     Returns top 3 ranked by lowest mean risk, plus the worst block to avoid.
     """
     thresholds = _load_thresholds()
+    if location_id <= 0:
+        raise HTTPException(status_code=422, detail="location_id must be a positive integer")
     activity_key = activity.lower().strip()
     if activity_key not in thresholds:
         activity_key = "walk"

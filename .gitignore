@@ -95,6 +95,7 @@ analytics/models/*.onnx
 data/raw/*
 !data/raw/.gitkeep
 !data/raw/mumbai_wards_census_2011.json
+!data/raw/india_cities.json
 data/processed/*
 !data/processed/.gitkeep
 

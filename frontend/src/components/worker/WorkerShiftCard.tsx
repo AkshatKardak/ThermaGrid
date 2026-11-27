@@ -27,7 +27,7 @@ import { getRiskBand } from '../../theme/tokens';
 import { formatNumber } from '../../utils/format';
 
 interface WorkerShiftCardProps {
-  locationId: number;
+  locationId?: number | null;
 }
 
 const PRESETS = [

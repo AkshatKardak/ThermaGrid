@@ -11,7 +11,6 @@ from app.models.location import Location
 from app.models.subscription import Subscription
 from app.services.alerts.base import AlertChannel
 from app.services.alerts.email_resend import EmailChannel
-from app.services.alerts.whatsapp import WhatsAppChannel
 
 logger = logging.getLogger(__name__)
 
@@ -84,8 +83,6 @@ def get_channel() -> AlertChannel:
     provider = get_settings().alert_provider.lower().strip()
     if provider == "resend":
         return EmailChannel()
-    if provider == "whatsapp":
-        return WhatsAppChannel()
     return _Noop()
 
 
@@ -261,10 +258,6 @@ async def dispatch_ward_alerts(
                     f"Take preventive hydration precautions."
                 )
                 channel_success = await EmailChannel().send(sub.destination, subject, body)
-            elif sub.channel == "whatsapp":
-                subject = f"HEAT WARNING · {location.ward_name}"
-                body = f"Thermal stress in {location.ward_name} is {score:.1f}/100 ({band.upper()}). Stay hydrated."
-                channel_success = await WhatsAppChannel().send(sub.destination, subject, body)
             else:
                 channel_success = await _Noop().send(sub.destination, "HEAT WARNING", reason_str)
         except Exception as ex:

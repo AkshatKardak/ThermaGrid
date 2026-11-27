@@ -76,8 +76,8 @@ Follow this scripted 3-minute click path to evaluate all core user-facing and au
 ### Step 8 · Self-Serve Alert Subscriptions (`/app/account`)
 1. Navigate to **Account** via the navbar icon or link.
 2. Under **Alerts**:
-   - Choose channel: WhatsApp or Email.
-   - Enter your destination phone or email.
+   - Choose channel: Email.
+   - Enter your destination email.
    - Drag the threshold slider: watch the band pill update color in real-time.
    - Click **Save Subscription**: notice the inline green success confirmation.
    - Click **Send test alert**: verify simulated dispatch feedback.

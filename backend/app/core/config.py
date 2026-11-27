@@ -53,13 +53,8 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     alert_from_email: str = "ThermaGrid <onboarding@resend.dev>"
 
-    # WhatsApp Cloud API (test number)
-    whatsapp_phone_id: str = ""
-    whatsapp_waba_id: str = ""
-    whatsapp_token: str = ""
-
     # Alerts
-    alert_provider: str = "none"  # resend | whatsapp | none
+    alert_provider: str = "none"  # resend | none
     alert_threshold: float = 80.0
     alert_cooldown_minutes: int = 180
     alert_max_per_day: int = 2

@@ -85,3 +85,20 @@ When deploying on Render's free tier, keep the following hardware constraints in
 - **RAM Limits:** Free instances provide **512 MB RAM**. ThermaGrid's idle RSS sits at approximately **~348 MB**. Single-worker Uvicorn (`--workers 1`) is strictly required to prevent Out-Of-Memory (OOM) process termination.
 - **Inactivity Spin-Down:** Free instances spin down after **15 minutes** of idle traffic. The first request after a period of inactivity may incur a cold-start delay of 30–50 seconds while the container initializes.
 - **APScheduler Background Jobs:** Background cron jobs (`SCHEDULER_ENABLED`) cannot reliably ingest hourly weather feeds on a container that spins down when idle. Scheduled telemetry ingestion requires an upgraded persistent instance.
+
+---
+
+## Granting Authority Access
+
+The municipal authority console (`/app/authority`) provides ward-level risk rankings, intervention queue management, and emergency alert broadcast dispatching. Access requires verified administrative role permissions:
+
+1. Sign in to the application using standard authentication.
+2. In the Clerk Dashboard, navigate to **Users** -> select the user -> **Metadata** -> **Public**.
+3. Set the metadata key:
+   ```json
+   {
+     "role": "authority"
+   }
+   ```
+4. Sign out and sign back in to refresh the session claims. The municipal authority navigation tab and `/app/authority` console will unlock.
+

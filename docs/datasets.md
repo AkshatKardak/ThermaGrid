@@ -38,3 +38,28 @@ This document records the authoritative public datasets ingested by ThermaGrid, 
 - Upstream numerical meteorological feeds tag each observation with its origin:
   - Observed/Reanalysis: `is_demo=False`, `source_name="Open-Meteo ECMWF/GFS"`.
   - Fallback / Synthetic: If upstream APIs are unreachable, observations are flagged with `is_demo=True` and `source_name="synthetic"`. Synthetic observations are never recorded as observed.
+
+---
+
+## 3. Data Assets & Remote Fetching
+
+To preserve a lean repository footprint (<5MB tracked), heavy spatial shapefiles, raw geospatial dumps, and tabular CSV/Parquet artifacts are excluded from Git versioning via `.gitignore`. 
+
+The repository tracks lightweight, topologically simplified boundary vectors for zero-dependency frontend rendering. Full-resolution datasets and external telemetry can be fetched or verified on demand using `scripts/fetch_data.py`:
+
+```bash
+# Verify integrity of current local datasets
+python3 scripts/fetch_data.py --verify
+
+# Fetch full-resolution GeoJSON boundaries and Census tables
+python3 scripts/fetch_data.py --dataset all --force
+```
+
+### Dataset Registry & Sourced Links
+
+| Dataset | Coverage / Content | Source & License | Local Target |
+|---|---|---|---|
+| **India State & UT Boundaries** | 35 States & Union Territories vector boundaries | [DataMeet Maps (Admin2 GeoJSON)](https://github.com/datameet/maps) · Open Data Commons ODbL | `frontend/src/assets/geo/india-states.json` |
+| **Mumbai Ward Census 2011** | Demographics, slum density, and housing roof materials | [DataMeet Mumbai Wards](https://github.com/datameet/mumbai-ward-boundaries) · Public Domain | `data/raw/mumbai_wards_census_2011.json` |
+| **Ahmedabad 2010 Scenario Fixture** | 72-hour synthetic diurnal progression (May 20-22, 2010 scenario) | Synthetic diurnal sinusoid with bounded noise (internal sanity check) | `tests/fixtures/ahmedabad_2010_observed.json` |
+

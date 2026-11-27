@@ -226,7 +226,7 @@ export const Analytics: React.FC = () => {
           Selected Focal Ward: <strong className="text-ink">{selectedWard?.ward_name}</strong>
         </span>
         <select
-          value={selectedLocationId}
+          value={selectedLocationId ?? ''}
           onChange={(e) => setSelection({ wardId: Number(e.target.value) })}
           className="bg-raised text-ink text-xs font-mono px-3 py-1.5 rounded-[6px] border border-border outline-none cursor-pointer focus:border-accent"
         >

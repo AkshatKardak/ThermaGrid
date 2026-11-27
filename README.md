@@ -1,254 +1,231 @@
+<p align="center">
+  <img src="frontend/public/thermagrid-logo.png" alt="ThermaGrid Logo" width="220" />
+</p>
+
+<p align="center">
+  <a href="#problem-statement">Problem Statement</a> ·
+  <a href="#solution">Solution</a> ·
+  <a href="#core-features">Core Features</a> ·
+  <a href="#unique-features">Unique Features</a> ·
+  <a href="#system-architecture-and-folder-structure">System Architecture and Folder Structure</a> ·
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#tech-stack">Tech Stack</a> ·
+  <a href="#how-to-clone-and-run">How to Clone and Run</a> ·
+  <a href="#environment-variables">Environment Variables</a>
+</p>
+
 # ThermaGrid
 
-<div align="center">
-  <img src="frontend/public/thermagrid-logo.png" alt="ThermaGrid Logo" width="220" />
-  <p><strong>Hyperlocal Human Thermal-Stress Early-Warning & Municipal Decision-Support System</strong></p>
-  <p>Built by <a href="https://github.com/AkshatKardak">Akshat Kardak</a> · Released under the MIT Licence</p>
-</div>
+Hyperlocal urban heat-stress intelligence and municipal decision-support system for Indian cities.
 
 ---
 
-## Overview
+## Problem Statement
 
-ThermaGrid evaluates hyperlocal human thermal strain across Indian urban wards by coupling synoptic numerical weather models, authoritative ground telemetry, and microclimatic built-environment vulnerability metrics. 
+Urban heat in Indian cities is severely heterogeneous. Macro-scale meteorological reporting typically issues a single temperature reading for an entire metropolitan agglomeration. However, surface thermal conditions, relative humidity, wind obstruction, and solar radiation vary sharply across administrative wards due to localized urban morphology and canopy cover.
 
-The system computes physiological heat stress indices (ISO 7243 WBGT, UTCI, NOAA Heat Index) and models multi-hour indoor thermal phase delay across building archetypes to support municipal disaster response and public health action plans.
+City-average temperature figures obscure lethal localized heat extremes. Dense informal settlements with non-insulated tin roofing, high built-density, and absent vegetative canopy experience microclimatic temperatures significantly higher than coastal, suburban, or tree-lined areas within the same municipal corporation.
+
+Socio-economically vulnerable cohorts face disproportional physiological strain during heatwave intervals. Outdoor workers (construction laborers, delivery personnel, street vendors), young children, and elderly residents in informal dwellings encounter continuous thermal stress without mechanical cooling access.
+
+Existing India Meteorological Department (IMD) heatwave alerts operate at synoptic regional scales. Municipal disaster management authorities require granular, ward-level indices to direct life-saving interventions, open emergency cooling shelters, enforce occupational work-rest cycles, and deploy hydration points where vulnerability is highest.
+
+---
+
+## Solution
+
+ThermaGrid delivers an end-to-end biometeorological analytics pipeline and decision-support system. It continuously ingests surface meteorological telemetry and numerical weather forecasts, evaluates multi-index physiological heat stress metrics, layers built-environment vulnerability parameters, and computes one deterministic composite risk score per municipal ward.
+
+The platform synthesizes atmospheric conditions with physical urban realities: roof thermal inertia, demographic age profiles, outdoor worker concentrations, and informal housing prevalence derived from Census 2011 Primary Census Abstract data.
+
+Outputs are surfaced through dual specialized interfaces: a citizen-facing portal providing individualized safe-window activity planning and indoor exposure advisories, and a municipal authority console offering live spatial heat maps, intervention queue dispatching, and automated Heat Action Plan (HAP) reporting.
+
+The automated operational flow executes across four structured stages:
+
+1. Telemetry Ingestion: Hourly collection of downscaled surface meteorology (dry-bulb temperature, relative humidity, wind speed, solar radiation) from open numerical weather grids.
+2. Biophysical Index Computation: Parallel calculation of ISO 7243 Wet-Bulb Globe Temperature (WBGT), Universal Thermal Climate Index (UTCI), and NOAA Heat Index.
+3. Vulnerability Synthesis: Integration of thermal hazard scores with ward demographic exposure, housing envelope lag, and cooling deficit indicators.
+4. Actionable Delivery: Exposing composite scores via REST API, public web dashboard, and automated early-warning email notifications.
+
+---
+
+## Core Features
+
+- Per-Ward Risk Scoring (`/api/v1/risk`): Computes composite ward-level human thermal risk scores (0-100), factor breakdown attribution, and deterministic severity explanations.
+- Biophysical Thermal Indices (`/api/v1/thermal`): Evaluates ISO 7243 WBGT, UTCI, NOAA Heat Index, and Humidex across current and historical observation windows.
+- Multi-Day Risk Forecasting (`/api/v1/risk/forecast`): Generates 3 to 5-day predictive risk trajectories with upper and lower statistical confidence intervals.
+- Cooling Centre Registry (`/api/v1/cooling-centres`): Inventories verified municipal hydration and cooling shelters with geodesic nearest-facility distance calculations and directions.
+- Alert Notification Dispatch (`/api/v1/alerts`, `/api/v1/subscriptions`): Dispatches verified emergency heat advisories to citizen email subscribers based on custom risk thresholds.
+- Occupational Shift Advisories (`/api/v1/worker`): Produces worker safety cards, hydration volume requirements (mL/hr), and work-rest ratios calibrated to metabolic work rates.
+- Activity Safe-Window Planner (`/api/v1/planner`): Convolves diurnal risk curves against activity-specific exertion thresholds to find safe daily time intervals.
+- Heat Action Plan (HAP) Reporting (`/api/v1/reports`): Compiles and generates official Heat Action Plan (HAP) executive audit PDF documents.
+- Care-Circle Dependents (`/api/v1/dependents`): Scopes multi-ward thermal risk tracking for elderly family members and vulnerable individuals.
+- Municipal Authority Console (`/api/v1/authority`): Provides executive mission-control overview, ward risk rankings, intervention queue dispatching, and jurisdiction scoping.
+- Administrative Locations Registry (`/api/v1/locations`): Manages spatial boundaries, demographic attributes, and topological hierarchy mappings across wards and districts.
+- State and city coverage: the location selector spans every state and union territory, with city-level (district) analytics where ward boundaries are not available and ward-level drill-down for Mumbai and Delhi.
+
+---
+
+## Unique Features
+
+- Indoor thermal lag model: 4 building archetypes (tin roof top floor, RCC top floor, RCC ground, AC) with distinct lag hours and indoor delta, predicting indoor peak hours after outdoor solar peak.
+- Dual-engine physiological indices: ISO 7243 WBGT (Stull wet-bulb + simplified globe temperature) and 6th-order polynomial UTCI, with exact measured deviations against reference tables (max WBGT deviation 0.3300 degC across 12 atmospheric conditions, max UTCI deviation 1.47 degC; point to [Physics Validation Documentation](docs/physics-validation.md) for the full reference table and citations).
+- Activity safe-window planner: sliding-window convolution across the diurnal curve that computes when specific activities (walk, commute, exercise, outdoor work) can be safely conducted.
+- Nocturnal recovery evaluation: tropical night detection (minimum temperature >= 25 degC) over the 20:00 to 06:00 window, identifying cumulative cardiovascular strain.
+- Empirical backtest validation: Ahmedabad May 2010 heatwave hindcast with reported MAE and correlation r, tested against documented observational data (point to [Ahmedabad 2010 Backtest Report](docs/backtest/ahmedabad-2010.md)).
+- Composite vulnerability indexing: integrating biophysical heat indices with Census 2011 PCA demographics (informal housing, outdoor worker share, elderly/child ratios, cooling deficits).
+- Reproducible dataset registry: 9 open public datasets with licenses, provenance, and automated verification scripts (point to [Dataset Registry](docs/datasets.md)).
+
+---
+
+## System Architecture and Folder Structure
+
+ThermaGrid uses a decoupled micro-architecture designed for low-latency spatial queries and reproducible numerical computation. The backend is built with FastAPI, SQLAlchemy 2.0, Pydantic v2, and PostgreSQL with PostGIS-compatible bounding-box indexing (featuring an automated SQLite dev fallback). The frontend is a React 19 single-page application built on Vite, Tailwind CSS, Leaflet spatial mapping, and TanStack Query. The offline analytical core is powered by NumPy, SciPy, and Numba for high-performance biometeorological formula evaluation.
+
+```text
+ThermaGrid/
+├── analytics/              # Biometeorological algorithms and physics engines
+│   ├── config/             # Archetypes, weights, and index configuration YAMLs
+│   └── src/                # WBGT, UTCI, Heat Index, and remote sensing models
+├── backend/                # FastAPI application tier
+│   ├── app/
+│   │   ├── api/routes/     # REST endpoint routers (risk, thermal, planner, etc.)
+│   │   ├── core/           # Security, authentication, and application settings
+│   │   ├── db/             # SQLAlchemy engine, sessions, and database seeder
+│   │   ├── jobs/           # Scheduled APScheduler background telemetry tasks
+│   │   ├── models/         # Database ORM models (Location, Risk, Alert, etc.)
+│   │   ├── schemas/        # Pydantic validation request/response schemas
+│   │   └── services/       # Core business logic and external integration clients
+│   ├── migrations/         # Alembic database schema migrations
+│   └── requirements.txt    # Pinned Python package dependencies
+├── data/                   # Boundary vectors, Census tables, and local registries
+│   └── raw/                # Mumbai ward vectors and India cities registry
+├── docs/                   # Engineering, deployment, and validation documentation
+├── frontend/               # React 19 + TypeScript + Vite single-page application
+│   ├── public/             # Static public assets and logo images
+│   └── src/
+│       ├── components/     # UI building blocks (cards, charts, maps, navbar)
+│       ├── config/         # India spatial metadata and hierarchy configs
+│       ├── hooks/          # TanStack Query data-fetching hooks
+│       ├── pages/          # Citizen dashboard and Authority control views
+│       └── store/          # Zustand application state management
+├── scripts/                # Database seeding, backtesting, and data fetch CLI tools
+└── tests/                  # Integration test suite and physics benchmarks
+```
+
+---
+
+## Screenshots
+
+<!-- TODO: Add screenshots once the deployment URL is live -->
+
+| View | Description | Status |
+|---|---|---|
+| Citizen Dashboard | Real-time ward thermal risk overview, biophysical metrics, and life-safety advisories | _pending_ |
+| Authority Decision Console | Mission-control spatial command deck, intervention queue, and ward rankings | _pending_ |
+| Safe-Window Planner | Diurnal sliding-window activity planner and outdoor exposure recommendations | _pending_ |
+
+_Screenshots will be captured and added following production deployment._
 
 ---
 
 ## Tech Stack
 
-| Layer | Technologies |
+| Category | Technologies |
 |---|---|
-| **Frontend** | React 19, TypeScript, Vite, Tailwind CSS, Recharts, Framer Motion |
-| **Backend** | Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, Uvicorn |
-| **Spatial & Analytics** | GeoPandas, NumPy, SciPy, react-simple-maps, d3-geo, Leaflet |
-| **Database & Cache** | PostgreSQL, PostGIS, SQLite (development fallback) |
-| **Auth & Ingestion** | Clerk, Open-Meteo API, IMD Telemetry Network |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Leaflet, Framer Motion, TanStack Query |
+| Backend | FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, PostgreSQL (psycopg v3), SQLite fallback |
+| Data and analytics | NumPy, SciPy, Numba, Shapely, PyYAML |
+| Auth and infra | Clerk JWT, Resend API, Docker (local development) |
 
 ---
 
-## System Architecture
+## How to Clone and Run
 
-```mermaid
-flowchart LR
-    A["React SPA\n(Vite + Tailwind + Recharts)"] -->|HTTPS / REST API| B["FastAPI Backend\n(ISO 7243 WBGT + Risk Engine)"]
-    B -->|SQLAlchemy 2.0| C["PostgreSQL + PostGIS\n(Spatial Wards & Telemetry)"]
-    B -->|Hourly Ingestion| D["External Telemetry\n(Open-Meteo & IMD AWS)"]
-```
-
----
-
-## Heat Vulnerability Formulation
-
-The composite ward thermal stress score is formulated across four normalized dimensions:
-
-$$R = w_h H + w_e E + w_v V - w_a A$$
-
-- **Hazard ($H$):** Dynamic biometeorological stress derived via ISO 7243:2017 Wet-Bulb Globe Temperature (WBGT with Stull 2011 wet-bulb and empirical globe temperature), Universal Thermal Climate Index (UTCI), and NOAA Heat Index.
-- **Exposure ($E$):** Population density, child/elderly age dependency ratios, and outdoor labor fractions.
-- **Vulnerability ($V$):** Uninsulated corrugated tin/asbestos roof fraction, informal housing density, and baseline disease burden.
-- **Adaptive Capacity ($A$):** Urban tree canopy fraction, municipal cooling centre proximity, and hospital bed availability.
-
----
-
-## Quick Start
-
-### 1. Repository Setup
-
-```bash
-git clone https://github.com/AkshatKardak/ThermaGrid.git
-cd ThermaGrid
-```
-
-### 2. Backend Setup
-
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# Run migrations
-alembic upgrade head
-
-# Seed initial ward spatial geodata and telemetry
-python seed.py
-
-# Start development server
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-The API will be available at `http://localhost:8000`. Interactive OpenAPI documentation is hosted at `http://localhost:8000/docs`.
-
-### 3. Frontend Setup
-
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
-
-The frontend application will be accessible at `http://localhost:5173`.
-
----
-
-## Municipal Authority Console Access
-
-The authority command console (`/app/authority`) provides ward-level risk rankings, intervention queue management, and emergency alert broadcast dispatching. Access requires verified administrative role permissions:
-
-1. Sign in to the application using standard authentication.
-2. In the Clerk Dashboard, navigate to **Users** &rarr; select the user &rarr; **Metadata** &rarr; **Public**.
-3. Set the metadata key:
-   ```json
-   {
-     "role": "authority"
-   }
-   ```
-4. Sign out and sign back in to refresh the session claims. The municipal authority navigation tab and `/app/authority` console will unlock.
-
----
-
-## Deployment
-
-ThermaGrid uses a decoupled cloud architecture:
-- **Frontend:** [Netlify](https://www.netlify.com/) static SPA (React 19 + Vite 8).
-- **Backend:** [Render](https://render.com/) Web Service (Python 3.12 / FastAPI / Uvicorn).
-- **Database:** External PostgreSQL (e.g., [Neon](https://neon.tech/) or [Supabase](https://supabase.com/) free tier, or paid Render PostgreSQL). Plain `postgresql://` connection strings work directly with SQLAlchemy 2.1.6 and psycopg v3 without PostGIS extensions.
-
-For a step-by-step first-deploy walkthrough, see the [Deployment Checklist](docs/deployment.md).
-
-### Platform Environment Variables
-
-#### Netlify (Frontend)
-Configure these variables in the Netlify Dashboard (**Site configuration > Environment variables**), never in `netlify.toml`:
-
-| Variable | Description | Example / Required Value |
-| :--- | :--- | :--- |
-| `VITE_API_BASE_URL` | Canonical backend API endpoint | `https://<api-host>.onrender.com/api/v1` |
-| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key for user authentication | `pk_live_...` or `pk_test_...` |
-
-#### Render (Backend)
-Configured via the [`render.yaml`](render.yaml) blueprint and Render Dashboard (**Environment**):
-
-| Variable | Description | Required Setting / Note |
-| :--- | :--- | :--- |
-| `DATABASE_URL` | External PostgreSQL connection string | External host (Neon / Supabase / paid Render Postgres) |
-| `CORS_ORIGINS` | Allowed origins (**must be the exact Netlify origin**) | `https://<site>.netlify.app` *(localhost fails in production)* |
-| `CLERK_SECRET_KEY` | Clerk backend authentication secret | `sk_live_...` or `sk_test_...` |
-| `CLERK_JWKS_URL` | Clerk JWKS public key endpoint for JWT validation | `https://<domain>.clerk.accounts.dev/.well-known/jwks.json` |
-| `CLERK_ISSUER` | Clerk authentication token issuer URL | `https://<domain>.clerk.accounts.dev` |
-| `RESEND_API_KEY` | Resend API key for early warning dispatch | `re_...` |
-| `ALLOW_SYNTHETIC_RISK` | Permit synthetic risk calculation during stale data | `"true"` for demo; `"false"` for strict operations |
-| `SCHEDULER_ENABLED` | Background APScheduler cron execution | `"false"` on free tier; `"true"` on paid instances |
-| `ALLOW_SQLITE_FALLBACK`| Fallback to local SQLite when Postgres drops | `"false"` in production |
-
-### Free-Tier Operational Constraints
-
-- **Instance Memory (512 MB):** Free Render instances provide 512 MB RAM against an idle application RSS of **~348 MB**. Single-worker Uvicorn (`--workers 1`) is required to avoid memory exhaustion (OOM).
-- **Inactivity Spin-Down:** Free instances spin down after **15 minutes** of inactivity. The first request after sleep incurs a 30–50 second cold-start delay.
-- **Background Cron Jobs:** `SCHEDULER_ENABLED` is set to `"false"` in `render.yaml` because idle spin-down terminates background cron execution. Continuous weather telemetry ingestion requires an upgraded persistent instance.
-- **Database Expiration:** Do **not** provision a free-tier Render PostgreSQL database. Free Render databases expire and are deleted 30 days after creation (256 MB RAM, 1 GB storage, no backups). Use an external managed instance (Neon or Supabase free tiers) or paid Render Postgres.
-
-### Post-Deploy Verification Step
-
-The blueprint `startCommand` automatically runs database migrations and seeds municipal ward census data:
-```bash
-cd backend && alembic upgrade head && python ../scripts/seed_database.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
-```
-If deploying manually or overriding the start command without the seeder:
-1. Open the **Render Shell** for your service.
-2. Run the idempotent database seeder:
+1. Clone repository
    ```bash
-   python scripts/seed_database.py
+   git clone https://github.com/AkshatKardak/ThermaGrid.git
+   cd ThermaGrid
    ```
-3. Verify live service health and data rows:
+
+2. Backend setup
    ```bash
-   curl -I https://<api-host>.onrender.com/health
-   curl https://<api-host>.onrender.com/api/v1/locations
+   cd backend
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   cp .env.example .env
+   ```
+
+3. Database setup
+   ```bash
+   alembic upgrade head
+   python ../scripts/seed_database.py
+   ```
+   Note: SQLite fallback is used automatically when DATABASE_URL is not set. For containerised deployments, see [Deployment Guide](docs/deployment.md).
+
+4. Start backend server
+   ```bash
+   uvicorn app.main:app --reload --port 8000
+   ```
+
+5. Frontend setup
+   ```bash
+   cd ../frontend
+   npm install
+   cp .env.example .env.local
+   npm run dev
+   ```
+
+6. Run tests
+   ```bash
+   cd ..
+   pytest --cov=backend/app --cov=analytics/src --cov-fail-under=70
+   cd frontend && npm test -- --run
+   python scripts/backtest.py --check
    ```
 
 ---
 
-## Physics Reference Validation
+## Environment Variables
 
-ThermaGrid's biometeorological engines are verified against published reference standards and peer-reviewed worked examples in a table-driven test suite (`tests/analytics/test_physics_reference.py`):
+### Backend
 
-| Biometeorological Metric | Reference Standard / Literature | Benchmark Scope | Max Observed Deviation | Tolerance Gate |
-|---|---|---|---|---|
-| **ISO 7243 WBGT** | ISO 7243:2017, Stull (2011), Bernard & Pourmoghani (1999) | 6 cases (psychrometric baselines, CAV coverall +2°C, CAV vapor barrier +11°C) | **0.3300°C** | $\pm 0.50^\circ\text{C}$ |
-| **UTCI** | COST Action 730, Bröde et al. (2012), Błażejczyk et al. (2013) | 6 cases (reference baseline 20°C, moderate, strong, very strong, extreme >46°C) | **1.47°C** | $\pm 1.50^\circ\text{C}$ |
-| **NOAA Heat Index** | Rothfusz (1990) NOAA NWS Technical Attachment SR 90-23 | 5 cases (worked example 90°F/70% RH, Caution, Danger, Extreme Danger) | **0.5100°C** | $\pm 0.60^\circ\text{C}$ |
+| Variable | Purpose |
+|---|---|
+| POSTGRES_USER | Database superuser username |
+| POSTGRES_PASSWORD | Database superuser password |
+| POSTGRES_DB | Target PostgreSQL database name |
+| POSTGRES_PORT | PostgreSQL listening network port |
+| DATABASE_URL | Primary PostgreSQL connection string |
+| APP_ENV | Operational environment identifier |
+| DEBUG | Debugging and diagnostic log toggle |
+| API_V1_PREFIX | Routing prefix for version 1 API endpoints |
+| CORS_ORIGINS | Permitted client browser origins |
+| ALLOW_SQLITE_FALLBACK | Local SQLite fallback enablement |
+| SCHEDULER_ENABLED | Background cron job execution toggle |
+| ALLOW_SYNTHETIC_RISK | Synthetic fallback telemetry generator toggle |
+| CLERK_SECRET_KEY | Server-side Clerk authentication secret |
+| CLERK_JWKS_URL | JSON Web Key Set signature validation endpoint |
+| CLERK_ISSUER | Expected JWT token issuer claim |
+| CLERK_AUTHORIZED_PARTIES | Permitted client party authentication origins |
+| RESEND_API_KEY | Resend email dispatch integration key |
 
-> [!NOTE]
-> Maximum observed WBGT deviation across all published ISO 7243 reference cases is **0.3300°C**, reflecting empirical Stull wet-bulb approximation against thermodynamic psychrometric tables.
+### Frontend
 
-### Synthetic Diurnal Sanity Backtest (Ahmedabad May 2010 Scenario)
-
-The May 2010 Ahmedabad heatwave scenario is audited via an automated reproducibility pipeline (`scripts/backtest.py --check --max-mae 0.5`) evaluated against a synthetic diurnal benchmark fixture (`tests/fixtures/ahmedabad_2010_observed.json`).
-
-> [!NOTE]
-> **Synthetic Sanity Check Disclaimer:**
-> The observation series (`tests/fixtures/ahmedabad_2010_observed.json`) is a synthetic diurnal sinusoid with bounded noise ($\pm 0.30^\circ\text{C}$), designed to verify internal consistency and ensure the model correctly reproduces diurnal cycles and thermal stress transitions. It is a synthetic sanity check, not a comparison against IMD weather station observations.
-
-- **Air Temperature MAE:** **0.156°C** ($r = 0.9996$, RMSE 0.180°C)
-- **ISO 7243 WBGT MAE:** **0.153°C** ($r = 0.9992$)
-- **Peak Dry-Bulb Temperature:** 46.8°C modeled (synthetic fixture peaks at 47.0°C)
-- **Peak Modeled WBGT:** 36.2°C (Exceeds ISO 7243 Extreme Alert Threshold)
-- **Detailed Report:** See [Ahmedabad 2010 Backtest Report](docs/backtest/ahmedabad-2010.md) and [Metrics Artifact](docs/backtest/ahmedabad-2010.json).
-
----
-
-## Data Assets & Remote Fetching
-
-To preserve a lean repository footprint (<5MB tracked), heavy spatial shapefiles, raw geospatial dumps, and tabular CSV/Parquet artifacts are excluded from Git versioning via `.gitignore`. 
-
-The repository tracks lightweight, topologically simplified boundary vectors for zero-dependency frontend rendering. Full-resolution datasets and external telemetry can be fetched or verified on demand using `scripts/fetch_data.py`:
-
-```bash
-# Verify integrity of current local datasets
-python3 scripts/fetch_data.py --verify
-
-# Fetch full-resolution GeoJSON boundaries and Census tables
-python3 scripts/fetch_data.py --dataset all --force
-```
-
-### Dataset Registry & Sourced Links
-
-| Dataset | Coverage / Content | Source & License | Local Target |
-|---|---|---|---|
-| **India State & UT Boundaries** | 35 States & Union Territories vector boundaries | [DataMeet Maps (Admin2 GeoJSON)](https://github.com/datameet/maps) · Open Data Commons ODbL | `frontend/src/assets/geo/india-states.json` |
-| **Mumbai Ward Census 2011** | Demographics, slum density, and housing roof materials | [DataMeet Mumbai Wards](https://github.com/datameet/mumbai-ward-boundaries) · Public Domain | `data/raw/mumbai_wards_census_2011.json` |
-| **Ahmedabad 2010 Scenario Fixture** | 72-hour synthetic diurnal progression (May 20-22, 2010 scenario) | Synthetic diurnal sinusoid with bounded noise (internal sanity check) | `tests/fixtures/ahmedabad_2010_observed.json` |
+| Variable | Purpose |
+|---|---|
+| VITE_API_BASE_URL | Backend API endpoint base URL |
+| VITE_CLERK_PUBLISHABLE_KEY | Client-side Clerk publishable key |
+| VITE_MAP_STYLE_URL | Basemap tile layer style definition |
+| VITE_MAPBOX_TOKEN | Mapbox mapping service access token |
+| VITE_APP_NAME | Application display brand title |
+| VITE_ENABLE_3D | Three-dimensional map feature toggle |
+| VITE_ENABLE_ANALYTICS | Client telemetry and analytics toggle |
+| VITE_DEFAULT_CITY | Initial municipal city loaded on boot |
 
 ---
 
-## Limitations
-
-While ThermaGrid bridges the gap between regional synoptic forecasting and municipal decision support, users and civil authorities should interpret outputs within the boundaries of the following physical and physiological modeling constraints:
-
-### 1. Indoor Ventilation & Air-Exchange Rates
-The indoor thermal phase lag model simulates diurnal temperature attenuation and nocturnal heat retention across representative structural archetypes (e.g., informal uninsulated corrugated tin vs. engineered reinforced cement concrete) using lumped thermal capacitance and empirical phase-delay parameters. The engine assumes nominal natural infiltration rates and does not model real-time Computational Fluid Dynamics (CFD), occupant-driven window operation, ceiling-fan airspeeds, or dynamic air changes per hour (ACH). In dense informal settlements, restricted cross-ventilation can yield indoor temperatures exceeding outdoor ambient conditions by $2\text{--}4^\circ\text{C}$ beyond baseline model predictions.
-
-### 2. Occupant Acclimatisation Dynamics
-Physiological thresholds (such as work-rest cycles and WBGT risk categories) are referenced against ISO 7243:2017 standards differentiating between acclimatised and unacclimatised cohorts under steady-state assumptions. The system does not capture the transient kinetics of human seasonal acclimatisation—particularly during early-season heat spikes (e.g., March or April) when urban populations have not yet acquired cardiovascular and sudomotor adaptations—or the heightened vulnerability of transient, unacclimatised interstate migrant labor forces.
-
-### 3. Individual Physiology & Clinical Heterogeneity
-Standardized biometeorological indices (ISO 7243 / Stull WBGT, UTCI, NOAA Heat Index) simulate thermal strain for an idealized reference human (a healthy 75 kg adult male, $1.8\,\text{m}^2$ body surface area, standard metabolic activity). These indices cannot capture individualized physiological variance arising from:
-- **Age extremes:** Infants with underdeveloped thermoregulatory mechanisms and elderly individuals with reduced sudomotor response and cardiovascular reserves.
-- **Clinical comorbidities:** Cardiovascular diseases, chronic kidney disease, hypertension, and diabetes mellitus.
-- **Pharmacological factors:** Consumption of diuretics, beta-blockers, anticholinergics, or antihypertensives that suppress peripheral vasodilation or sweating.
-- **Maternal health:** Pregnancy-induced metabolic strain and elevated susceptibility to heat stress.
-
-### 4. Ward-Level Spatial Resolution & Microclimatic Averaging
-Telemetry and vulnerability indices are aggregated to the municipal administrative ward boundary scale ($2\text{--}15\,\text{km}^2$) to align directly with municipal governance, resource staging, and emergency alert jurisdictions. This spatial averaging inherently smooths out microclimatic extremes:
-- **Urban Street Canyons:** Localized building height-to-width ($H/W$) ratios, vehicular heat corridors, and commercial HVAC condenser exhausts can generate intense localized thermal hotspots.
-- **Micro-Scale Refuges:** Pockets of localized vegetative canopy, pocket parks, and shaded pedestrian alleys that offer thermal relief are averaged into the broader ward-level mean radiant temperature ($T_\text{mrt}$).
-
----
-
-## Licence & Citations
-
-- Distributed under the [MIT Licence](LICENSE).
-- Meteorological calculations implement ISO 7243:2017 Wet-Bulb Globe Temperature (using Stull (2011) wet-bulb temperature with empirical globe temperature estimation) and Rothfusz (1990) National Weather Service Heat Index algorithms.
-- Boundary geometries conform to official Survey of India administrative boundary standards.
+<p align="center">
+  Built by <a href="https://github.com/AkshatKardak">Akshat Kardak</a> · Released under the MIT Licence
+</p>

@@ -16,7 +16,7 @@ export interface IndoorHeatResponse {
   note: string;
 }
 
-export function useIndoorHeat(locationId: number, archetype: string) {
+export function useIndoorHeat(locationId: number | null | undefined, archetype: string) {
   return useQuery<IndoorHeatResponse>({
     queryKey: ['indoor-heat', locationId, archetype],
     queryFn: async () => {
@@ -25,6 +25,7 @@ export function useIndoorHeat(locationId: number, archetype: string) {
       });
       return res.data;
     },
+    enabled: Number.isFinite(locationId) && (locationId as number) > 0,
     staleTime: 60 * 1000,
   });
 }

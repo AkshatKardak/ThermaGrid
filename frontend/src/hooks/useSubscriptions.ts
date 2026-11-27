@@ -6,7 +6,7 @@ export interface Subscription {
   clerk_user_id: string;
   ward_id?: number | null;
   ward_name?: string | null;
-  channel: 'whatsapp' | 'email';
+  channel: 'email';
   destination: string;
   threshold: number;
   language: string;
@@ -17,7 +17,7 @@ export interface Subscription {
 
 export interface CreateSubscriptionPayload {
   ward_id?: number;
-  channel: 'whatsapp' | 'email';
+  channel: 'email';
   destination: string;
   threshold?: number;
   language?: string;

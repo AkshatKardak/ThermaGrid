@@ -35,7 +35,7 @@ export interface WorkerShiftCardResponse {
 }
 
 export function useWorkerShiftCard(
-  locationId: number,
+  locationId: number | null | undefined,
   met: number,
   exposure: string,
   start: string,
@@ -59,6 +59,7 @@ export function useWorkerShiftCard(
       });
       return res.data;
     },
+    enabled: Number.isFinite(locationId) && (locationId as number) > 0,
     staleTime: 60 * 1000,
   });
 }

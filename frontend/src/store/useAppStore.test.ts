@@ -45,7 +45,7 @@ describe('Selection Store Cascade Reducer', () => {
     expect(state.selection.wardId).toBeNull();
   });
 
-  it('switches back to Maharashtra and restores valid Mumbai ward', () => {
+  it('switches back to Maharashtra and resets ward to null for data-driven resolution', () => {
     const { setSelection } = useAppStore.getState();
 
     setSelection({ stateCode: 'TS' });
@@ -54,10 +54,11 @@ describe('Selection Store Cascade Reducer', () => {
     setSelection({ stateCode: 'MH' });
     const state = useAppStore.getState();
     expect(state.selection.cityCode).toBe('Mumbai');
-    expect(state.selection.wardId).toBe(1);
+    expect(state.selection.wardId).toBeNull();
+    expect(state.selectedLocationId).toBeNull();
   });
 
-  it('updates state and ward when city is set to Delhi', () => {
+  it('updates state and resets ward to null when city is set to Delhi', () => {
     const { setSelection } = useAppStore.getState();
 
     setSelection({ cityCode: 'Delhi' });
@@ -65,29 +66,26 @@ describe('Selection Store Cascade Reducer', () => {
     const state = useAppStore.getState();
     expect(state.selection.stateCode).toBe('DL');
     expect(state.selection.cityCode).toBe('Delhi');
-    expect(state.selection.wardId).toBe(25);
+    expect(state.selection.wardId).toBeNull();
+    expect(state.selectedLocationId).toBeNull();
   });
 
-  it('rejects setting a Mumbai ward when current city is Hyderabad', () => {
-    const { setSelection } = useAppStore.getState();
-
-    // First change to Hyderabad
-    setSelection({ cityCode: 'Hyderabad' });
-    expect(useAppStore.getState().selection.wardId).toBeNull();
-
-    // Attempt to set Mumbai Ward 1 while in Hyderabad
-    setSelection({ wardId: 1 });
-
-    // Must be rejected! wardId remains null
-    expect(useAppStore.getState().selection.wardId).toBeNull();
-  });
-
-  it('accepts setting a Mumbai ward when current city is Mumbai', () => {
+  it('accepts setting a ward when explicitly selected', () => {
     const { setSelection } = useAppStore.getState();
 
     setSelection({ cityCode: 'Mumbai' });
     setSelection({ wardId: 4 });
 
     expect(useAppStore.getState().selection.wardId).toBe(4);
+    expect(useAppStore.getState().selectedLocationId).toBe(4);
+  });
+
+  it('clears ward to null and never coerces to 0', () => {
+    const { setSelection } = useAppStore.getState();
+
+    setSelection({ wardId: null });
+
+    expect(useAppStore.getState().selection.wardId).toBeNull();
+    expect(useAppStore.getState().selectedLocationId).toBeNull();
   });
 });

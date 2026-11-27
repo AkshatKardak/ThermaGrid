@@ -82,6 +82,8 @@ def get_current_risk(
     Computes current comprehensive ward-level human thermal risk score (0-100),
     factor breakdown, and deterministic explanation.
     """
+    if location_id <= 0:
+        raise HTTPException(status_code=422, detail="location_id must be a positive integer")
     return RiskService.get_current_risk(db, location_id)
 
 
@@ -94,6 +96,8 @@ def get_night_risk(
     Computes overnight thermal stress and tropical night flag (min >= 25.0°C)
     over 20:00 -> 06:00 forecast hours with templated guidance.
     """
+    if location_id <= 0:
+        raise HTTPException(status_code=422, detail="location_id must be a positive integer")
     try:
         weather_fc = WeatherService.get_weather_forecast(db, location_id, days=2)
     except Exception as e:
@@ -211,6 +215,8 @@ def get_indoor_risk(
     Computes estimated indoor temperatures and thermal lag relative to outdoor conditions
     using documented building archetypes.
     """
+    if location_id <= 0:
+        raise HTTPException(status_code=422, detail="location_id must be a positive integer")
     archetypes = _load_archetypes()
     arch_key = archetype.strip().lower()
     if arch_key not in archetypes:
@@ -288,6 +294,8 @@ def get_risk_forecast(
     """
     Produces 3-5 day risk forecast with lower and upper confidence bounds.
     """
+    if location_id <= 0:
+        raise HTTPException(status_code=422, detail="location_id must be a positive integer")
     return ForecastService.get_risk_forecast(db, location_id, days=days)
 
 
@@ -369,4 +377,6 @@ def get_all_wards_risk(
 @router.get("/{location_id}", response_model=RiskCurrentOut)
 def get_risk_by_location(location_id: int, db: Session = Depends(get_db)):
     """Retrieves risk evaluation for a specific ward ID."""
+    if location_id <= 0:
+        raise HTTPException(status_code=422, detail="location_id must be a positive integer")
     return RiskService.get_current_risk(db, location_id)

@@ -24,7 +24,7 @@ class Subscription(Base):
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     clerk_user_id = Column(String(255), nullable=False, index=True)
     ward_id = Column(Integer, ForeignKey("locations.id"), nullable=True)
-    channel = Column(String(20), nullable=False)  # 'whatsapp' | 'email'
+    channel = Column(String(20), nullable=False)  # 'email'
     destination = Column(String(255), nullable=False)  # E.164 phone or email
     threshold = Column(Integer, default=70, nullable=False)  # risk score
     language = Column(String(10), default="en", nullable=False)

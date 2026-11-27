@@ -29,7 +29,7 @@ const FAQS = [
   },
   {
     q: 'How do I get alerts?',
-    a: 'Sign up for free in the ThermaGrid portal to receive automated SMS and WhatsApp advisories whenever your selected ward crosses predetermined risk thresholds (e.g., ≥80 HTSI).',
+    a: 'Sign up for free in the ThermaGrid portal to receive automated email advisories whenever your selected ward crosses predetermined risk thresholds (e.g., ≥80 HTSI).',
   },
   {
     q: 'Who can access the municipal console?',

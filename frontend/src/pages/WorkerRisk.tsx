@@ -73,7 +73,7 @@ export const WorkerRisk: React.FC = () => {
           </label>
           <select
             id="worker-ward"
-            value={selectedLocationId}
+            value={selectedLocationId ?? ''}
             onChange={(e) => setSelection({ wardId: Number(e.target.value) })}
             className="bg-surface text-ink text-xs font-mono px-3 py-2 rounded-[8px] border border-border outline-none cursor-pointer focus:border-accent"
           >
